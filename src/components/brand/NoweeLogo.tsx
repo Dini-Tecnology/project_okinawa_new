@@ -111,7 +111,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   if (variant === "wordmark") {
     return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOWEE">
+      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
         <Wordmark />
       </div>
     );
@@ -122,7 +122,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       className={`inline-flex items-center ${className}`}
       style={{ gap: `${gap}px` }}
       role="img"
-      aria-label="NOWEE"
+      aria-label="NOOWE"
     >
       <Mark />
       <Wordmark />
