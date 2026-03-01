@@ -32,87 +32,82 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 }) => {
   const { height, fontSize, markSize, gap } = sizeMap[size];
 
-  const fontStyle: React.CSSProperties = {
-    fontFamily: "'Space Grotesk', 'Inter', sans-serif",
-    fontWeight: 600,
-    letterSpacing: "-0.02em",
-    fontSize: `${fontSize}px`,
-    lineHeight: `${height}px`,
-  };
-
-  // Overlap amount between the two O's (negative margin)
-  const overlap = fontSize * -0.18;
-
-  /**
-   * Interlocked OO — two "O" characters from the same font,
-   * overlapping like a chain/Venn diagram.
-   * Left O = primary (orange), Right O = secondary (teal).
-   * A small clip trick makes them appear linked, not just overlapping.
-   */
-  const InterlockedOO = () => (
-    <span className="inline-flex items-baseline relative" aria-hidden="true">
-      {/* Left O — orange, slightly in front at top */}
-      <span
-        className="text-primary relative"
-        style={{
-          ...fontStyle,
-          fontWeight: 700,
-          zIndex: 2,
-        }}
-      >
-        o
-      </span>
-      {/* Right O — teal, overlapping left */}
-      <span
-        className="text-secondary relative"
-        style={{
-          ...fontStyle,
-          fontWeight: 700,
-          marginLeft: `${overlap}px`,
-          zIndex: 1,
-        }}
-      >
-        o
-      </span>
-      {/* Chain-link effect: redraw a small segment of the right O on top
-          so it appears to pass OVER the left O at the bottom intersection */}
-      <span
-        className="absolute text-secondary"
-        style={{
-          ...fontStyle,
-          fontWeight: 700,
-          left: `${fontSize + overlap}px`,
-          top: 0,
-          zIndex: 3,
-          clipPath: `inset(55% 40% 0% 20%)`,
-        }}
-      >
-        o
-      </span>
-    </span>
+  const Mark = () => (
+    <svg
+      width={markSize}
+      height={markSize}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="flex-shrink-0"
+      aria-label="NOOWE mark"
+    >
+      {/* Left O — Primary (warm orange), ring style */}
+      <circle
+        cx="22"
+        cy="32"
+        r="14"
+        className="stroke-primary"
+        strokeWidth="4"
+        fill="none"
+        opacity="0.95"
+      />
+      {/* Right O — Secondary (teal), ring style */}
+      <circle
+        cx="42"
+        cy="32"
+        r="14"
+        className="stroke-secondary"
+        strokeWidth="4"
+        fill="none"
+        opacity="0.9"
+      />
+      {/* Interlock effect: hide the back segment of right ring behind left ring */}
+      {/* Left ring foreground overlap piece */}
+      <clipPath id="noowe-clip-right">
+        <rect x="28" y="18" width="8" height="14" />
+      </clipPath>
+      <circle
+        cx="22"
+        cy="32"
+        r="14"
+        className="stroke-primary"
+        strokeWidth="4"
+        fill="none"
+        clipPath="url(#noowe-clip-right)"
+      />
+    </svg>
   );
-
-  // Mark-only: just the interlocked OO
-  if (variant === "mark") {
-    return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
-        <span style={fontStyle}>
-          <InterlockedOO />
-        </span>
-      </div>
-    );
-  }
 
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight inline-flex items-baseline"
-      style={fontStyle}
+      className="text-foreground tracking-tight"
+      style={{
+        fontSize: `${fontSize}px`,
+        lineHeight: `${height}px`,
+        fontFamily: "'Space Grotesk', 'Inter', sans-serif",
+        fontWeight: 600,
+        letterSpacing: "-0.02em",
+      }}
     >
       n
-      <InterlockedOO />
+      <span
+        className="text-primary"
+        style={{ fontWeight: 700 }}
+      >
+        oo
+      </span>
       we
     </span>
   );
+
+  if (variant === "mark") {
+    return (
+      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
+        <Mark />
+      </div>
+    );
+  }
 
   if (variant === "wordmark") {
     return (
@@ -122,13 +117,14 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
     );
   }
 
-  // Full = unified wordmark (no separate mark + text)
   return (
     <div
       className={`inline-flex items-center ${className}`}
+      style={{ gap: `${gap}px` }}
       role="img"
       aria-label="NOOWE"
     >
+      <Mark />
       <Wordmark />
     </div>
   );
