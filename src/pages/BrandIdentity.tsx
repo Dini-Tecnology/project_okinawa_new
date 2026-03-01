@@ -55,46 +55,23 @@ const BrandIdentity = () => {
           <hr className="border-border" />
         </div>
 
-        {/* ─── LOGO VARIANTS ─── */}
+        {/* ─── LOGO ─── */}
         <section className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="font-display text-2xl font-semibold mb-2">Logo</h2>
-          <p className="text-muted-foreground mb-12">Três variantes para diferentes contextos e espaços.</p>
+          <p className="text-muted-foreground mb-12">Logo unificado — tipografia e marca são uma coisa só. Os "OO" entrelaçados vivem dentro do nome.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Full */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* On Light */}
             <div className="rounded-xl border border-border p-10 flex flex-col items-center justify-center gap-6 bg-card">
-              <NoweeLogo size="lg" variant="full" />
-              <span className="text-xs tracking-widest uppercase text-muted-foreground">Full</span>
+              <NoweeLogo size="lg" />
+              <span className="text-xs tracking-widest uppercase text-muted-foreground">On Light</span>
             </div>
-            {/* Mark */}
-            <div className="rounded-xl border border-border p-10 flex flex-col items-center justify-center gap-6 bg-card">
-              <NoweeLogo size="lg" variant="mark" />
-              <span className="text-xs tracking-widest uppercase text-muted-foreground">Mark</span>
-            </div>
-            {/* Wordmark */}
-            <div className="rounded-xl border border-border p-10 flex flex-col items-center justify-center gap-6 bg-card">
-              <NoweeLogo size="lg" variant="wordmark" />
-              <span className="text-xs tracking-widest uppercase text-muted-foreground">Wordmark</span>
-            </div>
-          </div>
-
-          {/* On Dark */}
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* On Dark */}
             <div className="rounded-xl p-10 flex flex-col items-center justify-center gap-6" style={{ background: "hsl(220 20% 10%)" }}>
-              <div className="[&_span]:!text-white">
-                <NoweeLogo size="lg" variant="full" />
+              <div className="[&_path]:fill-white">
+                <NoweeLogo size="lg" />
               </div>
               <span className="text-xs tracking-widest uppercase" style={{ color: "hsl(220 10% 60%)" }}>On Dark</span>
-            </div>
-            <div className="rounded-xl p-10 flex flex-col items-center justify-center gap-6" style={{ background: "hsl(220 20% 10%)" }}>
-              <NoweeLogo size="lg" variant="mark" />
-              <span className="text-xs tracking-widest uppercase" style={{ color: "hsl(220 10% 60%)" }}>On Dark</span>
-            </div>
-            <div className="rounded-xl p-10 flex flex-col items-center justify-center gap-6 bg-primary">
-              <div className="[&_span]:!text-white">
-                <NoweeLogo size="lg" variant="wordmark" />
-              </div>
-              <span className="text-xs tracking-widest uppercase text-primary-foreground/60">On Primary</span>
             </div>
           </div>
         </section>
@@ -267,9 +244,8 @@ const BrandIdentity = () => {
             {/* Splash Screen mockup */}
             <div className="rounded-xl overflow-hidden" style={{ background: "hsl(220 20% 7%)" }}>
               <div className="p-10 flex flex-col items-center justify-center min-h-[280px] gap-6">
-                <NoweeLogo size="xl" variant="mark" />
-                <div className="[&_span]:!text-white">
-                  <NoweeLogo size="lg" variant="wordmark" />
+                <div className="[&_path]:fill-white">
+                  <NoweeLogo size="xl" />
                 </div>
                 <p className="text-xs tracking-[0.15em] uppercase" style={{ color: "hsl(220 10% 50%)" }}>
                   Experiências gastronômicas
@@ -280,7 +256,7 @@ const BrandIdentity = () => {
 
             {/* Notification badge */}
             <div className="rounded-xl border border-border bg-card p-6 flex items-center gap-4">
-              <NoweeLogo size="sm" variant="mark" />
+              <NoweeLogo size="xs" />
               <div className="flex-1">
                 <p className="text-sm font-medium text-foreground">Sua reserva está confirmada!</p>
                 <p className="text-xs text-muted-foreground">Restaurante Oia · Hoje, 20h</p>
@@ -372,7 +348,7 @@ const BrandIdentity = () => {
 
         {/* ─── FOOTER ─── */}
         <footer className="max-w-6xl mx-auto px-6 py-16 text-center">
-          <NoweeLogo size="sm" variant="mark" className="justify-center mb-4" />
+          <NoweeLogo size="sm" className="justify-center mb-4" />
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} NOOWE · Brand Identity System v1.0
           </p>
