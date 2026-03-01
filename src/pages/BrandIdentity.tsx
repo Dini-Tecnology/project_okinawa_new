@@ -18,7 +18,7 @@ const typographySamples = [
   { label: "Heading 1", family: "Space Grotesk", weight: 600, size: "36px", tracking: "-0.02em", sample: "Experiências que conectam" },
   { label: "Heading 2", family: "Space Grotesk", weight: 600, size: "28px", tracking: "-0.02em", sample: "Reservas inteligentes" },
   { label: "Heading 3", family: "Inter", weight: 600, size: "22px", tracking: "-0.01em", sample: "Seu restaurante favorito" },
-  { label: "Body Large", family: "Inter", weight: 400, size: "18px", tracking: "0", sample: "Momentos compartilhados, memórias que ficam. O NOWEE conecta você às melhores experiências gastronômicas." },
+  { label: "Body Large", family: "Inter", weight: 400, size: "18px", tracking: "0", sample: "Momentos compartilhados, memórias que ficam. O NOOWE conecta você às melhores experiências gastronômicas." },
   { label: "Body", family: "Inter", weight: 400, size: "16px", tracking: "0", sample: "Reserve mesas, peça pratos, divida a conta — tudo em um só lugar." },
   { label: "Caption", family: "Inter", weight: 500, size: "12px", tracking: "0.04em", sample: "DISPONÍVEL AGORA · SÃO PAULO" },
 ];
@@ -26,7 +26,7 @@ const typographySamples = [
 const BrandIdentity = () => {
   return (
     <>
-      <SEOHead title="Brand Identity — NOWEE" description="NOWEE brand identity system — logo, colors, typography, and usage guidelines." noIndex />
+      <SEOHead title="Brand Identity — NOOWE" description="NOOWE brand identity system — logo, colors, typography, and usage guidelines." noIndex />
       <div className="min-h-screen bg-background text-foreground">
 
         {/* ─── HERO ─── */}
@@ -121,46 +121,47 @@ const BrandIdentity = () => {
         {/* ─── MARK ANATOMY ─── */}
         <section className="max-w-6xl mx-auto px-6 py-20">
           <h2 className="font-display text-2xl font-semibold mb-2">Mark — Anatomia</h2>
-          <p className="text-muted-foreground mb-12">Dois círculos sobrepostos formando uma vesica piscis. O ponto de encontro entre pessoas e experiências.</p>
+          <p className="text-muted-foreground mb-12">Dois "O"s entrelaçados como elos de uma corrente. Conexão, vínculo, encontro.</p>
 
           <div className="flex flex-col md:flex-row items-center gap-12 md:gap-20">
             <div className="flex-shrink-0">
               <svg width="240" height="240" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                {/* Guide circles */}
-                <circle cx="24" cy="32" r="18" stroke="hsl(14 100% 57%)" strokeWidth="0.3" strokeDasharray="2 2" fill="none" />
-                <circle cx="40" cy="32" r="18" stroke="hsl(168 84% 29%)" strokeWidth="0.3" strokeDasharray="2 2" fill="none" />
-                {/* Filled */}
-                <circle cx="24" cy="32" r="18" fill="hsl(14 100% 57%)" opacity="0.85" />
-                <circle cx="40" cy="32" r="18" fill="hsl(168 84% 29%)" opacity="0.7" />
-                <clipPath id="anatomy-clip">
-                  <circle cx="24" cy="32" r="18" />
+                {/* Guide rings */}
+                <circle cx="22" cy="32" r="14" stroke="hsl(14 100% 57%)" strokeWidth="0.3" strokeDasharray="2 2" fill="none" />
+                <circle cx="42" cy="32" r="14" stroke="hsl(168 84% 29%)" strokeWidth="0.3" strokeDasharray="2 2" fill="none" />
+                {/* Left O ring */}
+                <circle cx="22" cy="32" r="14" stroke="hsl(14 100% 57%)" strokeWidth="4" fill="none" opacity="0.95" />
+                {/* Right O ring */}
+                <circle cx="42" cy="32" r="14" stroke="hsl(168 84% 29%)" strokeWidth="4" fill="none" opacity="0.9" />
+                {/* Interlock: left ring passes over right at top */}
+                <clipPath id="anatomy-interlock">
+                  <rect x="28" y="18" width="8" height="14" />
                 </clipPath>
-                <circle cx="40" cy="32" r="18" clipPath="url(#anatomy-clip)" fill="white" opacity="0.3" />
-                {/* Center lines */}
-                <line x1="32" y1="14" x2="32" y2="50" stroke="white" strokeWidth="0.3" strokeDasharray="1 1" />
-                <circle cx="32" cy="32" r="1.5" fill="white" opacity="0.8" />
+                <circle cx="22" cy="32" r="14" stroke="hsl(14 100% 57%)" strokeWidth="4" fill="none" clipPath="url(#anatomy-interlock)" />
+                {/* Center point */}
+                <circle cx="32" cy="32" r="1.5" fill="hsl(38 92% 50%)" opacity="0.8" />
               </svg>
             </div>
             <div className="space-y-4 text-sm">
               <div className="flex items-start gap-3">
                 <div className="w-3 h-3 rounded-full bg-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">Círculo Laranja — Energia</p>
+                  <p className="font-medium text-foreground">Anel Laranja — Energia</p>
                   <p className="text-muted-foreground">Paixão, calor humano, a ação de sair e viver.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <div className="w-3 h-3 rounded-full bg-secondary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">Círculo Teal — Confiança</p>
+                  <p className="font-medium text-foreground">Anel Teal — Confiança</p>
                   <p className="text-muted-foreground">Inovação, frescor, a tecnologia que simplifica.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-3 h-3 rounded-full bg-background border border-border mt-0.5 flex-shrink-0" />
+                <div className="w-3 h-3 rounded-full bg-accent mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-foreground">Intersecção — Conexão</p>
-                  <p className="text-muted-foreground">O ponto onde pessoas e experiências se encontram. O agora.</p>
+                  <p className="font-medium text-foreground">Entrelaçamento — Vínculo</p>
+                  <p className="text-muted-foreground">Onde os anéis se cruzam, as pessoas se conectam. O agora.</p>
                 </div>
               </div>
             </div>
@@ -292,7 +293,7 @@ const BrandIdentity = () => {
               <NoweeLogo size="sm" />
               <div>
                 <p className="text-sm font-medium text-foreground">Maria Santos</p>
-                <p className="text-xs text-muted-foreground">Head of Product · maria@nowee.app</p>
+                <p className="text-xs text-muted-foreground">Head of Product · maria@noowe.app</p>
               </div>
             </div>
           </div>
@@ -357,7 +358,7 @@ const BrandIdentity = () => {
                         color: "hsl(280 60% 50%)",
                       }}
                     >
-                      nowee
+                      noowe
                     </span>
                   ) : (
                     <NoweeLogo size="md" />
@@ -373,7 +374,7 @@ const BrandIdentity = () => {
         <footer className="max-w-6xl mx-auto px-6 py-16 text-center">
           <NoweeLogo size="sm" variant="mark" className="justify-center mb-4" />
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} NOWEE · Brand Identity System v1.0
+            © {new Date().getFullYear()} NOOWE · Brand Identity System v1.0
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             Documento confidencial. Uso interno e parceiros autorizados.
