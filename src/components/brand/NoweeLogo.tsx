@@ -103,7 +103,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   if (variant === "mark") {
     return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOWEE">
+      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
         <Mark />
       </div>
     );
