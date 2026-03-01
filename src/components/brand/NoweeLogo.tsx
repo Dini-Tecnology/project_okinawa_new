@@ -2,130 +2,106 @@ import React from "react";
 
 interface NoweeLogoProps {
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
-  variant?: "full" | "mark" | "wordmark";
-  theme?: "light" | "dark" | "auto";
   className?: string;
 }
 
 const sizeMap = {
-  xs: { height: 24, fontSize: 14, markSize: 20, gap: 6 },
-  sm: { height: 32, fontSize: 20, markSize: 28, gap: 8 },
-  md: { height: 44, fontSize: 28, markSize: 38, gap: 10 },
-  lg: { height: 60, fontSize: 38, markSize: 50, gap: 12 },
-  xl: { height: 80, fontSize: 52, markSize: 66, gap: 14 },
-  "2xl": { height: 110, fontSize: 72, markSize: 90, gap: 18 },
+  xs: 28,
+  sm: 38,
+  md: 52,
+  lg: 72,
+  xl: 100,
+  "2xl": 140,
 };
 
 /**
- * NOOWE Brand Logo
+ * NOOWE Brand Logo — Unified Typographic Mark
  *
- * The mark is two interlocking "O" rings — one warm orange, one teal —
- * linked like chain links to symbolize connection and shared experiences.
+ * The word "NOOWE" rendered as a single piece where
+ * the two O's are interlocking rings woven into the
+ * letterforms. Typography IS the mark.
  *
  * Modern Chic. Minimal. Memorable.
  */
 const NoweeLogo: React.FC<NoweeLogoProps> = ({
   size = "md",
-  variant = "full",
-  theme = "auto",
   className = "",
 }) => {
-  const { height, fontSize, markSize, gap } = sizeMap[size];
-
-  const Mark = () => (
-    <svg
-      width={markSize}
-      height={markSize}
-      viewBox="0 0 64 64"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="flex-shrink-0"
-      aria-label="NOOWE mark"
-    >
-      {/* Left O — Primary (warm orange), ring style */}
-      <circle
-        cx="22"
-        cy="32"
-        r="14"
-        className="stroke-primary"
-        strokeWidth="4"
-        fill="none"
-        opacity="0.95"
-      />
-      {/* Right O — Secondary (teal), ring style */}
-      <circle
-        cx="42"
-        cy="32"
-        r="14"
-        className="stroke-secondary"
-        strokeWidth="4"
-        fill="none"
-        opacity="0.9"
-      />
-      {/* Interlock effect: hide the back segment of right ring behind left ring */}
-      {/* Left ring foreground overlap piece */}
-      <clipPath id="noowe-clip-right">
-        <rect x="28" y="18" width="8" height="14" />
-      </clipPath>
-      <circle
-        cx="22"
-        cy="32"
-        r="14"
-        className="stroke-primary"
-        strokeWidth="4"
-        fill="none"
-        clipPath="url(#noowe-clip-right)"
-      />
-    </svg>
-  );
-
-  const Wordmark = () => (
-    <span
-      className="text-foreground tracking-tight"
-      style={{
-        fontSize: `${fontSize}px`,
-        lineHeight: `${height}px`,
-        fontFamily: "'Space Grotesk', 'Inter', sans-serif",
-        fontWeight: 600,
-        letterSpacing: "-0.02em",
-      }}
-    >
-      n
-      <span
-        className="text-primary"
-        style={{ fontWeight: 700 }}
-      >
-        oo
-      </span>
-      we
-    </span>
-  );
-
-  if (variant === "mark") {
-    return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
-        <Mark />
-      </div>
-    );
-  }
-
-  if (variant === "wordmark") {
-    return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
-        <Wordmark />
-      </div>
-    );
-  }
+  const height = sizeMap[size];
+  // Aspect ratio ~4.2:1
+  const width = Math.round(height * 4.2);
 
   return (
     <div
       className={`inline-flex items-center ${className}`}
-      style={{ gap: `${gap}px` }}
       role="img"
       aria-label="NOOWE"
     >
-      <Mark />
-      <Wordmark />
+      <svg
+        width={width}
+        height={height}
+        viewBox="0 0 420 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="flex-shrink-0"
+      >
+        <defs>
+          {/* Clip to make left O pass in front of right O at top */}
+          <clipPath id="noowe-interlock">
+            <rect x="168" y="20" width="18" height="30" />
+          </clipPath>
+        </defs>
+
+        {/* ── N ── */}
+        {/* Clean geometric N with slight taper */}
+        <path
+          d="M12 78V22h6l42 42V22h8v56h-6L20 36v42h-8z"
+          className="fill-foreground"
+        />
+
+        {/* ── First O — Primary ring ── */}
+        <circle
+          cx="118"
+          cy="50"
+          r="28"
+          className="stroke-primary"
+          strokeWidth="8"
+          fill="none"
+        />
+
+        {/* ── Second O — Secondary ring ── */}
+        <circle
+          cx="178"
+          cy="50"
+          r="28"
+          className="stroke-secondary"
+          strokeWidth="8"
+          fill="none"
+        />
+
+        {/* ── Interlock: first O passes OVER second O at top ── */}
+        <circle
+          cx="118"
+          cy="50"
+          r="28"
+          className="stroke-primary"
+          strokeWidth="8"
+          fill="none"
+          clipPath="url(#noowe-interlock)"
+        />
+
+        {/* ── W ── */}
+        <path
+          d="M224 22l20 56h-1l18-44 18 44h-1l20-56h9l-25 56h-8l-14-38-14 38h-8L213 22h11z"
+          className="fill-foreground"
+        />
+
+        {/* ── E ── */}
+        <path
+          d="M340 22h48v8h-40v16h36v8h-36v18h42v8h-50V22z"
+          className="fill-foreground"
+        />
+      </svg>
     </div>
   );
 };
