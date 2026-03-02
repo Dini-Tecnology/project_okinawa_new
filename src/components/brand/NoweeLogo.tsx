@@ -33,32 +33,40 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // Inline mark sized to match the font's cap-height
-  const inlineMarkHeight = fontSize * 0.85;
-  const inlineMarkWidth = inlineMarkHeight * 1.45; // wider to fit two rings
+  // Rings match the cap-height of the font (roughly 70% of fontSize)
+  const capHeight = fontSize * 0.72;
+  const ringRadius = capHeight / 2;
+  const overlap = ringRadius * 0.55; // how much the two rings overlap
+  const svgHeight = capHeight + 4; // small padding for stroke
+  const svgWidth = ringRadius * 2 * 2 - overlap * 2 + 4; // two circles minus overlap + stroke padding
+  const cy = svgHeight / 2;
+  const cx1 = ringRadius + 2;
+  const cx2 = svgWidth - ringRadius - 2;
+  const strokeW = Math.max(2, fontSize * 0.09);
 
   const InlineMark = () => (
     <svg
-      width={inlineMarkWidth}
-      height={inlineMarkHeight}
-      viewBox="0 0 58 40"
+      width={svgWidth}
+      height={svgHeight}
+      viewBox={`0 0 ${svgWidth} ${svgHeight}`}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="inline-block flex-shrink-0"
-      style={{ verticalAlign: "baseline", marginBottom: `${fontSize * -0.08}px` }}
+      style={{ verticalAlign: "middle", marginTop: `${fontSize * -0.08}px` }}
     >
-      <circle cx="16" cy="20" r="12" className="stroke-primary" strokeWidth="3.5" fill="none" opacity="0.95" />
-      <circle cx="42" cy="20" r="12" className="stroke-secondary" strokeWidth="3.5" fill="none" opacity="0.9" />
+      <circle cx={cx1} cy={cy} r={ringRadius} className="stroke-primary" strokeWidth={strokeW} fill="none" opacity="0.95" />
+      <circle cx={cx2} cy={cy} r={ringRadius} className="stroke-secondary" strokeWidth={strokeW} fill="none" opacity="0.9" />
+      {/* Interlock: left ring passes over right ring in top half */}
       <clipPath id={`noowe-clip-${size}`}>
-        <rect x="24" y="8" width="6" height="12" />
+        <rect x={cx1 + ringRadius * 0.3} y={0} width={overlap} height={cy} />
       </clipPath>
-      <circle cx="16" cy="20" r="12" className="stroke-primary" strokeWidth="3.5" fill="none" clipPath={`url(#noowe-clip-${size})`} />
+      <circle cx={cx1} cy={cy} r={ringRadius} className="stroke-primary" strokeWidth={strokeW} fill="none" clipPath={`url(#noowe-clip-${size})`} />
     </svg>
   );
 
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight inline-flex items-baseline"
+      className="text-foreground tracking-tight inline-flex items-center"
       style={{
         fontSize: `${fontSize}px`,
         lineHeight: `${height}px`,
