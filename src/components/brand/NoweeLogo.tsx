@@ -33,59 +33,30 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // "OO" shaped to match Space Grotesk 600 weight — slightly squared superellipse
-  // with thick stroke matching the font's visual weight
-  const sw = 5.5; // stroke width to match semibold font weight
-
+  // Two filled overlapping circles like Mastercard — primary (orange) + secondary (teal)
   const InlineMark = () => (
     <svg
       width="100%"
       height="100%"
-      viewBox="0 0 62 34"
+      viewBox="0 0 44 30"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Left O — Primary (orange), superellipse shape like Space Grotesk O */}
-      <rect
-        x={sw / 2 + 1}
-        y={sw / 2}
-        width={26}
-        height={34 - sw}
-        rx="11"
-        ry="13"
-        className="stroke-primary"
-        strokeWidth={sw}
-        fill="none"
-      />
-      {/* Right O — Secondary (teal) */}
-      <rect
-        x={62 - 26 - sw / 2 - 1}
-        y={sw / 2}
-        width={26}
-        height={34 - sw}
-        rx="11"
-        ry="13"
-        className="stroke-secondary"
-        strokeWidth={sw}
-        fill="none"
-      />
-
-      {/* Interlock: left O passes OVER right O in the top-half of the overlap */}
-      <clipPath id={`noowe-clip-${size}`}>
-        <rect x="22" y="0" width="9" height="17" />
+      {/* Left O — filled orange */}
+      <circle cx="15" cy="15" r="14" className="fill-primary" opacity="0.95" />
+      {/* Right O — filled teal */}
+      <circle cx="29" cy="15" r="14" className="fill-secondary" opacity="0.85" />
+      {/* Overlap blend — darker mix in the intersection */}
+      <clipPath id={`noowe-overlap-${size}`}>
+        <circle cx="29" cy="15" r="14" />
       </clipPath>
-      <rect
-        x={sw / 2 + 1}
-        y={sw / 2}
-        width={26}
-        height={34 - sw}
-        rx="11"
-        ry="13"
-        className="stroke-primary"
-        strokeWidth={sw}
-        fill="none"
-        clipPath={`url(#noowe-clip-${size})`}
+      <circle
+        cx="15"
+        cy="15"
+        r="14"
+        fill="hsl(var(--primary) / 0.45)"
+        clipPath={`url(#noowe-overlap-${size})`}
       />
     </svg>
   );
