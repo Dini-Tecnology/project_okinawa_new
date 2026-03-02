@@ -33,16 +33,17 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // Rings match the cap-height of the font (roughly 70% of fontSize)
-  const capHeight = fontSize * 0.72;
-  const ringRadius = capHeight / 2;
-  const overlap = ringRadius * 0.55; // how much the two rings overlap
-  const svgHeight = capHeight + 4; // small padding for stroke
-  const svgWidth = ringRadius * 2 * 2 - overlap * 2 + 4; // two circles minus overlap + stroke padding
+  // Rings match the x-height of lowercase letters (~42% of fontSize for Space Grotesk)
+  const xHeight = fontSize * 0.36;
+  const ringRadius = xHeight / 2;
+  const overlap = ringRadius * 0.5;
+  const strokeW = Math.max(1.5, fontSize * 0.07);
+  const pad = strokeW; // padding for stroke
+  const svgHeight = xHeight + pad * 2;
+  const svgWidth = ringRadius * 4 - overlap * 2 + pad * 2;
   const cy = svgHeight / 2;
-  const cx1 = ringRadius + 2;
-  const cx2 = svgWidth - ringRadius - 2;
-  const strokeW = Math.max(2, fontSize * 0.09);
+  const cx1 = ringRadius + pad;
+  const cx2 = svgWidth - ringRadius - pad;
 
   const InlineMark = () => (
     <svg
@@ -52,13 +53,13 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="inline-block flex-shrink-0"
-      style={{ verticalAlign: "middle", marginTop: `${fontSize * -0.08}px` }}
+      style={{ verticalAlign: "middle" }}
     >
-      <circle cx={cx1} cy={cy} r={ringRadius} className="stroke-primary" strokeWidth={strokeW} fill="none" opacity="0.95" />
-      <circle cx={cx2} cy={cy} r={ringRadius} className="stroke-secondary" strokeWidth={strokeW} fill="none" opacity="0.9" />
+      <circle cx={cx1} cy={cy} r={ringRadius} className="stroke-primary" strokeWidth={strokeW} fill="none" />
+      <circle cx={cx2} cy={cy} r={ringRadius} className="stroke-secondary" strokeWidth={strokeW} fill="none" />
       {/* Interlock: left ring passes over right ring in top half */}
       <clipPath id={`noowe-clip-${size}`}>
-        <rect x={cx1 + ringRadius * 0.3} y={0} width={overlap} height={cy} />
+        <rect x={cx1 + ringRadius * 0.35} y={0} width={overlap} height={cy} />
       </clipPath>
       <circle cx={cx1} cy={cy} r={ringRadius} className="stroke-primary" strokeWidth={strokeW} fill="none" clipPath={`url(#noowe-clip-${size})`} />
     </svg>
