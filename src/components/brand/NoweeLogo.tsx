@@ -33,62 +33,6 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // Two interlocking chain links — vínculo, conexão
-  const InlineMark = () => {
-    const sw = 3.8; // stroke weight matching font
-    return (
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 52 26"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        {/* Left link — rounded rect, orange */}
-        <rect
-          x={sw / 2}
-          y={sw / 2}
-          width={28}
-          height={26 - sw}
-          rx="9"
-          ry="9"
-          className="stroke-primary"
-          strokeWidth={sw}
-          fill="none"
-        />
-        {/* Right link — rounded rect, teal, interlocked */}
-        <rect
-          x={22}
-          y={sw / 2}
-          width={28}
-          height={26 - sw}
-          rx="9"
-          ry="9"
-          className="stroke-secondary"
-          strokeWidth={sw}
-          fill="none"
-        />
-        {/* Interlock illusion: redraw left link's right side OVER the right link's left side (top half) */}
-        <clipPath id={`chain-top-${size}`}>
-          <rect x="20" y="0" width="12" height="13" />
-        </clipPath>
-        <rect
-          x={sw / 2}
-          y={sw / 2}
-          width={28}
-          height={26 - sw}
-          rx="9"
-          ry="9"
-          className="stroke-primary"
-          strokeWidth={sw}
-          fill="none"
-          clipPath={`url(#chain-top-${size})`}
-        />
-      </svg>
-    );
-  };
-
   const Wordmark = () => (
     <span
       className="text-foreground tracking-tight inline-flex items-center"
@@ -102,16 +46,11 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       }}
     >
       <span>n</span>
-      <span
-        className="inline-block flex-shrink-0"
-        style={{
-          width: "1.5em",
-          height: "0.72em",
-          margin: "0 -0.06em",
-          transform: "translateY(0.06em)",
-        }}
-      >
-        <InlineMark />
+      <span className="text-primary inline-block" style={{ marginRight: "-0.16em" }}>
+        o
+      </span>
+      <span className="text-secondary inline-block" style={{ marginRight: "-0.02em" }}>
+        o
       </span>
       <span>we</span>
     </span>
