@@ -38,22 +38,22 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
     <svg
       width="100%"
       height="100%"
-      viewBox="0 0 58 34"
+      viewBox="0 0 60 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <circle cx="20.5" cy="17" r="13.4" className="stroke-primary" strokeWidth="3.2" fill="none" />
-      <circle cx="37.5" cy="17" r="13.4" className="stroke-secondary" strokeWidth="3.2" fill="none" />
+      <circle cx="22" cy="17" r="15" className="stroke-primary" strokeWidth="3.2" fill="none" />
+      <circle cx="38" cy="17" r="15" className="stroke-secondary" strokeWidth="3.2" fill="none" />
 
       {/* Interlock: left ring crosses above in top overlap */}
       <clipPath id={`noowe-clip-${size}`}>
-        <rect x="26.8" y="0" width="6.2" height="17" />
+        <rect x="27.2" y="0" width="6" height="17" />
       </clipPath>
       <circle
-        cx="20.5"
+        cx="22"
         cy="17"
-        r="13.4"
+        r="15"
         className="stroke-primary"
         strokeWidth="3.2"
         fill="none"
@@ -64,7 +64,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight inline-flex items-baseline"
+      className="text-foreground tracking-tight inline-flex items-center"
       style={{
         fontSize: `${fontSize}px`,
         lineHeight: `${height}px`,
@@ -77,9 +77,9 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       <span
         className="inline-block flex-shrink-0"
         style={{
-          width: "1.22em",
+          width: "1.28em",
           height: "1em",
-          margin: "0 -0.01em",
+          margin: "0 -0.015em",
           transform: "translateY(0.01em)",
         }}
       >
