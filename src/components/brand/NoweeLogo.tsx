@@ -105,10 +105,10 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       <span
         className="inline-block flex-shrink-0"
         style={{
-          width: "1.28em",
-          height: "1em",
-          margin: "0 -0.015em",
-          transform: "translateY(0.01em)",
+          width: "1.3em",
+          height: "0.78em",
+          margin: "0 -0.02em",
+          transform: "translateY(0.04em)",
         }}
       >
         <InlineMark />
