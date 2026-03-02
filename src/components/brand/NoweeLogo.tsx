@@ -33,29 +33,57 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // "OO" inline symbol with the same visual block as text letters
+  // "OO" shaped to match Space Grotesk 600 weight — slightly squared superellipse
+  // with thick stroke matching the font's visual weight
+  const sw = 5.5; // stroke width to match semibold font weight
+
   const InlineMark = () => (
     <svg
       width="100%"
       height="100%"
-      viewBox="0 0 60 34"
+      viewBox="0 0 62 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <circle cx="22" cy="17" r="15" className="stroke-primary" strokeWidth="3.2" fill="none" />
-      <circle cx="38" cy="17" r="15" className="stroke-secondary" strokeWidth="3.2" fill="none" />
-
-      {/* Interlock: left ring crosses above in top overlap */}
-      <clipPath id={`noowe-clip-${size}`}>
-        <rect x="27.2" y="0" width="6" height="17" />
-      </clipPath>
-      <circle
-        cx="22"
-        cy="17"
-        r="15"
+      {/* Left O — Primary (orange), superellipse shape like Space Grotesk O */}
+      <rect
+        x={sw / 2 + 1}
+        y={sw / 2}
+        width={26}
+        height={34 - sw}
+        rx="11"
+        ry="13"
         className="stroke-primary"
-        strokeWidth="3.2"
+        strokeWidth={sw}
+        fill="none"
+      />
+      {/* Right O — Secondary (teal) */}
+      <rect
+        x={62 - 26 - sw / 2 - 1}
+        y={sw / 2}
+        width={26}
+        height={34 - sw}
+        rx="11"
+        ry="13"
+        className="stroke-secondary"
+        strokeWidth={sw}
+        fill="none"
+      />
+
+      {/* Interlock: left O passes OVER right O in the top-half of the overlap */}
+      <clipPath id={`noowe-clip-${size}`}>
+        <rect x="22" y="0" width="9" height="17" />
+      </clipPath>
+      <rect
+        x={sw / 2 + 1}
+        y={sw / 2}
+        width={26}
+        height={34 - sw}
+        rx="11"
+        ry="13"
+        className="stroke-primary"
+        strokeWidth={sw}
         fill="none"
         clipPath={`url(#noowe-clip-${size})`}
       />
