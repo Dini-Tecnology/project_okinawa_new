@@ -79,30 +79,32 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
     </svg>
   );
 
-  const inlineMarkSize = fontSize * 1.1;
+  // Inline mark sized to match the font's cap-height
+  const inlineMarkHeight = fontSize * 0.85;
+  const inlineMarkWidth = inlineMarkHeight * 1.45; // wider to fit two rings
 
   const InlineMark = () => (
     <svg
-      width={inlineMarkSize}
-      height={inlineMarkSize}
-      viewBox="0 0 64 64"
+      width={inlineMarkWidth}
+      height={inlineMarkHeight}
+      viewBox="0 0 58 40"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className="inline-block flex-shrink-0"
-      style={{ verticalAlign: "middle", margin: `0 ${fontSize * -0.05}px` }}
+      style={{ verticalAlign: "baseline", marginBottom: `${fontSize * -0.08}px` }}
     >
-      <circle cx="22" cy="32" r="14" className="stroke-primary" strokeWidth="4" fill="none" opacity="0.95" />
-      <circle cx="42" cy="32" r="14" className="stroke-secondary" strokeWidth="4" fill="none" opacity="0.9" />
-      <clipPath id={`noowe-inline-clip-${size}`}>
-        <rect x="28" y="18" width="8" height="14" />
+      <circle cx="16" cy="20" r="12" className="stroke-primary" strokeWidth="3.5" fill="none" opacity="0.95" />
+      <circle cx="42" cy="20" r="12" className="stroke-secondary" strokeWidth="3.5" fill="none" opacity="0.9" />
+      <clipPath id={`noowe-clip-${size}`}>
+        <rect x="24" y="8" width="6" height="12" />
       </clipPath>
-      <circle cx="22" cy="32" r="14" className="stroke-primary" strokeWidth="4" fill="none" clipPath={`url(#noowe-inline-clip-${size})`} />
+      <circle cx="16" cy="20" r="12" className="stroke-primary" strokeWidth="3.5" fill="none" clipPath={`url(#noowe-clip-${size})`} />
     </svg>
   );
 
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight inline-flex items-center"
+      className="text-foreground tracking-tight inline-flex items-baseline"
       style={{
         fontSize: `${fontSize}px`,
         lineHeight: `${height}px`,
@@ -117,30 +119,18 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
     </span>
   );
 
+  // "mark" variant — just the interlocking rings
   if (variant === "mark") {
     return (
       <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
-        <Mark />
+        <InlineMark />
       </div>
     );
   }
 
-  if (variant === "wordmark") {
-    return (
-      <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
-        <Wordmark />
-      </div>
-    );
-  }
-
+  // Both "full" and "wordmark" now render the same: the wordmark with inline rings
   return (
-    <div
-      className={`inline-flex items-center ${className}`}
-      style={{ gap: `${gap}px` }}
-      role="img"
-      aria-label="NOOWE"
-    >
-      <Mark />
+    <div className={`inline-flex items-center ${className}`} role="img" aria-label="NOOWE">
       <Wordmark />
     </div>
   );
