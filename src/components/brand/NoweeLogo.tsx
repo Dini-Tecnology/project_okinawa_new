@@ -33,32 +33,29 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
   const { height, fontSize } = sizeMap[size];
 
 
-  // The logo is the full word "NOOWE"; only the two "O" letters are interlocked rings.
-  // Sized in "em" so the rings always match the text size.
+  // "OO" inline symbol with the same visual block as text letters
   const InlineMark = () => (
     <svg
-      width="1.12em"
-      height="1em"
-      viewBox="0 0 56 32"
+      width="100%"
+      height="100%"
+      viewBox="0 0 58 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className="inline-block flex-shrink-0"
-      style={{ verticalAlign: "-0.08em" }}
       aria-hidden="true"
     >
-      <circle cx="20" cy="16" r="11.5" className="stroke-primary" strokeWidth="3.2" fill="none" />
-      <circle cx="36" cy="16" r="11.5" className="stroke-secondary" strokeWidth="3.2" fill="none" />
+      <circle cx="22" cy="17" r="11.8" className="stroke-primary" strokeWidth="3.1" fill="none" />
+      <circle cx="36" cy="17" r="11.8" className="stroke-secondary" strokeWidth="3.1" fill="none" />
 
-      {/* Interlock effect: left ring passes over right ring in upper overlap */}
+      {/* Interlock: left ring crosses above in top overlap */}
       <clipPath id={`noowe-clip-${size}`}>
-        <rect x="25.4" y="0" width="5.8" height="16" />
+        <rect x="26.5" y="0" width="5.5" height="17" />
       </clipPath>
       <circle
-        cx="20"
-        cy="16"
-        r="11.5"
+        cx="22"
+        cy="17"
+        r="11.8"
         className="stroke-primary"
-        strokeWidth="3.2"
+        strokeWidth="3.1"
         fill="none"
         clipPath={`url(#noowe-clip-${size})`}
       />
@@ -67,7 +64,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight inline-flex items-center"
+      className="text-foreground tracking-tight inline-flex items-baseline"
       style={{
         fontSize: `${fontSize}px`,
         lineHeight: `${height}px`,
@@ -76,7 +73,19 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
         letterSpacing: "-0.02em",
       }}
     >
-      n<InlineMark />we
+      <span>n</span>
+      <span
+        className="inline-block flex-shrink-0"
+        style={{
+          width: "1.16em",
+          height: "0.9em",
+          margin: "0 -0.01em",
+          transform: "translateY(0.02em)",
+        }}
+      >
+        <InlineMark />
+      </span>
+      <span>we</span>
     </span>
   );
 
