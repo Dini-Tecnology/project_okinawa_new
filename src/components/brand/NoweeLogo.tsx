@@ -43,19 +43,19 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <circle cx="22" cy="17" r="11.8" className="stroke-primary" strokeWidth="3.1" fill="none" />
-      <circle cx="36" cy="17" r="11.8" className="stroke-secondary" strokeWidth="3.1" fill="none" />
+      <circle cx="20.5" cy="17" r="13.4" className="stroke-primary" strokeWidth="3.2" fill="none" />
+      <circle cx="37.5" cy="17" r="13.4" className="stroke-secondary" strokeWidth="3.2" fill="none" />
 
       {/* Interlock: left ring crosses above in top overlap */}
       <clipPath id={`noowe-clip-${size}`}>
-        <rect x="26.5" y="0" width="5.5" height="17" />
+        <rect x="26.8" y="0" width="6.2" height="17" />
       </clipPath>
       <circle
-        cx="22"
+        cx="20.5"
         cy="17"
-        r="11.8"
+        r="13.4"
         className="stroke-primary"
-        strokeWidth="3.1"
+        strokeWidth="3.2"
         fill="none"
         clipPath={`url(#noowe-clip-${size})`}
       />
@@ -73,19 +73,19 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
         letterSpacing: "-0.02em",
       }}
     >
-      <span>n</span>
+      <span>N</span>
       <span
         className="inline-block flex-shrink-0"
         style={{
-          width: "1.16em",
-          height: "0.9em",
+          width: "1.22em",
+          height: "1em",
           margin: "0 -0.01em",
-          transform: "translateY(0.02em)",
+          transform: "translateY(0.01em)",
         }}
       >
         <InlineMark />
       </span>
-      <span>we</span>
+      <span>WE</span>
     </span>
   );
 
