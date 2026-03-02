@@ -79,9 +79,30 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
     </svg>
   );
 
+  const inlineMarkSize = fontSize * 1.1;
+
+  const InlineMark = () => (
+    <svg
+      width={inlineMarkSize}
+      height={inlineMarkSize}
+      viewBox="0 0 64 64"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="inline-block flex-shrink-0"
+      style={{ verticalAlign: "middle", margin: `0 ${fontSize * -0.05}px` }}
+    >
+      <circle cx="22" cy="32" r="14" className="stroke-primary" strokeWidth="4" fill="none" opacity="0.95" />
+      <circle cx="42" cy="32" r="14" className="stroke-secondary" strokeWidth="4" fill="none" opacity="0.9" />
+      <clipPath id={`noowe-inline-clip-${size}`}>
+        <rect x="28" y="18" width="8" height="14" />
+      </clipPath>
+      <circle cx="22" cy="32" r="14" className="stroke-primary" strokeWidth="4" fill="none" clipPath={`url(#noowe-inline-clip-${size})`} />
+    </svg>
+  );
+
   const Wordmark = () => (
     <span
-      className="text-foreground tracking-tight"
+      className="text-foreground tracking-tight inline-flex items-center"
       style={{
         fontSize: `${fontSize}px`,
         lineHeight: `${height}px`,
@@ -91,12 +112,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
       }}
     >
       n
-      <span
-        className="text-primary"
-        style={{ fontWeight: 700 }}
-      >
-        oo
-      </span>
+      <InlineMark />
       we
     </span>
   );
