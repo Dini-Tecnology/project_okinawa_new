@@ -8,12 +8,12 @@ interface NoweeLogoProps {
 }
 
 const sizeMap = {
-  xs: { height: 24, fontSize: 14 },
-  sm: { height: 32, fontSize: 20 },
-  md: { height: 44, fontSize: 28 },
-  lg: { height: 60, fontSize: 38 },
-  xl: { height: 80, fontSize: 52 },
-  "2xl": { height: 110, fontSize: 72 },
+  xs: { height: 28, fontSize: 17 },
+  sm: { height: 36, fontSize: 24 },
+  md: { height: 50, fontSize: 34 },
+  lg: { height: 68, fontSize: 46 },
+  xl: { height: 92, fontSize: 62 },
+  "2xl": { height: 126, fontSize: 86 },
 };
 
 /**
@@ -34,7 +34,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   // The "oo" mark: two overlapping circles with a glowing lens intersection
   const InlineMark = () => {
-    const r = fontSize * 0.32; // circle radius — matches lowercase letter height
+    const r = fontSize * 0.32; // circle radius
     const cx1 = r + 1;
     const cx2 = cx1 + r * 1.05; // slight overlap
     const cy = r + 1;
