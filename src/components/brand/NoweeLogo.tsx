@@ -34,7 +34,7 @@ const NoweeLogo: React.FC<NoweeLogoProps> = ({
 
   // The "oo" mark: two overlapping circles with a glowing lens intersection
   const InlineMark = () => {
-    const r = fontSize * 0.35; // circle radius — matches lowercase letter height
+    const r = fontSize * 0.32; // circle radius
     const cx1 = r + 1;
     const cx2 = cx1 + r * 1.05; // slight overlap
     const cy = r + 1;
