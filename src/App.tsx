@@ -56,6 +56,7 @@ const App = () => (
                     <Route path="/pitch/app" element={<AppPresentationDeck />} />
                     <Route path="/pitch/restaurants" element={<RestaurantPitchDeck />} />
                     <Route path="/pitch/investors" element={<InvestorPitchDeck />} />
+                    <Route path="/pitch/partner" element={<PartnerPitchDeck />} />
                     <Route path="/marketing/qr-codes" element={<QRCodeMaterials />} />
                     <Route path="/logo" element={<LogoShowcase />} />
                     <Route path="/brand" element={<BrandIdentity />} />
