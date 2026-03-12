@@ -54,19 +54,20 @@ const slides: Slide[] = [
   { id: "cover", type: "cover", title: "NOOWE" },
   { id: "purpose", type: "purpose", title: "Propósito" },
   { id: "problem", type: "problem", title: "O Problema" },
+  { id: "opportunity", type: "opportunity", title: "Oportunidade" },
   { id: "solution", type: "solution", title: "A Solução" },
   { id: "product-client", type: "product-client", title: "App Cliente" },
   { id: "product-restaurant", type: "product-restaurant", title: "App Restaurante" },
-  { id: "experience", type: "experience", title: "Experiência" },
+  { id: "experience", type: "experience", title: "Jornada" },
   { id: "market", type: "market", title: "Mercado" },
   { id: "business-model", type: "business-model", title: "Modelo" },
+  { id: "unit-economics", type: "unit-economics", title: "Unit Economics" },
   { id: "competitive", type: "competitive", title: "Diferencial" },
-  { id: "traction", type: "traction", title: "Tração" },
+  { id: "product-arch", type: "product-arch", title: "Produto" },
   { id: "gtm", type: "gtm", title: "Go-to-Market" },
   { id: "roadmap", type: "roadmap", title: "Roadmap" },
-  { id: "partnership", type: "partnership", title: "Parceria" },
   { id: "vision", type: "vision", title: "Visão" },
-  { id: "cta", type: "cta", title: "Próximos Passos" },
+  { id: "cta", type: "cta", title: "Encerramento" },
 ];
 
 // ========================================
@@ -86,12 +87,9 @@ const PhoneMockup = ({
     className={`relative ${className}`}
     style={{ transform: `scale(${scale})`, transformOrigin: "center" }}
   >
-    {/* Phone frame */}
     <div className="w-[220px] h-[440px] bg-foreground/90 rounded-[36px] p-[6px] shadow-2xl">
       <div className="w-full h-full bg-background rounded-[30px] overflow-hidden relative">
-        {/* Notch */}
         <div className="absolute top-[4px] left-1/2 -translate-x-1/2 w-[70px] h-[18px] bg-foreground rounded-full z-20" />
-        {/* Status bar */}
         <div className="absolute top-0 left-0 right-0 h-8 bg-background/80 z-10 flex items-center justify-between px-5 pt-1">
           <span className="text-foreground text-[8px] font-semibold">9:41</span>
           <div className="flex items-center gap-0.5">
@@ -102,11 +100,9 @@ const PhoneMockup = ({
             <div className="w-4 h-[7px] bg-foreground rounded-sm ml-1" />
           </div>
         </div>
-        {/* Screen content */}
         <div className="h-full pt-8 overflow-hidden">{children}</div>
       </div>
     </div>
-    {/* Glow effect */}
     <div className="absolute -inset-4 bg-primary/10 rounded-[48px] blur-2xl -z-10" />
   </div>
 );
@@ -153,7 +149,6 @@ const MiniHomeScreen = () => (
         </div>
       ))}
     </div>
-    {/* Nav bar */}
     <div className="px-2 py-2 border-t border-border flex justify-around">
       {["home", "search", "queue", "calendar", "user"].map((_, idx) => (
         <div
@@ -424,16 +419,17 @@ const CoverSlide = () => (
     </div>
 
     <p className="text-2xl md:text-4xl text-foreground/80 max-w-3xl relative z-10 leading-relaxed font-light">
-      A plataforma que transforma{" "}
-      <span className="text-primary font-semibold">presença física</span> em{" "}
-      <span className="text-secondary font-semibold">experiências inesquecíveis</span>
+      A plataforma que devolve o{" "}
+      <span className="text-primary font-semibold">relacionamento com o cliente</span> ao{" "}
+      <span className="text-secondary font-semibold">restaurante</span>
     </p>
 
-    <div className="mt-16 flex items-center gap-3 text-sm text-muted-foreground relative z-10">
-      <Handshake className="w-4 h-4 text-primary" />
-      <span>Apresentação para Parceiro Estratégico</span>
-      <span>•</span>
-      <span>Março 2025</span>
+    <p className="text-lg text-muted-foreground max-w-2xl relative z-10 mt-6 leading-relaxed">
+      Infraestrutura digital para restaurantes, bares e estabelecimentos que conecta a experiência do cliente a resultados ao negócio.
+    </p>
+
+    <div className="mt-16 text-sm text-muted-foreground relative z-10">
+      <span>Março 2026</span>
     </div>
   </div>
 );
@@ -447,30 +443,31 @@ const PurposeSlide = () => (
     </p>
 
     <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 leading-tight max-w-4xl">
-      Acreditamos que as{" "}
-      <span className="text-primary">melhores memórias</span> acontecem{" "}
+      Acreditamos que a melhor tecnologia é aquela que fortalece a{" "}
       <span className="relative">
-        presencialmente
+        hospitalidade
         <span className="absolute bottom-0 left-0 right-0 h-1 bg-primary/30 rounded-full" />
       </span>
     </h2>
 
     <div className="space-y-6 max-w-3xl">
       <p className="text-xl text-foreground/80 leading-relaxed">
-        Enquanto o mundo digital afasta as pessoas, nós usamos tecnologia para{" "}
-        <strong className="text-foreground">aproximá-las</strong>. A NOOWE é uma plataforma{" "}
-        <strong className="text-primary">anti-delivery</strong> — otimizamos cada segundo da
-        experiência presencial.
+        Nos últimos anos, restaurantes passaram a depender cada vez mais de intermediários digitais para atrair clientes.
+      </p>
+
+      <p className="text-xl text-foreground/80 leading-relaxed">
+        Marketplaces ajudaram a gerar demanda, mas também criaram um novo problema:{" "}
+        <strong className="text-foreground">o restaurante perdeu o relacionamento direto com o cliente.</strong>
       </p>
 
       <div className="flex items-start gap-4 p-6 rounded-2xl bg-card border border-border">
         <Heart className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
         <div>
           <p className="text-lg font-bold text-foreground mb-1">
-            "As pessoas não querem pedir comida. Querem viver momentos."
+            A NOOWE nasce para devolver esse controle ao restaurante
           </p>
           <p className="text-sm text-muted-foreground">
-            Filosofia NOOWE — Cada feature é desenhada para tornar o presencial irresistível.
+            Conectando descoberta, experiência presencial e fidelização em uma única plataforma.
           </p>
         </div>
       </div>
@@ -482,19 +479,21 @@ const ProblemSlide = () => (
   <div className="h-full flex flex-col justify-center px-6 md:px-20">
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">O Problema</p>
 
-    <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 leading-tight">
-      Restaurantes perdem
-      <br />
-      <span className="text-destructive">R$ 50 bilhões/ano</span>
-      <br />
-      para intermediários
+    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-8 leading-tight">
+      Restaurantes operam com{" "}
+      <span className="text-destructive">margens apertadas</span> e{" "}
+      <span className="text-destructive">tecnologia fragmentada</span>
     </h2>
+
+    <p className="text-xl text-muted-foreground mb-8 max-w-3xl">
+      Hoje, grande parte da operação digital de um restaurante depende de múltiplas ferramentas desconectadas.
+    </p>
 
     <div className="grid md:grid-cols-3 gap-6 mb-8">
       {[
-        { number: "25%", label: "Comissão predatória", icon: Percent, desc: "Cobrada por marketplaces" },
-        { number: "0%", label: "Dados do cliente", icon: BarChart3, desc: "Pertencem ao restaurante" },
-        { number: "70%", label: "Nunca retornam", icon: TrendingDown, desc: "Após primeira visita" },
+        { number: "12%–27%", label: "Comissões cobradas", icon: Percent, desc: "por marketplaces de delivery" },
+        { number: "5+", label: "Sistemas diferentes", icon: Layers, desc: "Reservas, pedidos, pagamentos, fidelidade e gestão" },
+        { number: "0", label: "Acesso real aos dados", icon: BarChart3, desc: "Marketplaces concentram relacionamento e comportamento" },
       ].map((stat, i) => (
         <div key={i} className="p-6 rounded-2xl bg-card border border-border hover:border-primary/20 transition-colors">
           <stat.icon className="w-8 h-8 text-destructive mb-4" />
@@ -505,9 +504,48 @@ const ProblemSlide = () => (
       ))}
     </div>
 
-    <p className="text-xl text-muted-foreground max-w-3xl">
-      Restaurantes usam <strong className="text-foreground">5+ ferramentas desconectadas</strong>{" "}
-      e pagam caro para marketplaces que roubam seu cliente.
+    <p className="text-lg text-muted-foreground max-w-3xl">
+      Além disso, muitos restaurantes não possuem ferramentas para{" "}
+      <strong className="text-foreground">transformar visitas em clientes recorrentes</strong>.
+    </p>
+  </div>
+);
+
+const OpportunitySlide = () => (
+  <div className="h-full flex flex-col justify-center px-6 md:px-20 relative overflow-hidden">
+    <div className="absolute right-0 top-0 bottom-0 w-1/3 bg-gradient-to-l from-primary/5 to-transparent" />
+
+    <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">A Oportunidade</p>
+
+    <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 leading-tight max-w-4xl">
+      O relacionamento direto com o cliente voltou a ser{" "}
+      <span className="text-primary">estratégico</span>
+    </h2>
+
+    <p className="text-xl text-foreground/80 mb-10 max-w-3xl">
+      Restaurantes precisam de ferramentas que permitam:
+    </p>
+
+    <div className="grid md:grid-cols-2 gap-5 mb-10 max-w-3xl">
+      {[
+        { icon: Users, text: "Conhecer seus clientes" },
+        { icon: TrendingUp, text: "Aumentar recorrência" },
+        { icon: Smartphone, text: "Digitalizar a experiência presencial" },
+        { icon: Shield, text: "Reduzir dependência de intermediários" },
+      ].map((item, i) => (
+        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-card border border-border">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <item.icon className="w-5 h-5 text-primary" />
+          </div>
+          <p className="text-lg text-foreground">{item.text}</p>
+        </div>
+      ))}
+    </div>
+
+    <p className="text-lg text-muted-foreground max-w-3xl relative z-10">
+      Com a digitalização da jornada no salão, surgem novas oportunidades de{" "}
+      <strong className="text-foreground">eficiência operacional</strong> e{" "}
+      <strong className="text-foreground">crescimento de receita</strong>.
     </p>
   </div>
 );
@@ -516,20 +554,23 @@ const SolutionSlide = () => (
   <div className="h-full flex flex-col justify-center px-6 md:px-20">
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">A Solução</p>
 
-    <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-8 leading-tight">
-      Devolvemos o cliente
-      <br />
-      <span className="text-primary">ao restaurante</span>
+    <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-4 leading-tight">
+      Uma plataforma completa para a{" "}
+      <span className="text-primary">experiência no restaurante</span>
     </h2>
+
+    <p className="text-xl text-muted-foreground mb-10 max-w-3xl">
+      A NOOWE conecta toda a jornada do cliente em um único ecossistema.
+    </p>
 
     <div className="grid md:grid-cols-2 gap-8 mb-8">
       <div className="space-y-5">
         {[
-          { icon: Heart, text: "Relacionamento direto restaurante → cliente" },
-          { icon: Brain, text: "Dados e insights de comportamento em tempo real" },
-          { icon: Zap, text: "Operação 100% digitalizada sem atrito" },
-          { icon: TrendingUp, text: "Programa de fidelidade que realmente funciona" },
-          { icon: CreditCard, text: "Split payment, gorjetas e pagamento digital" },
+          { icon: MapPin, text: "Descoberta e reservas" },
+          { icon: Utensils, text: "Pedidos e menu digital" },
+          { icon: CreditCard, text: "Pagamentos e split automático" },
+          { icon: Award, text: "Fidelidade e recompensas" },
+          { icon: BarChart3, text: "Analytics e comportamento do cliente" },
         ].map((item, i) => (
           <div key={i} className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -543,11 +584,12 @@ const SolutionSlide = () => (
       <div className="flex items-center justify-center">
         <div className="relative">
           <div className="text-center p-10 rounded-3xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-            <p className="text-7xl font-bold text-primary mb-2">+45%</p>
-            <p className="text-xl text-foreground">
-              Taxa de retorno
-              <br />
-              dos clientes
+            <Zap className="w-12 h-12 text-primary mx-auto mb-4" />
+            <p className="text-xl font-bold text-foreground">
+              Tudo integrado em uma única infraestrutura
+            </p>
+            <p className="text-sm text-muted-foreground mt-2">
+              pensada para o ambiente presencial
             </p>
           </div>
           <div className="absolute -inset-6 bg-primary/5 rounded-[3rem] blur-xl -z-10" />
@@ -563,10 +605,10 @@ const ProductClientSlide = () => (
       App Cliente
     </p>
     <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-2 text-center">
-      A experiência na palma da mão
+      Uma experiência digital pensada para o cliente do restaurante
     </h2>
     <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
-      38 telas nativas. Cada detalhe pensado para transformar visitas em hábitos.
+      Aplicativo que acompanha toda a jornada da visita. Cada visita gera dados e insights que ajudam o restaurante a construir relacionamento com o cliente.
     </p>
 
     <div className="flex items-center justify-center gap-6 md:gap-10">
@@ -597,10 +639,10 @@ const ProductRestaurantSlide = () => (
       App Restaurante
     </p>
     <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-2 text-center">
-      Gestão inteligente em tempo real
+      Ferramentas operacionais em tempo real
     </h2>
     <p className="text-muted-foreground text-center mb-8 max-w-2xl mx-auto">
-      22 telas para operação. Dashboard, KDS, planta do salão, analytics e equipe.
+      Plataforma completa de gestão da experiência do cliente. Tudo em uma interface simples para operação do dia a dia.
     </p>
 
     <div className="flex items-center justify-center gap-8">
@@ -610,11 +652,11 @@ const ProductRestaurantSlide = () => (
 
       <div className="hidden md:flex flex-col gap-4 max-w-xs">
         {[
-          { icon: BarChart3, title: "Dashboard em tempo real", desc: "Faturamento, mesas, fila, pedidos" },
-          { icon: Utensils, title: "KDS Cozinha", desc: "Controle por estação culinária" },
-          { icon: MapPin, title: "Planta do Salão", desc: "Gestão visual de mesas e reservas" },
-          { icon: Users, title: "Gestão de Equipe", desc: "Turnos, gorjetas, performance" },
-          { icon: Brain, title: "Analytics & BI", desc: "Insights de comportamento e receita" },
+          { icon: BarChart3, title: "Dashboard operacional", desc: "Faturamento, mesas, fila, pedidos" },
+          { icon: MapPin, title: "Controle de mesas e reservas", desc: "Gestão visual do salão" },
+          { icon: Utensils, title: "Gestão de pedidos e cozinha (KDS)", desc: "Controle por estação culinária" },
+          { icon: Users, title: "Gestão de equipe e gorjetas", desc: "Turnos, performance" },
+          { icon: Brain, title: "Analytics de comportamento e receita", desc: "Insights em tempo real" },
         ].map((f, i) => (
           <div key={i} className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-lg bg-secondary/10 flex items-center justify-center flex-shrink-0">
@@ -634,10 +676,10 @@ const ProductRestaurantSlide = () => (
 const ExperienceSlide = () => (
   <div className="h-full flex flex-col justify-center px-6 md:px-12 overflow-hidden">
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest text-center">
-      Jornada Completa
+      A Jornada Digital
     </p>
     <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-8 text-center">
-      Cada momento, <span className="text-primary">digitalizado</span>
+      Digitalizamos toda a experiência do cliente no restaurante
     </h2>
 
     <div className="flex items-center justify-center gap-4 md:gap-8 mb-6">
@@ -676,6 +718,10 @@ const ExperienceSlide = () => (
         ))}
       </div>
     </div>
+
+    <p className="text-sm text-muted-foreground text-center mt-6 max-w-2xl mx-auto">
+      Cada etapa gera dados que ajudam o restaurante a entender melhor seu público e aumentar a recorrência.
+    </p>
   </div>
 );
 
@@ -684,14 +730,15 @@ const MarketSlide = () => (
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">Mercado</p>
 
     <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-10">
-      Mercado de <span className="text-primary">R$ 500 bi</span>
+      O mercado de alimentação fora do lar no Brasil ultrapassa{" "}
+      <span className="text-primary">R$ 500 bilhões</span>
     </h2>
 
     <div className="grid md:grid-cols-3 gap-6 mb-10">
       {[
-        { value: "R$ 500bi", label: "TAM", desc: "Food Service Brasil" },
-        { value: "R$ 80bi", label: "SAM", desc: "Full-Service + Fast Casual" },
-        { value: "R$ 5bi", label: "SOM", desc: "Target inicial (SP + RJ)" },
+        { value: "R$ 500bi", label: "Tamanho do mercado", desc: "de food service no Brasil" },
+        { value: "1,3 milhão", label: "Restaurantes, bares", desc: "e estabelecimentos ativos" },
+        { value: "+10%", label: "Crescimento médio", desc: "anual do setor" },
       ].map((item, i) => (
         <div
           key={i}
@@ -704,22 +751,10 @@ const MarketSlide = () => (
       ))}
     </div>
 
-    <div className="flex items-center gap-8">
-      <div className="flex-1 p-5 rounded-xl bg-card border border-border">
-        <div className="flex items-center gap-3 mb-2">
-          <TrendingUp className="w-5 h-5 text-success" />
-          <span className="text-success font-bold">+12% ao ano</span>
-        </div>
-        <p className="text-sm text-muted-foreground">Crescimento do setor</p>
-      </div>
-      <div className="flex-1 p-5 rounded-xl bg-card border border-border">
-        <div className="flex items-center gap-3 mb-2">
-          <Building2 className="w-5 h-5 text-primary" />
-          <span className="text-primary font-bold">1.3 milhão</span>
-        </div>
-        <p className="text-sm text-muted-foreground">Restaurantes no Brasil</p>
-      </div>
-    </div>
+    <p className="text-lg text-muted-foreground max-w-3xl">
+      A digitalização da experiência presencial ainda está nos estágios iniciais, criando uma{" "}
+      <strong className="text-foreground">grande oportunidade para plataformas especializadas</strong>.
+    </p>
   </div>
 );
 
@@ -729,53 +764,69 @@ const BusinessModelSlide = () => (
       Modelo de Negócio
     </p>
 
-    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-10">SaaS + Take Rate</h2>
+    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-10">
+      SaaS + infraestrutura de pagamentos
+    </h2>
 
-    <div className="grid md:grid-cols-2 gap-8 mb-8">
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-          <DollarSign className="w-5 h-5 text-primary" />
-          Fontes de Receita
-        </h3>
-        {[
-          { source: "Assinatura SaaS", value: "R$ 299-999/mês", desc: "Por restaurante" },
-          { source: "Take Rate", value: "1.5-2.5%", desc: "Sobre pagamentos" },
-          { source: "Premium Add-ons", value: "R$ 99-299/mês", desc: "AI, Analytics Pro" },
-        ].map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between p-4 rounded-xl bg-card border border-border"
-          >
-            <div>
-              <p className="font-semibold text-foreground">{item.source}</p>
-              <p className="text-xs text-muted-foreground">{item.desc}</p>
-            </div>
-            <p className="text-primary font-bold">{item.value}</p>
-          </div>
-        ))}
+    <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="p-6 rounded-2xl bg-card border border-border">
+        <DollarSign className="w-8 h-8 text-primary mb-4" />
+        <h3 className="text-lg font-bold text-foreground mb-2">Assinatura mensal (SaaS)</h3>
+        <p className="text-2xl font-bold text-primary mb-1">R$ 199 – R$ 799</p>
+        <p className="text-sm text-muted-foreground">por restaurante, dependendo do porte e funcionalidades</p>
       </div>
 
-      <div className="space-y-4">
-        <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-          <LineChart className="w-5 h-5 text-secondary" />
-          Unit Economics
-        </h3>
-        {[
-          { metric: "CAC", value: "R$ 500" },
-          { metric: "LTV", value: "R$ 12.000" },
-          { metric: "LTV/CAC", value: "24x" },
-          { metric: "Payback", value: "2 meses" },
-        ].map((item, i) => (
-          <div
-            key={i}
-            className="flex items-center justify-between p-4 rounded-xl bg-card border border-border"
-          >
-            <p className="text-foreground">{item.metric}</p>
-            <p className="text-secondary font-bold text-xl">{item.value}</p>
-          </div>
-        ))}
+      <div className="p-6 rounded-2xl bg-card border border-border">
+        <Percent className="w-8 h-8 text-secondary mb-4" />
+        <h3 className="text-lg font-bold text-foreground mb-2">Take rate em pagamentos</h3>
+        <p className="text-2xl font-bold text-secondary mb-1">3,5% – 7,5%</p>
+        <p className="text-sm text-muted-foreground">sobre transações processadas</p>
+      </div>
+
+      <div className="p-6 rounded-2xl bg-card border border-border">
+        <Sparkles className="w-8 h-8 text-primary mb-4" />
+        <h3 className="text-lg font-bold text-foreground mb-2">Add-ons premium</h3>
+        <div className="space-y-2 mt-3">
+          {["Analytics avançado", "Automação de marketing", "Ferramentas de fidelização"].map((item, i) => (
+            <div key={i} className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="text-sm text-foreground">{item}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
+  </div>
+);
+
+const UnitEconomicsSlide = () => (
+  <div className="h-full flex flex-col justify-center px-6 md:px-20">
+    <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">
+      Unit Economics
+    </p>
+
+    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+      Unit Economics <span className="text-muted-foreground font-normal text-2xl">(realista)</span>
+    </h2>
+
+    <div className="grid md:grid-cols-4 gap-6 mb-10">
+      {[
+        { metric: "CAC estimado", value: "R$ 800 – R$ 1.500" },
+        { metric: "MRR médio por restaurante", value: "R$ 300 – R$ 600" },
+        { metric: "LTV estimado", value: "R$ 6.000 – R$ 12.000" },
+        { metric: "Payback estimado", value: "6 – 10 meses" },
+      ].map((item, i) => (
+        <div key={i} className="p-6 rounded-2xl bg-card border border-border text-center">
+          <p className="text-sm text-muted-foreground mb-3">{item.metric}</p>
+          <p className="text-xl font-bold text-primary">{item.value}</p>
+        </div>
+      ))}
+    </div>
+
+    <p className="text-lg text-muted-foreground max-w-3xl">
+      Com o crescimento da base, canais orgânicos e parcerias tendem a{" "}
+      <strong className="text-foreground">reduzir o CAC</strong>.
+    </p>
   </div>
 );
 
@@ -784,25 +835,24 @@ const CompetitiveSlide = () => (
     <p className="text-primary text-sm font-medium mb-3 uppercase tracking-widest">Diferencial Competitivo</p>
 
     <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-6">
-      Único <span className="text-primary">All-in-One</span> para experiência presencial
+      O mercado hoje é <span className="text-destructive">fragmentado</span>
     </h2>
 
     <div className="grid md:grid-cols-2 gap-6">
       <div className="p-5 rounded-2xl bg-gradient-to-br from-destructive/5 to-transparent border border-destructive/20">
         <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
           <X className="w-5 h-5 text-destructive" />
-          Mercado Fragmentado
+          Cada solução resolve apenas parte do problema
         </h3>
         <div className="space-y-2 text-sm">
           {[
-            { tool: "iFood/Rappi", problem: "25% comissão, só delivery" },
-            { tool: "TheFork", problem: "Só reserva, cliente deles" },
-            { tool: "Toast/Linx", problem: "Só POS, sem consumidor" },
-            { tool: "Apps próprios", problem: "Caro, sem escala" },
+            { tool: "POS e gestão", problem: "Ex: Linx" },
+            { tool: "Marketplaces", problem: "Ex: iFood e Rappi" },
+            { tool: "Reservas e CRM", problem: "Ex: SevenRooms" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center justify-between p-2 rounded-lg bg-card/50">
+            <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-card/50">
               <span className="font-medium text-foreground">{item.tool}</span>
-              <span className="text-xs text-destructive">{item.problem}</span>
+              <span className="text-xs text-muted-foreground">{item.problem}</span>
             </div>
           ))}
         </div>
@@ -813,6 +863,9 @@ const CompetitiveSlide = () => (
           <CheckCircle2 className="w-5 h-5 text-primary" />
           NOOWE — Tudo Integrado
         </h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          A NOOWE conecta toda a experiência em uma única plataforma integrada.
+        </p>
         <div className="space-y-2 text-sm">
           {[
             "Reservas + Fila Virtual",
@@ -820,7 +873,6 @@ const CompetitiveSlide = () => (
             "Split Payment + Gorjetas",
             "Fidelidade + Gamificação",
             "Dashboard + KDS + Analytics",
-            "60 telas nativas prontas",
           ].map((f, i) => (
             <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-card/50">
               <Check className="w-4 h-4 text-primary flex-shrink-0" />
@@ -833,65 +885,47 @@ const CompetitiveSlide = () => (
   </div>
 );
 
-const TractionSlide = () => (
+const ProductArchSlide = () => (
   <div className="h-full flex flex-col justify-center px-6 md:px-20">
-    <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">Tração</p>
+    <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">Produto</p>
 
     <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-10">
-      Produto <span className="text-primary">pronto</span> para escalar
+      Arquitetura <span className="text-primary">pronta para escalar</span>
     </h2>
 
-    <div className="grid md:grid-cols-4 gap-6 mb-10">
+    <div className="grid md:grid-cols-2 gap-6 mb-8">
       {[
-        { number: "60", label: "Telas nativas", icon: Smartphone },
-        { number: "850+", label: "Testes automatizados", icon: Shield },
-        { number: "95%", label: "Code coverage", icon: Target },
-        { number: "2", label: "Apps funcionais", icon: Layers },
-      ].map((stat, i) => (
-        <div key={i} className="p-5 rounded-2xl bg-card border border-border text-center">
-          <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
-          <p className="text-3xl font-bold text-foreground">{stat.number}</p>
-          <p className="text-sm text-muted-foreground">{stat.label}</p>
+        {
+          icon: Smartphone,
+          title: "Dois aplicativos nativos",
+          desc: "App cliente e app restaurante",
+        },
+        {
+          icon: Layers,
+          title: "Plataforma completa de backend",
+          desc: "Pagamentos, reservas, pedidos e fidelidade",
+        },
+        {
+          icon: Globe,
+          title: "Arquitetura escalável",
+          desc: "Preparada para expansão multi-cidade",
+        },
+        {
+          icon: Sparkles,
+          title: "Design system consistente",
+          desc: "Experiência pensada para operação real de restaurante",
+        },
+      ].map((item, i) => (
+        <div key={i} className="p-6 rounded-2xl bg-card border border-border flex items-start gap-4">
+          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <item.icon className="w-6 h-6 text-primary" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-foreground">{item.title}</h3>
+            <p className="text-sm text-muted-foreground mt-1">{item.desc}</p>
+          </div>
         </div>
       ))}
-    </div>
-
-    <div className="grid md:grid-cols-2 gap-6">
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-success/10 to-transparent border border-success/20">
-        <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-          <Rocket className="w-5 h-5 text-success" />
-          Hoje
-        </h3>
-        <ul className="space-y-2 text-sm">
-          <li className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" /> MVP completo e funcional
-          </li>
-          <li className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" /> Arquitetura enterprise-ready
-          </li>
-          <li className="flex items-center gap-2">
-            <Check className="w-4 h-4 text-success" /> Design system maduro
-          </li>
-        </ul>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20">
-        <h3 className="font-bold text-foreground mb-3 flex items-center gap-2">
-          <Target className="w-5 h-5 text-primary" />
-          Próximos 90 dias
-        </h3>
-        <ul className="space-y-2 text-sm">
-          <li className="flex items-center gap-2">
-            <CircleDot className="w-4 h-4 text-primary" /> 5 restaurantes piloto
-          </li>
-          <li className="flex items-center gap-2">
-            <CircleDot className="w-4 h-4 text-primary" /> 500 usuários ativos
-          </li>
-          <li className="flex items-center gap-2">
-            <CircleDot className="w-4 h-4 text-primary" /> Primeiro MRR
-          </li>
-        </ul>
-      </div>
     </div>
   </div>
 );
@@ -901,29 +935,29 @@ const GTMSlide = () => (
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">Go-to-Market</p>
 
     <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-      Supply First, <span className="text-primary">Demand Follows</span>
+      Começamos pela oferta:{" "}
+      <span className="text-primary">restaurantes parceiros</span>
     </h2>
     <p className="text-xl text-muted-foreground mb-8 max-w-3xl">
-      30 restaurantes <strong className="text-foreground">Founding Partners</strong> com 0% de fee
-      por 6 meses em troca de co-criação.
+      Estratégia inicial baseada em três pilares:
     </p>
 
     <div className="grid md:grid-cols-3 gap-6 mb-8">
       {[
         {
+          icon: Award,
+          title: "Founding restaurants",
+          desc: "Primeiros parceiros participam da evolução do produto",
+        },
+        {
           icon: QrCode,
-          title: "QR Code na mesa",
-          desc: "Aquisição in-loco: cada mesa é um ponto de entrada para o app",
+          title: "Aquisição no ponto de consumo",
+          desc: "QR code nas mesas gera downloads do app",
         },
         {
           icon: Users,
-          title: "Efeito de rede local",
-          desc: "Cada restaurante traz seus clientes para o ecossistema NOOWE",
-        },
-        {
-          icon: Award,
-          title: "Gamificação cross-venue",
-          desc: "Pontos de fidelidade válidos em toda a rede de parceiros",
+          title: "Rede local",
+          desc: "Cada restaurante traz seus próprios clientes para o ecossistema",
         },
       ].map((item, i) => (
         <div key={i} className="p-5 rounded-2xl bg-card border border-border">
@@ -936,7 +970,7 @@ const GTMSlide = () => (
 
     <div className="p-5 rounded-2xl bg-gradient-to-r from-primary/10 to-transparent border-l-4 border-primary">
       <p className="text-lg text-foreground">
-        <strong>Motor orgânico:</strong> cada refeição presencial gera 2-3 novos downloads via QR Code.
+        Esse modelo cria <strong>crescimento orgânico</strong> a partir do uso real no salão.
       </p>
     </div>
   </div>
@@ -947,7 +981,7 @@ const RoadmapSlide = () => (
     <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">Roadmap</p>
 
     <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-10">
-      Do MVP ao <span className="text-primary">Series A</span>
+      Primeiros marcos de <span className="text-primary">crescimento</span>
     </h2>
 
     <div className="relative">
@@ -956,27 +990,21 @@ const RoadmapSlide = () => (
       <div className="space-y-8">
         {[
           {
-            phase: "Q1 2025",
-            title: "Lançamento",
-            items: ["5 Founding Partners", "App Store + Play Store", "Primeiros dados"],
+            phase: "3 meses",
+            title: "Próximos 3 meses",
+            items: ["Primeiros restaurantes parceiros", "Validação de uso no mundo real"],
             status: "current",
           },
           {
-            phase: "Q2-Q3 2025",
-            title: "Escala Regional",
-            items: ["30 restaurantes SP", "5.000 usuários", "R$ 50k MRR"],
+            phase: "12 meses",
+            title: "12 meses",
+            items: ["Expansão na cidade de São Paulo", "Primeira base relevante de usuários"],
             status: "next",
           },
           {
-            phase: "Q4 2025",
-            title: "Expansão",
-            items: ["RJ + BH", "AI harmonizações", "R$ 200k MRR"],
-            status: "future",
-          },
-          {
-            phase: "2026",
-            title: "Series A",
-            items: ["100+ restaurantes", "50.000+ usuários", "R$ 500k+ MRR"],
+            phase: "24 meses",
+            title: "24 meses",
+            items: ["Expansão para outras capitais brasileiras", "Escala da base de restaurantes e clientes"],
             status: "future",
           },
         ].map((phase, i) => (
@@ -990,14 +1018,13 @@ const RoadmapSlide = () => (
                   : "bg-muted text-muted-foreground"
               }`}
             >
-              <span className="text-xs font-bold">{phase.phase.split(" ")[0]}</span>
+              <Clock className="w-5 h-5" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
                 <h3 className="text-lg font-bold text-foreground">{phase.title}</h3>
-                <span className="text-xs text-muted-foreground">{phase.phase}</span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {phase.items.map((item, j) => (
                   <div key={j} className="px-3 py-1.5 rounded-lg bg-muted text-xs text-foreground">
                     {item}
@@ -1007,68 +1034,6 @@ const RoadmapSlide = () => (
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  </div>
-);
-
-const PartnershipSlide = () => (
-  <div className="h-full flex flex-col justify-center px-6 md:px-20 relative overflow-hidden">
-    <div className="absolute right-0 top-0 bottom-0 w-1/2 bg-gradient-to-l from-primary/5 to-transparent" />
-
-    <p className="text-primary text-sm font-medium mb-4 uppercase tracking-widest">
-      A Oportunidade
-    </p>
-
-    <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-      Seja <span className="text-primary">co-fundador</span> dessa revolução
-    </h2>
-    <p className="text-xl text-muted-foreground mb-10 max-w-3xl">
-      Não estamos buscando apenas capital. Buscamos um parceiro que compartilhe nossa visão e
-      acelere o caminho.
-    </p>
-
-    <div className="grid md:grid-cols-2 gap-6 mb-8 relative z-10">
-      <div className="p-6 rounded-2xl bg-card border border-border">
-        <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-primary" />
-          O que você recebe
-        </h3>
-        <ul className="space-y-3">
-          {[
-            "Equity significativo em startup com produto pronto",
-            "Assento no conselho e participação em decisões",
-            "Acesso a mercado de R$ 500bi em forte crescimento",
-            "Tecnologia proprietária com 850+ testes e 95% coverage",
-            "GTM validado com estratégia de Founding Partners",
-          ].map((item, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-              <span className="text-foreground">{item}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="p-6 rounded-2xl bg-card border border-border">
-        <h3 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
-          <Target className="w-5 h-5 text-secondary" />
-          O que buscamos
-        </h3>
-        <ul className="space-y-3">
-          {[
-            "Investimento para acelerar os primeiros 90 dias",
-            "Network no setor de food service / hospitality",
-            "Experiência em escalar operações B2B2C",
-            "Mentalidade de builder — hands-on, não passivo",
-            "Visão de longo prazo: construir categoria, não flip",
-          ].map((item, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <ArrowRight className="w-5 h-5 text-secondary flex-shrink-0 mt-0.5" />
-              <span className="text-foreground">{item}</span>
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   </div>
@@ -1085,27 +1050,31 @@ const VisionSlide = () => (
       <Globe className="w-16 h-16 text-primary/30 mx-auto mb-8" />
 
       <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight max-w-4xl">
-        Um mundo onde cada restaurante{" "}
-        <span className="text-primary">conhece e encanta</span> cada cliente
+        Construir a infraestrutura digital da{" "}
+        <span className="text-primary">hospitalidade</span>
       </h2>
 
       <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10">
-        Imaginamos um futuro onde a tecnologia é invisível, a hospitalidade é personalizada, e cada
-        visita se torna uma memória.
+        Nossa visão é um futuro onde:
       </p>
 
       <div className="flex items-center justify-center gap-8">
         {[
-          { number: "100+", label: "Restaurantes parceiros" },
-          { number: "50k+", label: "Usuários ativos" },
-          { number: "R$ 500k+", label: "MRR em 24 meses" },
+          { icon: Users, label: "Restaurantes conhecem seus clientes" },
+          { icon: Sparkles, label: "A experiência presencial é personalizada" },
+          { icon: Eye, label: "A tecnologia trabalha de forma invisível" },
         ].map((stat, i) => (
-          <div key={i} className="text-center">
-            <p className="text-3xl font-bold text-primary">{stat.number}</p>
-            <p className="text-xs text-muted-foreground">{stat.label}</p>
+          <div key={i} className="text-center max-w-[200px]">
+            <stat.icon className="w-8 h-8 text-primary mx-auto mb-3" />
+            <p className="text-sm text-foreground">{stat.label}</p>
           </div>
         ))}
       </div>
+
+      <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-10">
+        Queremos ajudar restaurantes a transformar cada visita em um{" "}
+        <strong className="text-foreground">relacionamento duradouro</strong>.
+      </p>
     </div>
   </div>
 );
@@ -1120,13 +1089,16 @@ const CTASlide = () => (
       <NoweeLogo size="xl" className="mx-auto mb-8" />
 
       <h2 className="text-4xl md:text-6xl font-bold text-foreground mb-4">
-        Vamos construir{" "}
-        <span className="text-primary">juntos</span>?
+        Estamos no início de uma grande{" "}
+        <span className="text-primary">transformação</span>
       </h2>
 
-      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-12">
-        O produto está pronto. O mercado está esperando. Falta o parceiro certo para transformar uma
-        visão em realidade.
+      <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-6">
+        Restaurantes estão se digitalizando rapidamente, mas ainda carecem de ferramentas que conectem experiência, operação e relacionamento com o cliente.
+      </p>
+
+      <p className="text-xl text-foreground font-semibold max-w-2xl mx-auto mb-12">
+        A NOOWE nasce para ocupar esse espaço.
       </p>
 
       <div className="flex flex-col items-center gap-6">
@@ -1135,18 +1107,8 @@ const CTASlide = () => (
             <Handshake className="w-7 h-7 text-primary-foreground" />
           </div>
           <div className="text-left">
-            <p className="text-lg font-bold text-foreground">Próximos Passos</p>
-            <p className="text-sm text-muted-foreground">
-              Deep-dive técnico • Demo ao vivo • Term sheet
-            </p>
+            <p className="text-2xl font-bold text-foreground">Vamos construir isso juntos.</p>
           </div>
-        </div>
-
-        <div className="mt-4 p-4 rounded-2xl bg-card border border-border">
-          <p className="text-sm text-muted-foreground">
-            Explore o protótipo interativo agora em{" "}
-            <span className="text-primary font-semibold">/mobile-v2</span>
-          </p>
         </div>
       </div>
     </div>
@@ -1200,17 +1162,18 @@ export default function PartnerPitchDeck() {
       case "cover": return <CoverSlide />;
       case "purpose": return <PurposeSlide />;
       case "problem": return <ProblemSlide />;
+      case "opportunity": return <OpportunitySlide />;
       case "solution": return <SolutionSlide />;
       case "product-client": return <ProductClientSlide />;
       case "product-restaurant": return <ProductRestaurantSlide />;
       case "experience": return <ExperienceSlide />;
       case "market": return <MarketSlide />;
       case "business-model": return <BusinessModelSlide />;
+      case "unit-economics": return <UnitEconomicsSlide />;
       case "competitive": return <CompetitiveSlide />;
-      case "traction": return <TractionSlide />;
+      case "product-arch": return <ProductArchSlide />;
       case "gtm": return <GTMSlide />;
       case "roadmap": return <RoadmapSlide />;
-      case "partnership": return <PartnershipSlide />;
       case "vision": return <VisionSlide />;
       case "cta": return <CTASlide />;
       default: return <CoverSlide />;
@@ -1220,8 +1183,8 @@ export default function PartnerPitchDeck() {
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       <SEOHead
-        title="Parceiro Estratégico"
-        description="NOOWE — Apresentação para parceiro estratégico. A plataforma anti-delivery que transforma presença física em experiências inesquecíveis."
+        title="NOOWE — Apresentação"
+        description="NOOWE — A plataforma que devolve o relacionamento com o cliente ao restaurante."
         canonical="/pitch/partner"
       />
 
@@ -1237,7 +1200,7 @@ export default function PartnerPitchDeck() {
             </button>
           </div>
           <div className="h-full flex items-center justify-center">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 p-8 max-w-6xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-9 gap-3 p-8 max-w-6xl">
               {slides.map((slide, index) => (
                 <button
                   key={slide.id}
@@ -1268,7 +1231,6 @@ export default function PartnerPitchDeck() {
 
         <div className="flex items-center gap-2">
           <NoweeLogo size="xs" />
-          <span className="text-xs text-muted-foreground">• Parceiro Estratégico</span>
         </div>
 
         <div className="text-sm font-medium text-muted-foreground">
