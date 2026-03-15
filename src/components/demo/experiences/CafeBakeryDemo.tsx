@@ -98,7 +98,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const categories = [...new Set(CAFE_MENU.map(m => m.cat))];
 
   const addToCartDirect = (item: typeof CAFE_MENU[0]) => {
-    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, emoji: item.emoji }]);
+    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, iconCat: item.iconCat }]);
   };
 
   const addCustomized = () => {
