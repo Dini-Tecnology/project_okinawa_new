@@ -388,7 +388,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Prato Principal" back="course-1" sub="Curso 5 de 7" />
           <CourseProgress current={5} total={7} />
           <div className="text-center mb-4">
-            <ItemIcon cat="steak" size="hero" className="mx-auto" />
+            <FoodImg id="wagyu" size="hero" alt="Wagyu A5" className="mx-auto" />
             <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Prato Principal</p>
             <h2 className="font-display text-xl font-bold">Wagyu A5 com Aspargos</h2>
             <p className="text-xs text-muted-foreground mt-1">Miyazaki, Japão · Brasa de binchotan</p>
