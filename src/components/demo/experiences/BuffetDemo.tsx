@@ -317,7 +317,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Minha Comanda" back="drinks" />
           <div className="p-3 rounded-xl bg-muted/30 flex items-center gap-3 mb-4">
-            <span className="text-xl">🍽️</span>
+            <ItemIcon cat="buffet" size="sm" />
             <div><p className="font-semibold text-sm">Sabores Noowe</p><p className="text-xs text-muted-foreground">Mesa 12 · Comanda SN-012</p></div>
           </div>
           {/* Food section */}
