@@ -159,7 +159,7 @@ const DemoClientInner = () => {
         {/* Main content: sidebar + phone + info */}
         <div className="flex gap-8 items-start max-w-7xl w-full justify-center">
           {/* Journey sidebar */}
-          <div className="hidden lg:block w-60 shrink-0 sticky top-8">
+          <div className="hidden md:block w-60 shrink-0 sticky top-8">
             <h2 className="font-display text-sm font-bold mb-1 text-foreground">Jornada do Cliente</h2>
             <p className="text-xs text-muted-foreground mb-4">Siga os passos ou explore livremente</p>
             <div className="space-y-0.5">
