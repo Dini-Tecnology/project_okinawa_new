@@ -137,7 +137,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
-            {['Happy Hour 🎉', 'Cerveja Artesanal 🍺', 'Coquetelaria 🍸', 'Ao vivo 🎵', 'Petiscos 🍟'].map((f, i) => (
+            {['Happy Hour', 'Cerveja Artesanal', 'Coquetelaria', 'Ao vivo', 'Petiscos'].map((f, i) => (
               <button key={f} className={`px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap ${i === 0 ? 'bg-warning text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{f}</button>
             ))}
           </div>
