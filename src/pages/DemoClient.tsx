@@ -1,21 +1,23 @@
 /**
- * Demo Client Page — Next Level v3
- * Full client journey with Order Status, Shared Comanda, Split Payment, Guest Invitations
+ * Demo Client Page — v4
+ * Unified payment flow: Comanda → Fechar Conta (integrated split + pay)
+ * New screens: Notifications, AI Harmonization
  */
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { DemoProvider, useDemoContext, type DemoMenuItem, type OrderStatus } from '@/contexts/DemoContext';
+import { DemoProvider, useDemoContext, type DemoMenuItem } from '@/contexts/DemoContext';
 import {
   ArrowLeft, ArrowRight, Search, MapPin, Star, Clock, Heart,
-  Minus, Plus, ShoppingCart, X, ChevronRight, CreditCard,
+  Minus, Plus, X, ChevronRight, CreditCard,
   Users, Gift, Check, Loader2, UtensilsCrossed, CalendarDays,
   Sparkles, Crown, QrCode, Bell, User, Settings, LogOut,
-  MessageSquare, HandMetal, Timer, Wifi, Camera, ChevronDown,
-  Phone, Mail, Award, History, HelpCircle, Zap, Share2,
+  HandMetal, Timer, Wifi, Camera, ChevronDown,
+  Phone, Award, History, HelpCircle, Zap, Share2,
   UserPlus, Receipt, DollarSign, Nfc, Smartphone, Wallet,
-  ChefHat, CheckCircle, AlertCircle, Send, Copy,
+  ChefHat, CheckCircle, Send, Copy, AlertCircle,
+  Wine, Flame, Leaf, Brain, MessageCircle,
 } from 'lucide-react';
 
 // ============ PHONE SHELL ============
@@ -51,33 +53,36 @@ const GuidedHint: React.FC<{ text: string; pulse?: boolean }> = ({ text, pulse =
   </div>
 );
 
-// ============ BOTTOM NAV ============
+// ============ TYPES ============
 
 type Screen =
-  | 'home' | 'restaurant' | 'menu' | 'item' | 'comanda' | 'checkout'
-  | 'order-status' | 'loyalty' | 'reservations' | 'reservation-detail'
+  | 'home' | 'restaurant' | 'menu' | 'item' | 'comanda'
+  | 'fechar-conta' | 'split-by-item'
+  | 'order-status' | 'loyalty' | 'reservations'
   | 'qr-scan' | 'call-waiter' | 'profile' | 'virtual-queue' | 'my-orders'
-  | 'shared-comanda' | 'split-payment' | 'split-by-item' | 'payment-success';
+  | 'payment-success' | 'notifications' | 'ai-harmonization';
 
 type NavTab = 'explore' | 'orders' | 'scan' | 'loyalty' | 'profile';
 
 const getNavTab = (screen: Screen): NavTab => {
   if (['home', 'restaurant'].includes(screen)) return 'explore';
-  if (['menu', 'item', 'comanda', 'checkout', 'order-status', 'my-orders', 'call-waiter', 'shared-comanda', 'split-payment', 'split-by-item', 'payment-success'].includes(screen)) return 'orders';
+  if (['menu', 'item', 'comanda', 'fechar-conta', 'split-by-item', 'order-status', 'my-orders', 'call-waiter', 'payment-success', 'ai-harmonization'].includes(screen)) return 'orders';
   if (['qr-scan'].includes(screen)) return 'scan';
   if (['loyalty'].includes(screen)) return 'loyalty';
-  if (['profile', 'reservations', 'reservation-detail', 'virtual-queue'].includes(screen)) return 'profile';
+  if (['profile', 'reservations', 'virtual-queue', 'notifications'].includes(screen)) return 'profile';
   return 'explore';
 };
 
-const BottomNav: React.FC<{ currentScreen: Screen; onNavigate: (s: Screen) => void; cartCount: number }> = ({ currentScreen, onNavigate, cartCount }) => {
+// ============ BOTTOM NAV ============
+
+const BottomNav: React.FC<{ currentScreen: Screen; onNavigate: (s: Screen) => void; cartCount: number; notifCount: number }> = ({ currentScreen, onNavigate, cartCount, notifCount }) => {
   const activeTab = getNavTab(currentScreen);
   const tabs: { id: NavTab; icon: React.FC<{ className?: string }>; label: string; screen: Screen; badge?: number }[] = [
     { id: 'explore', icon: Search, label: 'Explorar', screen: 'home' },
     { id: 'orders', icon: UtensilsCrossed, label: 'Pedidos', screen: 'my-orders', badge: cartCount },
     { id: 'scan', icon: QrCode, label: 'QR Code', screen: 'qr-scan' },
     { id: 'loyalty', icon: Gift, label: 'Fidelidade', screen: 'loyalty' },
-    { id: 'profile', icon: User, label: 'Perfil', screen: 'profile' },
+    { id: 'profile', icon: User, label: 'Perfil', screen: 'profile', badge: notifCount },
   ];
 
   return (
@@ -103,15 +108,21 @@ const BottomNav: React.FC<{ currentScreen: Screen; onNavigate: (s: Screen) => vo
   );
 };
 
-// ============ SCREENS ============
+// ============ HOME ============
 
 const HomeScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { restaurant } = useDemoContext();
   return (
     <div className="px-5 pb-4">
-      <div className="pt-2 pb-4">
-        <p className="text-sm text-muted-foreground">Boa noite 👋</p>
-        <h1 className="font-display text-xl font-bold">Descubra experiências</h1>
+      <div className="pt-2 pb-4 flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">Boa noite 👋</p>
+          <h1 className="font-display text-xl font-bold">Descubra experiências</h1>
+        </div>
+        <button onClick={() => onNavigate('notifications')} className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center">
+          <Bell className="w-4.5 h-4.5 text-muted-foreground" />
+          <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-destructive text-primary-foreground text-[9px] font-bold flex items-center justify-center">3</span>
+        </button>
       </div>
       <GuidedHint text="Toque no restaurante para começar sua jornada" />
       <div className="flex items-center gap-2 bg-muted rounded-xl px-4 py-3 mb-5">
@@ -177,6 +188,55 @@ const HomeScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate 
   );
 };
 
+// ============ NOTIFICATIONS ============
+
+const NotificationsScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
+  const notifications = [
+    { id: 1, type: 'reservation', title: 'Reserva confirmada!', desc: 'Bistrô Noowe · Hoje às 20:00 · 2 pessoas', time: 'Agora', icon: CalendarDays, color: 'bg-success/10 text-success', unread: true },
+    { id: 2, type: 'invite', title: 'Maria te convidou!', desc: 'Junte-se à comanda da Mesa 7 no Bistrô Noowe', time: '5 min', icon: UserPlus, color: 'bg-primary/10 text-primary', unread: true, action: 'Aceitar' },
+    { id: 3, type: 'queue', title: 'Sua mesa está pronta!', desc: 'Bistrô Noowe · Mesa 12 está disponível', time: '12 min', icon: Timer, color: 'bg-warning/10 text-warning', unread: true },
+    { id: 4, type: 'loyalty', title: '+125 pontos ganhos', desc: 'Visita ao Bistrô Noowe · Total: 1.250 pts', time: '2h', icon: Gift, color: 'bg-accent/10 text-accent' },
+    { id: 5, type: 'promo', title: '🎉 Happy Hour ativo!', desc: 'Drinks com 30% off até 19h no Bistrô Noowe', time: '3h', icon: Sparkles, color: 'bg-secondary/10 text-secondary' },
+    { id: 6, type: 'order', title: 'Seu pedido está pronto!', desc: 'Tartare de Atum e Filé ao Molho de Vinho', time: 'Ontem', icon: ChefHat, color: 'bg-primary/10 text-primary' },
+  ];
+
+  return (
+    <div className="px-5 pb-4">
+      <div className="flex items-center justify-between py-4">
+        <button onClick={() => onNavigate('home')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+        <h1 className="font-display font-bold">Notificações</h1>
+        <button className="text-xs text-primary font-medium">Limpar</button>
+      </div>
+      <div className="space-y-2">
+        {notifications.map((n) => (
+          <div key={n.id} className={`p-4 rounded-xl border transition-colors ${n.unread ? 'bg-primary/5 border-primary/15' : 'bg-card border-border'}`}>
+            <div className="flex gap-3">
+              <div className={`w-10 h-10 rounded-xl ${n.color} flex items-center justify-center shrink-0`}>
+                <n.icon className="w-5 h-5" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <p className={`text-sm ${n.unread ? 'font-semibold text-foreground' : 'font-medium text-foreground'}`}>{n.title}</p>
+                  <span className="text-[10px] text-muted-foreground shrink-0">{n.time}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">{n.desc}</p>
+                {n.action && (
+                  <div className="flex gap-2 mt-2">
+                    <button onClick={() => onNavigate('my-orders')} className="px-4 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">{n.action}</button>
+                    <button className="px-4 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground">Recusar</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ============ RESTAURANT ============
+
 const RestaurantScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { restaurant } = useDemoContext();
   return (
@@ -214,6 +274,8 @@ const RestaurantScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNav
     </div>
   );
 };
+
+// ============ QR SCAN ============
 
 const QRScanScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const [scanned, setScanned] = useState(false);
@@ -255,6 +317,8 @@ const QRScanScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigat
   );
 };
 
+// ============ CALL WAITER ============
+
 const CallWaiterScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const [called, setCalled] = useState<string | null>(null);
   const [confirmed, setConfirmed] = useState(false);
@@ -271,9 +335,9 @@ const CallWaiterScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNav
           <p className="text-sm text-muted-foreground mb-5">Mesa 7 · Bistrô Noowe</p>
           <div className="space-y-3">
             {[
-              { type: 'waiter', icon: HandMetal, label: 'Chamar Garçom', desc: 'Atendimento geral', color: 'bg-primary/10 text-primary' },
-              { type: 'sommelier', icon: Star, label: 'Chamar Sommelier', desc: 'Ajuda com vinhos e harmonização', color: 'bg-secondary/10 text-secondary' },
-              { type: 'help', icon: HelpCircle, label: 'Preciso de Ajuda', desc: 'Outras necessidades', color: 'bg-muted text-muted-foreground' },
+              { type: 'waiter', icon: HandMetal, label: 'Chamar Garçom', desc: 'Dúvidas sobre pratos, pedidos especiais', color: 'bg-primary/10 text-primary' },
+              { type: 'sommelier', icon: Wine, label: 'Chamar Sommelier', desc: 'Harmonização de vinhos e drinks', color: 'bg-secondary/10 text-secondary' },
+              { type: 'help', icon: HelpCircle, label: 'Preciso de Ajuda', desc: 'Acessibilidade, limpeza, outros', color: 'bg-muted text-muted-foreground' },
             ].map(({ type, icon: Icon, label, desc, color }) => (
               <button key={type} onClick={() => handleCall(type)} disabled={called !== null} className="w-full flex items-center gap-4 p-4 rounded-xl border border-border hover:border-primary/30 transition-all text-left disabled:opacity-50">
                 <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center`}><Icon className="w-5 h-5" /></div>
@@ -299,6 +363,8 @@ const CallWaiterScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNav
     </div>
   );
 };
+
+// ============ VIRTUAL QUEUE ============
 
 const VirtualQueueScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const [joined, setJoined] = useState(false);
@@ -348,6 +414,8 @@ const VirtualQueueScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
   );
 };
 
+// ============ PROFILE ============
+
 const ProfileScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { loyaltyPoints } = useDemoContext();
   return (
@@ -365,17 +433,20 @@ const ProfileScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNaviga
       </div>
       <div className="space-y-1">
         {[
+          { icon: Bell, label: 'Notificações', screen: 'notifications' as Screen, badge: 3 },
           { icon: History, label: 'Histórico de Visitas', screen: 'my-orders' as Screen },
           { icon: CalendarDays, label: 'Minhas Reservas', screen: 'reservations' as Screen },
           { icon: Gift, label: 'Programa de Fidelidade', screen: 'loyalty' as Screen },
           { icon: CreditCard, label: 'Métodos de Pagamento' },
           { icon: Heart, label: 'Restaurantes Favoritos' },
-          { icon: Bell, label: 'Notificações' },
           { icon: Settings, label: 'Configurações' },
           { icon: HelpCircle, label: 'Ajuda & Suporte' },
-        ].map(({ icon: Icon, label, screen }) => (
+        ].map(({ icon: Icon, label, screen, badge }) => (
           <button key={label} onClick={() => screen ? onNavigate(screen) : undefined} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
-            <Icon className="w-5 h-5 text-muted-foreground" /><span className="flex-1 text-sm text-left">{label}</span><ChevronRight className="w-4 h-4 text-muted-foreground/40" />
+            <Icon className="w-5 h-5 text-muted-foreground" />
+            <span className="flex-1 text-sm text-left">{label}</span>
+            {badge && <span className="w-5 h-5 rounded-full bg-destructive text-primary-foreground text-[10px] font-bold flex items-center justify-center">{badge}</span>}
+            <ChevronRight className="w-4 h-4 text-muted-foreground/40" />
           </button>
         ))}
       </div>
@@ -383,6 +454,8 @@ const ProfileScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNaviga
     </div>
   );
 };
+
+// ============ MY ORDERS ============
 
 const MyOrdersScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { clientActiveOrder } = useDemoContext();
@@ -402,11 +475,6 @@ const MyOrdersScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavig
             <p className="text-sm font-semibold">Bistrô Noowe · Mesa 7</p>
             <p className="text-xs text-muted-foreground">{clientActiveOrder.items.length} itens · R$ {clientActiveOrder.total}</p>
             <div className="flex items-center gap-1 mt-2 text-primary text-xs font-medium"><span>Acompanhar</span><ArrowRight className="w-3 h-3" /></div>
-          </button>
-          <button onClick={() => onNavigate('shared-comanda')} className="w-full p-3 rounded-xl border border-border mb-5 flex items-center gap-3">
-            <Users className="w-5 h-5 text-primary" />
-            <div className="flex-1 text-left"><p className="text-sm font-semibold">Comanda Compartilhada</p><p className="text-xs text-muted-foreground">3 pessoas na mesa · ver divisão</p></div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
           </button>
         </>
       )}
@@ -429,6 +497,8 @@ const MyOrdersScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavig
   );
 };
 
+// ============ MENU ============
+
 const MenuScreen: React.FC<{ onNavigate: (s: Screen) => void; onSelectItem: (item: DemoMenuItem) => void }> = ({ onNavigate, onSelectItem }) => {
   const { menu, cart } = useDemoContext();
   const categories = [...new Set(menu.map(m => m.category))];
@@ -447,7 +517,7 @@ const MenuScreen: React.FC<{ onNavigate: (s: Screen) => void; onSelectItem: (ite
         </div>
         <div className="flex gap-2 mb-3">
           <button onClick={() => onNavigate('call-waiter')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs font-medium"><HandMetal className="w-3 h-3 text-primary" />Chamar Garçom</button>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-muted text-xs font-medium"><Sparkles className="w-3 h-3 text-secondary" />Harmonização IA</button>
+          <button onClick={() => onNavigate('ai-harmonization')} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-primary/10 to-accent/10 text-xs font-medium border border-primary/20"><Brain className="w-3 h-3 text-primary" />Harmonização IA</button>
         </div>
         <div className="flex gap-2 overflow-x-auto scrollbar-hide">
           {categories.map(cat => (<button key={cat} onClick={() => setActiveCategory(cat)} className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${activeCategory === cat ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{cat}</button>))}
@@ -483,6 +553,132 @@ const MenuScreen: React.FC<{ onNavigate: (s: Screen) => void; onSelectItem: (ite
     </div>
   );
 };
+
+// ============ AI HARMONIZATION ============
+
+const AIHarmonizationScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
+  const [step, setStep] = useState<'preferences' | 'loading' | 'results'>('preferences');
+  const [selectedPrefs, setSelectedPrefs] = useState<string[]>(['Vinho Tinto']);
+
+  const togglePref = (p: string) => setSelectedPrefs(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+
+  useEffect(() => {
+    if (step === 'loading') {
+      const t = setTimeout(() => setStep('results'), 2000);
+      return () => clearTimeout(t);
+    }
+  }, [step]);
+
+  return (
+    <div className="px-5 pb-4">
+      <div className="flex items-center justify-between py-4">
+        <button onClick={() => onNavigate('menu')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+        <h1 className="font-display font-bold flex items-center gap-2"><Brain className="w-5 h-5 text-primary" />Harmonização IA</h1>
+        <div className="w-8" />
+      </div>
+
+      {step === 'preferences' && (
+        <>
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3">
+              <Sparkles className="w-8 h-8 text-primary" />
+            </div>
+            <h2 className="font-display text-lg font-bold mb-1">Deixe a IA montar sua experiência</h2>
+            <p className="text-xs text-muted-foreground">Selecione suas preferências e nossa IA sugerirá a combinação perfeita de pratos e bebidas</p>
+          </div>
+
+          <div className="mb-5">
+            <label className="text-sm font-semibold mb-3 block">Preferência de bebida</label>
+            <div className="flex flex-wrap gap-2">
+              {['Vinho Tinto', 'Vinho Branco', 'Espumante', 'Cerveja', 'Cocktail', 'Sem álcool'].map(p => (
+                <button key={p} onClick={() => togglePref(p)} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${selectedPrefs.includes(p) ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-5">
+            <label className="text-sm font-semibold mb-3 block">Restrições alimentares</label>
+            <div className="flex flex-wrap gap-2">
+              {['Nenhuma', 'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose'].map((p, i) => (
+                <button key={p} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${i === 0 ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-5">
+            <label className="text-sm font-semibold mb-3 block">Ocasião</label>
+            <div className="flex flex-wrap gap-2">
+              {['Jantar casual', 'Encontro romântico', 'Negócios', 'Aniversário', 'Com amigos'].map((p, i) => (
+                <button key={p} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${i === 0 ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
+              ))}
+            </div>
+          </div>
+
+          <button onClick={() => setStep('loading')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-semibold text-sm shadow-glow flex items-center justify-center gap-2">
+            <Brain className="w-4 h-4" />Gerar Harmonização
+          </button>
+        </>
+      )}
+
+      {step === 'loading' && (
+        <div className="text-center py-12">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-5 animate-pulse">
+            <Brain className="w-10 h-10 text-primary" />
+          </div>
+          <h2 className="font-display text-lg font-bold mb-2">Analisando combinações...</h2>
+          <p className="text-xs text-muted-foreground mb-4">Nossa IA está avaliando 430+ combinações de pratos e bebidas</p>
+          <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
+        </div>
+      )}
+
+      {step === 'results' && (
+        <>
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-5">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-foreground">Harmonização Perfeita</span>
+              <span className="px-2 py-0.5 rounded-full bg-success/20 text-success text-[10px] font-bold">98% match</span>
+            </div>
+            <p className="text-xs text-muted-foreground">Baseado nas suas preferências de vinho tinto e jantar casual</p>
+          </div>
+
+          <div className="space-y-3 mb-5">
+            {[
+              { course: 'Entrada', name: 'Tartare de Atum', desc: 'Notas cítricas que preparam o paladar', price: 58, icon: Leaf },
+              { course: 'Principal', name: 'Filé ao Molho de Vinho', desc: 'Harmoniza perfeitamente com taninos encorpados', price: 118, icon: Flame },
+              { course: 'Vinho', name: 'Malbec Reserva 2019', desc: 'Argentino, frutado com taninos macios', price: 89, icon: Wine },
+              { course: 'Sobremesa', name: 'Crème Brûlée', desc: 'Finaliza com doçura equilibrada', price: 38, icon: Star },
+            ].map((item, i) => (
+              <div key={i} className="p-4 rounded-xl border border-border bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><item.icon className="w-4 h-4 text-primary" /></div>
+                  <div className="flex-1">
+                    <p className="text-[10px] text-primary font-semibold uppercase tracking-wider">{item.course}</p>
+                    <p className="text-sm font-semibold text-foreground">{item.name}</p>
+                  </div>
+                  <span className="font-display font-bold text-sm text-foreground">R$ {item.price}</span>
+                </div>
+                <p className="text-xs text-muted-foreground ml-10">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="p-4 rounded-xl bg-muted/30 mb-4">
+            <div className="flex justify-between mb-1"><span className="text-sm text-muted-foreground">Total sugerido</span><span className="font-display font-bold text-lg text-foreground">R$ 303</span></div>
+            <p className="text-xs text-muted-foreground">Experiência completa para 1 pessoa</p>
+          </div>
+
+          <div className="space-y-2">
+            <button onClick={() => onNavigate('menu')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-glow">Adicionar Tudo à Comanda</button>
+            <button onClick={() => onNavigate('menu')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm text-muted-foreground">Escolher Manualmente</button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+// ============ ITEM DETAIL ============
 
 const ItemDetailScreen: React.FC<{ item: DemoMenuItem; onNavigate: (s: Screen) => void }> = ({ item, onNavigate }) => {
   const { addToCart } = useDemoContext();
@@ -521,6 +717,8 @@ const ItemDetailScreen: React.FC<{ item: DemoMenuItem; onNavigate: (s: Screen) =
   );
 };
 
+// ============ COMANDA ============
+
 const ComandaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { cart, updateCartQuantity, removeFromCart, cartTotal } = useDemoContext();
   return (
@@ -538,54 +736,46 @@ const ComandaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNaviga
         </div>
       ) : (
         <>
-          <GuidedHint text="Revise sua comanda e vá para o pagamento" pulse={false} />
-
-          {/* Restaurant Info */}
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 mb-4">
             <span className="text-2xl">🍽️</span>
             <div className="flex-1"><p className="font-semibold text-sm">Bistrô Noowe</p><p className="text-xs text-muted-foreground">Mesa 7 · Fine Dining</p></div>
-            <button onClick={() => onNavigate('order-status')} className="px-3 py-2 rounded-xl bg-primary/10 text-primary text-xs font-medium">Ver Status</button>
           </div>
 
-          {/* AI Pairing */}
-          <button className="w-full p-3 rounded-xl bg-foreground flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center"><Sparkles className="w-5 h-5 text-primary-foreground" /></div>
-            <div className="flex-1 text-left"><p className="text-background font-semibold text-sm">Harmonização IA</p><p className="text-muted text-xs">Bebidas ideais para sua comanda</p></div>
-            <ChevronRight className="w-5 h-5 text-muted" />
+          <GuidedHint text="Revise seus itens e feche a conta quando quiser" pulse={false} />
+
+          {cart.map((item) => (
+            <div key={item.menuItem.id} className="flex items-center gap-3 py-3 border-b border-border">
+              <img src={item.menuItem.image} alt={item.menuItem.name} className="w-14 h-14 rounded-xl object-cover" />
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm truncate">{item.menuItem.name}</p>
+                <p className="text-xs text-muted-foreground">R$ {item.menuItem.price}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => item.quantity === 1 ? removeFromCart(item.menuItem.id) : updateCartQuantity(item.menuItem.id, item.quantity - 1)} className="w-7 h-7 rounded-full border border-border flex items-center justify-center"><Minus className="w-3 h-3" /></button>
+                <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
+                <button onClick={() => updateCartQuantity(item.menuItem.id, item.quantity + 1)} className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"><Plus className="w-3 h-3" /></button>
+              </div>
+            </div>
+          ))}
+
+          {/* Invite people to comanda */}
+          <button className="w-full mt-4 p-3 rounded-xl border border-dashed border-border flex items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+            <UserPlus className="w-4 h-4" /><span className="text-xs font-medium">Convidar pessoas para a comanda</span>
           </button>
 
-          <div className="space-y-3">
-            {cart.map(item => (
-              <div key={item.menuItem.id} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
-                <img src={item.menuItem.image} alt={item.menuItem.name} className="w-16 h-16 rounded-xl object-cover" />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm truncate">{item.menuItem.name}</h3>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{item.menuItem.description}</p>
-                  <p className="text-sm font-display font-semibold text-primary mt-1">R$ {item.menuItem.price * item.quantity}</p>
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => updateCartQuantity(item.menuItem.id, item.quantity - 1)} className="w-7 h-7 rounded-full border border-border flex items-center justify-center"><Minus className="w-3 h-3" /></button>
-                    <span className="font-semibold text-sm w-4 text-center">{item.quantity}</span>
-                    <button onClick={() => updateCartQuantity(item.menuItem.id, item.quantity + 1)} className="w-7 h-7 rounded-full bg-primary text-primary-foreground flex items-center justify-center"><Plus className="w-3 h-3" /></button>
-                  </div>
-                  <button onClick={() => removeFromCart(item.menuItem.id)} className="text-xs text-muted-foreground hover:text-destructive">Remover</button>
-                </div>
-              </div>
-            ))}
+          <div className="mt-5 p-4 rounded-xl bg-muted/30">
+            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">R$ {cartTotal}</span></div>
+            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Taxa de serviço (10%)</span><span className="font-medium">R$ {Math.round(cartTotal * 0.1)}</span></div>
+            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
+              <span>Total</span><span>R$ {Math.round(cartTotal * 1.1)}</span>
+            </div>
           </div>
 
-          <button onClick={() => onNavigate('menu')} className="w-full mt-4 py-3 rounded-2xl border-2 border-dashed border-primary/30 text-primary font-medium text-sm">+ Adicionar mais itens</button>
-
-          <div className="mt-5 p-4 rounded-xl bg-muted/30 space-y-2">
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>R$ {cartTotal}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Taxa de serviço (10%)</span><span>R$ {Math.round(cartTotal * 0.1)}</span></div>
-            <div className="border-t border-border pt-2 flex justify-between font-display font-bold"><span>Total</span><span>R$ {Math.round(cartTotal * 1.1)}</span></div>
-          </div>
-
-          <div className="flex gap-3 mt-5">
-            <button onClick={() => onNavigate('shared-comanda')} className="flex-1 py-4 rounded-2xl bg-muted font-semibold text-foreground text-sm flex items-center justify-center gap-2"><Users className="w-4 h-4" />Comanda Compartilhada</button>
-            <button onClick={() => onNavigate('checkout')} className="flex-1 py-4 rounded-2xl bg-primary text-primary-foreground font-semibold shadow-glow text-sm">Pagar</button>
+          <div className="space-y-2 mt-4">
+            <button onClick={() => onNavigate('fechar-conta')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-semibold text-sm shadow-glow flex items-center justify-center gap-2">
+              <CreditCard className="w-4 h-4" />Fechar Conta
+            </button>
+            <button onClick={() => onNavigate('menu')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm text-muted-foreground">Adicionar mais itens</button>
           </div>
         </>
       )}
@@ -593,364 +783,280 @@ const ComandaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNaviga
   );
 };
 
-// ============ NEW: ORDER STATUS (Rich V2 Style) ============
+// ============ ORDER STATUS (V2 Style) ============
 
 const OrderStatusScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
-  const { clientActiveOrder } = useDemoContext();
-  const status = clientActiveOrder?.status || 'preparing';
+  const [elapsedMin, setElapsedMin] = useState(8);
+  useEffect(() => { const t = setInterval(() => setElapsedMin(prev => prev + 1), 15000); return () => clearInterval(t); }, []);
 
-  const statusSteps = [
-    { key: 'confirmed' as OrderStatus, label: 'Recebido', icon: Check, completed: true },
-    { key: 'preparing' as OrderStatus, label: 'Preparando', icon: ChefHat, completed: status !== 'confirmed', active: status === 'preparing' },
-    { key: 'ready' as OrderStatus, label: 'Pronto', icon: UtensilsCrossed, completed: status === 'ready' || status === 'delivered', active: status === 'ready' },
-    { key: 'delivered' as OrderStatus, label: 'Entregue', icon: Sparkles, completed: status === 'delivered', active: status === 'delivered' },
+  const orderItems = [
+    { name: 'Tartare de Atum', status: 'ready' as const, chef: 'Chef Ricardo', time: '12 min' },
+    { name: 'Filé ao Molho de Vinho', status: 'preparing' as const, chef: 'Chef Ricardo', time: '~8 min' },
+    { name: 'Risoto de Funghi', status: 'preparing' as const, chef: 'Chef Ana', time: '~10 min' },
+    { name: 'Gin Tônica Aurora', status: 'ready' as const, chef: 'Bar', time: '3 min' },
   ];
 
-  const orderItems = clientActiveOrder?.items || [
-    { menuItem: { id: 'e1', name: 'Tartare de Atum', price: 58, prepTime: 8 } as DemoMenuItem, quantity: 1 },
-    { menuItem: { id: 'p2', name: 'Filé ao Molho de Vinho', price: 118, prepTime: 25 } as DemoMenuItem, quantity: 1 },
-    { menuItem: { id: 'b1', name: 'Gin Tônica Aurora', price: 38, prepTime: 3 } as DemoMenuItem, quantity: 2 },
-  ];
+  const statusConfig = {
+    ready: { label: 'Pronto', color: 'bg-success text-primary-foreground', icon: CheckCircle },
+    preparing: { label: 'Preparando', color: 'bg-warning text-primary-foreground', icon: ChefHat },
+    pending: { label: 'Na fila', color: 'bg-muted text-muted-foreground', icon: Clock },
+  };
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header with gradient */}
-      <div className="bg-gradient-to-br from-primary via-primary/90 to-accent px-4 pt-3 pb-8">
-        <div className="flex items-center gap-3 mb-5">
-          <button onClick={() => onNavigate('my-orders')} className="p-2 rounded-xl bg-primary-foreground/20 backdrop-blur-sm"><ArrowLeft className="h-5 w-5 text-primary-foreground" /></button>
-          <div className="flex-1">
-            <h1 className="text-lg font-bold text-primary-foreground">Status do Pedido</h1>
-            <p className="text-primary-foreground/80 text-xs">Mesa 7 • Bistrô Noowe</p>
-          </div>
-          <button onClick={() => onNavigate('call-waiter')} className="p-2 rounded-xl bg-primary-foreground/20"><Bell className="h-5 w-5 text-primary-foreground" /></button>
+    <div className="pb-4">
+      {/* Hero header */}
+      <div className="bg-gradient-to-br from-primary to-accent p-5 pb-8">
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => onNavigate('my-orders')} className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center"><ArrowLeft className="w-4 h-4 text-primary-foreground" /></button>
+          <span className="text-xs text-primary-foreground/70 font-medium">Pedido #2847</span>
+          <button onClick={() => onNavigate('call-waiter')} className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center"><HandMetal className="w-4 h-4 text-primary-foreground" /></button>
         </div>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3 animate-pulse">
+            <ChefHat className="w-8 h-8 text-primary-foreground" />
+          </div>
+          <h1 className="text-xl font-bold text-primary-foreground mb-1">Preparando seu pedido</h1>
+          <p className="text-sm text-primary-foreground/70">{elapsedMin} min decorridos · ETA ~15 min</p>
+        </div>
+      </div>
 
-        {/* Progress Steps */}
-        <div className="bg-primary-foreground/15 backdrop-blur-sm rounded-2xl p-4">
-          <div className="flex items-center justify-between">
-            {statusSteps.map((step, index) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.key} className="flex items-center">
-                  <div className="flex flex-col items-center">
-                    <div className={`w-11 h-11 rounded-2xl flex items-center justify-center ${step.completed ? step.active ? 'bg-primary-foreground shadow-lg' : 'bg-primary-foreground/30' : 'bg-primary-foreground/10'}`}>
-                      <Icon className={`w-5 h-5 ${step.completed ? step.active ? 'text-primary' : 'text-primary-foreground' : 'text-primary-foreground/50'}`} />
-                    </div>
-                    <span className={`text-[10px] mt-1.5 font-medium ${step.active ? 'text-primary-foreground' : 'text-primary-foreground/70'}`}>{step.label}</span>
-                  </div>
-                  {index < statusSteps.length - 1 && <div className={`w-8 h-1 mx-1 rounded-full ${step.completed ? 'bg-primary-foreground/50' : 'bg-primary-foreground/20'}`} />}
-                </div>
-              );
-            })}
+      {/* Progress bar */}
+      <div className="px-5 -mt-4">
+        <div className="bg-card rounded-2xl p-4 shadow-md border border-border mb-4">
+          <div className="flex justify-between text-xs text-muted-foreground mb-2">
+            <span>Recebido</span><span>Preparando</span><span>Pronto</span><span>Entregue</span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style={{ width: '55%' }} />
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto -mt-4 px-4 pb-8">
-        {/* ETA Card */}
-        <div className="bg-card rounded-3xl p-4 shadow-lg border border-border mb-4">
-          <div className="flex items-center justify-between">
-            <div><p className="text-muted-foreground text-xs">Tempo estimado</p><p className="text-2xl font-bold text-foreground">12-18 min</p></div>
-            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center"><Clock className="w-7 h-7 text-primary" /></div>
-          </div>
-          <div className="mt-3 h-2 bg-muted rounded-full overflow-hidden"><div className="h-full w-2/3 bg-gradient-to-r from-primary to-accent rounded-full animate-pulse" /></div>
-        </div>
-
-        {/* Items with individual status */}
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Itens da Comanda</h2>
-        <div className="space-y-3 mb-4">
+      {/* Items */}
+      <div className="px-5">
+        <h2 className="font-semibold text-sm mb-3">Itens do pedido</h2>
+        <div className="space-y-2">
           {orderItems.map((item, i) => {
-            const itemStatus = i === 0 ? 'preparing' : i === 1 ? 'preparing' : 'ready';
+            const config = statusConfig[item.status];
+            const Icon = config.icon;
             return (
-              <div key={item.menuItem.id + i} className={`bg-card rounded-2xl p-4 border ${itemStatus === 'preparing' ? 'border-primary/30 shadow-sm shadow-primary/10' : itemStatus === 'ready' ? 'border-success/30' : 'border-border'}`}>
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-sm text-foreground">{item.menuItem.name}</h3>
-                    {item.quantity > 1 && <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">x{item.quantity}</span>}
-                  </div>
-                  <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                    itemStatus === 'preparing' ? 'bg-primary/10 text-primary' :
-                    itemStatus === 'ready' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {itemStatus === 'preparing' ? 'Preparando' : itemStatus === 'ready' ? 'Pronto!' : 'Na fila'}
-                  </span>
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card">
+                <div className={`w-9 h-9 rounded-lg ${config.color} flex items-center justify-center`}>
+                  <Icon className="w-4 h-4" />
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground flex items-center gap-1"><ChefHat className="w-3.5 h-3.5" />Chef Tanaka</span>
-                  <span className="text-primary font-medium">~{item.menuItem.prepTime || 10}min</span>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-foreground">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">{item.chef} · {item.time}</p>
                 </div>
+                <span className={`px-2 py-1 rounded-lg text-[10px] font-semibold ${item.status === 'ready' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                  {config.label}
+                </span>
               </div>
             );
           })}
         </div>
 
-        {/* Quick Actions */}
-        <div className="space-y-2">
-          <button onClick={() => onNavigate('shared-comanda')} className="w-full p-4 rounded-2xl bg-card border border-border flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><Users className="w-5 h-5 text-primary" /></div>
-            <div className="flex-1 text-left"><p className="font-semibold text-sm">Comanda Compartilhada</p><p className="text-xs text-muted-foreground">3 pessoas · ver divisão</p></div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
-          <button onClick={() => onNavigate('split-payment')} className="w-full p-4 rounded-2xl bg-card border border-border flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center"><CreditCard className="w-5 h-5 text-accent-foreground" /></div>
-            <div className="flex-1 text-left"><p className="font-semibold text-sm">Pagar / Dividir Conta</p><p className="text-xs text-muted-foreground">4 modos de divisão disponíveis</p></div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </button>
-          <button onClick={() => onNavigate('call-waiter')} className="w-full p-4 rounded-2xl bg-foreground flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-muted-foreground/20 flex items-center justify-center"><HandMetal className="w-5 h-5 text-background" /></div>
-            <div className="flex-1 text-left"><p className="text-background font-semibold text-sm">Chamar Garçom</p><p className="text-muted text-xs">Atendimento discreto</p></div>
-          </button>
+        {/* Table info */}
+        <div className="mt-5 p-4 rounded-xl bg-muted/30 flex items-center gap-3">
+          <Users className="w-5 h-5 text-primary" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Mesa 7 · 3 pessoas</p>
+            <p className="text-xs text-muted-foreground">Você, Maria e João</p>
+          </div>
+          <button onClick={() => onNavigate('fechar-conta')} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">Fechar Conta</button>
         </div>
       </div>
     </div>
   );
 };
 
-// ============ SHARED COMANDA (from SharedOrderScreenV2) ============
+// ============ FECHAR CONTA — UNIFIED PAYMENT FLOW ============
+// This is the ONE screen where everything happens:
+// - See who's at the table
+// - Invite more people
+// - Choose to pay solo or split
+// - Choose split mode
+// - Select payment method
+// - Add tip
+// - Pay
 
-const SharedComandaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
-  const [inviteSent, setInviteSent] = useState(false);
-
-  const guests = [
-    { id: 'you', name: 'Você', avatar: '👤', isHost: true, items: [{ name: 'Tartare de Atum', price: 58 }, { name: 'Filé ao Molho de Vinho', price: 118 }], amountDue: 193.60, paid: false },
-    { id: 'maria', name: 'Maria Silva', avatar: '👩', isHost: false, items: [{ name: 'Risoto de Funghi', price: 82 }, { name: 'Crème Brûlée', price: 38 }], amountDue: 132.00, paid: true },
-    { id: 'joao', name: 'João Santos', avatar: '👨', isHost: false, items: [{ name: 'Salmão Grelhado', price: 96 }, { name: 'Gin Tônica Aurora', price: 38 }], amountDue: 147.40, paid: false, partialPaid: 50 },
-  ];
-  const totalOrder = 473.00;
-  const totalPaid = 132 + 50;
-
-  return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="px-5 py-4 bg-card border-b border-border">
-        <div className="flex items-center gap-3 mb-3">
-          <button onClick={() => onNavigate('comanda')} className="p-2 -ml-2 rounded-full hover:bg-muted transition-colors"><ArrowLeft className="w-5 h-5 text-muted-foreground" /></button>
-          <div className="flex-1"><h1 className="text-lg font-semibold text-foreground">Comanda Compartilhada</h1><p className="text-xs text-muted-foreground">Bistrô Noowe · Mesa 7</p></div>
-          <button onClick={() => setInviteSent(true)} className="p-2.5 rounded-full bg-gradient-to-br from-primary to-accent text-primary-foreground shadow-lg"><UserPlus className="w-5 h-5" /></button>
-        </div>
-        {/* Split Mode Selector */}
-        <div className="flex gap-2">
-          {[{ id: 'individual', name: 'Individual', icon: Receipt }, { id: 'equal', name: 'Dividir Igual', icon: Users }, { id: 'selective', name: 'Por Item', icon: Check }].map((mode, i) => (
-            <button key={mode.id} className={`flex items-center gap-2 px-3 py-2 rounded-xl border whitespace-nowrap ${i === 0 ? 'bg-primary/10 border-primary text-primary' : 'bg-card border-border text-muted-foreground'}`}>
-              <mode.icon className="w-4 h-4" /><span className="text-sm font-medium">{mode.name}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-5 py-4 pb-48">
-        {inviteSent && (
-          <div className="p-3 rounded-xl bg-success/10 border border-success/30 mb-4 flex items-center gap-3">
-            <Check className="w-5 h-5 text-success" />
-            <div><p className="text-sm font-medium text-success">Convite enviado!</p><p className="text-xs text-muted-foreground">Enviado via app e SMS</p></div>
-          </div>
-        )}
-
-        {/* Payment Progress */}
-        <div className="p-4 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold text-foreground text-sm">Progresso do Pagamento</h3>
-            <span className="text-sm font-mono text-muted-foreground">R$ {totalPaid.toFixed(2)} / R$ {totalOrder.toFixed(2)}</span>
-          </div>
-          <div className="h-3 rounded-full bg-card overflow-hidden shadow-inner">
-            <div className="h-full rounded-full bg-gradient-to-r from-primary to-accent transition-all" style={{ width: `${(totalPaid / totalOrder) * 100}%` }} />
-          </div>
-          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
-            <span>{guests.filter(g => g.paid).length} de {guests.length} pagaram</span>
-            <span>Falta: R$ {(totalOrder - totalPaid).toFixed(2)}</span>
-          </div>
-        </div>
-
-        {/* Guests */}
-        <h2 className="font-semibold text-xs text-muted-foreground mb-3">PARTICIPANTES ({guests.length})</h2>
-        <div className="space-y-3">
-          {guests.map((guest) => (
-            <div key={guest.id} className={`rounded-2xl border overflow-hidden ${guest.paid ? 'bg-success/5 border-success/30' : guest.partialPaid ? 'bg-warning/5 border-warning/30' : 'bg-card border-border'}`}>
-              <div className="p-3 border-b border-border/50">
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <span className="text-2xl">{guest.avatar}</span>
-                    {guest.paid && <div className="absolute -bottom-1 -right-1 p-0.5 rounded-full bg-success"><Check className="w-3 h-3 text-primary-foreground" /></div>}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-sm text-foreground">{guest.name}</span>
-                      {guest.isHost && <Crown className="w-4 h-4 text-accent" />}
-                    </div>
-                    <div className="flex items-center gap-2 text-xs">
-                      {guest.paid ? (
-                        <span className="text-success flex items-center gap-1"><CheckCircle className="w-3 h-3" />Pago</span>
-                      ) : guest.partialPaid ? (
-                        <span className="text-warning flex items-center gap-1"><Clock className="w-3 h-3" />Parcial (R$ {guest.partialPaid})</span>
-                      ) : (
-                        <span className="text-muted-foreground flex items-center gap-1"><AlertCircle className="w-3 h-3" />Pendente</span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-sm text-foreground">R$ {guest.amountDue.toFixed(2)}</p>
-                    <p className="text-xs text-muted-foreground">{guest.items.length} itens</p>
-                  </div>
-                </div>
-              </div>
-              <div className="p-3 space-y-1">
-                {guest.items.map((item, i) => (
-                  <div key={i} className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{item.name}</span>
-                    <span className="font-medium text-foreground">R$ {item.price.toFixed(2)}</span>
-                  </div>
-                ))}
-              </div>
-              {!guest.paid && guest.isHost && (
-                <div className="p-3 pt-0">
-                  <button onClick={() => onNavigate('split-payment')} className="w-full py-2.5 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold text-sm shadow-lg">
-                    Pagar R$ {guest.amountDue.toFixed(2)}
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Invite Guest */}
-        <button onClick={() => setInviteSent(true)} className="w-full mt-4 p-4 rounded-2xl border-2 border-dashed border-border flex items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-          <UserPlus className="w-5 h-5" /><span className="font-medium">Convidar Participante</span>
-        </button>
-
-        {/* Share Link */}
-        <div className="mt-4 p-4 rounded-2xl bg-muted/30 flex items-center gap-3">
-          <Share2 className="w-5 h-5 text-primary" />
-          <div className="flex-1"><p className="text-sm font-medium">Compartilhar comanda</p><p className="text-xs text-muted-foreground">noowe.app/join/BN-7-2847</p></div>
-          <button className="p-2 rounded-lg bg-primary/10"><Copy className="w-4 h-4 text-primary" /></button>
-        </div>
-      </div>
-
-      {/* Bottom */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background via-background to-transparent pt-8">
-        <div className="p-4 rounded-2xl bg-card border border-border shadow-sm mb-3">
-          <div className="flex items-center justify-between mb-1">
-            <span className="text-sm text-muted-foreground">Sua parte:</span>
-            <span className="font-bold text-lg text-foreground">R$ 193,60</span>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground"><Receipt className="w-3.5 h-3.5" /><span>2 itens + taxa de serviço</span></div>
-        </div>
-        <button onClick={() => onNavigate('split-payment')} className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/25">
-          <CreditCard className="w-5 h-5" />Pagar Minha Parte
-        </button>
-      </div>
-    </div>
-  );
-};
-
-// ============ SPLIT PAYMENT (from SplitPaymentScreenV2 / UnifiedPaymentScreenV2) ============
-
-const SplitPaymentScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
-  const [splitMode, setSplitMode] = useState<'individual' | 'equal' | 'selective' | 'fixed'>('selective');
-  const [selectedPayment, setSelectedPayment] = useState<string>('pix');
+const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
+  const [payMode, setPayMode] = useState<'solo' | 'split'>('split');
+  const [splitMode, setSplitMode] = useState<'individual' | 'equal' | 'selective' | 'fixed'>('individual');
+  const [selectedPayment, setSelectedPayment] = useState('pix');
   const [tipPercent, setTipPercent] = useState(10);
   const [selectedItems, setSelectedItems] = useState<string[]>(['i1', 'i2']);
   const [fixedAmount, setFixedAmount] = useState(200);
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
 
   const orderItems = [
     { id: 'i1', name: 'Tartare de Atum', price: 58, orderedBy: 'Você' },
     { id: 'i2', name: 'Filé ao Molho de Vinho', price: 118, orderedBy: 'Você' },
     { id: 'i3', name: 'Risoto de Funghi', price: 82, orderedBy: 'Maria' },
-    { id: 'i4', name: 'Crème Brûlée', price: 38, orderedBy: 'Maria', paid: true },
+    { id: 'i4', name: 'Crème Brûlée', price: 38, orderedBy: 'Maria' },
     { id: 'i5', name: 'Salmão Grelhado', price: 96, orderedBy: 'João' },
     { id: 'i6', name: 'Gin Tônica Aurora', price: 38, orderedBy: 'João' },
   ];
 
   const guests = [
-    { id: 'you', name: 'Você (Anfitrião)', paid: false },
-    { id: 'maria', name: 'Maria Silva', paid: true },
-    { id: 'joao', name: 'João Santos', paid: false },
+    { id: 'you', name: 'Você', role: 'Anfitrião', paid: false, items: ['i1', 'i2'] },
+    { id: 'maria', name: 'Maria Silva', role: 'Convidada', paid: true, items: ['i3', 'i4'] },
+    { id: 'joao', name: 'João Santos', role: 'Convidado', paid: false, items: ['i5', 'i6'] },
   ];
 
   const totalOrder = orderItems.reduce((s, i) => s + i.price, 0);
-  const paidByOthers = 170; // Maria
-  const remainingTotal = totalOrder - paidByOthers;
+  const serviceCharge = Math.round(totalOrder * 0.1);
+  const totalWithService = totalOrder + serviceCharge;
+  const paidByOthers = 120; // Maria's paid items
 
-  const calculateMyTotal = () => {
+  const calculateMyAmount = () => {
+    if (payMode === 'solo') return totalWithService - paidByOthers;
     switch (splitMode) {
-      case 'individual': return remainingTotal;
-      case 'equal': return remainingTotal / guests.filter(g => !g.paid).length;
-      case 'selective': return selectedItems.reduce((sum, itemId) => { const item = orderItems.find(i => i.id === itemId); return sum + (item ? item.price : 0); }, 0);
-      case 'fixed': return Math.min(fixedAmount, remainingTotal);
+      case 'individual': {
+        const myItems = orderItems.filter(i => i.orderedBy === 'Você');
+        return myItems.reduce((s, i) => s + i.price, 0) + Math.round(myItems.reduce((s, i) => s + i.price, 0) * 0.1);
+      }
+      case 'equal': {
+        const unpaidGuests = guests.filter(g => !g.paid).length;
+        return Math.round((totalWithService - paidByOthers) / unpaidGuests);
+      }
+      case 'selective':
+        return selectedItems.reduce((sum, itemId) => { const item = orderItems.find(i => i.id === itemId); return sum + (item ? item.price : 0); }, 0);
+      case 'fixed':
+        return Math.min(fixedAmount, totalWithService - paidByOthers);
       default: return 0;
     }
   };
 
-  const mySubtotal = calculateMyTotal();
-  const myTip = mySubtotal * tipPercent / 100;
+  const mySubtotal = calculateMyAmount();
+  const myTip = Math.round(mySubtotal * tipPercent / 100);
   const myTotal = mySubtotal + myTip;
 
   const toggleItem = (itemId: string) => setSelectedItems(prev => prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]);
 
   return (
     <div className="flex flex-col h-full bg-background">
-      <div className="bg-card px-5 py-4 border-b border-border">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-primary to-accent px-5 py-4">
         <div className="flex items-center gap-4">
-          <button onClick={() => onNavigate('shared-comanda')} className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center"><ArrowLeft className="w-5 h-5 text-muted-foreground" /></button>
-          <div className="flex-1"><h1 className="text-lg font-bold text-foreground">Pagar Conta</h1><p className="text-xs text-muted-foreground">Total: R$ {totalOrder.toFixed(2)} · Resta: R$ {remainingTotal.toFixed(2)}</p></div>
+          <button onClick={() => onNavigate('comanda')} className="w-10 h-10 rounded-xl bg-primary-foreground/20 flex items-center justify-center"><ArrowLeft className="w-5 h-5 text-primary-foreground" /></button>
+          <div className="flex-1">
+            <h1 className="text-lg font-bold text-primary-foreground">Fechar Conta</h1>
+            <p className="text-xs text-primary-foreground/70">Mesa 7 · Bistrô Noowe</p>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-bold text-primary-foreground">R$ {totalWithService}</p>
+            <p className="text-[10px] text-primary-foreground/70">Total da mesa</p>
+          </div>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-5 space-y-5">
-        {/* Guest Status */}
+        {/* People at the table */}
         <div>
-          <h2 className="font-semibold text-foreground text-sm mb-3">Status da Mesa</h2>
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-foreground text-sm flex items-center gap-2"><Users className="w-4 h-4 text-primary" />Na mesa</h2>
+            <button onClick={() => setShowInvite(!showInvite)} className="text-xs text-primary font-medium flex items-center gap-1"><UserPlus className="w-3 h-3" />Convidar</button>
+          </div>
+
+          {showInvite && (
+            <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 mb-3">
+              <p className="text-xs text-muted-foreground mb-3">Convide alguém para se juntar à comanda e dividir a conta</p>
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border mb-2">
+                <Share2 className="w-4 h-4 text-primary" />
+                <span className="flex-1 text-xs text-muted-foreground">noowe.app/join/BN-7-2847</span>
+                <button className="p-1.5 rounded-md bg-primary/10"><Copy className="w-3 h-3 text-primary" /></button>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => { setInviteSent(true); setTimeout(() => setShowInvite(false), 1000); }} className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1">
+                  {inviteSent ? <><Check className="w-3 h-3" />Enviado!</> : <><Send className="w-3 h-3" />SMS</>}
+                </button>
+                <button className="flex-1 py-2 rounded-lg border border-border text-xs font-medium flex items-center justify-center gap-1">
+                  <MessageCircle className="w-3 h-3" />WhatsApp
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {guests.map((guest) => (
-              <div key={guest.id} className={`flex-shrink-0 p-3 rounded-2xl border-2 min-w-[100px] text-center ${guest.paid ? 'border-success bg-success/10' : 'border-border bg-card'}`}>
-                <div className={`w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center ${guest.paid ? 'bg-success' : 'bg-muted'}`}>
-                  {guest.paid ? <Check className="w-5 h-5 text-primary-foreground" /> : <User className="w-5 h-5 text-muted-foreground" />}
+              <div key={guest.id} className={`flex-shrink-0 p-3 rounded-2xl border-2 min-w-[90px] text-center ${guest.paid ? 'border-success bg-success/5' : guest.id === 'you' ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
+                <div className={`w-9 h-9 rounded-full mx-auto mb-1.5 flex items-center justify-center text-primary-foreground font-bold text-sm ${guest.paid ? 'bg-success' : guest.id === 'you' ? 'bg-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {guest.paid ? <Check className="w-4 h-4" /> : guest.name.charAt(0)}
                 </div>
                 <p className="text-xs font-medium text-foreground truncate">{guest.name.split(' ')[0]}</p>
-                <p className={`text-xs ${guest.paid ? 'text-success' : 'text-muted-foreground'}`}>{guest.paid ? 'Pago' : 'Pendente'}</p>
+                <p className={`text-[10px] ${guest.paid ? 'text-success font-semibold' : 'text-muted-foreground'}`}>
+                  {guest.paid ? '✓ Pago' : guest.role}
+                </p>
               </div>
             ))}
+            <button onClick={() => setShowInvite(true)} className="flex-shrink-0 w-[90px] p-3 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+              <UserPlus className="w-5 h-5 mb-1" />
+              <span className="text-[10px]">Convidar</span>
+            </button>
           </div>
         </div>
 
-        {/* Split Mode */}
+        {/* Pay mode: solo or split */}
         <div>
-          <h2 className="font-semibold text-foreground text-sm mb-3">Modo de Pagamento</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">Como deseja pagar?</h2>
           <div className="grid grid-cols-2 gap-2">
-            {[
-              { id: 'individual' as const, name: 'Unitário', desc: 'Paga tudo', icon: User },
-              { id: 'equal' as const, name: 'Dividir Igual', desc: 'Valor dividido', icon: Users },
-              { id: 'selective' as const, name: 'Por Item', desc: 'Escolha itens', icon: Check },
-              { id: 'fixed' as const, name: 'Valor Fixo', desc: 'Defina valor', icon: DollarSign },
-            ].map((mode) => (
-              <button key={mode.id} onClick={() => setSplitMode(mode.id)} className={`p-3 rounded-2xl border-2 text-left transition-all ${splitMode === mode.id ? 'bg-primary/10 border-primary' : 'bg-card border-border'}`}>
-                <div className="flex items-center gap-2 mb-1">
-                  <mode.icon className={`w-4 h-4 ${splitMode === mode.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                  <span className={`font-semibold text-xs ${splitMode === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.name}</span>
-                </div>
-                <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
-              </button>
-            ))}
+            <button onClick={() => setPayMode('solo')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'solo' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+              <User className={`w-5 h-5 mx-auto mb-1 ${payMode === 'solo' ? 'text-primary' : 'text-muted-foreground'}`} />
+              <p className={`text-xs font-semibold ${payMode === 'solo' ? 'text-primary' : 'text-foreground'}`}>Pagar Tudo</p>
+              <p className="text-[10px] text-muted-foreground">Você paga a conta toda</p>
+            </button>
+            <button onClick={() => setPayMode('split')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'split' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+              <Users className={`w-5 h-5 mx-auto mb-1 ${payMode === 'split' ? 'text-primary' : 'text-muted-foreground'}`} />
+              <p className={`text-xs font-semibold ${payMode === 'split' ? 'text-primary' : 'text-foreground'}`}>Dividir Conta</p>
+              <p className="text-[10px] text-muted-foreground">Cada um paga sua parte</p>
+            </button>
           </div>
         </div>
+
+        {/* Split modes (only if splitting) */}
+        {payMode === 'split' && (
+          <div>
+            <h2 className="font-semibold text-foreground text-sm mb-3">Modo de divisão</h2>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { id: 'individual' as const, name: 'Meus Itens', desc: 'Cada um paga o que pediu', icon: User },
+                { id: 'equal' as const, name: 'Partes Iguais', desc: 'Divide igualmente', icon: Users },
+                { id: 'selective' as const, name: 'Por Item', desc: 'Escolha itens específicos', icon: Check },
+                { id: 'fixed' as const, name: 'Valor Fixo', desc: 'Defina quanto pagar', icon: DollarSign },
+              ].map((mode) => (
+                <button key={mode.id} onClick={() => setSplitMode(mode.id)} className={`p-3 rounded-2xl border-2 text-left transition-all ${splitMode === mode.id ? 'bg-primary/10 border-primary' : 'bg-card border-border'}`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <mode.icon className={`w-4 h-4 ${splitMode === mode.id ? 'text-primary' : 'text-muted-foreground'}`} />
+                    <span className={`font-semibold text-xs ${splitMode === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.name}</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Selective Mode - Items */}
-        {splitMode === 'selective' && (
+        {payMode === 'split' && splitMode === 'selective' && (
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h2 className="font-semibold text-foreground text-sm">Selecione os Itens</h2>
+              <h2 className="font-semibold text-foreground text-sm">Selecione os itens</h2>
               <button onClick={() => onNavigate('split-by-item')} className="text-xs text-primary font-medium flex items-center gap-1">Tela completa <ChevronRight className="w-3 h-3" /></button>
             </div>
             <div className="space-y-2">
               {orderItems.map((item) => {
                 const isSelected = selectedItems.includes(item.id);
-                const isPaid = item.paid;
+                const guest = guests.find(g => g.paid && g.items.includes(item.id));
+                const isPaid = !!guest;
                 return (
-                  <button key={item.id} onClick={() => !isPaid && toggleItem(item.id)} disabled={isPaid} className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${isPaid ? 'border-success/30 bg-success/10 opacity-60' : isSelected ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+                  <button key={item.id} onClick={() => !isPaid && toggleItem(item.id)} disabled={isPaid} className={`w-full p-3 rounded-xl border-2 flex items-center gap-3 transition-all ${isPaid ? 'border-success/30 bg-success/5 opacity-60' : isSelected ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${isPaid ? 'border-success bg-success' : isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
                       {(isSelected || isPaid) && <Check className="w-3 h-3 text-primary-foreground" />}
                     </div>
                     <div className="flex-1 text-left"><p className="text-sm font-medium text-foreground">{item.name}</p><p className="text-xs text-muted-foreground">{item.orderedBy}{isPaid ? ' · Pago' : ''}</p></div>
-                    <span className="font-semibold text-sm text-foreground">R$ {item.price.toFixed(2)}</span>
+                    <span className="font-semibold text-sm text-foreground">R$ {item.price}</span>
                   </button>
                 );
               })}
@@ -959,13 +1065,13 @@ const SplitPaymentScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
         )}
 
         {/* Fixed Amount Mode */}
-        {splitMode === 'fixed' && (
+        {payMode === 'split' && splitMode === 'fixed' && (
           <div className="bg-card rounded-2xl p-4 border border-border">
-            <p className="text-xs text-muted-foreground text-center mb-3">Máximo: R$ {remainingTotal.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground text-center mb-3">Quanto deseja pagar? (Restante fica com o anfitrião)</p>
             <div className="flex items-center justify-center gap-4">
-              <button onClick={() => setFixedAmount(Math.max(0, fixedAmount - 10))} className="w-12 h-12 rounded-full bg-muted text-xl font-bold text-muted-foreground">−</button>
+              <button onClick={() => setFixedAmount(Math.max(10, fixedAmount - 10))} className="w-12 h-12 rounded-full bg-muted text-xl font-bold text-muted-foreground">−</button>
               <span className="text-3xl font-bold text-foreground">R$ {fixedAmount}</span>
-              <button onClick={() => setFixedAmount(Math.min(remainingTotal, fixedAmount + 10))} className="w-12 h-12 rounded-full bg-muted text-xl font-bold text-muted-foreground">+</button>
+              <button onClick={() => setFixedAmount(Math.min(totalWithService, fixedAmount + 10))} className="w-12 h-12 rounded-full bg-muted text-xl font-bold text-muted-foreground">+</button>
             </div>
           </div>
         )}
@@ -984,7 +1090,7 @@ const SplitPaymentScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
 
         {/* Payment Method */}
         <div>
-          <h2 className="font-semibold text-foreground text-sm mb-3">Forma de Pagamento</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">Forma de pagamento</h2>
           <div className="grid grid-cols-3 gap-2">
             {[
               { id: 'pix', name: 'PIX', icon: QrCode },
@@ -1006,55 +1112,55 @@ const SplitPaymentScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
         <div className="p-4 rounded-2xl bg-card border border-border">
           <h3 className="font-semibold text-foreground mb-3">Resumo</h3>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="text-foreground">R$ {mySubtotal.toFixed(2)}</span></div>
-            <div className="flex justify-between"><span className="text-muted-foreground">Gorjeta ({tipPercent}%)</span><span className="text-foreground">R$ {myTip.toFixed(2)}</span></div>
-            <div className="border-t border-border pt-2 flex justify-between"><span className="font-semibold text-foreground">Total</span><span className="font-bold text-xl text-primary">R$ {myTotal.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Sua parte</span><span className="text-foreground">R$ {mySubtotal.toFixed(2)}</span></div>
+            {tipPercent > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Gorjeta ({tipPercent}%)</span><span className="text-foreground">R$ {myTip.toFixed(2)}</span></div>}
+            {paidByOthers > 0 && <div className="flex justify-between text-success"><span>Pago por outros</span><span>- R$ {paidByOthers.toFixed(2)}</span></div>}
+            <div className="border-t border-border pt-2 flex justify-between"><span className="font-semibold text-foreground">Você paga</span><span className="font-bold text-xl text-primary">R$ {myTotal.toFixed(2)}</span></div>
           </div>
         </div>
       </div>
 
+      {/* Pay button */}
       <div className="p-5 bg-card border-t border-border">
-        <button onClick={() => onNavigate('payment-success')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-2xl shadow-xl shadow-primary/25 active:scale-[0.98] transition-all">
-          Pagar R$ {myTotal.toFixed(2)}
+        <button onClick={() => onNavigate('payment-success')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-2xl shadow-xl shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+          <CreditCard className="w-5 h-5" />Pagar R$ {myTotal.toFixed(2)}
         </button>
       </div>
     </div>
   );
 };
 
-// ============ SPLIT BY ITEM ============
+// ============ SPLIT BY ITEM (full screen drill-down) ============
 
 const SplitByItemScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const [items, setItems] = useState([
-    { id: 1, name: 'Tartare de Atum', price: 58, quantity: 1, assignedTo: 'Você' },
-    { id: 2, name: 'Filé ao Molho de Vinho', price: 118, quantity: 1, assignedTo: 'Você' },
-    { id: 3, name: 'Risoto de Funghi', price: 82, quantity: 1, assignedTo: 'Maria' },
-    { id: 4, name: 'Crème Brûlée', price: 38, quantity: 1, assignedTo: 'Maria' },
-    { id: 5, name: 'Salmão Grelhado', price: 96, quantity: 1, assignedTo: null as string | null },
-    { id: 6, name: 'Gin Tônica Aurora', price: 38, quantity: 2, assignedTo: null as string | null },
+    { id: 1, name: 'Tartare de Atum', price: 58, assignedTo: 'Você' },
+    { id: 2, name: 'Filé ao Molho de Vinho', price: 118, assignedTo: 'Você' },
+    { id: 3, name: 'Risoto de Funghi', price: 82, assignedTo: 'Maria' },
+    { id: 4, name: 'Crème Brûlée', price: 38, assignedTo: 'Maria' },
+    { id: 5, name: 'Salmão Grelhado', price: 96, assignedTo: null as string | null },
+    { id: 6, name: 'Gin Tônica Aurora', price: 38, assignedTo: null as string | null },
   ]);
   const [selectedItem, setSelectedItem] = useState<number | null>(null);
-  const guests = [
+  const guestsList = [
     { id: 'you', name: 'Você', color: 'from-primary to-accent' },
     { id: 'maria', name: 'Maria', color: 'from-secondary to-secondary/80' },
     { id: 'joao', name: 'João', color: 'from-destructive to-destructive/80' },
   ];
 
   const assignItem = (itemId: number, guestName: string) => { setItems(items.map(item => item.id === itemId ? { ...item, assignedTo: guestName } : item)); setSelectedItem(null); };
-  const getGuestTotal = (guestName: string) => items.filter(item => item.assignedTo === guestName).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const unassignedTotal = items.filter(item => !item.assignedTo).reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const getGuestTotal = (guestName: string) => items.filter(item => item.assignedTo === guestName).reduce((sum, item) => sum + item.price, 0);
 
   return (
     <div className="h-full bg-background flex flex-col">
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-3">
-          <button onClick={() => onNavigate('split-payment')} className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="h-5 w-5 text-foreground" /></button>
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-accent flex items-center justify-center"><Sparkles className="h-5 w-5 text-primary-foreground" /></div>
-          <div><h1 className="text-lg font-bold text-foreground">Dividir por Item</h1><p className="text-xs text-muted-foreground">Selecione quem paga cada item</p></div>
+          <button onClick={() => onNavigate('fechar-conta')} className="p-2 rounded-xl hover:bg-muted transition-colors"><ArrowLeft className="h-5 w-5 text-foreground" /></button>
+          <div><h1 className="text-lg font-bold text-foreground">Dividir por Item</h1><p className="text-xs text-muted-foreground">Atribua cada item a quem vai pagar</p></div>
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {guests.map((guest) => (
-            <div key={guest.id} className="flex-shrink-0 px-3 py-2 rounded-xl bg-card/70 backdrop-blur-sm border border-border">
+          {guestsList.map((guest) => (
+            <div key={guest.id} className="flex-shrink-0 px-3 py-2 rounded-xl bg-card/70 border border-border">
               <div className="flex items-center gap-2">
                 <div className={`w-6 h-6 rounded-full bg-gradient-to-br ${guest.color} flex items-center justify-center text-primary-foreground text-xs font-bold`}>{guest.name.charAt(0)}</div>
                 <div><p className="text-xs font-medium text-foreground">{guest.name}</p><p className="text-xs text-primary font-semibold">R$ {getGuestTotal(guest.name).toFixed(2)}</p></div>
@@ -1073,20 +1179,17 @@ const SplitByItemScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
                   <h3 className="font-medium text-foreground text-sm">{item.name}</h3>
                   {item.assignedTo && <span className="px-2 py-0.5 rounded-full bg-success/20 text-success text-xs">{item.assignedTo}</span>}
                 </div>
-                <p className="text-xs text-muted-foreground">{item.quantity}x R$ {item.price.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">R$ {item.price.toFixed(2)}</p>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="font-semibold text-foreground">R$ {(item.price * item.quantity).toFixed(2)}</span>
-                <button onClick={() => setSelectedItem(selectedItem === item.id ? null : item.id)} className={`p-2 rounded-xl transition-all ${item.assignedTo ? 'bg-success text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                  {item.assignedTo ? <Check className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </button>
-              </div>
+              <button onClick={() => setSelectedItem(selectedItem === item.id ? null : item.id)} className={`p-2 rounded-xl transition-all ${item.assignedTo ? 'bg-success text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                {item.assignedTo ? <Check className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              </button>
             </div>
             {selectedItem === item.id && (
               <div className="mt-3 pt-3 border-t border-border">
                 <p className="text-xs text-muted-foreground mb-2">Atribuir a:</p>
                 <div className="flex flex-wrap gap-2">
-                  {guests.map((guest) => (
+                  {guestsList.map((guest) => (
                     <button key={guest.id} onClick={() => assignItem(item.id, guest.name)} className={`flex items-center gap-2 px-3 py-2 rounded-xl transition-all ${item.assignedTo === guest.name ? `bg-gradient-to-r ${guest.color} text-primary-foreground` : 'bg-muted text-muted-foreground'}`}>
                       <User className="h-3 w-3" /><span className="text-xs font-medium">{guest.name}</span>
                     </button>
@@ -1099,8 +1202,7 @@ const SplitByItemScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
       </div>
 
       <div className="p-4 bg-card border-t border-border">
-        {unassignedTotal > 0 && <div className="flex justify-between items-center mb-2 px-2"><span className="text-sm text-warning">Itens não atribuídos</span><span className="text-sm font-semibold text-warning">R$ {unassignedTotal.toFixed(2)}</span></div>}
-        <button onClick={() => onNavigate('split-payment')} className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold shadow-lg">Confirmar Divisão</button>
+        <button onClick={() => onNavigate('fechar-conta')} className="w-full py-4 rounded-2xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold shadow-lg">Confirmar Divisão</button>
       </div>
     </div>
   );
@@ -1108,44 +1210,40 @@ const SplitByItemScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
 
 // ============ PAYMENT SUCCESS ============
 
-const PaymentSuccessScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
-  return (
-    <div className="flex flex-col h-full bg-background">
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-6 shadow-xl shadow-success/30 animate-bounce">
-          <Check className="w-12 h-12 text-primary-foreground" />
-        </div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Pagamento Confirmado!</h2>
-        <p className="text-muted-foreground mb-4">
-          Seu pagamento de <strong className="text-primary">R$ 193,60</strong> foi processado
-        </p>
-        <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-          <Heart className="w-4 h-4 fill-primary" /><span className="text-sm font-medium">+10% gorjeta para a equipe</span>
-        </div>
-
-        <div className="w-full p-4 rounded-2xl bg-card border border-border mb-6">
-          <div className="flex justify-between text-sm mb-2">
-            <span className="text-muted-foreground">Pontos ganhos</span>
-            <span className="font-bold text-foreground">+19 pts</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-muted-foreground">Valor restante da mesa</span>
-            <span className="font-bold text-foreground">R$ 97,40</span>
-          </div>
-        </div>
-
-        <div className="w-full space-y-3">
-          <button onClick={() => onNavigate('loyalty')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-2xl shadow-xl shadow-primary/25 flex items-center justify-center gap-2">
-            <Gift className="w-4 h-4" />Ver Programa de Fidelidade
-          </button>
-          <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
+const PaymentSuccessScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => (
+  <div className="flex flex-col h-full bg-background">
+    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-6 shadow-xl shadow-success/30 animate-bounce">
+        <Check className="w-12 h-12 text-primary-foreground" />
+      </div>
+      <h2 className="text-2xl font-bold text-foreground mb-2">Pagamento Confirmado!</h2>
+      <p className="text-muted-foreground mb-4">Seu pagamento de <strong className="text-primary">R$ 193,60</strong> foi processado</p>
+      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
+        <Heart className="w-4 h-4 fill-primary" /><span className="text-sm font-medium">+10% gorjeta para a equipe</span>
+      </div>
+      <div className="w-full p-4 rounded-2xl bg-card border border-border mb-4">
+        <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Pontos ganhos</span><span className="font-bold text-foreground">+19 pts</span></div>
+        <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Valor restante da mesa</span><span className="font-bold text-foreground">R$ 97,40</span></div>
+        <div className="flex justify-between text-sm"><span className="text-muted-foreground">João (pendente)</span><span className="font-bold text-warning">Aguardando</span></div>
+      </div>
+      <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center gap-3">
+        <Award className="w-5 h-5 text-accent" />
+        <div className="flex-1 text-left">
+          <p className="text-sm font-semibold">Nível Gold · 1.269 pts</p>
+          <p className="text-xs text-muted-foreground">Faltam 731 pts para Platinum</p>
         </div>
       </div>
+      <div className="w-full space-y-3">
+        <button onClick={() => onNavigate('loyalty')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-2xl shadow-xl shadow-primary/25 flex items-center justify-center gap-2">
+          <Gift className="w-4 h-4" />Ver Programa de Fidelidade
+        </button>
+        <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
-// ============ RESERVATION WITH SHARING ============
+// ============ RESERVATIONS ============
 
 const ReservationsScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const [confirmed, setConfirmed] = useState(false);
@@ -1178,14 +1276,10 @@ const ReservationsScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
           <h2 className="font-display text-xl font-bold mb-2">Reserva Confirmada!</h2>
           <p className="text-sm text-muted-foreground mb-1">Bistrô Noowe · Hoje às 20:00</p>
           <p className="text-sm text-muted-foreground mb-4">2 pessoas · Mesa no salão</p>
-
-          {/* Confirmation Code */}
           <div className="p-4 rounded-xl bg-muted/30 mb-4">
             <p className="text-xs text-muted-foreground">Código de confirmação</p>
             <p className="font-display text-2xl font-bold tracking-widest mt-1">BN-2847</p>
           </div>
-
-          {/* Guest List */}
           <div className="text-left mb-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-primary" />Convidados</h3>
@@ -1217,14 +1311,11 @@ const ReservationsScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
               ))}
             </div>
           </div>
-
-          {/* Share */}
           <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-5 flex items-center gap-3">
             <Share2 className="w-5 h-5 text-primary" />
             <div className="flex-1 text-left"><p className="text-sm font-medium">Compartilhar reserva</p><p className="text-xs text-muted-foreground">noowe.app/r/BN-2847</p></div>
             <button className="p-2 rounded-lg bg-primary/10"><Copy className="w-4 h-4 text-primary" /></button>
           </div>
-
           <div className="space-y-2">
             <button onClick={() => onNavigate('menu')} className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm">Ver Cardápio</button>
             <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao início</button>
@@ -1235,60 +1326,7 @@ const ReservationsScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onN
   );
 };
 
-const CheckoutScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
-  const { cartTotal, placeOrder } = useDemoContext();
-  const [paymentMode, setPaymentMode] = useState<'full' | 'split'>('full');
-  const [splitCount, setSplitCount] = useState(2);
-  const [processing, setProcessing] = useState(false);
-  const [selectedMethod, setSelectedMethod] = useState(0);
-  const total = Math.round(cartTotal * 1.1);
-
-  const handlePay = () => {
-    setProcessing(true);
-    setTimeout(() => { placeOrder(); setProcessing(false); onNavigate('order-status'); }, 2000);
-  };
-
-  return (
-    <div className="px-5 pb-4">
-      <div className="flex items-center justify-between py-4">
-        <button onClick={() => onNavigate('comanda')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-        <h1 className="font-display font-bold">Pagamento</h1>
-        <div className="w-8" />
-      </div>
-      <GuidedHint text="Escolha o método de pagamento e confirme" pulse={false} />
-      <div className="mb-5">
-        <p className="text-sm font-semibold mb-2">Como deseja pagar?</p>
-        <div className="grid grid-cols-2 gap-3">
-          <button onClick={() => setPaymentMode('full')} className={`p-3 rounded-xl border text-sm font-medium text-center transition-colors ${paymentMode === 'full' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}><CreditCard className="w-5 h-5 mx-auto mb-1" />Pagar total</button>
-          <button onClick={() => { setPaymentMode('split'); onNavigate('shared-comanda'); }} className={`p-3 rounded-xl border text-sm font-medium text-center transition-colors ${paymentMode === 'split' ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}><Users className="w-5 h-5 mx-auto mb-1" />Dividir conta</button>
-        </div>
-      </div>
-      <div className="mb-5">
-        <p className="text-sm font-semibold mb-2">Método</p>
-        <div className="space-y-2">
-          {[{ label: 'Cartão ····4892', icon: '💳' }, { label: 'Apple Pay', icon: '🍎' }, { label: 'PIX', icon: '📱' }, { label: 'Google Pay', icon: '🔵' }].map((method, i) => (
-            <button key={i} onClick={() => setSelectedMethod(i)} className={`w-full flex items-center gap-3 p-3 rounded-xl border text-sm transition-colors ${selectedMethod === i ? 'border-primary bg-primary/5' : 'border-border'}`}>
-              <span className="text-lg">{method.icon}</span><span className="flex-1 text-left">{method.label}</span>{selectedMethod === i && <Check className="w-4 h-4 text-primary" />}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="mb-5">
-        <p className="text-sm font-semibold mb-2">Gorjeta (opcional)</p>
-        <div className="flex gap-2">
-          {['Nenhuma', '5%', '10%', '15%'].map((tip, i) => (<button key={tip} className={`flex-1 py-2 rounded-lg border text-xs font-medium transition-colors ${i === 2 ? 'border-primary bg-primary/5 text-primary' : 'border-border text-muted-foreground'}`}>{tip}</button>))}
-        </div>
-      </div>
-      <div className="p-4 rounded-xl bg-muted/30 mb-5">
-        <div className="flex justify-between font-display font-bold text-lg"><span>Total</span><span>R$ {total}</span></div>
-        <p className="text-xs text-muted-foreground mt-1">+ {Math.floor(total / 10)} pontos de fidelidade</p>
-      </div>
-      <button onClick={handlePay} disabled={processing} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-glow disabled:opacity-70 flex items-center justify-center gap-2">
-        {processing ? <><Loader2 className="w-4 h-4 animate-spin" /> Processando...</> : <>Confirmar pagamento · R$ {total}</>}
-      </button>
-    </div>
-  );
-};
+// ============ LOYALTY ============
 
 const LoyaltyScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNavigate }) => {
   const { loyaltyPoints } = useDemoContext();
@@ -1338,16 +1376,15 @@ const LoyaltyScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNaviga
 const JOURNEY_STEPS = [
   { step: 1, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Escanear QR da mesa', screens: ['qr-scan'] },
-  { step: 3, label: 'Explorar o cardápio', screens: ['menu', 'item'] },
+  { step: 3, label: 'Explorar cardápio', screens: ['menu', 'item', 'ai-harmonization'] },
   { step: 4, label: 'Montar comanda', screens: ['comanda'] },
   { step: 5, label: 'Acompanhar pedido', screens: ['order-status'] },
-  { step: 6, label: 'Comanda compartilhada', screens: ['shared-comanda'] },
-  { step: 7, label: 'Dividir conta', screens: ['split-payment', 'split-by-item'] },
-  { step: 8, label: 'Pagar', screens: ['checkout', 'payment-success'] },
-  { step: 9, label: 'Programa de fidelidade', screens: ['loyalty'] },
-  { step: 10, label: 'Reservar mesa', screens: ['reservations', 'reservation-detail'] },
-  { step: 11, label: 'Fila virtual', screens: ['virtual-queue'] },
-  { step: 12, label: 'Chamar garçom', screens: ['call-waiter'] },
+  { step: 6, label: 'Fechar conta & pagar', screens: ['fechar-conta', 'split-by-item', 'payment-success'] },
+  { step: 7, label: 'Programa de fidelidade', screens: ['loyalty'] },
+  { step: 8, label: 'Reservar mesa', screens: ['reservations'] },
+  { step: 9, label: 'Fila virtual', screens: ['virtual-queue'] },
+  { step: 10, label: 'Chamar equipe', screens: ['call-waiter'] },
+  { step: 11, label: 'Notificações', screens: ['notifications'] },
 ];
 
 // ============ MAIN COMPONENT ============
@@ -1368,7 +1405,7 @@ const DemoClientInner = () => {
       case 'menu': return <MenuScreen onNavigate={handleNavigate} onSelectItem={handleSelectItem} />;
       case 'item': return selectedItem ? <ItemDetailScreen item={selectedItem} onNavigate={handleNavigate} /> : null;
       case 'comanda': return <ComandaScreen onNavigate={handleNavigate} />;
-      case 'checkout': return <CheckoutScreen onNavigate={handleNavigate} />;
+      case 'fechar-conta': return <FecharContaScreen onNavigate={handleNavigate} />;
       case 'order-status': return <OrderStatusScreen onNavigate={handleNavigate} />;
       case 'loyalty': return <LoyaltyScreen onNavigate={handleNavigate} />;
       case 'reservations': return <ReservationsScreen onNavigate={handleNavigate} />;
@@ -1377,10 +1414,10 @@ const DemoClientInner = () => {
       case 'profile': return <ProfileScreen onNavigate={handleNavigate} />;
       case 'virtual-queue': return <VirtualQueueScreen onNavigate={handleNavigate} />;
       case 'my-orders': return <MyOrdersScreen onNavigate={handleNavigate} />;
-      case 'shared-comanda': return <SharedComandaScreen onNavigate={handleNavigate} />;
-      case 'split-payment': return <SplitPaymentScreen onNavigate={handleNavigate} />;
       case 'split-by-item': return <SplitByItemScreen onNavigate={handleNavigate} />;
       case 'payment-success': return <PaymentSuccessScreen onNavigate={handleNavigate} />;
+      case 'notifications': return <NotificationsScreen onNavigate={handleNavigate} />;
+      case 'ai-harmonization': return <AIHarmonizationScreen onNavigate={handleNavigate} />;
     }
   };
 
@@ -1389,23 +1426,22 @@ const DemoClientInner = () => {
   const screenInfoMap: Record<Screen, { emoji: string; title: string; desc: string }> = {
     'home': { emoji: '🏠', title: 'Tela Inicial', desc: 'O cliente descobre restaurantes por proximidade, categoria e avaliação.' },
     'restaurant': { emoji: '🍽️', title: 'Página do Restaurante', desc: 'Perfil completo com fotos, avaliações, features e acesso rápido ao cardápio e reservas.' },
-    'menu': { emoji: '📋', title: 'Cardápio Digital', desc: 'Menu digital com categorias, tags de alérgenos, tempo de preparo e itens populares.' },
-    'item': { emoji: '🍽️', title: 'Detalhe do Prato', desc: 'Detalhe do prato com foto, descrição, personalização e adição rápida à comanda.' },
-    'comanda': { emoji: '📝', title: 'Minha Comanda', desc: 'Revisão da comanda com ajuste de quantidades, harmonização IA e acesso à comanda compartilhada.' },
-    'checkout': { emoji: '💳', title: 'Pagamento', desc: 'Pagamento com opções de split (dividir conta), gorjeta e múltiplos métodos.' },
+    'menu': { emoji: '📋', title: 'Cardápio Digital', desc: 'Menu digital com categorias, tags de alérgenos, tempo de preparo e harmonização IA.' },
+    'item': { emoji: '🍽️', title: 'Detalhe do Prato', desc: 'Detalhe do prato com foto, descrição e adição rápida à comanda.' },
+    'comanda': { emoji: '📝', title: 'Minha Comanda', desc: 'Revisão da comanda com ajuste de quantidades e convite de pessoas.' },
+    'fechar-conta': { emoji: '💳', title: 'Fechar Conta', desc: 'Fluxo integrado: veja quem está na mesa, convide pessoas, escolha dividir ou pagar tudo, selecione modo de divisão, gorjeta e método de pagamento — tudo em uma tela.' },
     'order-status': { emoji: '👨‍🍳', title: 'Status do Pedido', desc: 'Acompanhamento em tempo real com status individual por item e nome do chef responsável.' },
     'loyalty': { emoji: '🏆', title: 'Fidelidade', desc: 'Programa de pontos com níveis (Silver→Black), recompensas resgatáveis e histórico.' },
     'reservations': { emoji: '📅', title: 'Reservas', desc: 'Reserva com convite de amigos, compartilhamento de link e código de confirmação.' },
-    'reservation-detail': { emoji: '📋', title: 'Detalhe da Reserva', desc: 'Gestão de convidados, QR code e compartilhamento da reserva.' },
     'qr-scan': { emoji: '📷', title: 'QR Code', desc: 'Escaneamento do QR Code da mesa para associação automática.' },
-    'call-waiter': { emoji: '🙋', title: 'Chamar Equipe', desc: 'Chamada discreta: garçom, sommelier ou ajuda geral. Sem opção de conta (pagamento é in-app).' },
+    'call-waiter': { emoji: '🙋', title: 'Chamar Equipe', desc: 'Chamada discreta: garçom, sommelier ou ajuda geral.' },
     'profile': { emoji: '👤', title: 'Perfil', desc: 'Perfil do cliente com histórico, favoritos, nível de fidelidade e configurações.' },
     'virtual-queue': { emoji: '⏱️', title: 'Fila Virtual', desc: 'Fila virtual para restaurantes lotados com acompanhamento em tempo real.' },
-    'my-orders': { emoji: '📦', title: 'Meus Pedidos', desc: 'Histórico de pedidos, pedido ativo e acesso à comanda compartilhada.' },
-    'shared-comanda': { emoji: '👥', title: 'Comanda Compartilhada', desc: 'Gestão de participantes com convites, progresso de pagamento e divisão por modo.' },
-    'split-payment': { emoji: '💰', title: 'Dividir Conta', desc: '4 modos: Unitário, Dividir Igual, Por Item e Valor Fixo. Com gorjeta e 6 métodos de pagamento.' },
-    'split-by-item': { emoji: '🔀', title: 'Dividir por Item', desc: 'Atribua cada item a um participante. Itens não atribuídos ficam com o anfitrião.' },
+    'my-orders': { emoji: '📦', title: 'Meus Pedidos', desc: 'Histórico de pedidos e pedido ativo.' },
+    'split-by-item': { emoji: '🔀', title: 'Dividir por Item', desc: 'Atribuição visual de cada item a um participante da mesa.' },
     'payment-success': { emoji: '✅', title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
+    'notifications': { emoji: '🔔', title: 'Notificações', desc: 'Convites para comanda, fila pronta, pontos ganhos, promoções e status de pedidos.' },
+    'ai-harmonization': { emoji: '🧠', title: 'Harmonização IA', desc: 'A IA sugere combinações perfeitas de pratos e bebidas baseado em suas preferências.' },
   };
 
   const info = screenInfoMap[currentScreen] || { emoji: '📱', title: 'Demo', desc: '' };
@@ -1450,7 +1486,7 @@ const DemoClientInner = () => {
           {/* Phone */}
           <div className="relative">
             <PhoneShell>{renderScreen()}</PhoneShell>
-            <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} cartCount={cartCount} />
+            <BottomNav currentScreen={currentScreen} onNavigate={handleNavigate} cartCount={cartCount} notifCount={3} />
           </div>
 
           {/* Info sidebar */}
