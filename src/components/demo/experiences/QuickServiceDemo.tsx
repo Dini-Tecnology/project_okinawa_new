@@ -154,7 +154,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <button onClick={() => onNavigate('restaurant')} className="w-full text-left mb-5 group">
             <div className="p-4 rounded-2xl bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">⚡</span>
+                <ItemIcon cat="quick" size="xl" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-display text-lg font-bold">NOOWE Express</h3>
