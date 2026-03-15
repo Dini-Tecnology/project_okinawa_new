@@ -52,12 +52,12 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 const BOTTLES = [
-  { id: 'b1', name: 'Absolut Vodka', price: 350, desc: '750ml · Inclui 4 energéticos', category: 'Vodka', iconCat: 'cocktail' },
-  { id: 'b2', name: 'Grey Goose', price: 580, desc: '750ml · Premium · Inclui tônica', category: 'Vodka', iconCat: 'cocktail' },
-  { id: 'b3', name: 'Moët Chandon', price: 650, desc: '750ml · Brut Impérial', category: 'Espumante', iconCat: 'wine' },
-  { id: 'b4', name: 'Johnnie Walker Black', price: 480, desc: '750ml · 12 anos · Inclui gelo e água', category: 'Whisky', iconCat: 'cocktail' },
-  { id: 'b5', name: 'Balde Cerveja (6)', price: 120, desc: '6 long necks premium', category: 'Cerveja', iconCat: 'beer' },
-  { id: 'b6', name: 'Don Julio Tequila', price: 520, desc: '750ml · Reposado · Inclui limões', category: 'Tequila', iconCat: 'cocktail' },
+  { id: 'b1', name: 'Absolut Vodka', price: 350, desc: '750ml · Inclui 4 energéticos', category: 'Vodka', iconCat: 'cocktail', imgId: 'vodka' },
+  { id: 'b2', name: 'Grey Goose', price: 580, desc: '750ml · Premium · Inclui tônica', category: 'Vodka', iconCat: 'cocktail', imgId: 'vodka' },
+  { id: 'b3', name: 'Moët Chandon', price: 650, desc: '750ml · Brut Impérial', category: 'Espumante', iconCat: 'wine', imgId: 'champagne' },
+  { id: 'b4', name: 'Johnnie Walker Black', price: 480, desc: '750ml · 12 anos · Inclui gelo e água', category: 'Whisky', iconCat: 'cocktail', imgId: 'whisky' },
+  { id: 'b5', name: 'Balde Cerveja (6)', price: 120, desc: '6 long necks premium', category: 'Cerveja', iconCat: 'beer', imgId: 'beer-bucket' },
+  { id: 'b6', name: 'Don Julio Tequila', price: 520, desc: '750ml · Reposado · Inclui limões', category: 'Tequila', iconCat: 'cocktail', imgId: 'tequila' },
 ];
 
 export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
@@ -485,7 +485,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             {BOTTLES.map(bottle => (
               <button key={bottle.id} onClick={() => { setSelectedBottle(bottle); onNavigate('bottle-detail'); }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={bottle.iconCat} size="md" />
+                <FoodImg id={bottle.imgId} size="md" alt={bottle.name} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm">{bottle.name}</p>
                   <p className="text-[10px] text-muted-foreground">{bottle.desc}</p>
@@ -504,7 +504,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title={selectedBottle.name} back="bottle-service" />
           <div className="text-center mb-4">
-            <ItemIcon cat={selectedBottle.iconCat} size="hero" className="mx-auto" />
+            <FoodImg id={selectedBottle.imgId} size="hero" alt={selectedBottle.name} className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-3">{selectedBottle.name}</h2>
             <p className="text-sm text-muted-foreground">{selectedBottle.desc}</p>
             <p className="font-display text-2xl font-bold text-primary mt-2">R$ {selectedBottle.price}</p>
@@ -612,16 +612,16 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="space-y-2 mb-4">
             {[
-              { name: 'Gin Tônica', price: 38, iconCat: 'cocktail' },
-              { name: 'Vodka Red Bull', price: 35, iconCat: 'cocktail' },
-              { name: 'Cerveja Long Neck', price: 18, iconCat: 'beer' },
-              { name: 'Água', price: 8, iconCat: 'water' },
-              { name: 'Energético', price: 20, iconCat: 'drink' },
-              { name: 'Shot Tequila', price: 25, iconCat: 'cocktail' },
+              { name: 'Gin Tônica', price: 38, imgId: 'gin-tonic' },
+              { name: 'Vodka Red Bull', price: 35, imgId: 'vodka' },
+              { name: 'Cerveja Long Neck', price: 18, imgId: 'ipa' },
+              { name: 'Água', price: 8, imgId: 'water' },
+              { name: 'Energético', price: 20, imgId: 'drink-generic' },
+              { name: 'Shot Tequila', price: 25, imgId: 'tequila' },
             ].map((d, i) => (
               <button key={i} onClick={() => { setConsumed(prev => prev + d.price); onNavigate('min-spend'); }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={d.iconCat} size="sm" />
+                <FoodImg id={d.imgId} size="sm" alt={d.name} />
                 <div className="flex-1"><p className="font-semibold text-sm">{d.name}</p></div>
                 <span className="font-semibold text-sm text-primary">R$ {d.price}</span>
               </button>

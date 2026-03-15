@@ -39,15 +39,15 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
 };
 
 const MENU = [
-  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos' },
-  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos' },
-  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos' },
-  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos' },
-  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas' },
-  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos' },
-  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, desc: 'Com doce de leite e canela', cat: 'Sobremesas' },
-  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas' },
-  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, desc: 'Arroz, canela e baunilha', cat: 'Bebidas' },
+  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos', imgId: 'taco' },
+  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos', imgId: 'taco' },
+  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos', imgId: 'taco' },
+  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos', imgId: 'burrito' },
+  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas', imgId: 'quesadilla' },
+  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos', imgId: 'nachos' },
+  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, desc: 'Com doce de leite e canela', cat: 'Sobremesas', imgId: 'churros' },
+  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas', imgId: 'hibiscus' },
+  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, desc: 'Arroz, canela e baunilha', cat: 'Bebidas', imgId: 'horchata' },
 ];
 
 const MENU_CAT_MAP: Record<string, string> = {
@@ -291,7 +291,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {MENU.map(item => (
               <button key={item.id} onClick={() => onNavigate('cart')} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={MENU_CAT_MAP[item.cat] || item.cat.toLowerCase()} size="md" />
+                <FoodImg id={item.imgId} size="md" alt={item.name} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
@@ -319,7 +319,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { item: MENU[7], qty: 1, notes: '' },
           ].map((c, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-2">
-              <ItemIcon cat={MENU_CAT_MAP[c.item.cat] || c.item.cat.toLowerCase()} size="sm" />
+              <FoodImg id={c.item.imgId} size="sm" alt={c.item.name} />
               <div className="flex-1">
                 <p className="font-semibold text-sm">{c.item.name}</p>
                 {c.notes && <p className="text-[10px] text-primary flex items-center gap-1"><Sparkles className="w-2.5 h-2.5" /> {c.notes}</p>}

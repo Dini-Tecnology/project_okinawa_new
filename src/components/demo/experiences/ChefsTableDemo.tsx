@@ -354,7 +354,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Amuse-Bouche" back="welcome" sub="Curso 1 de 7" />
           <CourseProgress current={1} total={7} />
           <div className="text-center mb-4">
-            <ItemIcon cat="seafood" size="hero" className="mx-auto" />
+            <FoodImg id="amuse-bouche" size="hero" alt="Tartar de Vieira" className="mx-auto" />
             <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Amuse-Bouche</p>
             <h2 className="font-display text-xl font-bold">Tartar de Vieira</h2>
             <p className="text-xs text-muted-foreground mt-1">com yuzu, microgreens e ostra Miyagi</p>
@@ -388,7 +388,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Prato Principal" back="course-1" sub="Curso 5 de 7" />
           <CourseProgress current={5} total={7} />
           <div className="text-center mb-4">
-            <ItemIcon cat="steak" size="hero" className="mx-auto" />
+            <FoodImg id="wagyu" size="hero" alt="Wagyu A5" className="mx-auto" />
             <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Prato Principal</p>
             <h2 className="font-display text-xl font-bold">Wagyu A5 com Aspargos</h2>
             <p className="text-xs text-muted-foreground mt-1">Miyazaki, Japão · Brasa de binchotan</p>
@@ -429,7 +429,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Grand Finale" back="course-2" sub="Curso 7 de 7" />
           <CourseProgress current={7} total={7} />
           <div className="text-center mb-4">
-            <ItemIcon cat="dessert" size="hero" className="mx-auto" />
+            <FoodImg id="souffle" size="hero" alt="Soufflé de Chocolate" className="mx-auto" />
             <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Sobremesa</p>
             <h2 className="font-display text-xl font-bold">Soufflé de Chocolate 70%</h2>
             <p className="text-xs text-muted-foreground mt-1">com sorvete de baunilha bourbon</p>

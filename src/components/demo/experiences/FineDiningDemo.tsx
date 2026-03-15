@@ -323,7 +323,7 @@ const VirtualQueueScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onN
         <div className="w-8" />
       </div>
       <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 mb-5">
-        <span className="text-2xl">🍽️</span>
+        <span className="text-2xl"><ItemIcon cat="chef" size="md" /></span>
         <div><p className="font-semibold text-sm">Bistrô Noowe</p><p className="text-xs text-muted-foreground">Lotação atual: <span className="text-warning font-semibold">Alta</span></p></div>
       </div>
       {!joined ? (
@@ -432,7 +432,7 @@ const MyOrdersScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavig
         { restaurant: 'Sushi Kenzo', date: 'Há 1 semana', total: 'R$ 248', items: 4, rating: 5 },
       ].map((order, i) => (
         <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 mb-1">
-          <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center text-lg">{i < 2 ? '🍽️' : '🍣'}</div>
+          <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center"><ItemIcon cat={i < 2 ? 'chef' : 'sushi'} size="sm" /></div>
           <div className="flex-1"><p className="text-sm font-semibold">{order.restaurant}</p><p className="text-xs text-muted-foreground">{order.date} · {order.items} itens</p></div>
           <div className="text-right">
             <p className="text-sm font-display font-bold">{order.total}</p>

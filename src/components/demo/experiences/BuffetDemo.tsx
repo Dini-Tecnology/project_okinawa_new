@@ -37,22 +37,22 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
 };
 
 const STATIONS = [
-  { name: 'Grelhados', cat: 'grelhados', items: ['Fraldinha', 'Linguiça', 'Frango'], status: 'fresh' as const },
-  { name: 'Massas', cat: 'massas', items: ['Espaguete', 'Penne', 'Lasanha'], status: 'fresh' as const },
-  { name: 'Saladas', cat: 'saladas', items: ['Folhas Mix', 'Tabule', 'Grega'], status: 'fresh' as const },
-  { name: 'Acompanhamentos', cat: 'acompanhamentos', items: ['Arroz', 'Feijão', 'Purê', 'Farofa'], status: 'replenishing' as const },
-  { name: 'Sobremesas', cat: 'sobremesas', items: ['Pudim', 'Mousse', 'Frutas'], status: 'fresh' as const },
-  { name: 'Sushi Bar', cat: 'sushi', items: ['Salmão', 'Atum', 'Philadelphia'], status: 'fresh' as const },
+  { name: 'Grelhados', cat: 'grelhados', imgId: 'grilled-meat', items: ['Fraldinha', 'Linguiça', 'Frango'], status: 'fresh' as const },
+  { name: 'Massas', cat: 'massas', imgId: 'pasta', items: ['Espaguete', 'Penne', 'Lasanha'], status: 'fresh' as const },
+  { name: 'Saladas', cat: 'saladas', imgId: 'salad-bar', items: ['Folhas Mix', 'Tabule', 'Grega'], status: 'fresh' as const },
+  { name: 'Acompanhamentos', cat: 'acompanhamentos', imgId: 'rice', items: ['Arroz', 'Feijão', 'Purê', 'Farofa'], status: 'replenishing' as const },
+  { name: 'Sobremesas', cat: 'sobremesas', imgId: 'pudding', items: ['Pudim', 'Mousse', 'Frutas'], status: 'fresh' as const },
+  { name: 'Sushi Bar', cat: 'sushi', imgId: 'sushi-platter', items: ['Salmão', 'Atum', 'Philadelphia'], status: 'fresh' as const },
 ];
 
 const DRINK_MENU = [
-  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, iconCat: 'juice', cat: 'Sucos' },
-  { id: 'd2', name: 'Suco Verde Detox', price: 15, iconCat: 'juice', cat: 'Sucos' },
-  { id: 'd3', name: 'Refrigerante Lata', price: 8, iconCat: 'soda', cat: 'Refrigerantes' },
-  { id: 'd4', name: 'Água Mineral', price: 6, iconCat: 'water', cat: 'Água' },
-  { id: 'd5', name: 'Água com Gás', price: 7, iconCat: 'water', cat: 'Água' },
-  { id: 'd6', name: 'Cerveja Artesanal', price: 18, iconCat: 'beer', cat: 'Cervejas' },
-  { id: 'd7', name: 'Taça de Vinho', price: 22, iconCat: 'wine', cat: 'Vinhos' },
+  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, iconCat: 'juice', imgId: 'juice', cat: 'Sucos' },
+  { id: 'd2', name: 'Suco Verde Detox', price: 15, iconCat: 'juice', imgId: 'juice-green', cat: 'Sucos' },
+  { id: 'd3', name: 'Refrigerante Lata', price: 8, iconCat: 'soda', imgId: 'soda', cat: 'Refrigerantes' },
+  { id: 'd4', name: 'Água Mineral', price: 6, iconCat: 'water', imgId: 'water', cat: 'Água' },
+  { id: 'd5', name: 'Água com Gás', price: 7, iconCat: 'water', imgId: 'sparkling-water', cat: 'Água' },
+  { id: 'd6', name: 'Cerveja Artesanal', price: 18, iconCat: 'beer', imgId: 'ipa', cat: 'Cervejas' },
+  { id: 'd7', name: 'Taça de Vinho', price: 22, iconCat: 'wine', imgId: 'wine-red', cat: 'Vinhos' },
 ];
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -193,7 +193,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <div key={i} className="p-3 rounded-xl border border-border bg-card">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <ItemIcon cat={station.cat} size="sm" />
+                    <FoodImg id={station.imgId} size="sm" alt={station.name} />
                     <span className="font-semibold text-sm">{station.name}</span>
                   </div>
                   <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold ${
@@ -289,7 +289,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   const sel = selectedDrinks.find(d => d.id === drink.id);
                   return (
                     <div key={drink.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-1.5">
-                      <ItemIcon cat={drink.iconCat} size="xs" />
+                      <FoodImg id={drink.imgId} size="xs" alt={drink.name} />
                       <div className="flex-1"><p className="text-sm font-medium">{drink.name}</p><p className="text-xs text-muted-foreground">R$ {drink.price}</p></div>
                       {sel ? (
                         <div className="flex items-center gap-2">

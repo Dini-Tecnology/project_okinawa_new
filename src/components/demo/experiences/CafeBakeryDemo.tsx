@@ -20,25 +20,26 @@ interface CartItem {
   name: string;
   price: number;
   iconCat: string;
+  imgId: string;
   customizations?: string[];
   isRefill?: boolean;
 }
 
 const CAFE_MENU = [
-  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
-  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
-  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', iconCat: 'coffee', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
-  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
-  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
-  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
-  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
-  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', iconCat: 'tea', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
-  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', iconCat: 'bread', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
-  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', iconCat: 'cheese', refill: false, desc: 'Pão de queijo mineiro quentinho' },
-  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', iconCat: 'sandwich', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
-  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', iconCat: 'dessert', refill: false, desc: 'Torta caseira com canela e sorvete' },
-  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', iconCat: 'brownie', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
-  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', iconCat: 'cookie', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
+  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', iconCat: 'coffee', imgId: 'espresso', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
+  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', iconCat: 'coffee', imgId: 'cappuccino', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
+  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', iconCat: 'coffee', imgId: 'filter-coffee', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
+  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', iconCat: 'coffee', imgId: 'latte', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
+  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', iconCat: 'coffee', imgId: 'cold-brew', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
+  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', iconCat: 'tea', imgId: 'green-tea', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
+  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', iconCat: 'tea', imgId: 'chamomile', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
+  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', iconCat: 'tea', imgId: 'matcha', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
+  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', iconCat: 'bread', imgId: 'croissant', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
+  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', iconCat: 'cheese', imgId: 'pao-queijo', refill: false, desc: 'Pão de queijo mineiro quentinho' },
+  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', iconCat: 'sandwich', imgId: 'sandwich-caprese', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
+  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', iconCat: 'dessert', imgId: 'apple-pie', refill: false, desc: 'Torta caseira com canela e sorvete' },
+  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', iconCat: 'brownie', imgId: 'brownie', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
+  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', iconCat: 'cookie', imgId: 'cookie', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
 ];
 
 const MILK_OPTIONS = ['Integral', 'Desnatado', 'Aveia', 'Amêndoas', 'Coco'];
@@ -98,7 +99,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const categories = [...new Set(CAFE_MENU.map(m => m.cat))];
 
   const addToCartDirect = (item: typeof CAFE_MENU[0]) => {
-    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, iconCat: item.iconCat }]);
+    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, iconCat: item.iconCat, imgId: item.imgId }]);
   };
 
   const addCustomized = () => {
@@ -112,12 +113,12 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     if (extraShot) customs.push('Shot extra');
 
     const totalPrice = selectedItem.price + size.priceAdd + (selectedFlavor ? 3 : 0) + (extraShot ? 4 : 0);
-    setCart(prev => [...prev, { id: selectedItem.id + '-' + Date.now(), name: selectedItem.name, price: totalPrice, iconCat: selectedItem.iconCat, customizations: customs }]);
+    setCart(prev => [...prev, { id: selectedItem.id + '-' + Date.now(), name: selectedItem.name, price: totalPrice, iconCat: selectedItem.iconCat, imgId: selectedItem.imgId, customizations: customs }]);
     onNavigate('comanda');
   };
 
   const addRefill = (originalItem: CartItem) => {
-    setCart(prev => [...prev, { id: 'refill-' + Date.now(), name: `Refil ${originalItem.name}`, price: 5, iconCat: 'coffee', isRefill: true }]);
+    setCart(prev => [...prev, { id: 'refill-' + Date.now(), name: `Refil ${originalItem.name}`, price: 5, iconCat: 'coffee', imgId: 'espresso', isRefill: true }]);
   };
 
   switch (screen) {
@@ -370,7 +371,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   onNavigate('comanda');
                 }
               }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={item.iconCat} size="sm" />
+                <FoodImg id={item.imgId} size="sm" alt={item.name} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
@@ -400,7 +401,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="text-center mb-4">
-            <ItemIcon cat={selectedItem.iconCat} size="xl" className="mx-auto" />
+            <FoodImg id={selectedItem.imgId} size="xl" alt={selectedItem.name} className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-2">{selectedItem.name}</h2>
             <p className="text-xs text-muted-foreground">{selectedItem.desc}</p>
           </div>
@@ -494,7 +495,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               {cart.map((c, i) => (
                 <div key={c.id} className={`flex items-center gap-3 py-3 border-b border-border ${c.isRefill ? 'bg-success/5 -mx-1 px-1 rounded-lg' : ''}`}>
-                  <ItemIcon cat={c.iconCat} size="xs" />
+                  <FoodImg id={c.imgId} size="xs" alt={c.name} />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{c.name}</p>
                     {c.customizations && <p className="text-[10px] text-primary">{c.customizations.join(' · ')}</p>}
