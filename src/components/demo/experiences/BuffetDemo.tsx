@@ -133,13 +133,13 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="grid grid-cols-2 gap-2 mb-4">
             {[
-              { label: 'Opções Hoje', value: '84+', emoji: '🍖' },
-              { label: 'Preço/kg', value: 'R$ 79,90', emoji: '⚖️' },
-              { label: 'Sushi Bar', value: '✓ Incluso', emoji: '🍣' },
-              { label: 'Ocupação', value: '65%', emoji: '👥' },
+              { label: 'Opções Hoje', value: '84+', icon: ChefHat },
+              { label: 'Preço/kg', value: 'R$ 79,90', icon: Scale },
+              { label: 'Sushi Bar', value: '✓ Incluso', icon: Utensils },
+              { label: 'Ocupação', value: '65%', icon: Users },
             ].map((s, i) => (
               <div key={i} className="p-3 rounded-xl bg-muted/30 text-center">
-                <span className="text-xl">{s.emoji}</span>
+                <s.icon className="w-5 h-5 text-primary mx-auto" />
                 <p className="text-xs font-bold mt-1">{s.value}</p>
                 <p className="text-[9px] text-muted-foreground">{s.label}</p>
               </div>
