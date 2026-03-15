@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, CreditCard, Gift, Calendar,
   Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart,
