@@ -405,7 +405,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <h2 className="font-display text-2xl font-bold mb-2">Bom apetite!</h2>
           <p className="text-sm text-muted-foreground mb-1">Pagamento confirmado — sem fila no caixa!</p>
-          <p className="text-xs text-muted-foreground mb-4">Pode continuar comendo e voltar a pesar 😊</p>
+          <p className="text-xs text-muted-foreground mb-4">Pode continuar comendo e voltar a pesar</p>
           <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
             <Gift className="w-5 h-5 text-primary" />
             <div className="text-left"><p className="text-sm font-semibold">+{Math.round(grandTotal / 2)} pontos ganhos!</p><p className="text-xs text-muted-foreground">Visita #5 — próxima sobremesa grátis!</p></div>
