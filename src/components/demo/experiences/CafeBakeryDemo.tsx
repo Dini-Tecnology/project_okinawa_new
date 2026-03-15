@@ -194,7 +194,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <div className="w-8" />
           </div>
           <div className="text-center mb-4">
-            <span className="text-6xl">☕</span>
+            <ItemIcon cat="coffee" size="hero" className="mx-auto" />
             <h2 className="font-display text-xl font-bold mt-2">Café Noowe</h2>
             <p className="text-sm text-muted-foreground">Seu espaço para trabalhar e saborear</p>
             <div className="flex items-center justify-center gap-3 mt-2 text-sm">
