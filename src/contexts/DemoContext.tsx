@@ -429,7 +429,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const tableNum = [1, 3, 5, 8, 10][Math.floor(Math.random() * 5)];
         setNotifications(prev => [{
           id: `nw-${Date.now()}`,
-          type: 'waiter_call',
+          type: 'waiter_call' as const,
           message: `Mesa ${tableNum} chamou o garçom`,
           timestamp: new Date(),
           read: false,

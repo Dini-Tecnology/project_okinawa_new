@@ -64,6 +64,9 @@ const App = () => (
                     <Route path="/logo" element={<LogoShowcase />} />
                     <Route path="/brand" element={<BrandIdentity />} />
                     <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/demo" element={<Demo />} />
+                    <Route path="/demo/client" element={<DemoClient />} />
+                    <Route path="/demo/restaurant" element={<DemoRestaurant />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
