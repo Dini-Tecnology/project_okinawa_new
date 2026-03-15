@@ -374,8 +374,8 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
-                    {item.refill && <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-semibold">♻️ Refil</span>}
-                    {(item as any).customizable && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-semibold">✨ Custom</span>}
+                    {item.refill && <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-semibold flex items-center gap-0.5"><RefreshCw className="w-2.5 h-2.5" /> Refil</span>}
+                    {(item as any).customizable && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-semibold flex items-center gap-0.5"><Sparkles className="w-2.5 h-2.5" /> Custom</span>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.desc}</p>
                   <p className="font-display font-bold text-sm mt-1">R$ {item.price}</p>
