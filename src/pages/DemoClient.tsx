@@ -1206,6 +1206,9 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
           <h3 className="font-semibold text-foreground mb-3">Resumo</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between"><span className="text-muted-foreground">Sua parte</span><span className="text-foreground">R$ {mySubtotal.toFixed(2)}</span></div>
+            {payMode === 'split' && sharedTotal > 0 && (
+              <div className="flex justify-between text-accent"><span className="flex items-center gap-1"><Users className="w-3 h-3" />Itens compartilhados</span><span>R$ {mySharedPortion.toFixed(2)}</span></div>
+            )}
             {tipPercent > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Gorjeta ({tipPercent}%)</span><span className="text-foreground">R$ {myTip.toFixed(2)}</span></div>}
             {paidByOthers > 0 && <div className="flex justify-between text-success"><span>Pago por outros</span><span>- R$ {paidByOthers.toFixed(2)}</span></div>}
             <div className="border-t border-border pt-2 flex justify-between"><span className="font-semibold text-foreground">Você paga</span><span className="font-bold text-xl text-primary">R$ {myTotal.toFixed(2)}</span></div>
