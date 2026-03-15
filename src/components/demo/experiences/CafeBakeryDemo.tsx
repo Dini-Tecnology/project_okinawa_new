@@ -265,7 +265,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-4"><Check className="w-8 h-8 text-success" /></div>
               <h2 className="font-display text-xl font-bold mb-2">Mesa 3 · Janela</h2>
-              <p className="text-xs text-muted-foreground mb-1">☕ Café Noowe</p>
+              <p className="text-xs text-muted-foreground mb-1">Café Noowe</p>
               <div className="flex items-center gap-3 text-xs mb-5">
                 <span className="flex items-center gap-1 text-success"><Plug className="w-3 h-3" />2 tomadas</span>
                 <span className="flex items-center gap-1 text-success"><Wifi className="w-3 h-3" />Wi-Fi forte</span>

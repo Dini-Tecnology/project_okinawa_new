@@ -411,9 +411,9 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <div className="text-left"><p className="text-sm font-semibold">+{Math.round(grandTotal / 2)} pontos ganhos!</p><p className="text-xs text-muted-foreground">Visita #5 — próxima sobremesa grátis!</p></div>
           </div>
           <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 text-left">
-            <p className="text-xs font-semibold mb-1">📊 Seu perfil de buffet</p>
+            <p className="text-xs font-semibold mb-1">Seu perfil de buffet</p>
             <p className="text-[10px] text-muted-foreground">Peso médio por visita: 520g</p>
-            <p className="text-[10px] text-muted-foreground">Estação favorita: Grelhados 🥩</p>
+            <p className="text-[10px] text-muted-foreground">Estação favorita: Grelhados</p>
             <p className="text-[10px] text-muted-foreground">Total em 5 visitas: R$ 287,40</p>
           </div>
           <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
