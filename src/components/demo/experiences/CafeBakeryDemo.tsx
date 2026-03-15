@@ -494,7 +494,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               {cart.map((c, i) => (
                 <div key={c.id} className={`flex items-center gap-3 py-3 border-b border-border ${c.isRefill ? 'bg-success/5 -mx-1 px-1 rounded-lg' : ''}`}>
-                  <span className="text-xl">{c.emoji}</span>
+                  <ItemIcon cat={c.iconCat} size="xs" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{c.name}</p>
                     {c.customizations && <p className="text-[10px] text-primary">{c.customizations.join(' · ')}</p>}
