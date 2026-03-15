@@ -10,7 +10,7 @@ import {
   Wifi, Battery, Plug, Volume2, Coffee, Gift, QrCode, RefreshCw,
   Search, MapPin, Laptop, ArrowRight, Bell, Heart, Timer,
   Loader2, ChevronRight, Award, Nfc, Smartphone, Wallet,
-  Zap, X, ChevronDown, Users,
+  Zap, X, ChevronDown, Users, Sparkles,
 } from 'lucide-react';
 
 type Screen = 'home' | 'restaurant' | 'qr-scan' | 'work-mode' | 'menu' | 'customize' | 'comanda' | 'payment' | 'payment-success';
