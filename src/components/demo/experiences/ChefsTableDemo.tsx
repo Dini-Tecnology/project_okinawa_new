@@ -429,7 +429,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Grand Finale" back="course-2" sub="Curso 7 de 7" />
           <CourseProgress current={7} total={7} />
           <div className="text-center mb-4">
-            <ItemIcon cat="dessert" size="hero" className="mx-auto" />
+            <FoodImg id="souffle" size="hero" alt="Soufflé de Chocolate" className="mx-auto" />
             <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Sobremesa</p>
             <h2 className="font-display text-xl font-bold">Soufflé de Chocolate 70%</h2>
             <p className="text-xs text-muted-foreground mt-1">com sorvete de baunilha bourbon</p>

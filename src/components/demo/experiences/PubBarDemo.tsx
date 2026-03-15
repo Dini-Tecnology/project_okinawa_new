@@ -405,7 +405,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title={drink.name} back="tap-list" />
           <div className="text-center mb-4">
-            <ItemIcon cat={drink.iconCat} size="hero" className="mx-auto" />
+            <FoodImg id={drink.imgId} size="hero" alt={drink.name} className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-3">{drink.name}</h2>
             {drink.style && <p className="text-xs text-primary font-medium">{drink.style}</p>}
             <p className="text-sm text-muted-foreground mt-1">{drink.desc}</p>

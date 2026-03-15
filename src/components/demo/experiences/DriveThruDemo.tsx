@@ -257,7 +257,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               return (
                 <div key={c.id} className="p-3 rounded-xl border border-border bg-card">
                   <div className="flex items-center gap-3">
-                    <ItemIcon cat={item.iconCat} size="sm" />
+                    <FoodImg id={item.imgId} size="sm" alt={item.name} />
                     <div className="flex-1">
                       <p className="font-semibold text-sm">{item.name}</p>
                       {c.notes && <p className="text-[10px] text-primary flex items-center gap-1"><Sparkles className="w-2.5 h-2.5" /> {c.notes}</p>}

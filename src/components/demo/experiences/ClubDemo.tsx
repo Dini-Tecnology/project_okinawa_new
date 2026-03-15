@@ -612,16 +612,16 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="space-y-2 mb-4">
             {[
-              { name: 'Gin Tônica', price: 38, iconCat: 'cocktail' },
-              { name: 'Vodka Red Bull', price: 35, iconCat: 'cocktail' },
-              { name: 'Cerveja Long Neck', price: 18, iconCat: 'beer' },
-              { name: 'Água', price: 8, iconCat: 'water' },
-              { name: 'Energético', price: 20, iconCat: 'drink' },
-              { name: 'Shot Tequila', price: 25, iconCat: 'cocktail' },
+              { name: 'Gin Tônica', price: 38, imgId: 'gin-tonic' },
+              { name: 'Vodka Red Bull', price: 35, imgId: 'vodka' },
+              { name: 'Cerveja Long Neck', price: 18, imgId: 'ipa' },
+              { name: 'Água', price: 8, imgId: 'water' },
+              { name: 'Energético', price: 20, imgId: 'drink-generic' },
+              { name: 'Shot Tequila', price: 25, imgId: 'tequila' },
             ].map((d, i) => (
               <button key={i} onClick={() => { setConsumed(prev => prev + d.price); onNavigate('min-spend'); }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={d.iconCat} size="sm" />
+                <FoodImg id={d.imgId} size="sm" alt={d.name} />
                 <div className="flex-1"><p className="font-semibold text-sm">{d.name}</p></div>
                 <span className="font-semibold text-sm text-primary">R$ {d.price}</span>
               </button>
