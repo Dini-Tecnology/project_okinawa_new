@@ -38,14 +38,14 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
 };
 
 const MENU_ITEMS = [
-  { id: 'classic', name: 'Combo Classic', desc: 'Smash Burger 180g + Batata G + Refri 500ml', price: 42, cal: 980, popular: true, cat: 'Combos', iconCat: 'burger' },
-  { id: 'chicken', name: 'Combo Chicken', desc: 'Chicken Crispy + Batata G + Refri 500ml', price: 45, cal: 880, cat: 'Combos', iconCat: 'chicken' },
-  { id: 'double', name: 'Combo Double', desc: 'Double Smash 360g + Batata G + Refri 500ml', price: 52, cal: 1350, cat: 'Combos', iconCat: 'burger' },
-  { id: 'kids', name: 'Combo Kids', desc: 'Mini Burger + Batata P + Suco Box', price: 32, cal: 550, cat: 'Combos', iconCat: 'kids' },
-  { id: 'wrap', name: 'Wrap Grelhado', desc: 'Frango, alface, tomate, molho ranch', price: 28, cal: 420, cat: 'Individuais', iconCat: 'wrap' },
-  { id: 'sundae', name: 'Sundae', desc: 'Chocolate, Morango ou Caramelo', price: 14, cal: 280, cat: 'Sobremesas', iconCat: 'icecream' },
-  { id: 'coffee', name: 'Café Latte 400ml', desc: 'Espresso com leite cremoso', price: 12, cal: 150, cat: 'Bebidas', iconCat: 'coffee' },
-  { id: 'shake', name: 'Milkshake 500ml', desc: 'Ovomaltine, Chocolate ou Morango', price: 22, cal: 480, cat: 'Bebidas', iconCat: 'milkshake' },
+  { id: 'classic', name: 'Combo Classic', desc: 'Smash Burger 180g + Batata G + Refri 500ml', price: 42, cal: 980, popular: true, cat: 'Combos', iconCat: 'burger', imgId: 'burger' },
+  { id: 'chicken', name: 'Combo Chicken', desc: 'Chicken Crispy + Batata G + Refri 500ml', price: 45, cal: 880, cat: 'Combos', iconCat: 'chicken', imgId: 'chicken-burger' },
+  { id: 'double', name: 'Combo Double', desc: 'Double Smash 360g + Batata G + Refri 500ml', price: 52, cal: 1350, cat: 'Combos', iconCat: 'burger', imgId: 'burger-double' },
+  { id: 'kids', name: 'Combo Kids', desc: 'Mini Burger + Batata P + Suco Box', price: 32, cal: 550, cat: 'Combos', iconCat: 'kids', imgId: 'nuggets' },
+  { id: 'wrap', name: 'Wrap Grelhado', desc: 'Frango, alface, tomate, molho ranch', price: 28, cal: 420, cat: 'Individuais', iconCat: 'wrap', imgId: 'wrap' },
+  { id: 'sundae', name: 'Sundae', desc: 'Chocolate, Morango ou Caramelo', price: 14, cal: 280, cat: 'Sobremesas', iconCat: 'icecream', imgId: 'sundae' },
+  { id: 'coffee', name: 'Café Latte 400ml', desc: 'Espresso com leite cremoso', price: 12, cal: 150, cat: 'Bebidas', iconCat: 'coffee', imgId: 'latte' },
+  { id: 'shake', name: 'Milkshake 500ml', desc: 'Ovomaltine, Chocolate ou Morango', price: 22, cal: 480, cat: 'Bebidas', iconCat: 'milkshake', imgId: 'milkshake' },
 ];
 
 interface CartItem { id: string; qty: number; notes: string; }
