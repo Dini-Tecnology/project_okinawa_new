@@ -362,9 +362,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       const itemTotal = (selectedItem.price + extraTotal) * itemQty;
       return (
         <div className="pb-4">
-          <div className="bg-gradient-to-b from-muted/50 to-background p-8 text-center">
+           <div className="bg-gradient-to-b from-muted/50 to-background p-6 flex items-center justify-center">
             <button onClick={() => onNavigate('menu')} className="absolute top-2 left-4 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-            <span className="text-7xl">{selectedItem.img}</span>
+            <FoodImg id={selectedItem.img} size="detail" alt={selectedItem.name} rounded="rounded-2xl" />
           </div>
           <div className="px-5 -mt-4 relative">
             <div className="bg-card rounded-2xl p-5 shadow-md border border-border">
