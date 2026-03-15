@@ -86,7 +86,7 @@ const DemoClientInner = () => {
   }, [serviceType]);
 
   const activeServiceType = SERVICE_TYPES.find(s => s.id === serviceType);
-  const info = config?.info[currentScreen] || { emoji: '📱', title: 'Demo', desc: '' };
+  const info = config?.info[currentScreen] || { title: 'Demo', desc: '' };
   const currentStepIdx = config?.steps.findIndex(s => s.screens.includes(currentScreen)) ?? -1;
 
   const handleTabChange = (tab: NavTab) => {
