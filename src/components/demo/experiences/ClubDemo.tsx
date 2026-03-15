@@ -99,7 +99,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       return (
         <div className="px-5 pb-4">
           <div className="pt-2 pb-3">
-            <p className="text-sm text-muted-foreground">Hoje à noite 🎵</p>
+            <p className="text-sm text-muted-foreground">Hoje à noite</p>
             <h1 className="font-display text-xl font-bold">Eventos & Clubs</h1>
           </div>
           <div className="flex items-center gap-2 mb-4">
