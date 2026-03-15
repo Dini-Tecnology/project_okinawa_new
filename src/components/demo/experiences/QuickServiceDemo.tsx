@@ -25,25 +25,25 @@ interface CartItem {
 }
 
 const MENU = [
-  { id: 'q1', name: 'Smash Burger Classic', price: 29, cat: 'Burgers', time: 5, img: '🍔', desc: 'Blend especial 150g, queijo cheddar, alface, tomate, molho da casa', popular: true, cals: 520 },
-  { id: 'q2', name: 'Smash Burger Duplo', price: 39, cat: 'Burgers', time: 6, img: '🍔', desc: 'Dois blends 150g, duplo cheddar, bacon crocante, molho especial', popular: true, cals: 780 },
-  { id: 'q3', name: 'Chicken Crispy', price: 32, cat: 'Burgers', time: 6, img: '🍗', desc: 'Frango empanado crocante, coleslaw, maionese sriracha', cals: 480 },
-  { id: 'q4', name: 'Veggie Smash', price: 28, cat: 'Burgers', time: 5, img: '🥬', desc: 'Hambúrguer de grão de bico, rúcula, tomate seco, tahini', cals: 380 },
-  { id: 'q5', name: 'Batata Frita G', price: 18, cat: 'Acompanhamentos', time: 4, img: '🍟', desc: 'Batata frita crocante com sal e orégano', cals: 320 },
-  { id: 'q6', name: 'Onion Rings (8un)', price: 16, cat: 'Acompanhamentos', time: 4, img: '🧅', desc: 'Anéis de cebola empanados com molho ranch', cals: 280 },
-  { id: 'q7', name: 'Nuggets (10un)', price: 22, cat: 'Acompanhamentos', time: 5, img: '🍗', desc: 'Nuggets artesanais com 3 molhos à escolha', cals: 350 },
-  { id: 'q8', name: 'Milkshake Nutella', price: 22, cat: 'Bebidas', time: 3, img: '🥤', desc: 'Milkshake cremoso com Nutella e chantilly', cals: 450 },
-  { id: 'q9', name: 'Milkshake Oreo', price: 22, cat: 'Bebidas', time: 3, img: '🥤', desc: 'Milkshake com Oreo triturado e calda de chocolate', cals: 420 },
-  { id: 'q10', name: 'Refrigerante 500ml', price: 9, cat: 'Bebidas', time: 1, img: '🥤', desc: 'Coca-Cola, Guaraná ou Sprite', cals: 140 },
-  { id: 'q11', name: 'Suco Natural 400ml', price: 14, cat: 'Bebidas', time: 2, img: '🧃', desc: 'Laranja, Limão com Hortelã ou Maracujá', cals: 120 },
-  { id: 'q12', name: 'Sundae', price: 14, cat: 'Sobremesas', time: 2, img: '🍦', desc: 'Chocolate, Morango ou Caramelo com granulado', cals: 280 },
-  { id: 'q13', name: 'Cookie Gigante', price: 12, cat: 'Sobremesas', time: 1, img: '🍪', desc: 'Cookie artesanal com gotas de chocolate belga', cals: 320 },
+  { id: 'q1', name: 'Smash Burger Classic', price: 29, cat: 'Burgers', time: 5, img: 'burger', desc: 'Blend especial 150g, queijo cheddar, alface, tomate, molho da casa', popular: true, cals: 520 },
+  { id: 'q2', name: 'Smash Burger Duplo', price: 39, cat: 'Burgers', time: 6, img: 'burger-double', desc: 'Dois blends 150g, duplo cheddar, bacon crocante, molho especial', popular: true, cals: 780 },
+  { id: 'q3', name: 'Chicken Crispy', price: 32, cat: 'Burgers', time: 6, img: 'chicken-burger', desc: 'Frango empanado crocante, coleslaw, maionese sriracha', cals: 480 },
+  { id: 'q4', name: 'Veggie Smash', price: 28, cat: 'Burgers', time: 5, img: 'veggie-burger', desc: 'Hambúrguer de grão de bico, rúcula, tomate seco, tahini', cals: 380 },
+  { id: 'q5', name: 'Batata Frita G', price: 18, cat: 'Acompanhamentos', time: 4, img: 'fries', desc: 'Batata frita crocante com sal e orégano', cals: 320 },
+  { id: 'q6', name: 'Onion Rings (8un)', price: 16, cat: 'Acompanhamentos', time: 4, img: 'onion-rings', desc: 'Anéis de cebola empanados com molho ranch', cals: 280 },
+  { id: 'q7', name: 'Nuggets (10un)', price: 22, cat: 'Acompanhamentos', time: 5, img: 'nuggets', desc: 'Nuggets artesanais com 3 molhos à escolha', cals: 350 },
+  { id: 'q8', name: 'Milkshake Nutella', price: 22, cat: 'Bebidas', time: 3, img: 'milkshake', desc: 'Milkshake cremoso com Nutella e chantilly', cals: 450 },
+  { id: 'q9', name: 'Milkshake Oreo', price: 22, cat: 'Bebidas', time: 3, img: 'milkshake-oreo', desc: 'Milkshake com Oreo triturado e calda de chocolate', cals: 420 },
+  { id: 'q10', name: 'Refrigerante 500ml', price: 9, cat: 'Bebidas', time: 1, img: 'soda', desc: 'Coca-Cola, Guaraná ou Sprite', cals: 140 },
+  { id: 'q11', name: 'Suco Natural 400ml', price: 14, cat: 'Bebidas', time: 2, img: 'juice', desc: 'Laranja, Limão com Hortelã ou Maracujá', cals: 120 },
+  { id: 'q12', name: 'Sundae', price: 14, cat: 'Sobremesas', time: 2, img: 'sundae', desc: 'Chocolate, Morango ou Caramelo com granulado', cals: 280 },
+  { id: 'q13', name: 'Cookie Gigante', price: 12, cat: 'Sobremesas', time: 1, img: 'cookie', desc: 'Cookie artesanal com gotas de chocolate belga', cals: 320 },
 ];
 
 const COMBOS = [
-  { id: 'combo1', name: 'Combo Classic', items: ['Smash Burger Classic', 'Batata Frita G', 'Refri 500ml'], price: 42, original: 56, img: '🍔🍟🥤', time: 6 },
-  { id: 'combo2', name: 'Combo Duplo', items: ['Smash Burger Duplo', 'Batata Frita G', 'Milkshake'], price: 62, original: 79, img: '🍔🍟🥤', time: 7 },
-  { id: 'combo3', name: 'Combo Kids', items: ['Nuggets (6un)', 'Batata P', 'Suco'], price: 32, original: 42, img: '🍗🍟🧃', time: 5 },
+  { id: 'combo1', name: 'Combo Classic', items: ['Smash Burger Classic', 'Batata Frita G', 'Refri 500ml'], price: 42, original: 56, img: 'combo', time: 6 },
+  { id: 'combo2', name: 'Combo Duplo', items: ['Smash Burger Duplo', 'Batata Frita G', 'Milkshake'], price: 62, original: 79, img: 'combo', time: 7 },
+  { id: 'combo3', name: 'Combo Kids', items: ['Nuggets (6un)', 'Batata P', 'Suco'], price: 32, original: 42, img: 'nuggets', time: 5 },
 ];
 
 const CUSTOMIZATIONS = {
