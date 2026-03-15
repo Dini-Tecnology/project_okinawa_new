@@ -5,7 +5,7 @@
  * Min Spend Tracker (real-time) → Dance Floor Ordering → End of Night Summary → Rate & Uber
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
   Users, Timer, ArrowRight, Music, Ticket, Crown, MapPin, UserPlus,
