@@ -120,7 +120,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <button onClick={() => onNavigate('club-detail')} className="w-full text-left mb-3">
             <div className="rounded-2xl overflow-hidden border border-border bg-card">
               <div className="h-32 bg-gradient-to-br from-purple-600/30 to-pink-600/30 flex items-center justify-center relative">
-                <span className="text-5xl">🎵</span>
+                <ItemIcon cat="club" size="hero" />
                 <div className="absolute top-2 left-3 flex gap-1">
                   <span className="px-2 py-0.5 rounded-full bg-primary/90 text-primary-foreground text-[9px] font-bold">HOJE</span>
                   <span className="px-2 py-0.5 rounded-full bg-warning/90 text-primary-foreground text-[9px] font-bold">Lote 2</span>
