@@ -127,7 +127,7 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       return (
         <div className="px-5 pb-4">
           <div className="pt-2 pb-3">
-            <p className="text-sm text-muted-foreground">Boa noite 👨‍👩‍👧‍👦</p>
+            <p className="text-sm text-muted-foreground">Boa noite</p>
             <h1 className="font-display text-xl font-bold">Jantar em família</h1>
           </div>
           <div className="flex items-center gap-2 mb-4">
