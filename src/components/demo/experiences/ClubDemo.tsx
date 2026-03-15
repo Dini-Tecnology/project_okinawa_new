@@ -112,7 +112,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </button>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
-            {['Hoje 🔥', 'Este fds', 'Tech House', 'Funk', 'Sertanejo', 'Open Bar'].map((f, i) => (
+            {['Hoje', 'Este fds', 'Tech House', 'Funk', 'Sertanejo', 'Open Bar'].map((f, i) => (
               <button key={f} className={`px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap ${i === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{f}</button>
             ))}
           </div>
