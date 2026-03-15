@@ -3,7 +3,7 @@
  * Deep UX: Map Discovery → Schedule → Truck Detail → Virtual Queue → Pre-Order → Cart → Payment → Live Prep → Push Ready → Pickup → Loyalty
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map,
