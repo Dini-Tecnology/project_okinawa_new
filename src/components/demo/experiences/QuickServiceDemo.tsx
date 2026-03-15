@@ -199,7 +199,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="text-center mb-4">
-            <span className="text-6xl">⚡</span>
+            <ItemIcon cat="quick" size="hero" className="mx-auto" />
             <h2 className="font-display text-xl font-bold mt-2">NOOWE Express</h2>
             <p className="text-sm text-muted-foreground">Fast Food Premium · Tempo médio 5 min</p>
             <div className="flex items-center justify-center gap-3 mt-2 text-sm">
