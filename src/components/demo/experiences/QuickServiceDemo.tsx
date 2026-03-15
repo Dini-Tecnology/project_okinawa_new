@@ -3,7 +3,7 @@
  * Deep journey: Discover → Skip the Line → Menu with Combos → Item Customization → Cart → Payment → Live Prep Tracking → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
   Zap, Timer, QrCode, ChevronRight, CreditCard, Gift, Smartphone,
