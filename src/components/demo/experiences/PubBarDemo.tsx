@@ -54,16 +54,16 @@ interface Drink {
 }
 
 const DRINKS: Drink[] = [
-  { id: 'd1', name: 'IPA Artesanal', price: 28, priceHH: 19, cat: 'Chopp', abv: 6.5, ibu: 55, style: 'American IPA', desc: 'Lupulada e cítrica com final amargo', isNew: true, iconCat: 'beer' },
-  { id: 'd2', name: 'Pilsen Premium', price: 22, priceHH: 15, cat: 'Chopp', abv: 4.8, ibu: 18, style: 'German Pilsner', desc: 'Leve, refrescante e maltada', iconCat: 'beer' },
-  { id: 'd3', name: 'Stout de Chocolate', price: 30, priceHH: 21, cat: 'Chopp', abv: 5.5, ibu: 35, style: 'Chocolate Stout', desc: 'Notas de cacau e café torrado', iconCat: 'beer' },
-  { id: 'd4', name: 'Wheat Beer', price: 25, priceHH: 17, cat: 'Chopp', abv: 5.0, ibu: 12, style: 'Hefeweizen', desc: 'Notas de banana e cravo', iconCat: 'beer' },
-  { id: 'd5', name: 'Gin Tônica', price: 38, priceHH: 26, cat: 'Drinks', abv: 12.0, desc: 'Gin artesanal com tônica premium', iconCat: 'cocktail' },
-  { id: 'd6', name: 'Aperol Spritz', price: 35, priceHH: 24, cat: 'Drinks', abv: 8.0, desc: 'Aperol, prosecco e soda', iconCat: 'wine' },
-  { id: 'd7', name: 'Moscow Mule', price: 36, priceHH: 25, cat: 'Drinks', abv: 10.0, desc: 'Vodka, ginger beer e limão', iconCat: 'cocktail' },
-  { id: 'd8', name: 'Porção de Batata', price: 32, priceHH: 32, cat: 'Petiscos', desc: 'Batata rústica com molhos', iconCat: 'fries' },
-  { id: 'd9', name: 'Nachos Supreme', price: 38, priceHH: 38, cat: 'Petiscos', desc: 'Nachos com guacamole e cheddar', iconCat: 'petiscos' },
-  { id: 'd10', name: 'Tábua de Frios', price: 65, priceHH: 65, cat: 'Petiscos', desc: 'Queijos, embutidos e frutas', iconCat: 'cheese' },
+  { id: 'd1', name: 'IPA Artesanal', price: 28, priceHH: 19, cat: 'Chopp', abv: 6.5, ibu: 55, style: 'American IPA', desc: 'Lupulada e cítrica com final amargo', isNew: true, iconCat: 'beer', imgId: 'ipa' },
+  { id: 'd2', name: 'Pilsen Premium', price: 22, priceHH: 15, cat: 'Chopp', abv: 4.8, ibu: 18, style: 'German Pilsner', desc: 'Leve, refrescante e maltada', iconCat: 'beer', imgId: 'pilsen' },
+  { id: 'd3', name: 'Stout de Chocolate', price: 30, priceHH: 21, cat: 'Chopp', abv: 5.5, ibu: 35, style: 'Chocolate Stout', desc: 'Notas de cacau e café torrado', iconCat: 'beer', imgId: 'stout' },
+  { id: 'd4', name: 'Wheat Beer', price: 25, priceHH: 17, cat: 'Chopp', abv: 5.0, ibu: 12, style: 'Hefeweizen', desc: 'Notas de banana e cravo', iconCat: 'beer', imgId: 'wheat-beer' },
+  { id: 'd5', name: 'Gin Tônica', price: 38, priceHH: 26, cat: 'Drinks', abv: 12.0, desc: 'Gin artesanal com tônica premium', iconCat: 'cocktail', imgId: 'gin-tonic' },
+  { id: 'd6', name: 'Aperol Spritz', price: 35, priceHH: 24, cat: 'Drinks', abv: 8.0, desc: 'Aperol, prosecco e soda', iconCat: 'wine', imgId: 'aperol' },
+  { id: 'd7', name: 'Moscow Mule', price: 36, priceHH: 25, cat: 'Drinks', abv: 10.0, desc: 'Vodka, ginger beer e limão', iconCat: 'cocktail', imgId: 'moscow-mule' },
+  { id: 'd8', name: 'Porção de Batata', price: 32, priceHH: 32, cat: 'Petiscos', desc: 'Batata rústica com molhos', iconCat: 'fries', imgId: 'rustic-fries' },
+  { id: 'd9', name: 'Nachos Supreme', price: 38, priceHH: 38, cat: 'Petiscos', desc: 'Nachos com guacamole e cheddar', iconCat: 'petiscos', imgId: 'nachos' },
+  { id: 'd10', name: 'Tábua de Frios', price: 65, priceHH: 65, cat: 'Petiscos', desc: 'Queijos, embutidos e frutas', iconCat: 'cheese', imgId: 'cheese-board' },
 ];
 
 interface TabItem { drinkId: string; who: string; time: string; }
