@@ -1459,7 +1459,7 @@ const DemoClientInner = () => {
     'profile': { emoji: '👤', title: 'Perfil', desc: 'Perfil do cliente com histórico, favoritos, nível de fidelidade e configurações.' },
     'virtual-queue': { emoji: '⏱️', title: 'Fila Virtual', desc: 'Fila virtual para restaurantes lotados com acompanhamento em tempo real.' },
     'my-orders': { emoji: '📦', title: 'Meus Pedidos', desc: 'Histórico de pedidos e pedido ativo.' },
-    'split-by-item': { emoji: '🔀', title: 'Dividir por Item', desc: 'Atribuição visual de cada item a um participante da mesa.' },
+    'payment-success': { emoji: '✅', title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
     'payment-success': { emoji: '✅', title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
     'notifications': { emoji: '🔔', title: 'Notificações', desc: 'Convites para comanda, fila pronta, pontos ganhos, promoções e status de pedidos.' },
     'ai-harmonization': { emoji: '🧠', title: 'Harmonização IA', desc: 'A IA sugere combinações perfeitas de pratos e bebidas baseado em suas preferências.' },
