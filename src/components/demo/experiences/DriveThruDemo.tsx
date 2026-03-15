@@ -3,7 +3,7 @@
  * Deep UX: Order Ahead → Menu Customization → Payment → GPS Live Tracking → Geofencing Trigger → Kitchen Notification → Lane Assignment → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Car, ArrowRight, Loader2, Radio, Zap,
