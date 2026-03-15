@@ -626,7 +626,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="text-center mb-5">
-            <span className="text-5xl">⚡</span>
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Zap className="w-8 h-8 text-primary" />
+            </div>
             <h2 className="font-display text-lg font-bold mt-2">Como foi sua experiência?</h2>
             <p className="text-sm text-muted-foreground">NOOWE Express</p>
           </div>
