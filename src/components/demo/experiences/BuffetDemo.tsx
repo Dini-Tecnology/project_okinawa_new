@@ -36,12 +36,12 @@ export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: s
 };
 
 const STATIONS = [
-  { name: 'Grelhados', emoji: '🥩', items: ['Fraldinha', 'Linguiça', 'Frango'], status: 'fresh' as const },
-  { name: 'Massas', emoji: '🍝', items: ['Espaguete', 'Penne', 'Lasanha'], status: 'fresh' as const },
-  { name: 'Saladas', emoji: '🥗', items: ['Folhas Mix', 'Tabule', 'Grega'], status: 'fresh' as const },
-  { name: 'Acompanhamentos', emoji: '🍚', items: ['Arroz', 'Feijão', 'Purê', 'Farofa'], status: 'replenishing' as const },
-  { name: 'Sobremesas', emoji: '🍰', items: ['Pudim', 'Mousse', 'Frutas'], status: 'fresh' as const },
-  { name: 'Sushi Bar', emoji: '🍣', items: ['Salmão', 'Atum', 'Philadelphia'], status: 'fresh' as const },
+  { name: 'Grelhados', cat: 'grelhados', items: ['Fraldinha', 'Linguiça', 'Frango'], status: 'fresh' as const },
+  { name: 'Massas', cat: 'massas', items: ['Espaguete', 'Penne', 'Lasanha'], status: 'fresh' as const },
+  { name: 'Saladas', cat: 'saladas', items: ['Folhas Mix', 'Tabule', 'Grega'], status: 'fresh' as const },
+  { name: 'Acompanhamentos', cat: 'acompanhamentos', items: ['Arroz', 'Feijão', 'Purê', 'Farofa'], status: 'replenishing' as const },
+  { name: 'Sobremesas', cat: 'sobremesas', items: ['Pudim', 'Mousse', 'Frutas'], status: 'fresh' as const },
+  { name: 'Sushi Bar', cat: 'sushi', items: ['Salmão', 'Atum', 'Philadelphia'], status: 'fresh' as const },
 ];
 
 const DRINK_MENU = [
