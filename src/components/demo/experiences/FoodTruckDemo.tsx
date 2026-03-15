@@ -6,7 +6,7 @@ import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
-  MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map,
+  MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map, Sparkles,
   Calendar, Heart, Users, Zap, ChefHat, AlertCircle, Flame,
   ShoppingBag, Smartphone, UtensilsCrossed, Footprints, ClipboardList,
 } from 'lucide-react';

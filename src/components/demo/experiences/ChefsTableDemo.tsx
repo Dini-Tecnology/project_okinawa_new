@@ -6,7 +6,7 @@ import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, CreditCard, Gift, Calendar,
-  Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart,
+  Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart, Flame,
   Users, Lock, MessageCircle, Share2, Award, Loader2, UtensilsCrossed,
   MapPin, Shirt, Timer, ClipboardList, Trophy,
 } from 'lucide-react';
