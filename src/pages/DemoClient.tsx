@@ -1436,7 +1436,6 @@ const DemoClientInner = () => {
       case 'virtual-queue': return <VirtualQueueScreen onNavigate={handleNavigate} />;
       case 'my-orders': return <MyOrdersScreen onNavigate={handleNavigate} />;
       case 'payment-success': return <PaymentSuccessScreen onNavigate={handleNavigate} />;
-      case 'payment-success': return <PaymentSuccessScreen onNavigate={handleNavigate} />;
       case 'notifications': return <NotificationsScreen onNavigate={handleNavigate} />;
       case 'ai-harmonization': return <AIHarmonizationScreen onNavigate={handleNavigate} />;
     }
