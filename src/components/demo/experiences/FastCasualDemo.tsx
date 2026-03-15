@@ -3,7 +3,7 @@
  * Deep UX: Discovery → Saved Bowls → Dish Builder (4 steps) → Allergy/Nutrition → Favorites → Payment → Live Prep → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
   Leaf, Flame, Droplets, Wheat, CreditCard, Gift, Plus,
