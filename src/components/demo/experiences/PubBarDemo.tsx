@@ -1,8 +1,5 @@
 /**
  * Pub & Bar Demo — Noowe Tap House
- * Deep UX: Discover → Open Tab (pre-auth) → Group Tab (invite friends) → Happy Hour auto-pricing →
- * Tap List (ABV/IBU) → Order Rounds → Drink Customization → Repeat Round → Tab Limit Alert →
- * Per-Consumption Split → Close Tab → Rate
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
@@ -12,7 +9,7 @@ import {
   Users, Timer, ArrowRight, Beer, RefreshCw, UserPlus, Share2,
   Copy, Send, ChevronDown, Zap, Sparkles, DollarSign, AlertTriangle,
   Bell, ThumbsUp, MapPin, Search, Thermometer, ChevronRight, Lock,
-  UtensilsCrossed,
+  UtensilsCrossed, Crown, Trophy, Settings,
 } from 'lucide-react';
 
 type Screen =
@@ -33,39 +30,40 @@ export const JOURNEY_STEPS = [
 ];
 
 export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Bares com tab digital e happy hour ativo.' },
-  'restaurant': { emoji: '🍺', title: 'Noowe Tap House', desc: 'Pub com 20 torneiras e tab digital.' },
-  'open-tab': { emoji: '💳', title: 'Abrir Tab', desc: 'Pré-autorização no cartão — paga só o que beber.' },
-  'group-tab': { emoji: '👥', title: 'Tab Compartilhado', desc: 'Amigos entram no tab e registram seus pedidos.' },
-  'happy-hour': { emoji: '🎉', title: 'Happy Hour', desc: 'Descontos automáticos em chopp e drinks.' },
-  'tap-list': { emoji: '🍺', title: 'Torneiras', desc: 'Lista completa com ABV, IBU e estilo.' },
-  'drink-detail': { emoji: '🍻', title: 'Detalhe', desc: 'Ficha completa do chopp ou drink.' },
-  'round-builder': { emoji: '🍻', title: 'Montar Rodada', desc: 'Monte a rodada para todo o grupo.' },
-  'round-confirm': { emoji: '✅', title: 'Rodada Enviada', desc: 'Pedido confirmado no balcão.' },
-  'repeat-round': { emoji: '🔄', title: 'Repetir Rodada', desc: 'Mesmo pedido com um toque.' },
-  'tab-live': { emoji: '📊', title: 'Tab ao Vivo', desc: 'Consumo em tempo real por pessoa.' },
-  'tab-limit': { emoji: '⚠️', title: 'Alerta de Limite', desc: 'Defina limites de gasto no tab.' },
-  'close-tab': { emoji: '💰', title: 'Fechar Tab', desc: 'Divisão por consumo ou igual.' },
-  'tab-success': { emoji: '✅', title: 'Tab Fechado', desc: 'Resumo final com pontos ganhos.' },
+  'home': { emoji: '', title: 'Descoberta', desc: 'Bares com tab digital e happy hour ativo.' },
+  'restaurant': { emoji: '', title: 'Noowe Tap House', desc: 'Pub com 20 torneiras e tab digital.' },
+  'open-tab': { emoji: '', title: 'Abrir Tab', desc: 'Pré-autorização no cartão — paga só o que beber.' },
+  'group-tab': { emoji: '', title: 'Tab Compartilhado', desc: 'Amigos entram no tab e registram seus pedidos.' },
+  'happy-hour': { emoji: '', title: 'Happy Hour', desc: 'Descontos automáticos em chopp e drinks.' },
+  'tap-list': { emoji: '', title: 'Torneiras', desc: 'Lista completa com ABV, IBU e estilo.' },
+  'drink-detail': { emoji: '', title: 'Detalhe', desc: 'Ficha completa do chopp ou drink.' },
+  'round-builder': { emoji: '', title: 'Montar Rodada', desc: 'Monte a rodada para todo o grupo.' },
+  'round-confirm': { emoji: '', title: 'Rodada Enviada', desc: 'Pedido confirmado no balcão.' },
+  'repeat-round': { emoji: '', title: 'Repetir Rodada', desc: 'Mesmo pedido com um toque.' },
+  'tab-live': { emoji: '', title: 'Tab ao Vivo', desc: 'Consumo em tempo real por pessoa.' },
+  'tab-limit': { emoji: '', title: 'Alerta de Limite', desc: 'Defina limites de gasto no tab.' },
+  'close-tab': { emoji: '', title: 'Fechar Tab', desc: 'Divisão por consumo ou igual.' },
+  'tab-success': { emoji: '', title: 'Tab Fechado', desc: 'Resumo final com pontos ganhos.' },
 };
 
 interface Drink {
   id: string; name: string; price: number; priceHH: number;
-  emoji: string; cat: string; abv?: number; ibu?: number;
+  cat: string; abv?: number; ibu?: number;
   style?: string; desc?: string; isNew?: boolean;
+  iconCat: string;
 }
 
 const DRINKS: Drink[] = [
-  { id: 'd1', name: 'IPA Artesanal', price: 28, priceHH: 19, emoji: '🍺', cat: 'Chopp', abv: 6.5, ibu: 55, style: 'American IPA', desc: 'Lupulada e cítrica com final amargo', isNew: true },
-  { id: 'd2', name: 'Pilsen Premium', price: 22, priceHH: 15, emoji: '🍺', cat: 'Chopp', abv: 4.8, ibu: 18, style: 'German Pilsner', desc: 'Leve, refrescante e maltada' },
-  { id: 'd3', name: 'Stout de Chocolate', price: 30, priceHH: 21, emoji: '🍺', cat: 'Chopp', abv: 5.5, ibu: 35, style: 'Chocolate Stout', desc: 'Notas de cacau e café torrado' },
-  { id: 'd4', name: 'Wheat Beer', price: 25, priceHH: 17, emoji: '🍺', cat: 'Chopp', abv: 5.0, ibu: 12, style: 'Hefeweizen', desc: 'Notas de banana e cravo' },
-  { id: 'd5', name: 'Gin Tônica', price: 38, priceHH: 26, emoji: '🍸', cat: 'Drinks', abv: 12.0, desc: 'Gin artesanal com tônica premium' },
-  { id: 'd6', name: 'Aperol Spritz', price: 35, priceHH: 24, emoji: '🥂', cat: 'Drinks', abv: 8.0, desc: 'Aperol, prosecco e soda' },
-  { id: 'd7', name: 'Moscow Mule', price: 36, priceHH: 25, emoji: '🍹', cat: 'Drinks', abv: 10.0, desc: 'Vodka, ginger beer e limão' },
-  { id: 'd8', name: 'Porção de Batata', price: 32, priceHH: 32, emoji: '🍟', cat: 'Petiscos', desc: 'Batata rústica com molhos' },
-  { id: 'd9', name: 'Nachos Supreme', price: 38, priceHH: 38, emoji: '🫔', cat: 'Petiscos', desc: 'Nachos com guacamole e cheddar' },
-  { id: 'd10', name: 'Tábua de Frios', price: 65, priceHH: 65, emoji: '🧀', cat: 'Petiscos', desc: 'Queijos, embutidos e frutas' },
+  { id: 'd1', name: 'IPA Artesanal', price: 28, priceHH: 19, cat: 'Chopp', abv: 6.5, ibu: 55, style: 'American IPA', desc: 'Lupulada e cítrica com final amargo', isNew: true, iconCat: 'beer' },
+  { id: 'd2', name: 'Pilsen Premium', price: 22, priceHH: 15, cat: 'Chopp', abv: 4.8, ibu: 18, style: 'German Pilsner', desc: 'Leve, refrescante e maltada', iconCat: 'beer' },
+  { id: 'd3', name: 'Stout de Chocolate', price: 30, priceHH: 21, cat: 'Chopp', abv: 5.5, ibu: 35, style: 'Chocolate Stout', desc: 'Notas de cacau e café torrado', iconCat: 'beer' },
+  { id: 'd4', name: 'Wheat Beer', price: 25, priceHH: 17, cat: 'Chopp', abv: 5.0, ibu: 12, style: 'Hefeweizen', desc: 'Notas de banana e cravo', iconCat: 'beer' },
+  { id: 'd5', name: 'Gin Tônica', price: 38, priceHH: 26, cat: 'Drinks', abv: 12.0, desc: 'Gin artesanal com tônica premium', iconCat: 'cocktail' },
+  { id: 'd6', name: 'Aperol Spritz', price: 35, priceHH: 24, cat: 'Drinks', abv: 8.0, desc: 'Aperol, prosecco e soda', iconCat: 'wine' },
+  { id: 'd7', name: 'Moscow Mule', price: 36, priceHH: 25, cat: 'Drinks', abv: 10.0, desc: 'Vodka, ginger beer e limão', iconCat: 'cocktail' },
+  { id: 'd8', name: 'Porção de Batata', price: 32, priceHH: 32, cat: 'Petiscos', desc: 'Batata rústica com molhos', iconCat: 'fries' },
+  { id: 'd9', name: 'Nachos Supreme', price: 38, priceHH: 38, cat: 'Petiscos', desc: 'Nachos com guacamole e cheddar', iconCat: 'petiscos' },
+  { id: 'd10', name: 'Tábua de Frios', price: 65, priceHH: 65, cat: 'Petiscos', desc: 'Queijos, embutidos e frutas', iconCat: 'cheese' },
 ];
 
 interface TabItem { drinkId: string; who: string; time: string; }
@@ -149,7 +147,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <div className="h-24 bg-gradient-to-r from-amber-600/20 to-yellow-700/20 flex items-center justify-center relative">
                 <ItemIcon cat="beer" size="hero" />
                 <div className="absolute top-2 right-2">
-                  <span className="px-2 py-0.5 rounded-full bg-warning/90 text-primary-foreground text-[9px] font-bold animate-pulse">🎉 Happy Hour</span>
+                  <span className="px-2 py-0.5 rounded-full bg-warning/90 text-primary-foreground text-[9px] font-bold animate-pulse flex items-center gap-1"><Sparkles className="w-2.5 h-2.5" /> Happy Hour</span>
                 </div>
                 <div className="absolute bottom-2 left-3 px-2 py-1 rounded-lg bg-background/80 backdrop-blur text-[10px] font-semibold">
                   20 torneiras
@@ -235,7 +233,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
           </div>
           <div className="p-3 rounded-xl bg-muted/30 mb-4">
-            <p className="text-xs font-semibold mb-2">⚙️ Configurar limite (opcional)</p>
+            <p className="text-xs font-semibold mb-2 flex items-center gap-1.5"><Settings className="w-3.5 h-3.5 text-muted-foreground" /> Configurar limite (opcional)</p>
             <div className="flex items-center gap-3">
               <button onClick={() => setTabLimit(prev => Math.max(100, prev - 50))} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><Minus className="w-4 h-4" /></button>
               <div className="flex-1 text-center">
@@ -272,7 +270,11 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 <div className={`w-9 h-9 rounded-full ${f.color} flex items-center justify-center text-primary-foreground text-sm font-bold`}>{f.initial}</div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{f.name}</p>
-                  <p className="text-[10px] text-muted-foreground">{f.status === 'host' ? '👑 Host do Tab' : f.status === 'joined' ? '✓ No tab' : '⏳ Convite pendente'}</p>
+                  <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    {f.status === 'host' && <><Crown className="w-2.5 h-2.5 text-accent" /> Host do Tab</>}
+                    {f.status === 'joined' && <><Check className="w-2.5 h-2.5 text-success" /> No tab</>}
+                    {f.status === 'pending' && <><Clock className="w-2.5 h-2.5 text-warning" /> Convite pendente</>}
+                  </p>
                 </div>
                 {f.status === 'pending' && <button className="px-2 py-1 rounded-lg bg-primary/10 text-[10px] text-primary font-semibold">Reenviar</button>}
               </div>
@@ -300,7 +302,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     case 'happy-hour':
       return (
         <div className="px-5 pb-4">
-          <Header title="🎉 Happy Hour" back="group-tab" />
+          <Header title="Happy Hour" back="group-tab" />
           <div className="p-4 rounded-xl bg-gradient-to-r from-warning/10 to-accent/10 border border-warning/20 mb-4">
             <div className="flex items-center justify-between mb-2">
               <div>
@@ -320,7 +322,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               const discount = Math.round((1 - drink.priceHH / drink.price) * 100);
               return (
                 <button key={drink.id} onClick={() => { setSelectedDrink(drink); onNavigate('drink-detail'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                  <span className="text-2xl">{drink.emoji}</span>
+                  <ItemIcon cat={drink.iconCat} size="md" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="font-semibold text-sm">{drink.name}</p>
@@ -363,7 +365,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {filtered.map(drink => (
               <button key={drink.id} onClick={() => { setSelectedDrink(drink); onNavigate('drink-detail'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <span className="text-2xl">{drink.emoji}</span>
+                <ItemIcon cat={drink.iconCat} size="md" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <p className="font-semibold text-sm">{drink.name}</p>
@@ -392,7 +394,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             ))}
           </div>
           <button onClick={() => onNavigate('round-builder')} className="w-full mt-4 py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
-            🍻 Montar Rodada
+            <Beer className="w-5 h-5" /> Montar Rodada
           </button>
         </div>
       );
@@ -403,10 +405,8 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title={drink.name} back="tap-list" />
           <div className="text-center mb-4">
-            <div className="w-20 h-20 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto mb-3">
-              <span className="text-5xl">{drink.emoji}</span>
-            </div>
-            <h2 className="font-display text-lg font-bold">{drink.name}</h2>
+            <ItemIcon cat={drink.iconCat} size="hero" className="mx-auto" />
+            <h2 className="font-display text-lg font-bold mt-3">{drink.name}</h2>
             {drink.style && <p className="text-xs text-primary font-medium">{drink.style}</p>}
             <p className="text-sm text-muted-foreground mt-1">{drink.desc}</p>
           </div>
@@ -463,7 +463,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     case 'round-builder':
       return (
         <div className="px-5 pb-4">
-          <Header title="🍻 Montar Rodada" back="tap-list" />
+          <Header title="Montar Rodada" back="tap-list" />
           <GuidedHint text="Monte a rodada do grupo — todos os drinks de uma vez" />
           <div className="space-y-3 mb-4">
             {FRIENDS.filter(f => f.status !== 'pending').map(f => (
@@ -478,7 +478,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                     return (
                       <button key={d.id} onClick={() => setRoundDrinks(prev => isSelected ? prev.filter(r => !(r.who === f.name && r.drinkId === d.id)) : [...prev, { drinkId: d.id, who: f.name }])}
                         className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium whitespace-nowrap border ${isSelected ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>
-                        {d.emoji} {d.name.split(' ')[0]}
+                        {d.name.split(' ')[0]}
                       </button>
                     );
                   })}
@@ -495,7 +495,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
           )}
           <button onClick={() => onNavigate('round-confirm')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
-            🍻 Enviar Rodada ({roundDrinks.length} drinks)
+            <Beer className="w-5 h-5" /> Enviar Rodada ({roundDrinks.length} drinks)
           </button>
         </div>
       );
@@ -506,7 +506,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mb-4">
             <Check className="w-10 h-10 text-success" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-1">Pedido Enviado! 🍻</h2>
+          <h2 className="font-display text-xl font-bold mb-1">Pedido Enviado!</h2>
           <p className="text-sm text-muted-foreground mb-4">O barman já recebeu</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-4">
             <div className="flex items-center justify-between text-sm mb-2">
@@ -537,7 +537,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mb-4">
             <RefreshCw className="w-10 h-10 text-success" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-1">Rodada Repetida! 🍻</h2>
+          <h2 className="font-display text-xl font-bold mb-1">Rodada Repetida!</h2>
           <p className="text-sm text-muted-foreground mb-4">Mesmo pedido para os 3</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-4 space-y-2">
             {[
@@ -553,7 +553,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               </div>
             ))}
           </div>
-          <p className="text-xs text-muted-foreground mb-4">⚡ Barman já recebeu o pedido</p>
+          <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1"><Zap className="w-3 h-3 text-primary" /> Barman já recebeu o pedido</p>
           <button onClick={() => onNavigate('tab-live')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
             Ver Tab Completo
           </button>
@@ -594,7 +594,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   <div className="flex gap-1 flex-wrap">
                     {personItems.map((item, i) => {
                       const d = DRINKS.find(d => d.id === item.drinkId);
-                      return <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-[9px] text-muted-foreground">{d?.emoji} {d?.name.split(' ')[0]} · {item.time}</span>;
+                      return <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-[9px] text-muted-foreground">{d?.name.split(' ')[0]} · {item.time}</span>;
                     })}
                   </div>
                 </div>
@@ -605,7 +605,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           {hhSavings > 0 && (
             <div className="p-3 rounded-xl bg-warning/5 border border-warning/20 mb-4 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-warning" />
-              <span className="text-xs text-warning font-medium">Economia HH: -R$ {hhSavings} 🎉</span>
+              <span className="text-xs text-warning font-medium">Economia HH: -R$ {hhSavings}</span>
             </div>
           )}
 
@@ -720,12 +720,12 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center mb-5 shadow-xl shadow-amber-500/30">
             <Beer className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-1">Tab Fechado! 🍻</h2>
+          <h2 className="font-display text-2xl font-bold mb-1">Tab Fechado!</h2>
           <p className="text-sm text-muted-foreground mb-4">Noowe Tap House agradece</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
             <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Você consumiu</span><span className="font-semibold">R$ {getPersonTotal('Você')}</span></div>
             {hhSavings > 0 && <div className="flex justify-between text-sm mb-1"><span className="text-warning">Economia HH total</span><span className="text-warning">-R$ {hhSavings}</span></div>}
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Status tab</span><span className="text-success font-semibold">✓ Todos pagaram</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Status tab</span><span className="text-success font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> Todos pagaram</span></div>
           </div>
           <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
             <Gift className="w-5 h-5 text-primary" />
@@ -735,8 +735,8 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
           </div>
           <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center gap-3">
-            <Star className="w-4 h-4 text-accent fill-accent" />
-            <p className="text-xs text-muted-foreground">Selo Bar Regular conquistado! 🏆</p>
+            <Trophy className="w-4 h-4 text-accent" />
+            <p className="text-xs text-muted-foreground">Selo Bar Regular conquistado!</p>
           </div>
           <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">
             Voltar ao Início

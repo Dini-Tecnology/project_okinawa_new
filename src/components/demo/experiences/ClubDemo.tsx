@@ -1,8 +1,5 @@
 /**
  * Club & Balada Demo — NOOWE Club
- * Deep UX: Event Discovery → Lineup → Ticket Purchase → Digital Ticket (QR) → Guest List Management →
- * Virtual Queue → VIP Table Selection (visual map) → Bottle Service with suggestions →
- * Min Spend Tracker (real-time) → Dance Floor Ordering → End of Night Summary → Rate & Uber
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
@@ -11,7 +8,8 @@ import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
   Users, Timer, ArrowRight, Music, Ticket, Crown, MapPin, UserPlus,
   Share2, Copy, Sparkles, Lock, Eye, ChevronRight, Bell, Car, ThumbsUp,
-  Search, Heart, AlertTriangle, Zap,
+  Search, Heart, AlertTriangle, Zap, Wine, Beer, UtensilsCrossed,
+  Droplets, Trophy, Lightbulb, Footprints, GlassWater, Building,
 } from 'lucide-react';
 
 type Screen =
@@ -34,32 +32,32 @@ export const JOURNEY_STEPS = [
 ];
 
 export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Eventos', desc: 'Descubra as melhores noites da cidade.' },
-  'club-detail': { emoji: '🎵', title: 'NOOWE Club', desc: 'Detalhes do evento com lotação em tempo real.' },
-  'lineup': { emoji: '🎧', title: 'Lineup', desc: 'DJs e horários com bio e setlist.' },
-  'tickets': { emoji: '🎫', title: 'Ingressos', desc: 'Lotes com preço dinâmico e comparação.' },
-  'digital-ticket': { emoji: '📱', title: 'Ingresso Digital', desc: 'QR Code animado anti-fraude.' },
-  'guest-list': { emoji: '📋', title: 'Guest List', desc: 'Gerencie seus convidados e +1s.' },
-  'virtual-queue': { emoji: '🚶', title: 'Fila Virtual', desc: 'Posição na fila sem ficar no frio.' },
-  'vip-table': { emoji: '👑', title: 'Camarotes', desc: 'Opções de camarote com consumação mínima.' },
-  'vip-map': { emoji: '🗺️', title: 'Mapa VIP', desc: 'Escolha a posição do seu camarote.' },
-  'bottle-service': { emoji: '🍾', title: 'Bottle Service', desc: 'Cardápio premium com sugestões do DJ.' },
-  'bottle-detail': { emoji: '🥃', title: 'Detalhe Garrafa', desc: 'Ficha completa com mixers inclusos.' },
-  'min-spend': { emoji: '📊', title: 'Consumação', desc: 'Tracker de consumação mínima em tempo real.' },
-  'floor-order': { emoji: '🍹', title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
-  'close': { emoji: '✅', title: 'Encerramento', desc: 'Resumo da noite com todos os gastos.' },
-  'rate': { emoji: '⭐', title: 'Avaliação', desc: 'Avalie a noite e ganhe pontos.' },
+  'home': { emoji: '', title: 'Eventos', desc: 'Descubra as melhores noites da cidade.' },
+  'club-detail': { emoji: '', title: 'NOOWE Club', desc: 'Detalhes do evento com lotação em tempo real.' },
+  'lineup': { emoji: '', title: 'Lineup', desc: 'DJs e horários com bio e setlist.' },
+  'tickets': { emoji: '', title: 'Ingressos', desc: 'Lotes com preço dinâmico e comparação.' },
+  'digital-ticket': { emoji: '', title: 'Ingresso Digital', desc: 'QR Code animado anti-fraude.' },
+  'guest-list': { emoji: '', title: 'Guest List', desc: 'Gerencie seus convidados e +1s.' },
+  'virtual-queue': { emoji: '', title: 'Fila Virtual', desc: 'Posição na fila sem ficar no frio.' },
+  'vip-table': { emoji: '', title: 'Camarotes', desc: 'Opções de camarote com consumação mínima.' },
+  'vip-map': { emoji: '', title: 'Mapa VIP', desc: 'Escolha a posição do seu camarote.' },
+  'bottle-service': { emoji: '', title: 'Bottle Service', desc: 'Cardápio premium com sugestões do DJ.' },
+  'bottle-detail': { emoji: '', title: 'Detalhe Garrafa', desc: 'Ficha completa com mixers inclusos.' },
+  'min-spend': { emoji: '', title: 'Consumação', desc: 'Tracker de consumação mínima em tempo real.' },
+  'floor-order': { emoji: '', title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
+  'close': { emoji: '', title: 'Encerramento', desc: 'Resumo da noite com todos os gastos.' },
+  'rate': { emoji: '', title: 'Avaliação', desc: 'Avalie a noite e ganhe pontos.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 const BOTTLES = [
-  { id: 'b1', name: 'Absolut Vodka', price: 350, emoji: '🍸', desc: '750ml · Inclui 4 energéticos', category: 'Vodka' },
-  { id: 'b2', name: 'Grey Goose', price: 580, emoji: '🍸', desc: '750ml · Premium · Inclui tônica', category: 'Vodka' },
-  { id: 'b3', name: 'Moët Chandon', price: 650, emoji: '🍾', desc: '750ml · Brut Impérial', category: 'Espumante' },
-  { id: 'b4', name: 'Johnnie Walker Black', price: 480, emoji: '🥃', desc: '750ml · 12 anos · Inclui gelo e água', category: 'Whisky' },
-  { id: 'b5', name: 'Balde Cerveja (6)', price: 120, emoji: '🍺', desc: '6 long necks premium', category: 'Cerveja' },
-  { id: 'b6', name: 'Don Julio Tequila', price: 520, emoji: '🫙', desc: '750ml · Reposado · Inclui limões', category: 'Tequila' },
+  { id: 'b1', name: 'Absolut Vodka', price: 350, desc: '750ml · Inclui 4 energéticos', category: 'Vodka', iconCat: 'cocktail' },
+  { id: 'b2', name: 'Grey Goose', price: 580, desc: '750ml · Premium · Inclui tônica', category: 'Vodka', iconCat: 'cocktail' },
+  { id: 'b3', name: 'Moët Chandon', price: 650, desc: '750ml · Brut Impérial', category: 'Espumante', iconCat: 'wine' },
+  { id: 'b4', name: 'Johnnie Walker Black', price: 480, desc: '750ml · 12 anos · Inclui gelo e água', category: 'Whisky', iconCat: 'cocktail' },
+  { id: 'b5', name: 'Balde Cerveja (6)', price: 120, desc: '6 long necks premium', category: 'Cerveja', iconCat: 'beer' },
+  { id: 'b6', name: 'Don Julio Tequila', price: 520, desc: '750ml · Reposado · Inclui limões', category: 'Tequila', iconCat: 'cocktail' },
 ];
 
 export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
@@ -217,7 +215,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-bold text-sm">{dj.name}</p>
-                        {dj.headliner && <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[9px] font-bold">⭐ Headliner</span>}
+                        {dj.headliner && <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[9px] font-bold flex items-center gap-0.5"><Star className="w-2.5 h-2.5" /> Headliner</span>}
                       </div>
                       <p className="text-[10px] text-muted-foreground">{dj.genre} · {dj.time}</p>
                     </div>
@@ -331,8 +329,10 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{g.name}</p>
-                  <p className="text-[10px] text-muted-foreground">
-                    {g.status === 'confirmed' ? '✓ Confirmado' : g.status === 'pending' ? '⏳ Pendente' : '✕ Recusou'}
+                  <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+                    {g.status === 'confirmed' && <><Check className="w-2.5 h-2.5 text-success" /> Confirmado</>}
+                    {g.status === 'pending' && <><Clock className="w-2.5 h-2.5 text-warning" /> Pendente</>}
+                    {g.status === 'declined' && <><ArrowLeft className="w-2.5 h-2.5" /> Recusou</>}
                   </p>
                 </div>
                 {g.status === 'pending' && (
@@ -377,11 +377,11 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <p className="text-sm text-muted-foreground">Estimativa: ~{queuePos * 2} min</p>
           </div>
           <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4">
-            <p className="text-xs font-bold mb-2">💡 Dicas enquanto espera:</p>
+            <p className="text-xs font-bold mb-2 flex items-center gap-1.5"><Lightbulb className="w-3.5 h-3.5 text-primary" /> Dicas enquanto espera:</p>
             <div className="space-y-1.5 text-xs text-muted-foreground">
-              <p>🚶 Pode sair da fila física — notificaremos quando chegar sua vez</p>
-              <p>🍹 Peça drinks pelo app e retire no bar da entrada</p>
-              <p>👥 Seus convidados entram com você automaticamente</p>
+              <p className="flex items-center gap-1.5"><Footprints className="w-3 h-3 text-primary" /> Pode sair da fila física — notificaremos quando chegar sua vez</p>
+              <p className="flex items-center gap-1.5"><GlassWater className="w-3 h-3 text-primary" /> Peça drinks pelo app e retire no bar da entrada</p>
+              <p className="flex items-center gap-1.5"><Users className="w-3 h-3 text-primary" /> Seus convidados entram com você automaticamente</p>
             </div>
           </div>
           {queuePos <= 2 && (
@@ -394,8 +394,8 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <button onClick={() => onNavigate('vip-table')} className="w-full py-4 bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-600/20 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2">
             <Crown className="w-5 h-5 text-accent" /> Skip a fila — Reserve Camarote VIP
           </button>
-          <button onClick={() => onNavigate('floor-order')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">
-            🍹 Pedir Drink na Espera
+          <button onClick={() => onNavigate('floor-order')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1.5">
+            <GlassWater className="w-4 h-4" /> Pedir Drink na Espera
           </button>
         </div>
       );
@@ -437,25 +437,23 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Mapa do Club" back="vip-table" />
           <div className="p-4 rounded-2xl bg-gradient-to-b from-muted/50 to-muted/20 border border-border mb-4 relative" style={{ height: 220 }}>
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg bg-purple-500/20 text-[10px] font-bold text-purple-500">🎧 PALCO</div>
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg bg-purple-500/20 text-[10px] font-bold text-purple-500 flex items-center gap-1"><Music className="w-3 h-3" /> PALCO</div>
             <div className="absolute top-16 left-1/2 -translate-x-1/2 w-32 h-16 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-[10px] text-muted-foreground">
-              🕺 PISTA
+              PISTA
             </div>
-            {/* Tables */}
             <div className="absolute bottom-16 left-4 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground opacity-50">Lounge</div>
-            <div className="absolute bottom-16 right-4 px-2 py-1.5 rounded-lg bg-primary/20 border-2 border-primary text-[9px] text-primary font-bold animate-pulse">✓ Premium</div>
+            <div className="absolute bottom-16 right-4 px-2 py-1.5 rounded-lg bg-primary/20 border-2 border-primary text-[9px] text-primary font-bold animate-pulse flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Premium</div>
             <div className="absolute top-12 right-3 px-2 py-1.5 rounded-lg bg-muted/50 border border-border text-[9px] text-muted-foreground line-through">Stage</div>
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground">Sky Box 🏙️</div>
-            {/* Bar */}
-            <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-amber-500/20 text-[8px] text-amber-600">🍸 Bar</div>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground flex items-center gap-0.5"><Building className="w-2.5 h-2.5" /> Sky Box</div>
+            <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-amber-500/20 text-[8px] text-amber-600 flex items-center gap-0.5"><GlassWater className="w-2.5 h-2.5" /> Bar</div>
           </div>
           <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
             <p className="font-bold text-sm mb-1">Camarote Premium Selecionado</p>
             <div className="text-xs text-muted-foreground space-y-0.5">
-              <p>📍 Frente ao palco · 8-12 pessoas</p>
-              <p>💰 Consumação mínima: R$ 3.000</p>
-              <p>💳 Depósito (convertido): R$ 1.200</p>
-              <p>🍾 Garçom exclusivo + mixers cortesia</p>
+              <p className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-primary" /> Frente ao palco · 8-12 pessoas</p>
+              <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Consumação mínima: R$ 3.000</p>
+              <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Depósito (convertido): R$ 1.200</p>
+              <p className="flex items-center gap-1.5"><Wine className="w-3 h-3 text-primary" /> Garçom exclusivo + mixers cortesia</p>
             </div>
           </div>
           <div className="p-3 rounded-xl bg-muted/30 mb-4">
@@ -478,16 +476,16 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     case 'bottle-service':
       return (
         <div className="px-5 pb-4">
-          <Header title="🍾 Bottle Service" back="vip-map" />
+          <Header title="Bottle Service" back="vip-map" />
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 mb-4 flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-xs text-primary font-medium">Sugestão do bartender para Tech House 🎧</span>
+            <span className="text-xs text-primary font-medium flex items-center gap-1">Sugestão do bartender para Tech House <Music className="w-3 h-3" /></span>
           </div>
           <div className="space-y-2 mb-4">
             {BOTTLES.map(bottle => (
               <button key={bottle.id} onClick={() => { setSelectedBottle(bottle); onNavigate('bottle-detail'); }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left">
-                <span className="text-2xl">{bottle.emoji}</span>
+                <ItemIcon cat={bottle.iconCat} size="md" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm">{bottle.name}</p>
                   <p className="text-[10px] text-muted-foreground">{bottle.desc}</p>
@@ -506,8 +504,8 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title={selectedBottle.name} back="bottle-service" />
           <div className="text-center mb-4">
-            <span className="text-6xl">{selectedBottle.emoji}</span>
-            <h2 className="font-display text-lg font-bold mt-2">{selectedBottle.name}</h2>
+            <ItemIcon cat={selectedBottle.iconCat} size="hero" className="mx-auto" />
+            <h2 className="font-display text-lg font-bold mt-3">{selectedBottle.name}</h2>
             <p className="text-sm text-muted-foreground">{selectedBottle.desc}</p>
             <p className="font-display text-2xl font-bold text-primary mt-2">R$ {selectedBottle.price}</p>
           </div>
@@ -592,10 +590,10 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="flex gap-2 mb-3">
             <button onClick={() => onNavigate('bottle-service')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              🍾 Garrafas
+              <Wine className="w-4 h-4" /> Garrafas
             </button>
             <button onClick={() => onNavigate('floor-order')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              🍹 Drinks
+              <GlassWater className="w-4 h-4" /> Drinks
             </button>
           </div>
           <button onClick={() => onNavigate('close')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow">
@@ -610,20 +608,20 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Pedir da Pista" back="min-spend" />
           <GuidedHint text="Peça sem sair da pista — retira no bar mais perto" />
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 mb-4">
-            <p className="text-xs font-medium">📍 Bar mais próximo: <span className="font-bold text-primary">Bar Pista Central</span> · 15m</p>
+            <p className="text-xs font-medium flex items-center gap-1"><MapPin className="w-3 h-3 text-primary" /> Bar mais próximo: <span className="font-bold text-primary">Bar Pista Central</span> · 15m</p>
           </div>
           <div className="space-y-2 mb-4">
             {[
-              { name: 'Gin Tônica', price: 38, emoji: '🍸' },
-              { name: 'Vodka Red Bull', price: 35, emoji: '🍹' },
-              { name: 'Cerveja Long Neck', price: 18, emoji: '🍺' },
-              { name: 'Água', price: 8, emoji: '💧' },
-              { name: 'Energético', price: 20, emoji: '⚡' },
-              { name: 'Shot Tequila', price: 25, emoji: '🫙' },
+              { name: 'Gin Tônica', price: 38, iconCat: 'cocktail' },
+              { name: 'Vodka Red Bull', price: 35, iconCat: 'cocktail' },
+              { name: 'Cerveja Long Neck', price: 18, iconCat: 'beer' },
+              { name: 'Água', price: 8, iconCat: 'water' },
+              { name: 'Energético', price: 20, iconCat: 'drink' },
+              { name: 'Shot Tequila', price: 25, iconCat: 'cocktail' },
             ].map((d, i) => (
               <button key={i} onClick={() => { setConsumed(prev => prev + d.price); onNavigate('min-spend'); }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <span className="text-xl">{d.emoji}</span>
+                <ItemIcon cat={d.iconCat} size="sm" />
                 <div className="flex-1"><p className="font-semibold text-sm">{d.name}</p></div>
                 <span className="font-semibold text-sm text-primary">R$ {d.price}</span>
               </button>
@@ -638,7 +636,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-5 shadow-xl shadow-purple-500/30">
             <Music className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-1">Noite Incrível! 🎵</h2>
+          <h2 className="font-display text-2xl font-bold mb-1">Noite Incrível!</h2>
           <p className="text-sm text-muted-foreground mb-4">NOOWE Club · Tech House Night</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
             <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Camarote Premium</span><span>R$ 3.000</span></div>
@@ -684,17 +682,17 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Avaliação" back="close" />
           <div className="text-center mb-4">
-            <span className="text-4xl">🎵</span>
+            <ItemIcon cat="music" size="xl" className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-2">Como foi a noite?</h2>
           </div>
           {[
-            { label: 'Música', emoji: '🎧' },
-            { label: 'Ambiente', emoji: '✨' },
-            { label: 'Drinks', emoji: '🍸' },
-            { label: 'Atendimento', emoji: '👨‍🍳' },
+            { label: 'Música', icon: Music },
+            { label: 'Ambiente', icon: Sparkles },
+            { label: 'Drinks', icon: GlassWater },
+            { label: 'Atendimento', icon: ThumbsUp },
           ].map(cat => (
             <div key={cat.label} className="mb-3">
-              <p className="text-sm font-semibold mb-1">{cat.emoji} {cat.label}</p>
+              <p className="text-sm font-semibold mb-1 flex items-center gap-1.5"><cat.icon className="w-3.5 h-3.5 text-primary" /> {cat.label}</p>
               <div className="flex gap-1">
                 {[1, 2, 3, 4, 5].map(s => (
                   <button key={s} className="flex-1 py-2 rounded-lg border border-border text-center">

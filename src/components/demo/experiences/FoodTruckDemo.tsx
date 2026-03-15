@@ -1,14 +1,14 @@
 /**
  * Food Truck Demo — Taco Noowe
- * Deep UX: Map Discovery → Schedule → Truck Detail → Virtual Queue → Pre-Order → Cart → Payment → Live Prep → Push Ready → Pickup → Loyalty
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
-  MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map,
-  Calendar, Heart, Users, Zap, ChefHat, AlertCircle,
+  MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map, Sparkles,
+  Calendar, Heart, Users, Zap, ChefHat, AlertCircle, Flame,
+  ShoppingBag, Smartphone, UtensilsCrossed, Footprints, ClipboardList,
 } from 'lucide-react';
 
 type Screen = 'home' | 'map' | 'truck-detail' | 'schedule' | 'queue' | 'menu' | 'item-detail' | 'cart' | 'payment' | 'waiting' | 'ready' | 'rating';
@@ -24,31 +24,36 @@ export const JOURNEY_STEPS = [
 ];
 
 export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Food trucks com localização em tempo real.' },
-  'map': { emoji: '🗺️', title: 'Mapa ao Vivo', desc: 'GPS em tempo real mostra onde cada truck está.' },
-  'truck-detail': { emoji: '🚚', title: 'Taco Noowe', desc: 'Food truck mexicano com fila virtual.' },
-  'schedule': { emoji: '📅', title: 'Agenda', desc: 'Saiba onde o truck estará nos próximos dias.' },
-  'queue': { emoji: '⏱️', title: 'Fila Virtual', desc: 'Entre na fila pelo app e espere onde quiser.' },
-  'menu': { emoji: '📋', title: 'Cardápio', desc: 'Menu do dia com itens sazonais.' },
-  'item-detail': { emoji: '🌮', title: 'Detalhes', desc: 'Personalize seu taco com extras.' },
-  'cart': { emoji: '🛒', title: 'Carrinho', desc: 'Revise antes de confirmar.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague antecipado para agilizar.' },
-  'waiting': { emoji: '👨‍🍳', title: 'Preparando', desc: 'Acompanhe o preparo em tempo real.' },
-  'ready': { emoji: '✅', title: 'Pronto!', desc: 'Retire no truck com seu código.' },
-  'rating': { emoji: '⭐', title: 'Avaliação', desc: 'Avalie e ganhe stamps extras.' },
+  'home': { emoji: '', title: 'Descoberta', desc: 'Food trucks com localização em tempo real.' },
+  'map': { emoji: '', title: 'Mapa ao Vivo', desc: 'GPS em tempo real mostra onde cada truck está.' },
+  'truck-detail': { emoji: '', title: 'Taco Noowe', desc: 'Food truck mexicano com fila virtual.' },
+  'schedule': { emoji: '', title: 'Agenda', desc: 'Saiba onde o truck estará nos próximos dias.' },
+  'queue': { emoji: '', title: 'Fila Virtual', desc: 'Entre na fila pelo app e espere onde quiser.' },
+  'menu': { emoji: '', title: 'Cardápio', desc: 'Menu do dia com itens sazonais.' },
+  'item-detail': { emoji: '', title: 'Detalhes', desc: 'Personalize seu taco com extras.' },
+  'cart': { emoji: '', title: 'Carrinho', desc: 'Revise antes de confirmar.' },
+  'payment': { emoji: '', title: 'Pagamento', desc: 'Pague antecipado para agilizar.' },
+  'waiting': { emoji: '', title: 'Preparando', desc: 'Acompanhe o preparo em tempo real.' },
+  'ready': { emoji: '', title: 'Pronto!', desc: 'Retire no truck com seu código.' },
+  'rating': { emoji: '', title: 'Avaliação', desc: 'Avalie e ganhe stamps extras.' },
 };
 
 const MENU = [
-  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, emoji: '🌮', desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos' },
-  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, emoji: '🌮', desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos' },
-  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, emoji: '🌮', desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos' },
-  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, emoji: '🌯', desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos' },
-  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, emoji: '🧀', desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas' },
-  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, emoji: '🫔', desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos' },
-  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, emoji: '🥖', desc: 'Com doce de leite e canela', cat: 'Sobremesas' },
-  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, emoji: '🌺', desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas' },
-  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, emoji: '🥛', desc: 'Arroz, canela e baunilha', cat: 'Bebidas' },
+  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos' },
+  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos' },
+  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos' },
+  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos' },
+  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas' },
+  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos' },
+  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, desc: 'Com doce de leite e canela', cat: 'Sobremesas' },
+  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas' },
+  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, desc: 'Arroz, canela e baunilha', cat: 'Bebidas' },
 ];
+
+const MENU_CAT_MAP: Record<string, string> = {
+  'Tacos': 'taco', 'Burritos': 'burrito', 'Quesadillas': 'cheese',
+  'Petiscos': 'petiscos', 'Sobremesas': 'dessert', 'Bebidas': 'drink',
+};
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
@@ -126,21 +131,19 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <p className="text-xs text-muted-foreground">Mapa interativo</p>
             </div>
           </div>
-          {/* Truck pins */}
           <div className="absolute top-28 left-14 cursor-pointer" onClick={() => onNavigate('truck-detail')}>
             <div className="px-3 py-2 rounded-2xl bg-primary text-primary-foreground text-xs font-bold shadow-lg flex items-center gap-1.5">
-              🌮 <span>800m</span>
+              <UtensilsCrossed className="w-3 h-3" /> <span>800m</span>
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
             </div>
             <div className="w-3 h-3 bg-primary rotate-45 -mt-1.5 ml-4" />
           </div>
           <div className="absolute top-52 right-10">
-            <div className="px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">🍔 1.5km</div>
+            <div className="px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"><ItemIcon cat="burger" size="xs" /> 1.5km</div>
           </div>
           <div className="absolute bottom-44 left-20">
-            <div className="px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-medium">🫐 2.1km</div>
+            <div className="px-3 py-1.5 rounded-full bg-muted text-muted-foreground text-xs font-medium flex items-center gap-1"><ItemIcon cat="acai" size="xs" /> 2.1km</div>
           </div>
-          {/* You */}
           <div className="absolute bottom-48 right-16 flex flex-col items-center">
             <div className="w-10 h-10 rounded-full bg-blue-500 border-4 border-blue-200 shadow-lg flex items-center justify-center">
               <div className="w-3 h-3 rounded-full bg-primary-foreground" />
@@ -152,7 +155,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="absolute bottom-4 left-4 right-4">
             <button onClick={() => onNavigate('truck-detail')} className="w-full p-4 rounded-2xl bg-background/95 backdrop-blur border border-border shadow-lg flex items-center gap-3">
-              <span className="text-2xl">🌮</span>
+              <ItemIcon cat="taco" size="md" />
               <div className="flex-1">
                 <p className="font-semibold text-sm">Taco Noowe</p>
                 <p className="text-xs text-muted-foreground">800m · 5 na fila · ~12 min</p>
@@ -236,7 +239,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="mt-3 p-3 rounded-xl bg-primary/5 border border-primary/20 flex items-center gap-2">
             <Bell className="w-4 h-4 text-primary" />
-            <span className="text-xs text-primary font-medium">🔔 Ativar notificação de localização</span>
+            <span className="text-xs text-primary font-medium">Ativar notificação de localização</span>
           </div>
         </div>
       );
@@ -252,7 +255,6 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <h2 className="font-display text-lg font-bold">Posição: {queuePos}º</h2>
             <p className="text-sm text-muted-foreground">Espera: ~{queuePos * 3} min</p>
           </div>
-          {/* Visual queue */}
           <div className="flex items-center gap-1.5 justify-center mb-5">
             {Array.from({length: 8}).map((_, i) => (
               <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold ${
@@ -263,11 +265,11 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             ))}
           </div>
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 mb-4">
-            <p className="text-xs font-semibold text-primary mb-1.5">📲 Enquanto espera:</p>
+            <p className="text-xs font-semibold text-primary mb-1.5 flex items-center gap-1"><Smartphone className="w-3.5 h-3.5" /> Enquanto espera:</p>
             <div className="space-y-1 text-xs text-muted-foreground">
-              <p>🛒 Faça o pedido antecipado</p>
-              <p>🚶 Passeie — notificamos por push</p>
-              <p>📋 Veja o cardápio completo</p>
+              <p className="flex items-center gap-1.5"><ShoppingBag className="w-3 h-3 text-primary" /> Faça o pedido antecipado</p>
+              <p className="flex items-center gap-1.5"><Footprints className="w-3 h-3 text-primary" /> Passeie — notificamos por push</p>
+              <p className="flex items-center gap-1.5"><ClipboardList className="w-3 h-3 text-primary" /> Veja o cardápio completo</p>
             </div>
           </div>
           <GuidedHint text="Peça antecipado para agilizar quando for sua vez" />
@@ -289,7 +291,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {MENU.map(item => (
               <button key={item.id} onClick={() => onNavigate('cart')} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <span className="text-2xl">{item.emoji}</span>
+                <ItemIcon cat={MENU_CAT_MAP[item.cat] || item.cat.toLowerCase()} size="md" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
@@ -317,10 +319,10 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { item: MENU[7], qty: 1, notes: '' },
           ].map((c, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-2">
-              <span className="text-2xl">{c.item.emoji}</span>
+              <ItemIcon cat={MENU_CAT_MAP[c.item.cat] || c.item.cat.toLowerCase()} size="sm" />
               <div className="flex-1">
                 <p className="font-semibold text-sm">{c.item.name}</p>
-                {c.notes && <p className="text-[10px] text-primary">✏️ {c.notes}</p>}
+                {c.notes && <p className="text-[10px] text-primary flex items-center gap-1"><Sparkles className="w-2.5 h-2.5" /> {c.notes}</p>}
               </div>
               <div className="text-right">
                 <span className="font-bold text-sm">R$ {c.item.price}</span>
@@ -369,14 +371,18 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'waiting':
       const prepStages = [
-        { label: 'Sua vez na fila!', desc: 'Preparação iniciada', icon: '🎉' },
-        { label: 'Grelhando proteína', desc: 'Carne al pastor na chapa', icon: '🔥' },
-        { label: 'Montando tacos', desc: 'Tortilla + recheio + toppings', icon: '🌮' },
+        { label: 'Sua vez na fila!', desc: 'Preparação iniciada', icon: Sparkles },
+        { label: 'Grelhando proteína', desc: 'Carne al pastor na chapa', icon: Flame },
+        { label: 'Montando tacos', desc: 'Tortilla + recheio + toppings', icon: UtensilsCrossed },
       ];
       return (
         <div className="flex flex-col items-center justify-center h-full px-5 text-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-4 animate-pulse">
-            <span className="text-3xl">{prepProgress < prepStages.length ? prepStages[prepProgress].icon : '✅'}</span>
+            {prepProgress < prepStages.length ? (
+              (() => { const Icon = prepStages[prepProgress].icon; return <Icon className="w-10 h-10 text-primary" />; })()
+            ) : (
+              <Check className="w-10 h-10 text-success" />
+            )}
           </div>
           <h2 className="font-display text-lg font-bold mb-1">
             {prepProgress < prepStages.length ? prepStages[prepProgress].label : 'Quase lá!'}
@@ -385,16 +391,19 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             {prepProgress < prepStages.length ? prepStages[prepProgress].desc : 'Finalizando...'}
           </p>
           <div className="w-full space-y-2 mb-4">
-            {prepStages.map((stage, i) => (
-              <div key={i} className={`flex items-center gap-3 p-2.5 rounded-xl ${i < prepProgress ? 'bg-success/10 border border-success/20' : i === prepProgress ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30'}`}>
-                <span className="text-lg">{stage.icon}</span>
-                <span className={`text-xs ${i <= prepProgress ? 'font-semibold' : 'text-muted-foreground'}`}>{stage.label}</span>
-                {i < prepProgress && <Check className="w-3.5 h-3.5 text-success ml-auto" />}
-                {i === prepProgress && <Loader2 className="w-3.5 h-3.5 text-primary animate-spin ml-auto" />}
-              </div>
-            ))}
+            {prepStages.map((stage, i) => {
+              const Icon = stage.icon;
+              return (
+                <div key={i} className={`flex items-center gap-3 p-2.5 rounded-xl ${i < prepProgress ? 'bg-success/10 border border-success/20' : i === prepProgress ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30'}`}>
+                  <Icon className={`w-5 h-5 ${i <= prepProgress ? 'text-primary' : 'text-muted-foreground'}`} />
+                  <span className={`text-xs ${i <= prepProgress ? 'font-semibold' : 'text-muted-foreground'}`}>{stage.label}</span>
+                  {i < prepProgress && <Check className="w-3.5 h-3.5 text-success ml-auto" />}
+                  {i === prepProgress && <Loader2 className="w-3.5 h-3.5 text-primary animate-spin ml-auto" />}
+                </div>
+              );
+            })}
           </div>
-          <p className="text-xs text-muted-foreground">📲 Push notification quando estiver pronto</p>
+          <p className="text-xs text-muted-foreground flex items-center gap-1"><Bell className="w-3 h-3 text-primary" /> Push notification quando estiver pronto</p>
         </div>
       );
 
@@ -404,7 +413,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-5 shadow-xl shadow-success/30">
             <Check className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Pedido Pronto! 🌮</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">Pedido Pronto!</h2>
           <p className="text-sm text-muted-foreground mb-4">Retire no truck — Taco Noowe</p>
           <div className="w-full p-5 rounded-2xl bg-card border border-border mb-4">
             <p className="text-xs text-muted-foreground">Código de retirada</p>
@@ -414,11 +423,10 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <Gift className="w-5 h-5 text-primary" />
             <div className="text-left"><p className="text-sm font-semibold">+10 pontos ganhos!</p><p className="text-xs text-muted-foreground">Stamp 4 de 8 — taco grátis em breve!</p></div>
           </div>
-          {/* Loyalty stamps visual */}
           <div className="w-full grid grid-cols-8 gap-1.5 mb-4">
             {Array.from({length: 8}).map((_, i) => (
               <div key={i} className={`h-8 rounded-lg flex items-center justify-center ${i < 4 ? 'bg-primary/20' : 'bg-muted/30'}`}>
-                {i < 4 ? <span className="text-sm">🌮</span> : <span className="text-xs text-muted-foreground">{i+1}</span>}
+                {i < 4 ? <UtensilsCrossed className="w-3.5 h-3.5 text-primary" /> : <span className="text-xs text-muted-foreground">{i+1}</span>}
               </div>
             ))}
           </div>
@@ -433,15 +441,15 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Como foi?" back="ready" />
           <div className="text-center mb-4">
-            <span className="text-5xl block mb-3">🌮</span>
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <ItemIcon cat="taco" size="xl" className="mx-auto" />
+            <div className="flex items-center justify-center gap-2 mb-2 mt-3">
               {[1,2,3,4,5].map(i => (
                 <Star key={i} className={`w-7 h-7 ${i <= 5 ? 'text-accent fill-accent' : 'text-muted'}`} />
               ))}
             </div>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-5 justify-center">
-            {['Autêntico 🇲🇽', 'Porção boa', 'Rápido', 'Sabor incrível', 'Voltaria!'].map(tag => (
+            {['Autêntico', 'Porção boa', 'Rápido', 'Sabor incrível', 'Voltaria!'].map(tag => (
               <button key={tag} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium border border-primary/20">{tag}</button>
             ))}
           </div>

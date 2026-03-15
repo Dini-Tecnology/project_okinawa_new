@@ -1,14 +1,14 @@
 /**
  * Drive-Thru Demo — NOOWE Drive
- * Deep UX: Order Ahead → Menu Customization → Payment → GPS Live Tracking → Geofencing Trigger → Kitchen Notification → Lane Assignment → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
-  MapPin, Navigation, Car, ArrowRight, Loader2, Radio, Zap,
-  ChefHat, Bell, AlertCircle, Search, Smartphone,
+  MapPin, Navigation, Car, ArrowRight, Loader2, Radio, Zap, Sparkles,
+  ChefHat, Bell, AlertCircle, Search, Smartphone, Flame, ThumbsUp,
+  UtensilsCrossed, Satellite, CircleParking,
 } from 'lucide-react';
 
 type Screen = 'home' | 'restaurant' | 'menu' | 'customize' | 'cart' | 'payment' | 'gps-tracking' | 'geofence' | 'lane-assign' | 'pickup' | 'done';
@@ -24,28 +24,28 @@ export const JOURNEY_STEPS = [
 ];
 
 export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Peça no caminho sem sair do carro.' },
-  'restaurant': { emoji: '🚗', title: 'NOOWE Drive', desc: 'Drive-thru inteligente com GPS.' },
-  'menu': { emoji: '📋', title: 'Menu Drive', desc: 'Combos e individuais otimizados para levar.' },
-  'customize': { emoji: '✏️', title: 'Personalizar', desc: 'Customize ingredientes, extras e observações.' },
-  'cart': { emoji: '🛒', title: 'Carrinho', desc: 'Revise e confirme antes de pagar.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague antecipado — retirada express.' },
-  'gps-tracking': { emoji: '📍', title: 'GPS Ativo', desc: 'Rastreamento em tempo real da sua aproximação.' },
-  'geofence': { emoji: '🛰️', title: 'Geofencing', desc: 'A 500m, a cozinha finaliza seu pedido.' },
-  'lane-assign': { emoji: '🅿️', title: 'Pista Designada', desc: 'Siga para a pista indicada pelo app.' },
-  'pickup': { emoji: '🚗', title: 'Retirada', desc: 'Pedido pronto e pago — retire na janela.' },
-  'done': { emoji: '✅', title: 'Concluído', desc: 'Entrega sem espera. Avalie a experiência.' },
+  'home': { emoji: '', title: 'Descoberta', desc: 'Peça no caminho sem sair do carro.' },
+  'restaurant': { emoji: '', title: 'NOOWE Drive', desc: 'Drive-thru inteligente com GPS.' },
+  'menu': { emoji: '', title: 'Menu Drive', desc: 'Combos e individuais otimizados para levar.' },
+  'customize': { emoji: '', title: 'Personalizar', desc: 'Customize ingredientes, extras e observações.' },
+  'cart': { emoji: '', title: 'Carrinho', desc: 'Revise e confirme antes de pagar.' },
+  'payment': { emoji: '', title: 'Pagamento', desc: 'Pague antecipado — retirada express.' },
+  'gps-tracking': { emoji: '', title: 'GPS Ativo', desc: 'Rastreamento em tempo real da sua aproximação.' },
+  'geofence': { emoji: '', title: 'Geofencing', desc: 'A 500m, a cozinha finaliza seu pedido.' },
+  'lane-assign': { emoji: '', title: 'Pista Designada', desc: 'Siga para a pista indicada pelo app.' },
+  'pickup': { emoji: '', title: 'Retirada', desc: 'Pedido pronto e pago — retire na janela.' },
+  'done': { emoji: '', title: 'Concluído', desc: 'Entrega sem espera. Avalie a experiência.' },
 };
 
 const MENU_ITEMS = [
-  { id: 'classic', name: 'Combo Classic', desc: 'Smash Burger 180g + Batata G + Refri 500ml', price: 42, cal: 980, emoji: '🍔', popular: true, cat: 'Combos' },
-  { id: 'chicken', name: 'Combo Chicken', desc: 'Chicken Crispy + Batata G + Refri 500ml', price: 45, cal: 880, emoji: '🍗', cat: 'Combos' },
-  { id: 'double', name: 'Combo Double', desc: 'Double Smash 360g + Batata G + Refri 500ml', price: 52, cal: 1350, emoji: '🍔', cat: 'Combos' },
-  { id: 'kids', name: 'Combo Kids', desc: 'Mini Burger + Batata P + Suco Box', price: 32, cal: 550, emoji: '🧒', cat: 'Combos' },
-  { id: 'wrap', name: 'Wrap Grelhado', desc: 'Frango, alface, tomate, molho ranch', price: 28, cal: 420, emoji: '🌯', cat: 'Individuais' },
-  { id: 'sundae', name: 'Sundae', desc: 'Chocolate, Morango ou Caramelo', price: 14, cal: 280, emoji: '🍦', cat: 'Sobremesas' },
-  { id: 'coffee', name: 'Café Latte 400ml', desc: 'Espresso com leite cremoso', price: 12, cal: 150, emoji: '☕', cat: 'Bebidas' },
-  { id: 'shake', name: 'Milkshake 500ml', desc: 'Ovomaltine, Chocolate ou Morango', price: 22, cal: 480, emoji: '🥤', cat: 'Bebidas' },
+  { id: 'classic', name: 'Combo Classic', desc: 'Smash Burger 180g + Batata G + Refri 500ml', price: 42, cal: 980, popular: true, cat: 'Combos', iconCat: 'burger' },
+  { id: 'chicken', name: 'Combo Chicken', desc: 'Chicken Crispy + Batata G + Refri 500ml', price: 45, cal: 880, cat: 'Combos', iconCat: 'chicken' },
+  { id: 'double', name: 'Combo Double', desc: 'Double Smash 360g + Batata G + Refri 500ml', price: 52, cal: 1350, cat: 'Combos', iconCat: 'burger' },
+  { id: 'kids', name: 'Combo Kids', desc: 'Mini Burger + Batata P + Suco Box', price: 32, cal: 550, cat: 'Combos', iconCat: 'kids' },
+  { id: 'wrap', name: 'Wrap Grelhado', desc: 'Frango, alface, tomate, molho ranch', price: 28, cal: 420, cat: 'Individuais', iconCat: 'wrap' },
+  { id: 'sundae', name: 'Sundae', desc: 'Chocolate, Morango ou Caramelo', price: 14, cal: 280, cat: 'Sobremesas', iconCat: 'icecream' },
+  { id: 'coffee', name: 'Café Latte 400ml', desc: 'Espresso com leite cremoso', price: 12, cal: 150, cat: 'Bebidas', iconCat: 'coffee' },
+  { id: 'shake', name: 'Milkshake 500ml', desc: 'Ovomaltine, Chocolate ou Morango', price: 22, cal: 480, cat: 'Bebidas', iconCat: 'milkshake' },
 ];
 
 interface CartItem { id: string; qty: number; notes: string; }
@@ -187,7 +187,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {MENU_ITEMS.map(item => (
               <button key={item.id} onClick={() => { setSelectedItem(item.id); onNavigate('customize'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <span className="text-2xl">{item.emoji}</span>
+                <ItemIcon cat={item.iconCat} size="md" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
@@ -214,11 +214,10 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Personalizar" back="menu" />
           <div className="text-center mb-4">
-            <span className="text-5xl">{customItem.emoji}</span>
+            <ItemIcon cat={customItem.iconCat} size="hero" className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-2">{customItem.name}</h2>
             <p className="text-xs text-muted-foreground">{customItem.desc}</p>
           </div>
-          {/* Customizations */}
           <h3 className="text-xs font-semibold mb-2">Remover ingredientes</h3>
           <div className="flex flex-wrap gap-1.5 mb-4">
             {['Cebola', 'Pickle', 'Mostarda', 'Ketchup', 'Alface'].map((ing, i) => (
@@ -227,12 +226,12 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <h3 className="text-xs font-semibold mb-2">Extras (+)</h3>
           {[
-            { name: 'Bacon Extra', price: 6, emoji: '🥓' },
-            { name: 'Queijo Extra', price: 4, emoji: '🧀' },
-            { name: 'Molho Especial', price: 3, emoji: '🫗' },
+            { name: 'Bacon Extra', price: 6, icon: Flame },
+            { name: 'Queijo Extra', price: 4, icon: UtensilsCrossed },
+            { name: 'Molho Especial', price: 3, icon: Zap },
           ].map((extra, i) => (
             <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border mb-1.5 ${i === 2 ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
-              <span className="text-lg">{extra.emoji}</span>
+              <extra.icon className={`w-4 h-4 ${i === 2 ? 'text-primary' : 'text-muted-foreground'}`} />
               <span className="flex-1 text-sm">{extra.name}</span>
               <span className="text-xs text-primary font-semibold">+R$ {extra.price}</span>
               {i === 2 && <Check className="w-4 h-4 text-primary" />}
@@ -258,10 +257,10 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               return (
                 <div key={c.id} className="p-3 rounded-xl border border-border bg-card">
                   <div className="flex items-center gap-3">
-                    <span className="text-2xl">{item.emoji}</span>
+                    <ItemIcon cat={item.iconCat} size="sm" />
                     <div className="flex-1">
                       <p className="font-semibold text-sm">{item.name}</p>
-                      {c.notes && <p className="text-[10px] text-primary">✏️ {c.notes}</p>}
+                      {c.notes && <p className="text-[10px] text-primary flex items-center gap-1"><Sparkles className="w-2.5 h-2.5" /> {c.notes}</p>}
                     </div>
                     <div className="flex items-center gap-2">
                       <button className="w-6 h-6 rounded-full bg-muted flex items-center justify-center"><Minus className="w-3 h-3" /></button>
@@ -320,10 +319,10 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'gps-tracking':
       const milestones = [
-        { dist: 5, label: 'Pedido confirmado', icon: '✅' },
-        { dist: 3, label: 'Cozinha alertada', icon: '👨‍🍳' },
-        { dist: 1, label: 'Preparo iniciado', icon: '🍳' },
-        { dist: 0.5, label: 'Geofencing ativado', icon: '🛰️' },
+        { dist: 5, label: 'Pedido confirmado', icon: Check },
+        { dist: 3, label: 'Cozinha alertada', icon: ChefHat },
+        { dist: 1, label: 'Preparo iniciado', icon: Flame },
+        { dist: 0.5, label: 'Geofencing ativado', icon: Satellite },
       ];
       return (
         <div className="flex flex-col items-center justify-center h-full px-5 text-center">
@@ -338,9 +337,10 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-full space-y-1.5">
             {milestones.map((m, i) => {
               const done = distance <= m.dist;
+              const Icon = m.icon;
               return (
                 <div key={i} className={`flex items-center gap-3 p-2.5 rounded-xl transition-all ${done ? 'bg-success/10 border border-success/20' : 'bg-muted/30 border border-transparent'}`}>
-                  <span className="text-lg">{m.icon}</span>
+                  <Icon className={`w-5 h-5 ${done ? 'text-success' : 'text-muted-foreground'}`} />
                   <span className={`text-xs ${done ? 'text-success font-semibold' : 'text-muted-foreground'}`}>{m.dist === 0.5 ? '500m' : `${m.dist}km`} — {m.label}</span>
                   {done && <Check className="w-3.5 h-3.5 text-success ml-auto" />}
                 </div>
@@ -356,11 +356,11 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-warning/10 flex items-center justify-center mb-4 animate-pulse">
             <Radio className="w-12 h-12 text-warning" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-2">Geofencing Ativado! 🛰️</h2>
+          <h2 className="font-display text-xl font-bold mb-2">Geofencing Ativado!</h2>
           <p className="text-sm text-muted-foreground mb-2">Você está a 500m do NOOWE Drive</p>
-          <p className="text-xs text-primary font-semibold mb-3">👨‍🍳 Cozinha finalizando seu pedido...</p>
+          <p className="text-xs text-primary font-semibold mb-3 flex items-center gap-1"><ChefHat className="w-3.5 h-3.5" /> Cozinha finalizando seu pedido...</p>
           <div className="w-full p-3 rounded-xl bg-muted/30 mb-4">
-            <p className="text-xs text-muted-foreground">⏱️ Pedido ficará pronto em ~1:30</p>
+            <p className="text-xs text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3 text-primary" /> Pedido ficará pronto em ~1:30</p>
           </div>
           <Loader2 className="w-6 h-6 text-primary animate-spin" />
         </div>
@@ -399,7 +399,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-5 shadow-xl shadow-success/30">
             <Check className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Boa viagem! 🚗</h2>
+          <h2 className="font-display text-2xl font-bold mb-2 flex items-center gap-2">Boa viagem! <Car className="w-6 h-6 text-primary" /></h2>
           <p className="text-sm text-muted-foreground mb-1">Pedido entregue em <strong>1min 48s</strong></p>
           <p className="text-xs text-primary font-semibold mb-4">Sem sair do carro. Sem esperar. Sem fila.</p>
           <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
@@ -412,7 +412,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             ))}
           </div>
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {['Rápido ⚡', 'Quentinho 🔥', 'Correto ✅', 'Atendimento 👍'].map(tag => (
+            {['Rápido', 'Quentinho', 'Correto', 'Atendimento'].map(tag => (
               <button key={tag} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium">{tag}</button>
             ))}
           </div>

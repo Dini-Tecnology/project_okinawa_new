@@ -1,14 +1,14 @@
 /**
  * Chef's Table Demo — Mesa do Chef Noowe
- * Deep UX: Discover → Detail → Date + Guests → Dietary Preferences → Wine Preferences → Payment → Countdown → Day-of Welcome → Course 1-3 + Sommelier → Photo Moment → Final Review + Certificate
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, CreditCard, Gift, Calendar,
-  Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart,
+  Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart, Flame,
   Users, Lock, MessageCircle, Share2, Award, Loader2, UtensilsCrossed,
+  MapPin, Shirt, Timer, ClipboardList, Trophy,
 } from 'lucide-react';
 
 type Screen = 'home' | 'detail' | 'reservation' | 'dietary' | 'wine-pref' | 'payment' | 'countdown' | 'welcome' | 'course-1' | 'course-2' | 'course-3' | 'photo' | 'finale';
@@ -26,19 +26,19 @@ export const JOURNEY_STEPS = [
 ];
 
 export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Experiências', desc: 'Descubra experiências gastronômicas exclusivas.' },
-  'detail': { emoji: '👨‍🍳', title: 'Mesa do Chef', desc: 'Jantar exclusivo para 8 com Chef Ricardo Oliveira.' },
-  'reservation': { emoji: '📅', title: 'Reserva', desc: 'Escolha data, convidados e garanta sua vaga.' },
-  'dietary': { emoji: '🥗', title: 'Dieta', desc: 'Alergias, restrições e preferências alimentares.' },
-  'wine-pref': { emoji: '🍷', title: 'Vinhos', desc: 'Perfil de preferências para harmonização.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pré-pagamento integral para confirmação.' },
-  'countdown': { emoji: '⏳', title: 'Contagem', desc: 'Faltam poucos dias para sua experiência.' },
-  'welcome': { emoji: '🥂', title: 'Boas-vindas', desc: 'Recepção com champagne e apresentação.' },
-  'course-1': { emoji: '🍽️', title: 'Amuse-Bouche', desc: 'Primeiro curso com história do chef.' },
-  'course-2': { emoji: '🥩', title: 'Prato Principal', desc: 'Wagyu A5 com harmonização do sommelier.' },
-  'course-3': { emoji: '🍫', title: 'Sobremesa', desc: 'Grand finale com soufflé e espumante.' },
-  'photo': { emoji: '📸', title: 'Foto', desc: 'Registro com o chef e menu assinado.' },
-  'finale': { emoji: '✨', title: 'Certificado', desc: 'Certificado digital e avaliação da experiência.' },
+  'home': { emoji: '', title: 'Experiências', desc: 'Descubra experiências gastronômicas exclusivas.' },
+  'detail': { emoji: '', title: 'Mesa do Chef', desc: 'Jantar exclusivo para 8 com Chef Ricardo Oliveira.' },
+  'reservation': { emoji: '', title: 'Reserva', desc: 'Escolha data, convidados e garanta sua vaga.' },
+  'dietary': { emoji: '', title: 'Dieta', desc: 'Alergias, restrições e preferências alimentares.' },
+  'wine-pref': { emoji: '', title: 'Vinhos', desc: 'Perfil de preferências para harmonização.' },
+  'payment': { emoji: '', title: 'Pagamento', desc: 'Pré-pagamento integral para confirmação.' },
+  'countdown': { emoji: '', title: 'Contagem', desc: 'Faltam poucos dias para sua experiência.' },
+  'welcome': { emoji: '', title: 'Boas-vindas', desc: 'Recepção com champagne e apresentação.' },
+  'course-1': { emoji: '', title: 'Amuse-Bouche', desc: 'Primeiro curso com história do chef.' },
+  'course-2': { emoji: '', title: 'Prato Principal', desc: 'Wagyu A5 com harmonização do sommelier.' },
+  'course-3': { emoji: '', title: 'Sobremesa', desc: 'Grand finale com soufflé e espumante.' },
+  'photo': { emoji: '', title: 'Foto', desc: 'Registro com o chef e menu assinado.' },
+  'finale': { emoji: '', title: 'Certificado', desc: 'Certificado digital e avaliação da experiência.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -199,7 +199,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="mb-4">
             <label className="text-xs font-semibold mb-2 block">Ocasião especial?</label>
             <div className="flex flex-wrap gap-2">
-              {['Sem ocasião', 'Aniversário 🎂', 'Proposta 💍', 'Negócios 💼', 'Celebração 🎉'].map((p, i) => (
+              {['Sem ocasião', 'Aniversário', 'Proposta', 'Negócios', 'Celebração'].map((p, i) => (
                 <button key={p} className={`px-3 py-2 rounded-xl text-xs font-medium border ${i === 0 ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
               ))}
             </div>
@@ -221,14 +221,16 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <label className="text-xs font-semibold mb-2 block">Preferência principal</label>
             <div className="grid grid-cols-2 gap-2">
               {[
-                { name: 'Tinto', emoji: '🍷', sel: true },
-                { name: 'Branco', emoji: '🥂' },
-                { name: 'Espumante', emoji: '🍾' },
-                { name: 'Sem álcool', emoji: '🧃' },
-              ].map((w, i) => (
+                { name: 'Tinto', icon: Wine, sel: true },
+                { name: 'Branco', icon: Wine },
+                { name: 'Espumante', icon: Sparkles },
+                { name: 'Sem álcool', icon: UtensilsCrossed },
+              ].map((w) => (
                 <button key={w.name} className={`p-3 rounded-xl text-center border-2 ${w.sel ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                  <span className="text-xl">{w.emoji}</span>
-                  <p className="text-xs font-medium mt-1">{w.name}</p>
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-1">
+                    <w.icon className="w-4 h-4 text-primary" />
+                  </div>
+                  <p className="text-xs font-medium">{w.name}</p>
                 </button>
               ))}
             </div>
@@ -261,7 +263,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-4">
             <Check className="w-8 h-8 text-success" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-2">Reserva Confirmada! ✨</h2>
+          <h2 className="font-display text-xl font-bold mb-2">Reserva Confirmada!</h2>
           <p className="text-sm text-muted-foreground mb-1">Mesa do Chef Noowe</p>
           <p className="text-xs text-muted-foreground mb-4">Sáb, 22 Mar · 20:00 · {guests} pessoas</p>
           <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3">
@@ -269,10 +271,10 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <p className="font-display text-3xl font-bold tracking-widest text-primary mt-1">MC-047</p>
           </div>
           <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 text-left text-xs text-muted-foreground space-y-1">
-            <p>📍 Endereço enviado por email</p>
-            <p>👔 Dress code: Smart Casual</p>
-            <p>⏱️ Chegue 10 min antes (20:00)</p>
-            <p>📝 Suas preferências foram enviadas ao chef</p>
+            <p className="flex items-center gap-2"><MapPin className="w-3 h-3 text-primary shrink-0" /> Endereço enviado por email</p>
+            <p className="flex items-center gap-2"><Shirt className="w-3 h-3 text-primary shrink-0" /> Dress code: Smart Casual</p>
+            <p className="flex items-center gap-2"><Timer className="w-3 h-3 text-primary shrink-0" /> Chegue 10 min antes (20:00)</p>
+            <p className="flex items-center gap-2"><ClipboardList className="w-3 h-3 text-primary shrink-0" /> Suas preferências foram enviadas ao chef</p>
           </div>
           <button onClick={() => onNavigate('countdown')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
             Continuar
@@ -320,13 +322,11 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <h2 className="font-display text-lg font-bold">Bem-vindo à Mesa do Chef</h2>
             <p className="text-xs text-muted-foreground">Sáb, 22 Mar · 20:00</p>
           </div>
-          {/* Welcome champagne */}
           <div className="p-4 rounded-xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 mb-4 text-center">
-            <span className="text-3xl">🥂</span>
-            <p className="text-sm font-semibold mt-2">Champagne de Boas-Vindas</p>
+            <Wine className="w-8 h-8 text-accent mx-auto mb-2" />
+            <p className="text-sm font-semibold">Champagne de Boas-Vindas</p>
             <p className="text-xs text-muted-foreground">Veuve Clicquot Brut · Cortesia do Chef</p>
           </div>
-          {/* Menu preview */}
           <div className="p-4 rounded-xl bg-card border border-border mb-4">
             <h3 className="font-semibold text-sm mb-2 flex items-center gap-2"><ChefHat className="w-4 h-4 text-primary" />Menu de Hoje — 7 Cursos</h3>
             {[
@@ -354,8 +354,8 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Amuse-Bouche" back="welcome" sub="Curso 1 de 7" />
           <CourseProgress current={1} total={7} />
           <div className="text-center mb-4">
-            <span className="text-5xl block mb-3">🍽️</span>
-            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1">Amuse-Bouche</p>
+            <ItemIcon cat="seafood" size="hero" className="mx-auto" />
+            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Amuse-Bouche</p>
             <h2 className="font-display text-xl font-bold">Tartar de Vieira</h2>
             <p className="text-xs text-muted-foreground mt-1">com yuzu, microgreens e ostra Miyagi</p>
           </div>
@@ -388,8 +388,8 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Prato Principal" back="course-1" sub="Curso 5 de 7" />
           <CourseProgress current={5} total={7} />
           <div className="text-center mb-4">
-            <span className="text-5xl block mb-3">🥩</span>
-            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1">Prato Principal</p>
+            <ItemIcon cat="steak" size="hero" className="mx-auto" />
+            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Prato Principal</p>
             <h2 className="font-display text-xl font-bold">Wagyu A5 com Aspargos</h2>
             <p className="text-xs text-muted-foreground mt-1">Miyazaki, Japão · Brasa de binchotan</p>
           </div>
@@ -410,10 +410,11 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <p className="text-[10px] text-accent italic mt-0.5">"Taninos elegantes que se fundem com a gordura do wagyu" — Sommelier</p>
             </div>
           </div>
-          {/* Interactive reaction */}
           <div className="flex items-center justify-center gap-3 mb-4">
-            {['😍', '🤤', '🔥', '👨‍🍳', '❤️'].map(emoji => (
-              <button key={emoji} className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center text-lg hover:scale-110 transition-transform">{emoji}</button>
+            {[Heart, Sparkles, Flame, ChefHat, Star].map((Icon, i) => (
+              <button key={i} className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center hover:scale-110 transition-transform">
+                <Icon className="w-5 h-5 text-primary" />
+              </button>
             ))}
           </div>
           <button onClick={() => onNavigate('course-3')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2">
@@ -428,8 +429,8 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <Header title="Grand Finale" back="course-2" sub="Curso 7 de 7" />
           <CourseProgress current={7} total={7} />
           <div className="text-center mb-4">
-            <span className="text-5xl block mb-3">🍫</span>
-            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1">Sobremesa</p>
+            <ItemIcon cat="dessert" size="hero" className="mx-auto" />
+            <p className="text-xs text-primary font-semibold uppercase tracking-wider mb-1 mt-3">Sobremesa</p>
             <h2 className="font-display text-xl font-bold">Soufflé de Chocolate 70%</h2>
             <p className="text-xs text-muted-foreground mt-1">com sorvete de baunilha bourbon</p>
           </div>
@@ -465,7 +466,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <p className="text-[10px] text-muted-foreground">Foto com Chef Ricardo</p>
             </div>
           </div>
-          <h2 className="font-display text-lg font-bold mb-2">Momento Especial 📸</h2>
+          <h2 className="font-display text-lg font-bold mb-2 flex items-center gap-2">Momento Especial <Camera className="w-5 h-5 text-primary" /></h2>
           <p className="text-xs text-muted-foreground mb-4">Foto profissional com o chef e menu assinado</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-4">
             <p className="text-xs text-muted-foreground mb-1">Menu assinado pelo chef</p>
@@ -488,7 +489,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-accent to-primary flex items-center justify-center mb-5 shadow-xl">
             <Award className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-1">Certificado Digital 🎖️</h2>
+          <h2 className="font-display text-xl font-bold mb-1 flex items-center gap-2">Certificado Digital <Trophy className="w-5 h-5 text-accent" /></h2>
           <p className="text-sm text-muted-foreground mb-4">Mesa do Chef Noowe · 22 Mar 2026</p>
           <div className="w-full p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 mb-4">
             <p className="text-xs text-muted-foreground">Certificamos que</p>
@@ -499,7 +500,7 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
           <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
             <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left"><p className="text-sm font-semibold">+680 pontos ganhos!</p><p className="text-xs text-muted-foreground">Nível Gold desbloqueado 👑</p></div>
+            <div className="text-left"><p className="text-sm font-semibold">+680 pontos ganhos!</p><p className="text-xs text-muted-foreground flex items-center gap-1">Nível Gold desbloqueado <Crown className="w-3 h-3 text-accent" /></p></div>
           </div>
           <div className="flex items-center justify-center gap-2 mb-4">
             {[1,2,3,4,5].map(i => <Star key={i} className="w-7 h-7 text-accent fill-accent" />)}
