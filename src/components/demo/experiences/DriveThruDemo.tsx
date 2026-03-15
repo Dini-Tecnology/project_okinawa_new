@@ -106,7 +106,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <button onClick={() => onNavigate('restaurant')} className="w-full text-left mb-4">
             <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-500/10 to-cyan-500/10 border border-blue-500/20">
               <div className="flex items-center gap-3">
-                <span className="text-4xl">🚗</span>
+                <ItemIcon cat="drive" size="xl" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-display text-lg font-bold">NOOWE Drive</h3>
