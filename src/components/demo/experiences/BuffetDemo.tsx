@@ -341,7 +341,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             const drink = DRINK_MENU.find(d => d.id === sd.id)!;
             return (
               <div key={sd.id} className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-sm">{drink.emoji} {drink.name} ×{sd.qty}</span>
+                <span className="text-sm">{drink.name} ×{sd.qty}</span>
                 <span className="text-sm">R$ {(drink.price * sd.qty).toFixed(2)}</span>
               </div>
             );
