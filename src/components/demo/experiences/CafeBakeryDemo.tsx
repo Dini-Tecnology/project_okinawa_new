@@ -480,7 +480,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="p-3 rounded-xl bg-muted/30 flex items-center gap-3 mb-4">
-            <span className="text-2xl">☕</span>
+            <ItemIcon cat="coffee" size="sm" />
             <div className="flex-1"><p className="font-semibold text-sm">Café Noowe</p><p className="text-xs text-muted-foreground">Mesa 3 · Janela · {sessionMinutes > 0 ? `${sessionMinutes}min` : 'Modo Trabalho'}</p></div>
           </div>
 
