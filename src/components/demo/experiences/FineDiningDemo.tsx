@@ -323,7 +323,7 @@ const VirtualQueueScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onN
         <div className="w-8" />
       </div>
       <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/30 mb-5">
-        <span className="text-2xl">🍽️</span>
+        <span className="text-2xl"><ItemIcon cat="chef" size="md" /></span>
         <div><p className="font-semibold text-sm">Bistrô Noowe</p><p className="text-xs text-muted-foreground">Lotação atual: <span className="text-warning font-semibold">Alta</span></p></div>
       </div>
       {!joined ? (
