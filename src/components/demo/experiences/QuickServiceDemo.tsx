@@ -320,7 +320,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 const inCart = cart.find(c => c.id === item.id);
                 return (
                   <button key={item.id} onClick={() => { setSelectedItem(item); setSelectedExtras([]); setRemovedItems([]); setItemQty(1); onNavigate('item'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                    <span className="text-3xl">{item.img}</span>
+                    <FoodImg id={item.img} size="md" alt={item.name} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-sm">{item.name}</p>
