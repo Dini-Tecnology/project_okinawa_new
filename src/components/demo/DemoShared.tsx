@@ -1,11 +1,67 @@
 /**
- * Shared Demo Components — PhoneShell, BottomNav, GuidedHint, ServiceTypeSelector
+ * Shared Demo Components — PhoneShell, BottomNav, GuidedHint, ServiceTypeSelector, ItemIcon
  */
 import React from 'react';
 import {
   Search, QrCode, Gift, User, UtensilsCrossed, Wifi, Zap,
-  Check, Bell,
+  Check, Bell, Coffee, Beer, Wine, Music, Car, Truck, ChefHat,
+  Leaf, Flame, Scale, Timer, Ticket, MapPin, ShoppingBag,
+  Droplets, Sandwich, CakeSlice, IceCream, Soup, Fish, Egg,
+  Cherry, Grape, Pizza, Salad,
 } from 'lucide-react';
+
+// ============ ITEM ICON — Replaces emojis with consistent Lucide icons ============
+const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
+  burger: UtensilsCrossed, chicken: UtensilsCrossed, meat: Flame, steak: Flame,
+  fries: UtensilsCrossed, sides: UtensilsCrossed, nuggets: UtensilsCrossed,
+  salad: Leaf, veggie: Leaf, healthy: Leaf, bowl: Leaf, wrap: Leaf,
+  coffee: Coffee, tea: Coffee, cafe: Coffee, bakery: CakeSlice,
+  beer: Beer, chopp: Beer, drink: Wine, cocktail: Wine, wine: Wine,
+  soda: Droplets, juice: Droplets, water: Droplets, milkshake: Droplets,
+  pizza: Pizza, pasta: UtensilsCrossed, italian: UtensilsCrossed,
+  sushi: Fish, seafood: Fish, fish: Fish, shrimp: Fish,
+  taco: UtensilsCrossed, mexican: UtensilsCrossed, burrito: UtensilsCrossed,
+  dessert: CakeSlice, cake: CakeSlice, cookie: CakeSlice, brownie: CakeSlice,
+  icecream: IceCream, sundae: IceCream,
+  soup: Soup, bread: Sandwich, sandwich: Sandwich,
+  egg: Egg, cheese: UtensilsCrossed, tofu: Leaf,
+  fruit: Cherry, acai: Grape,
+  quick: Zap, express: Zap, fast: Zap,
+  car: Car, drive: Car, truck: Truck, foodtruck: Truck,
+  chef: ChefHat, kitchen: ChefHat,
+  music: Music, club: Music, dj: Music,
+  buffet: Scale, weigh: Scale,
+  queue: Timer, wait: Timer,
+  ticket: Ticket, event: Ticket,
+  location: MapPin, map: MapPin,
+  order: ShoppingBag, bag: ShoppingBag,
+  generic: UtensilsCrossed,
+};
+
+export const ItemIcon: React.FC<{
+  cat?: string;
+  icon?: React.FC<{ className?: string }>;
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'hero';
+  gradient?: string;
+  className?: string;
+}> = ({ cat = 'generic', icon, size = 'md', gradient, className = '' }) => {
+  const sizeMap = {
+    xs: { container: 'w-7 h-7 rounded-lg', icon: 'w-3.5 h-3.5' },
+    sm: { container: 'w-8 h-8 rounded-lg', icon: 'w-4 h-4' },
+    md: { container: 'w-10 h-10 rounded-xl', icon: 'w-5 h-5' },
+    lg: { container: 'w-12 h-12 rounded-xl', icon: 'w-6 h-6' },
+    xl: { container: 'w-16 h-16 rounded-2xl', icon: 'w-8 h-8' },
+    hero: { container: 'w-20 h-20 rounded-2xl', icon: 'w-10 h-10' },
+  };
+  const s = sizeMap[size];
+  const IconComp = icon || CATEGORY_ICONS[cat.toLowerCase()] || UtensilsCrossed;
+  const bg = gradient || 'bg-primary/10';
+  return (
+    <div className={`${s.container} ${bg} flex items-center justify-center shrink-0 ${className}`}>
+      <IconComp className={`${s.icon} text-primary`} />
+    </div>
+  );
+};
 
 // ============ PHONE SHELL ============
 export const PhoneShell: React.FC<{ children: React.ReactNode }> = ({ children }) => (
