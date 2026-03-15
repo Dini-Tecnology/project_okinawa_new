@@ -175,7 +175,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <p className="text-xs text-muted-foreground">Código da comanda</p>
             <p className="font-display text-3xl font-bold tracking-widest text-primary mt-1">SN-012</p>
           </div>
-          <p className="text-xs text-muted-foreground mb-4">📱 Este código aparece automaticamente na balança via NFC</p>
+          <p className="text-xs text-muted-foreground mb-4">Este código aparece automaticamente na balança via NFC</p>
           <div className="w-full grid grid-cols-2 gap-2">
             <button onClick={() => onNavigate('stations')} className="py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm">Ver Estações</button>
             <button onClick={() => onNavigate('scale')} className="py-3 border border-border rounded-xl font-semibold text-sm">Ir à Balança</button>
