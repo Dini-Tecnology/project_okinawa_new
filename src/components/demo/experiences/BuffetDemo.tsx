@@ -96,7 +96,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       return (
         <div className="px-5 pb-4">
           <div className="pt-2 pb-4">
-            <p className="text-sm text-muted-foreground">Bom almoço 🍽️</p>
+            <p className="text-sm text-muted-foreground">Bom almoço</p>
             <h1 className="font-display text-xl font-bold">Buffets por perto</h1>
           </div>
           <GuidedHint text="Buffet com balança inteligente e comanda digital" />
