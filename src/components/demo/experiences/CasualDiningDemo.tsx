@@ -102,10 +102,10 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const [tipPct, setTipPct] = useState(10);
   const [ratings, setRatings] = useState({ food: 0, service: 0, ambiance: 0 });
   const [waitlistDrinks] = useState([
-    { name: 'Caipirinha', price: 22, cat: 'drink' },
-    { name: 'Cerveja Artesanal', price: 18, cat: 'beer' },
-    { name: 'Suco Natural', price: 12, cat: 'juice' },
-    { name: 'Porção de Pão de Alho', price: 16, cat: 'bread' },
+    { name: 'Caipirinha', price: 22, cat: 'drink', imgId: 'cocktail' },
+    { name: 'Cerveja Artesanal', price: 18, cat: 'beer', imgId: 'ipa' },
+    { name: 'Suco Natural', price: 12, cat: 'juice', imgId: 'juice' },
+    { name: 'Porção de Pão de Alho', price: 16, cat: 'bread', imgId: 'food-generic' },
   ]);
 
   const subtotal = orders.reduce((s, o) => s + o.item.price * o.qty, 0) + barOrders.reduce((s, o) => s + o.price, 0);
