@@ -389,7 +389,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setOrders(prev => [newOrder, ...prev].slice(0, 20));
         setNotifications(prev => [{
           id: `ns-${Date.now()}`,
-          type: 'new_order',
+          type: 'new_order' as const,
           message: `Novo pedido na Mesa ${tableNum} — ${customerName}`,
           timestamp: new Date(),
           read: false,
