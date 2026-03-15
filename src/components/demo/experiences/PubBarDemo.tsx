@@ -5,7 +5,7 @@
  * Per-Consumption Split → Close Tab → Rate
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
   Users, Timer, ArrowRight, Beer, RefreshCw, UserPlus, Share2,
