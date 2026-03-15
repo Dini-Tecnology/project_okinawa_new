@@ -145,7 +145,7 @@ const Demo = () => {
             {/* Bottom note */}
             <div className="text-center mt-12">
               <p className="text-xs text-muted-foreground">
-                Todos os dados são simulados. O restaurante <strong className="text-foreground">Bistrô Aurora</strong> é fictício e criado para fins de demonstração.
+                Todos os dados são simulados. O restaurante <strong className="text-foreground">Bistrô Noowe</strong> é fictício e criado para fins de demonstração.
               </p>
             </div>
           </div>

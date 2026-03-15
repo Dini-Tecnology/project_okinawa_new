@@ -1,7 +1,7 @@
 /**
  * Demo Context - Simulation Engine for NOOWE Demo System
  * 
- * Provides realistic mock data and auto-simulation for the Bistrô Aurora demo restaurant.
+ * Provides realistic mock data and auto-simulation for the Bistrô Noowe demo restaurant.
  * Manages orders, tables, reservations, menu, and analytics with timed auto-progression.
  */
 
@@ -123,7 +123,7 @@ interface DemoContextType {
 // ============ MOCK DATA ============
 
 const DEMO_RESTAURANT = {
-  name: 'Bistrô Aurora',
+  name: 'Bistrô Noowe',
   description: 'Gastronomia contemporânea com ingredientes locais e sazonais',
   cuisine: 'Contemporânea Brasileira',
   rating: 4.8,
