@@ -427,10 +427,10 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               </button>
             </div>
             <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2"><span>{baseItem.emoji}</span><span className="font-medium">{baseItem.name}</span></div>
-              <div className="flex items-center gap-2"><span>{proteinItem.emoji}</span><span className="font-medium">{proteinItem.name}</span></div>
+              <div className="flex items-center gap-2"><FoodImg id={baseItem.imgId} size="xs" alt={baseItem.name} /><span className="font-medium">{baseItem.name}</span></div>
+              <div className="flex items-center gap-2"><FoodImg id={proteinItem.imgId} size="xs" alt={proteinItem.name} /><span className="font-medium">{proteinItem.name}</span></div>
               <div className="flex flex-wrap gap-1.5 mt-1">
-                {selectedToppings.map(t => (<span key={t.id} className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{t.emoji} {t.name}</span>))}
+                {selectedToppings.map(t => (<span key={t.id} className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{t.name}</span>))}
               </div>
               <div className="flex gap-1.5 mt-1">
                 {selectedSauces.map(s => (<span key={s.id} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">{s.emoji} {s.name}</span>))}
