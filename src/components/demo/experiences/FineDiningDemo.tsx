@@ -67,7 +67,7 @@ const HomeScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate 
     <div className="px-5 pb-4">
       <div className="pt-2 pb-4 flex items-center justify-between">
         <div>
-          <p className="text-sm text-muted-foreground">Boa noite 👋</p>
+          <p className="text-sm text-muted-foreground">Boa noite</p>
           <h1 className="font-display text-xl font-bold">Descubra experiências</h1>
         </div>
         <button onClick={() => onNavigate('notifications')} className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center">
