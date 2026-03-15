@@ -433,7 +433,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 {selectedToppings.map(t => (<span key={t.id} className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{t.name}</span>))}
               </div>
               <div className="flex gap-1.5 mt-1">
-                {selectedSauces.map(s => (<span key={s.id} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">{s.emoji} {s.name}</span>))}
+                {selectedSauces.map(s => (<span key={s.id} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">{s.name}</span>))}
               </div>
             </div>
           </div>
