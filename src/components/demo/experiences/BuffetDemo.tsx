@@ -321,7 +321,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <div><p className="font-semibold text-sm">Sabores Noowe</p><p className="text-xs text-muted-foreground">Mesa 12 · Comanda SN-012</p></div>
           </div>
           {/* Food section */}
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2">⚖️ Comida (por peso)</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mb-2">Comida (por peso)</h3>
           {weighHistory.map((w, i) => (
             <div key={i} className="flex items-center justify-between py-2 border-b border-border">
               <span className="text-sm">Pesagem {i+1}</span>
