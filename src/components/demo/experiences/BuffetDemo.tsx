@@ -289,7 +289,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   const sel = selectedDrinks.find(d => d.id === drink.id);
                   return (
                     <div key={drink.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-1.5">
-                      <ItemIcon cat={drink.iconCat} size="xs" />
+                      <FoodImg id={drink.imgId} size="xs" alt={drink.name} />
                       <div className="flex-1"><p className="text-sm font-medium">{drink.name}</p><p className="text-xs text-muted-foreground">R$ {drink.price}</p></div>
                       {sel ? (
                         <div className="flex items-center gap-2">
