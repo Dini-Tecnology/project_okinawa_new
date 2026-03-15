@@ -886,9 +886,11 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
   const [selectedPayment, setSelectedPayment] = useState('pix');
   const [tipPercent, setTipPercent] = useState(10);
   const [selectedItems, setSelectedItems] = useState<string[]>(['i1', 'i2']);
+  const [sharedItems, setSharedItems] = useState<string[]>(['i7']);
   const [fixedAmount, setFixedAmount] = useState(200);
   const [showInvite, setShowInvite] = useState(false);
   const [inviteSent, setInviteSent] = useState(false);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   const orderItems = [
     { id: 'i1', name: 'Tartare de Atum', price: 58, orderedBy: 'Você' },
@@ -897,6 +899,7 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
     { id: 'i4', name: 'Crème Brûlée', price: 38, orderedBy: 'Maria' },
     { id: 'i5', name: 'Salmão Grelhado', price: 96, orderedBy: 'João' },
     { id: 'i6', name: 'Gin Tônica Aurora', price: 38, orderedBy: 'João' },
+    { id: 'i7', name: 'Batata Truffle Fries', price: 45, orderedBy: 'Mesa' },
   ];
 
   const guests = [
@@ -905,24 +908,31 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
     { id: 'joao', name: 'João Santos', role: 'Convidado', paid: false, items: ['i5', 'i6'] },
   ];
 
+  const unpaidGuests = guests.filter(g => !g.paid);
   const totalOrder = orderItems.reduce((s, i) => s + i.price, 0);
   const serviceCharge = Math.round(totalOrder * 0.1);
   const totalWithService = totalOrder + serviceCharge;
-  const paidByOthers = 120; // Maria's paid items
+  const paidByOthers = 120;
+  const sharedTotal = orderItems.filter(i => sharedItems.includes(i.id)).reduce((s, i) => s + i.price, 0);
+  const mySharedPortion = sharedTotal / guests.length;
 
   const calculateMyAmount = () => {
     if (payMode === 'solo') return totalWithService - paidByOthers;
     switch (splitMode) {
       case 'individual': {
-        const myItems = orderItems.filter(i => i.orderedBy === 'Você');
-        return myItems.reduce((s, i) => s + i.price, 0) + Math.round(myItems.reduce((s, i) => s + i.price, 0) * 0.1);
+        const myItems = orderItems.filter(i => i.orderedBy === 'Você' && !sharedItems.includes(i.id));
+        const myDirect = myItems.reduce((s, i) => s + i.price, 0);
+        return myDirect + mySharedPortion + Math.round((myDirect + mySharedPortion) * 0.1);
       }
-      case 'equal': {
-        const unpaidGuests = guests.filter(g => !g.paid).length;
-        return Math.round((totalWithService - paidByOthers) / unpaidGuests);
+      case 'equal':
+        return Math.round((totalWithService - paidByOthers) / unpaidGuests.length);
+      case 'selective': {
+        const directTotal = selectedItems.filter(id => !sharedItems.includes(id)).reduce((sum, itemId) => {
+          const item = orderItems.find(i => i.id === itemId);
+          return sum + (item ? item.price : 0);
+        }, 0);
+        return directTotal + mySharedPortion;
       }
-      case 'selective':
-        return selectedItems.reduce((sum, itemId) => { const item = orderItems.find(i => i.id === itemId); return sum + (item ? item.price : 0); }, 0);
       case 'fixed':
         return Math.min(fixedAmount, totalWithService - paidByOthers);
       default: return 0;
@@ -933,7 +943,19 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: Screen) => void }> = ({ onNa
   const myTip = Math.round(mySubtotal * tipPercent / 100);
   const myTotal = mySubtotal + myTip;
 
-  const toggleItem = (itemId: string) => setSelectedItems(prev => prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]);
+  const toggleItem = (itemId: string) => {
+    if (sharedItems.includes(itemId)) return;
+    setSelectedItems(prev => prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]);
+  };
+
+  const toggleShared = (itemId: string) => {
+    setSharedItems(prev => {
+      if (prev.includes(itemId)) return prev.filter(id => id !== itemId);
+      setSelectedItems(si => si.filter(id => id !== itemId));
+      return [...prev, itemId];
+    });
+    setExpandedItem(null);
+  };
 
   return (
     <div className="flex flex-col h-full bg-background">
