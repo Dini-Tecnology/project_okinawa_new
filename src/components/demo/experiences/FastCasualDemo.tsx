@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
