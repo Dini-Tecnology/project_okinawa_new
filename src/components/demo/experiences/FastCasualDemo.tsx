@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
   Leaf, Flame, Droplets, Wheat, CreditCard, Gift, Plus,
@@ -44,39 +45,39 @@ export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: s
 };
 
 const BASES = [
-  { id: 'rice', name: 'Arroz Branco', cal: 200, carbs: 44, prot: 4, fiber: 1, emoji: '🍚', desc: 'Grão longo, soltinho' },
-  { id: 'brown', name: 'Arroz Integral', cal: 180, carbs: 38, prot: 5, fiber: 4, emoji: '🍙', desc: 'Rico em fibras' },
-  { id: 'quinoa', name: 'Quinoa', cal: 160, carbs: 27, prot: 8, fiber: 5, emoji: '🌾', desc: 'Superfood proteico' },
-  { id: 'salad', name: 'Mix de Folhas', cal: 30, carbs: 5, prot: 2, fiber: 3, emoji: '🥬', desc: 'Low carb, leve' },
-  { id: 'wrap', name: 'Wrap Integral', cal: 150, carbs: 25, prot: 4, fiber: 3, emoji: '🫓', desc: 'Prático para levar' },
+  { id: 'rice', name: 'Arroz Branco', cal: 200, carbs: 44, prot: 4, fiber: 1, imgId: 'rice', desc: 'Grão longo, soltinho' },
+  { id: 'brown', name: 'Arroz Integral', cal: 180, carbs: 38, prot: 5, fiber: 4, imgId: 'brown-rice', desc: 'Rico em fibras' },
+  { id: 'quinoa', name: 'Quinoa', cal: 160, carbs: 27, prot: 8, fiber: 5, imgId: 'quinoa', desc: 'Superfood proteico' },
+  { id: 'salad', name: 'Mix de Folhas', cal: 30, carbs: 5, prot: 2, fiber: 3, imgId: 'mixed-greens', desc: 'Low carb, leve' },
+  { id: 'wrap', name: 'Wrap Integral', cal: 150, carbs: 25, prot: 4, fiber: 3, imgId: 'wrap-bowl', desc: 'Prático para levar' },
 ];
 
 const PROTEINS = [
-  { id: 'chicken', name: 'Frango Grelhado', cal: 165, carbs: 0, prot: 31, price: 12, emoji: '🍗', desc: 'Peito marinado no limão', allergens: [] },
-  { id: 'beef', name: 'Carne Bovina', cal: 250, carbs: 0, prot: 26, price: 16, emoji: '🥩', desc: 'Acém desfiado ao molho', allergens: [] },
-  { id: 'salmon', name: 'Salmão Grelhado', cal: 208, carbs: 0, prot: 20, price: 20, emoji: '🐟', desc: 'Filé com crosta de ervas', allergens: ['peixe'] },
-  { id: 'tofu', name: 'Tofu Crocante', cal: 144, carbs: 3, prot: 17, price: 10, emoji: '🧈', desc: 'Empanado e dourado', allergens: ['soja'] },
-  { id: 'shrimp', name: 'Camarão Salteado', cal: 99, carbs: 0, prot: 24, price: 22, emoji: '🦐', desc: 'Com alho e azeite', allergens: ['crustáceo'] },
+  { id: 'chicken', name: 'Frango Grelhado', cal: 165, carbs: 0, prot: 31, price: 12, imgId: 'grilled-chicken', desc: 'Peito marinado no limão', allergens: [] },
+  { id: 'beef', name: 'Carne Bovina', cal: 250, carbs: 0, prot: 26, price: 16, imgId: 'beef', desc: 'Acém desfiado ao molho', allergens: [] },
+  { id: 'salmon', name: 'Salmão Grelhado', cal: 208, carbs: 0, prot: 20, price: 20, imgId: 'salmon', desc: 'Filé com crosta de ervas', allergens: ['peixe'] },
+  { id: 'tofu', name: 'Tofu Crocante', cal: 144, carbs: 3, prot: 17, price: 10, imgId: 'tofu', desc: 'Empanado e dourado', allergens: ['soja'] },
+  { id: 'shrimp', name: 'Camarão Salteado', cal: 99, carbs: 0, prot: 24, price: 22, imgId: 'shrimp', desc: 'Com alho e azeite', allergens: ['crustáceo'] },
 ];
 
 const TOPPINGS = [
-  { id: 'tomato', name: 'Tomate Cereja', cal: 5, prot: 0, emoji: '🍅' },
-  { id: 'corn', name: 'Milho Grelhado', cal: 15, prot: 1, emoji: '🌽' },
-  { id: 'cucumber', name: 'Pepino', cal: 3, prot: 0, emoji: '🥒' },
-  { id: 'carrot', name: 'Cenoura Ralada', cal: 8, prot: 0, emoji: '🥕' },
-  { id: 'beet', name: 'Beterraba', cal: 10, prot: 1, emoji: '🟣' },
-  { id: 'edamame', name: 'Edamame', cal: 30, prot: 4, emoji: '🫛', extra: 4, allergens: ['soja'] },
-  { id: 'avocado', name: 'Abacate', cal: 40, prot: 1, emoji: '🥑', extra: 5 },
-  { id: 'egg', name: 'Ovo Cozido', cal: 70, prot: 6, emoji: '🥚', extra: 3, allergens: ['ovo'] },
-  { id: 'cheese', name: 'Queijo Feta', cal: 50, prot: 4, emoji: '🧀', extra: 5, allergens: ['lactose'] },
+  { id: 'tomato', name: 'Tomate Cereja', cal: 5, prot: 0, imgId: 'tomato' },
+  { id: 'corn', name: 'Milho Grelhado', cal: 15, prot: 1, imgId: 'corn' },
+  { id: 'cucumber', name: 'Pepino', cal: 3, prot: 0, imgId: 'cucumber' },
+  { id: 'carrot', name: 'Cenoura Ralada', cal: 8, prot: 0, imgId: 'carrot' },
+  { id: 'beet', name: 'Beterraba', cal: 10, prot: 1, imgId: 'beet' },
+  { id: 'edamame', name: 'Edamame', cal: 30, prot: 4, imgId: 'edamame', extra: 4, allergens: ['soja'] },
+  { id: 'avocado', name: 'Abacate', cal: 40, prot: 1, imgId: 'avocado', extra: 5 },
+  { id: 'egg', name: 'Ovo Cozido', cal: 70, prot: 6, imgId: 'egg', extra: 3, allergens: ['ovo'] },
+  { id: 'cheese', name: 'Queijo Feta', cal: 50, prot: 4, imgId: 'feta', extra: 5, allergens: ['lactose'] },
 ];
 
 const SAUCES = [
-  { id: 'tahini', name: 'Tahini Limão', cal: 45, emoji: '🫗', desc: 'Cremoso, cítrico', allergens: ['gergelim'] },
-  { id: 'caesar', name: 'Caesar Light', cal: 40, emoji: '🧴', desc: 'Clássico, levinho', allergens: ['lactose', 'ovo'] },
-  { id: 'oriental', name: 'Shoyu & Gengibre', cal: 25, emoji: '🥢', desc: 'Umami intenso', allergens: ['soja'] },
-  { id: 'mostarda', name: 'Mostarda & Mel', cal: 50, emoji: '🍯', desc: 'Agridoce', allergens: ['mostarda'] },
-  { id: 'pesto', name: 'Pesto de Manjericão', cal: 55, emoji: '🌿', desc: 'Fresco e aromático', allergens: ['castanha', 'lactose'] },
+  { id: 'tahini', name: 'Tahini Limão', cal: 45, imgId: 'tahini', desc: 'Cremoso, cítrico', allergens: ['gergelim'] },
+  { id: 'caesar', name: 'Caesar Light', cal: 40, imgId: 'food-generic', desc: 'Clássico, levinho', allergens: ['lactose', 'ovo'] },
+  { id: 'oriental', name: 'Shoyu & Gengibre', cal: 25, imgId: 'food-generic', desc: 'Umami intenso', allergens: ['soja'] },
+  { id: 'mostarda', name: 'Mostarda & Mel', cal: 50, imgId: 'food-generic', desc: 'Agridoce', allergens: ['mostarda'] },
+  { id: 'pesto', name: 'Pesto de Manjericão', cal: 55, imgId: 'pesto', desc: 'Fresco e aromático', allergens: ['castanha', 'lactose'] },
 ];
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -292,7 +293,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-2">
             {BASES.map(b => (
               <button key={b.id} onClick={() => setBase(b.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${base === b.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'}`}>
-                <span className="text-2xl">{b.emoji}</span>
+                <FoodImg id={b.imgId} size="sm" alt={b.name} />
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">{b.name}</p>
                   <p className="text-[10px] text-muted-foreground">{b.desc}</p>
@@ -322,7 +323,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-2">
             {PROTEINS.map(p => (
               <button key={p.id} onClick={() => setProtein(p.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${protein === p.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'}`}>
-                <span className="text-2xl">{p.emoji}</span>
+                <FoodImg id={p.imgId} size="sm" alt={p.name} />
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">{p.name}</p>
                   <p className="text-[10px] text-muted-foreground">{p.desc}</p>
@@ -359,7 +360,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-1.5">
             {TOPPINGS.map(t => (
               <button key={t.id} onClick={() => toggleTopping(t.id)} className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${toppings.includes(t.id) ? 'border-primary bg-primary/5' : 'border-border/50 bg-card'}`}>
-                <span className="text-xl">{t.emoji}</span>
+                <FoodImg id={t.imgId} size="xs" alt={t.name} />
                 <div className="flex-1 text-left">
                   <p className="text-sm font-medium">{t.name}</p>
                   <div className="flex items-center gap-2">
@@ -392,7 +393,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-2">
             {SAUCES.map(s => (
               <button key={s.id} onClick={() => toggleSauce(s.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${sauces.includes(s.id) ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                <span className="text-2xl">{s.emoji}</span>
+                <FoodImg id={s.imgId} size="sm" alt={s.name} />
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">{s.name}</p>
                   <p className="text-[10px] text-muted-foreground">{s.desc} · {s.cal} kcal</p>
@@ -426,13 +427,13 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               </button>
             </div>
             <div className="space-y-1.5 text-sm">
-              <div className="flex items-center gap-2"><span>{baseItem.emoji}</span><span className="font-medium">{baseItem.name}</span></div>
-              <div className="flex items-center gap-2"><span>{proteinItem.emoji}</span><span className="font-medium">{proteinItem.name}</span></div>
+              <div className="flex items-center gap-2"><FoodImg id={baseItem.imgId} size="xs" alt={baseItem.name} /><span className="font-medium">{baseItem.name}</span></div>
+              <div className="flex items-center gap-2"><FoodImg id={proteinItem.imgId} size="xs" alt={proteinItem.name} /><span className="font-medium">{proteinItem.name}</span></div>
               <div className="flex flex-wrap gap-1.5 mt-1">
-                {selectedToppings.map(t => (<span key={t.id} className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{t.emoji} {t.name}</span>))}
+                {selectedToppings.map(t => (<span key={t.id} className="px-2 py-0.5 rounded-full bg-muted text-[10px]">{t.name}</span>))}
               </div>
               <div className="flex gap-1.5 mt-1">
-                {selectedSauces.map(s => (<span key={s.id} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">{s.emoji} {s.name}</span>))}
+                {selectedSauces.map(s => (<span key={s.id} className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">{s.name}</span>))}
               </div>
             </div>
           </div>

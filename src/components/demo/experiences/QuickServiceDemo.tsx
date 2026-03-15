@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
   Zap, Timer, QrCode, ChevronRight, CreditCard, Gift, Smartphone,
@@ -24,25 +25,25 @@ interface CartItem {
 }
 
 const MENU = [
-  { id: 'q1', name: 'Smash Burger Classic', price: 29, cat: 'Burgers', time: 5, img: '🍔', desc: 'Blend especial 150g, queijo cheddar, alface, tomate, molho da casa', popular: true, cals: 520 },
-  { id: 'q2', name: 'Smash Burger Duplo', price: 39, cat: 'Burgers', time: 6, img: '🍔', desc: 'Dois blends 150g, duplo cheddar, bacon crocante, molho especial', popular: true, cals: 780 },
-  { id: 'q3', name: 'Chicken Crispy', price: 32, cat: 'Burgers', time: 6, img: '🍗', desc: 'Frango empanado crocante, coleslaw, maionese sriracha', cals: 480 },
-  { id: 'q4', name: 'Veggie Smash', price: 28, cat: 'Burgers', time: 5, img: '🥬', desc: 'Hambúrguer de grão de bico, rúcula, tomate seco, tahini', cals: 380 },
-  { id: 'q5', name: 'Batata Frita G', price: 18, cat: 'Acompanhamentos', time: 4, img: '🍟', desc: 'Batata frita crocante com sal e orégano', cals: 320 },
-  { id: 'q6', name: 'Onion Rings (8un)', price: 16, cat: 'Acompanhamentos', time: 4, img: '🧅', desc: 'Anéis de cebola empanados com molho ranch', cals: 280 },
-  { id: 'q7', name: 'Nuggets (10un)', price: 22, cat: 'Acompanhamentos', time: 5, img: '🍗', desc: 'Nuggets artesanais com 3 molhos à escolha', cals: 350 },
-  { id: 'q8', name: 'Milkshake Nutella', price: 22, cat: 'Bebidas', time: 3, img: '🥤', desc: 'Milkshake cremoso com Nutella e chantilly', cals: 450 },
-  { id: 'q9', name: 'Milkshake Oreo', price: 22, cat: 'Bebidas', time: 3, img: '🥤', desc: 'Milkshake com Oreo triturado e calda de chocolate', cals: 420 },
-  { id: 'q10', name: 'Refrigerante 500ml', price: 9, cat: 'Bebidas', time: 1, img: '🥤', desc: 'Coca-Cola, Guaraná ou Sprite', cals: 140 },
-  { id: 'q11', name: 'Suco Natural 400ml', price: 14, cat: 'Bebidas', time: 2, img: '🧃', desc: 'Laranja, Limão com Hortelã ou Maracujá', cals: 120 },
-  { id: 'q12', name: 'Sundae', price: 14, cat: 'Sobremesas', time: 2, img: '🍦', desc: 'Chocolate, Morango ou Caramelo com granulado', cals: 280 },
-  { id: 'q13', name: 'Cookie Gigante', price: 12, cat: 'Sobremesas', time: 1, img: '🍪', desc: 'Cookie artesanal com gotas de chocolate belga', cals: 320 },
+  { id: 'q1', name: 'Smash Burger Classic', price: 29, cat: 'Burgers', time: 5, img: 'burger', desc: 'Blend especial 150g, queijo cheddar, alface, tomate, molho da casa', popular: true, cals: 520 },
+  { id: 'q2', name: 'Smash Burger Duplo', price: 39, cat: 'Burgers', time: 6, img: 'burger-double', desc: 'Dois blends 150g, duplo cheddar, bacon crocante, molho especial', popular: true, cals: 780 },
+  { id: 'q3', name: 'Chicken Crispy', price: 32, cat: 'Burgers', time: 6, img: 'chicken-burger', desc: 'Frango empanado crocante, coleslaw, maionese sriracha', cals: 480 },
+  { id: 'q4', name: 'Veggie Smash', price: 28, cat: 'Burgers', time: 5, img: 'veggie-burger', desc: 'Hambúrguer de grão de bico, rúcula, tomate seco, tahini', cals: 380 },
+  { id: 'q5', name: 'Batata Frita G', price: 18, cat: 'Acompanhamentos', time: 4, img: 'fries', desc: 'Batata frita crocante com sal e orégano', cals: 320 },
+  { id: 'q6', name: 'Onion Rings (8un)', price: 16, cat: 'Acompanhamentos', time: 4, img: 'onion-rings', desc: 'Anéis de cebola empanados com molho ranch', cals: 280 },
+  { id: 'q7', name: 'Nuggets (10un)', price: 22, cat: 'Acompanhamentos', time: 5, img: 'nuggets', desc: 'Nuggets artesanais com 3 molhos à escolha', cals: 350 },
+  { id: 'q8', name: 'Milkshake Nutella', price: 22, cat: 'Bebidas', time: 3, img: 'milkshake', desc: 'Milkshake cremoso com Nutella e chantilly', cals: 450 },
+  { id: 'q9', name: 'Milkshake Oreo', price: 22, cat: 'Bebidas', time: 3, img: 'milkshake-oreo', desc: 'Milkshake com Oreo triturado e calda de chocolate', cals: 420 },
+  { id: 'q10', name: 'Refrigerante 500ml', price: 9, cat: 'Bebidas', time: 1, img: 'soda', desc: 'Coca-Cola, Guaraná ou Sprite', cals: 140 },
+  { id: 'q11', name: 'Suco Natural 400ml', price: 14, cat: 'Bebidas', time: 2, img: 'juice', desc: 'Laranja, Limão com Hortelã ou Maracujá', cals: 120 },
+  { id: 'q12', name: 'Sundae', price: 14, cat: 'Sobremesas', time: 2, img: 'sundae', desc: 'Chocolate, Morango ou Caramelo com granulado', cals: 280 },
+  { id: 'q13', name: 'Cookie Gigante', price: 12, cat: 'Sobremesas', time: 1, img: 'cookie', desc: 'Cookie artesanal com gotas de chocolate belga', cals: 320 },
 ];
 
 const COMBOS = [
-  { id: 'combo1', name: 'Combo Classic', items: ['Smash Burger Classic', 'Batata Frita G', 'Refri 500ml'], price: 42, original: 56, img: '🍔🍟🥤', time: 6 },
-  { id: 'combo2', name: 'Combo Duplo', items: ['Smash Burger Duplo', 'Batata Frita G', 'Milkshake'], price: 62, original: 79, img: '🍔🍟🥤', time: 7 },
-  { id: 'combo3', name: 'Combo Kids', items: ['Nuggets (6un)', 'Batata P', 'Suco'], price: 32, original: 42, img: '🍗🍟🧃', time: 5 },
+  { id: 'combo1', name: 'Combo Classic', items: ['Smash Burger Classic', 'Batata Frita G', 'Refri 500ml'], price: 42, original: 56, img: 'combo', time: 6 },
+  { id: 'combo2', name: 'Combo Duplo', items: ['Smash Burger Duplo', 'Batata Frita G', 'Milkshake'], price: 62, original: 79, img: 'combo', time: 7 },
+  { id: 'combo3', name: 'Combo Kids', items: ['Nuggets (6un)', 'Batata P', 'Suco'], price: 32, original: 42, img: 'nuggets', time: 5 },
 ];
 
 const CUSTOMIZATIONS = {
@@ -291,9 +292,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           {activeCategory === 'Combos' && (
             <div className="px-5 space-y-3 mt-3">
               {COMBOS.map(combo => (
-                <button key={combo.id} onClick={() => { addToCart({ id: combo.id, name: combo.name, price: combo.price, img: combo.img.slice(0, 2) }, 1); }} className="w-full p-4 rounded-xl border border-border bg-card text-left">
+                <button key={combo.id} onClick={() => { addToCart({ id: combo.id, name: combo.name, price: combo.price, img: combo.img }, 1); }} className="w-full p-4 rounded-xl border border-border bg-card text-left">
                   <div className="flex items-center gap-3">
-                    <span className="text-3xl">{combo.img.slice(0, 2)}</span>
+                    <FoodImg id={combo.img} size="md" alt={combo.name} />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-sm">{combo.name}</p>
@@ -319,7 +320,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 const inCart = cart.find(c => c.id === item.id);
                 return (
                   <button key={item.id} onClick={() => { setSelectedItem(item); setSelectedExtras([]); setRemovedItems([]); setItemQty(1); onNavigate('item'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                    <span className="text-3xl">{item.img}</span>
+                    <FoodImg id={item.img} size="md" alt={item.name} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-sm">{item.name}</p>
@@ -361,9 +362,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       const itemTotal = (selectedItem.price + extraTotal) * itemQty;
       return (
         <div className="pb-4">
-          <div className="bg-gradient-to-b from-muted/50 to-background p-8 text-center">
+           <div className="bg-gradient-to-b from-muted/50 to-background p-6 flex items-center justify-center">
             <button onClick={() => onNavigate('menu')} className="absolute top-2 left-4 w-8 h-8 rounded-full bg-background/80 flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-            <span className="text-7xl">{selectedItem.img}</span>
+            <FoodImg id={selectedItem.img} size="detail" alt={selectedItem.name} rounded="rounded-2xl" />
           </div>
           <div className="px-5 -mt-4 relative">
             <div className="bg-card rounded-2xl p-5 shadow-md border border-border">
@@ -450,7 +451,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
               {cart.map(c => (
                 <div key={c.id} className="flex items-center gap-3 py-3 border-b border-border">
-                  <span className="text-2xl">{c.img}</span>
+                  <FoodImg id={c.img} size="sm" alt={c.name} />
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-sm">{c.name}</p>
                     {c.customizations && <p className="text-[10px] text-primary">{c.customizations.join(', ')}</p>}
@@ -596,7 +597,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-6 shadow-xl shadow-success/30 animate-bounce">
             <Check className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Pedido Pronto! 🎉</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">Pedido Pronto!</h2>
           <p className="text-sm text-muted-foreground mb-4">Retire no balcão express</p>
 
           <div className="w-full p-5 rounded-2xl bg-card border border-border mb-4">
@@ -625,7 +626,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="text-center mb-5">
-            <span className="text-5xl">⚡</span>
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+              <Zap className="w-8 h-8 text-primary" />
+            </div>
             <h2 className="font-display text-lg font-bold mt-2">Como foi sua experiência?</h2>
             <p className="text-sm text-muted-foreground">NOOWE Express</p>
           </div>
@@ -644,7 +647,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               <h3 className="font-semibold text-sm mb-2 text-center">O que se destacou?</h3>
               <div className="flex flex-wrap gap-2 justify-center mb-5">
-                {['⚡ Velocidade', '🍔 Sabor', '📱 Praticidade', '😊 Atendimento', '💰 Custo-benefício', '📦 Embalagem'].map(tag => (
+                {['Velocidade', 'Sabor', 'Praticidade', 'Atendimento', 'Custo-benefício', 'Embalagem'].map(tag => (
                   <button key={tag} onClick={() => setRatingTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])}
                     className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${ratingTags.includes(tag) ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>
                     {tag}
@@ -664,7 +667,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">7 de 10 visitas · Mais 3 e ganhe um combo grátis! 🎁</p>
+            <p className="text-xs text-muted-foreground">7 de 10 visitas · Mais 3 e ganhe um combo grátis!</p>
           </div>
 
           <button onClick={() => onNavigate('home')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
