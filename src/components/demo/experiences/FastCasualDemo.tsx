@@ -194,7 +194,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { name: 'Veggie Zen', items: 'Mix Folhas + Tofu + Edamame + Pesto', cal: 380, price: 38 },
           ].map((bowl, i) => (
             <button key={i} onClick={() => onNavigate('restaurant')} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-2 text-left">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-lg">{i === 0 ? '💪' : '🧘'}</div>
+              <ItemIcon cat={i === 0 ? 'meat' : 'veggie'} />
               <div className="flex-1">
                 <p className="font-semibold text-sm">{bowl.name}</p>
                 <p className="text-[10px] text-muted-foreground">{bowl.items}</p>
