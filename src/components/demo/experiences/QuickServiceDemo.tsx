@@ -667,7 +667,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground">7 de 10 visitas · Mais 3 e ganhe um combo grátis! 🎁</p>
+            <p className="text-xs text-muted-foreground">7 de 10 visitas · Mais 3 e ganhe um combo grátis!</p>
           </div>
 
           <button onClick={() => onNavigate('home')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
