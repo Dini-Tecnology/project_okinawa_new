@@ -336,7 +336,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <span className="text-primary">R$ {foodTotal.toFixed(2)}</span>
           </div>
           {/* Drinks section */}
-          <h3 className="text-xs font-semibold text-muted-foreground mt-4 mb-2">🥤 Bebidas</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mt-4 mb-2">Bebidas</h3>
           {selectedDrinks.map(sd => {
             const drink = DRINK_MENU.find(d => d.id === sd.id)!;
             return (
