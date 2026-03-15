@@ -173,11 +173,11 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           {/* Other cafés */}
           <h3 className="font-display font-semibold text-sm mb-3">Mais opções</h3>
           {[
-            { name: 'Padaria Artesanal', dist: '450m', wifi: true, rating: 4.4, emoji: '🥖' },
-            { name: 'Chá & Companhia', dist: '900m', wifi: true, rating: 4.2, emoji: '🍵' },
+            { name: 'Padaria Artesanal', dist: '450m', wifi: true, rating: 4.4, cat: 'bakery' },
+            { name: 'Chá & Companhia', dist: '900m', wifi: true, rating: 4.2, cat: 'tea' },
           ].map((r, i) => (
             <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 mb-1">
-              <span className="text-2xl">{r.emoji}</span>
+              <ItemIcon cat={r.cat} />
               <div className="flex-1"><p className="font-semibold text-sm">{r.name}</p><p className="text-xs text-muted-foreground">{r.dist} {r.wifi ? '· Wi-Fi' : ''}</p></div>
               <div className="flex items-center gap-1"><Star className="w-3 h-3 text-accent fill-accent" /><span className="text-xs font-semibold">{r.rating}</span></div>
             </div>
