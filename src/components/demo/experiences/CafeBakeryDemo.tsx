@@ -3,7 +3,7 @@
  * Deep journey: Discover → QR Scan → Work Mode → Coffee Customization → Comanda Live → Refill → Payment → Loyalty
  */
 import React, { useState, useEffect } from 'react';
-import { GuidedHint } from '../DemoShared';
+import { GuidedHint, ItemIcon } from '../DemoShared';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard,
   Wifi, Battery, Plug, Volume2, Coffee, Gift, QrCode, RefreshCw,
