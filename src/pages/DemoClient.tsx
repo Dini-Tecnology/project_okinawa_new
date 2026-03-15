@@ -213,7 +213,7 @@ const DemoClientInner = () => {
             {/* Service type features */}
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
               <h3 className="font-display font-bold text-sm mb-3 flex items-center gap-2">
-                <span>{activeServiceType?.emoji}</span>
+                <ItemIcon cat={activeServiceType?.iconCat || 'generic'} size="xs" />
                 {activeServiceType?.name}
               </h3>
               <div className="space-y-2">
