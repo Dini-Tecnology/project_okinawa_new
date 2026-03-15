@@ -31,22 +31,22 @@ export const JOURNEY_STEPS = [
   { step: 10, label: 'Encerrar noite', screens: ['close', 'rate'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Eventos', desc: 'Descubra as melhores noites da cidade.' },
-  'club-detail': { emoji: '', title: 'NOOWE Club', desc: 'Detalhes do evento com lotação em tempo real.' },
-  'lineup': { emoji: '', title: 'Lineup', desc: 'DJs e horários com bio e setlist.' },
-  'tickets': { emoji: '', title: 'Ingressos', desc: 'Lotes com preço dinâmico e comparação.' },
-  'digital-ticket': { emoji: '', title: 'Ingresso Digital', desc: 'QR Code animado anti-fraude.' },
-  'guest-list': { emoji: '', title: 'Guest List', desc: 'Gerencie seus convidados e +1s.' },
-  'virtual-queue': { emoji: '', title: 'Fila Virtual', desc: 'Posição na fila sem ficar no frio.' },
-  'vip-table': { emoji: '', title: 'Camarotes', desc: 'Opções de camarote com consumação mínima.' },
-  'vip-map': { emoji: '', title: 'Mapa VIP', desc: 'Escolha a posição do seu camarote.' },
-  'bottle-service': { emoji: '', title: 'Bottle Service', desc: 'Cardápio premium com sugestões do DJ.' },
-  'bottle-detail': { emoji: '', title: 'Detalhe Garrafa', desc: 'Ficha completa com mixers inclusos.' },
-  'min-spend': { emoji: '', title: 'Consumação', desc: 'Tracker de consumação mínima em tempo real.' },
-  'floor-order': { emoji: '', title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
-  'close': { emoji: '', title: 'Encerramento', desc: 'Resumo da noite com todos os gastos.' },
-  'rate': { emoji: '', title: 'Avaliação', desc: 'Avalie a noite e ganhe pontos.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Eventos', desc: 'Descubra as melhores noites da cidade.' },
+  'club-detail': { title: 'NOOWE Club', desc: 'Detalhes do evento com lotação em tempo real.' },
+  'lineup': { title: 'Lineup', desc: 'DJs e horários com bio e setlist.' },
+  'tickets': { title: 'Ingressos', desc: 'Lotes com preço dinâmico e comparação.' },
+  'digital-ticket': { title: 'Ingresso Digital', desc: 'QR Code animado anti-fraude.' },
+  'guest-list': { title: 'Guest List', desc: 'Gerencie seus convidados e +1s.' },
+  'virtual-queue': { title: 'Fila Virtual', desc: 'Posição na fila sem ficar no frio.' },
+  'vip-table': { title: 'Camarotes', desc: 'Opções de camarote com consumação mínima.' },
+  'vip-map': { title: 'Mapa VIP', desc: 'Escolha a posição do seu camarote.' },
+  'bottle-service': { title: 'Bottle Service', desc: 'Cardápio premium com sugestões do DJ.' },
+  'bottle-detail': { title: 'Detalhe Garrafa', desc: 'Ficha completa com mixers inclusos.' },
+  'min-spend': { title: 'Consumação', desc: 'Tracker de consumação mínima em tempo real.' },
+  'floor-order': { title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
+  'close': { title: 'Encerramento', desc: 'Resumo da noite com todos os gastos.' },
+  'rate': { title: 'Avaliação', desc: 'Avalie a noite e ganhe pontos.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }

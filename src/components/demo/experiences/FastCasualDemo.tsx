@@ -29,20 +29,20 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Retirada & avaliação', screens: ['ready', 'rating'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre opções saudáveis e customizáveis por perto.' },
-  'restaurant': { emoji: '🥗', title: 'NOOWE Fresh', desc: 'Restaurante fast casual com montagem personalizada.' },
-  'saved-bowls': { emoji: '⭐', title: 'Meus Bowls', desc: 'Refaça pedidos salvos ou crie um novo do zero.' },
-  'builder-base': { emoji: '🍚', title: 'Escolha a Base', desc: 'Primeiro passo: arroz, quinoa, salada ou wrap.' },
-  'builder-protein': { emoji: '🥩', title: 'Proteína', desc: 'Selecione a proteína principal do seu prato.' },
-  'builder-toppings': { emoji: '🥬', title: 'Toppings', desc: 'Adicione vegetais e complementos — alguns premium.' },
-  'builder-sauce': { emoji: '🫗', title: 'Molho', desc: 'Toque final: escolha até 2 molhos artesanais.' },
-  'builder-summary': { emoji: '📊', title: 'Seu Bowl', desc: 'Resumo completo com nutrição e preço.' },
-  'allergies': { emoji: '⚠️', title: 'Alergias', desc: 'Verificação de alérgenos antes de confirmar.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Checkout com pontos e cupons aplicáveis.' },
-  'prep-tracking': { emoji: '👨‍🍳', title: 'Preparando', desc: 'Acompanhe cada etapa do preparo em tempo real.' },
-  'ready': { emoji: '✅', title: 'Pronto!', desc: 'Retire na bandeja com seu nome.' },
-  'rating': { emoji: '⭐', title: 'Avaliação', desc: 'Avalie e ganhe pontos extras.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre opções saudáveis e customizáveis por perto.' },
+  'restaurant': { title: 'NOOWE Fresh', desc: 'Restaurante fast casual com montagem personalizada.' },
+  'saved-bowls': { title: 'Meus Bowls', desc: 'Refaça pedidos salvos ou crie um novo do zero.' },
+  'builder-base': { title: 'Escolha a Base', desc: 'Primeiro passo: arroz, quinoa, salada ou wrap.' },
+  'builder-protein': { title: 'Proteína', desc: 'Selecione a proteína principal do seu prato.' },
+  'builder-toppings': { title: 'Toppings', desc: 'Adicione vegetais e complementos — alguns premium.' },
+  'builder-sauce': { title: 'Molho', desc: 'Toque final: escolha até 2 molhos artesanais.' },
+  'builder-summary': { title: 'Seu Bowl', desc: 'Resumo completo com nutrição e preço.' },
+  'allergies': { title: 'Alergias', desc: 'Verificação de alérgenos antes de confirmar.' },
+  'payment': { title: 'Pagamento', desc: 'Checkout com pontos e cupons aplicáveis.' },
+  'prep-tracking': { title: 'Preparando', desc: 'Acompanhe cada etapa do preparo em tempo real.' },
+  'ready': { title: 'Pronto!', desc: 'Retire na bandeja com seu nome.' },
+  'rating': { title: 'Avaliação', desc: 'Avalie e ganhe pontos extras.' },
 };
 
 const BASES = [

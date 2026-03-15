@@ -6,7 +6,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext } from '@/contexts/DemoContext';
-import { PhoneShell, BottomNav, SERVICE_TYPES, type NavTab } from '@/components/demo/DemoShared';
+import { PhoneShell, BottomNav, SERVICE_TYPES, ItemIcon, type NavTab } from '@/components/demo/DemoShared';
 import {
   ArrowLeft, Check, ChevronRight, Search, QrCode, Gift, User,
   UtensilsCrossed, Zap,
@@ -30,7 +30,7 @@ import { ClubDemo, JOURNEY_STEPS as CL_STEPS, SCREEN_INFO as CL_INFO } from '@/c
 interface DemoConfig {
   component: React.FC<{ screen: string; onNavigate: (s: string) => void }>;
   steps: { step: number; label: string; screens: string[] }[];
-  info: Record<string, { emoji: string; title: string; desc: string }>;
+  info: Record<string, { title: string; desc: string }>;
   defaultScreen: string;
   hasBottomNav: boolean;
 }
@@ -86,7 +86,7 @@ const DemoClientInner = () => {
   }, [serviceType]);
 
   const activeServiceType = SERVICE_TYPES.find(s => s.id === serviceType);
-  const info = config?.info[currentScreen] || { emoji: '📱', title: 'Demo', desc: '' };
+  const info = config?.info[currentScreen] || { title: 'Demo', desc: '' };
   const currentStepIdx = config?.steps.findIndex(s => s.screens.includes(currentScreen)) ?? -1;
 
   const handleTabChange = (tab: NavTab) => {
@@ -134,7 +134,7 @@ const DemoClientInner = () => {
                       : 'border-border bg-card hover:border-primary/30 hover:bg-muted/50'
                   }`}
                 >
-                  <span className="text-base">{st.emoji}</span>
+                  <ItemIcon cat={st.iconCat} size="xs" />
                   <div className="text-left">
                     <p className={`text-xs font-semibold ${isActive ? 'text-primary' : 'text-foreground'}`}>{st.name}</p>
                     <p className="text-[10px] text-muted-foreground hidden sm:block">{st.tagline}</p>
@@ -148,7 +148,7 @@ const DemoClientInner = () => {
         {/* Active demo title */}
         <div className="w-full max-w-7xl mb-4">
           <div className={`flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r ${activeServiceType?.color || ''} border border-border/50`}>
-            <span className="text-3xl">{activeServiceType?.emoji}</span>
+            <ItemIcon cat={activeServiceType?.iconCat || 'generic'} size="lg" />
             <div>
               <h1 className="font-display text-lg font-bold text-foreground">{activeServiceType?.restaurant}</h1>
               <p className="text-sm text-muted-foreground">{activeServiceType?.name} · {activeServiceType?.tagline}</p>
@@ -206,14 +206,14 @@ const DemoClientInner = () => {
           {/* Info sidebar */}
           <div className="hidden xl:block w-72 shrink-0 sticky top-8">
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
-              <h3 className="font-display font-bold mb-2">{info.emoji} {info.title}</h3>
+              <h3 className="font-display font-bold mb-2">{info.title}</h3>
               <p className="text-sm text-muted-foreground">{info.desc}</p>
             </div>
 
             {/* Service type features */}
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
               <h3 className="font-display font-bold text-sm mb-3 flex items-center gap-2">
-                <span>{activeServiceType?.emoji}</span>
+                <ItemIcon cat={activeServiceType?.iconCat || 'generic'} size="xs" />
                 {activeServiceType?.name}
               </h3>
               <div className="space-y-2">

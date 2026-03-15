@@ -68,16 +68,16 @@ export const JOURNEY_STEPS = [
   { step: 8, label: 'Avaliar & fidelidade', screens: ['rating'] },
 ];
 
-export const SCREEN_INFO: Record<string, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre Quick Services com Skip the Line: peça antes de chegar e retire sem fila.' },
-  'restaurant': { emoji: '⚡', title: 'NOOWE Express', desc: 'Restaurante focado em velocidade com pedido antecipado, combos otimizados e prep time visível.' },
-  'menu': { emoji: '📋', title: 'Menu Rápido', desc: 'Combos em destaque, menu categorizado por tipo, tempo de preparo por item e montagem de carrinho.' },
-  'item': { emoji: '🍔', title: 'Personalizar Item', desc: 'Customize: extras pagos (bacon, cheddar), remoção de ingredientes, tamanho e observações.' },
-  'cart': { emoji: '🛒', title: 'Carrinho', desc: 'Revisão completa com quantidades, cupom de desconto, tempo estimado total e modo de retirada.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'PIX, cartão, Apple Pay, Google Pay ou carteira NOOWE. Pontos de fidelidade podem ser usados.' },
-  'preparing': { emoji: '👨‍🍳', title: 'Preparo ao Vivo', desc: 'Tracking em 4 etapas: Recebido → Preparando → Conferência → Pronto. Push notification automática.' },
-  'ready': { emoji: '✅', title: 'Pronto!', desc: 'Código de retirada, tempo total, balcão express designado e registro de velocidade.' },
-  'rating': { emoji: '⭐', title: 'Avaliar', desc: 'Avaliação por categorias (velocidade, sabor, atendimento), pontos de fidelidade ganhos e stamp card.' },
+export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre Quick Services com Skip the Line: peça antes de chegar e retire sem fila.' },
+  'restaurant': { title: 'NOOWE Express', desc: 'Restaurante focado em velocidade com pedido antecipado, combos otimizados e prep time visível.' },
+  'menu': { title: 'Menu Rápido', desc: 'Combos em destaque, menu categorizado por tipo, tempo de preparo por item e montagem de carrinho.' },
+  'item': { title: 'Personalizar Item', desc: 'Customize: extras pagos (bacon, cheddar), remoção de ingredientes, tamanho e observações.' },
+  'cart': { title: 'Carrinho', desc: 'Revisão completa com quantidades, cupom de desconto, tempo estimado total e modo de retirada.' },
+  'payment': { title: 'Pagamento', desc: 'PIX, cartão, Apple Pay, Google Pay ou carteira NOOWE. Pontos de fidelidade podem ser usados.' },
+  'preparing': { title: 'Preparo ao Vivo', desc: 'Tracking em 4 etapas: Recebido → Preparando → Conferência → Pronto. Push notification automática.' },
+  'ready': { title: 'Pronto!', desc: 'Código de retirada, tempo total, balcão express designado e registro de velocidade.' },
+  'rating': { title: 'Avaliar', desc: 'Avaliação por categorias (velocidade, sabor, atendimento), pontos de fidelidade ganhos e stamp card.' },
 };
 
 interface Props { onNavigate: (s: string) => void; screen: string; }

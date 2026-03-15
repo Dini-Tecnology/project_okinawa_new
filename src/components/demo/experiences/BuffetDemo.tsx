@@ -23,17 +23,17 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Pagamento sem fila', screens: ['payment', 'payment-success'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre buffets por peso ou preço fixo.' },
-  'restaurant': { emoji: '🍽️', title: 'Sabores Noowe', desc: 'Buffet self-service com balança inteligente.' },
-  'checkin': { emoji: '📱', title: 'Check-in', desc: 'Check-in digital vincula sua comanda automaticamente.' },
-  'stations': { emoji: '🍖', title: 'Estações', desc: 'Veja o que está disponível em cada estação, ao vivo.' },
-  'scale': { emoji: '⚖️', title: 'Balança', desc: 'QR Code na balança registra o peso automaticamente.' },
-  'scale-history': { emoji: '📊', title: 'Pesagens', desc: 'Histórico de pesagens — volte quantas vezes quiser.' },
-  'drinks': { emoji: '🥤', title: 'Bebidas', desc: 'Peça bebidas pelo app — entregam na mesa.' },
-  'comanda': { emoji: '📝', title: 'Comanda', desc: 'Comanda ao vivo: comida por peso + bebidas + sobremesa.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague sem fila no caixa.' },
-  'payment-success': { emoji: '✅', title: 'Sucesso', desc: 'Pagamento confirmado com pontos e stamps.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre buffets por peso ou preço fixo.' },
+  'restaurant': { title: 'Sabores Noowe', desc: 'Buffet self-service com balança inteligente.' },
+  'checkin': { title: 'Check-in', desc: 'Check-in digital vincula sua comanda automaticamente.' },
+  'stations': { title: 'Estações', desc: 'Veja o que está disponível em cada estação, ao vivo.' },
+  'scale': { title: 'Balança', desc: 'QR Code na balança registra o peso automaticamente.' },
+  'scale-history': { title: 'Pesagens', desc: 'Histórico de pesagens — volte quantas vezes quiser.' },
+  'drinks': { title: 'Bebidas', desc: 'Peça bebidas pelo app — entregam na mesa.' },
+  'comanda': { title: 'Comanda', desc: 'Comanda ao vivo: comida por peso + bebidas + sobremesa.' },
+  'payment': { title: 'Pagamento', desc: 'Pague sem fila no caixa.' },
+  'payment-success': { title: 'Sucesso', desc: 'Pagamento confirmado com pontos e stamps.' },
 };
 
 const STATIONS = [
@@ -46,13 +46,13 @@ const STATIONS = [
 ];
 
 const DRINK_MENU = [
-  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, emoji: '🧃', cat: 'Sucos' },
-  { id: 'd2', name: 'Suco Verde Detox', price: 15, emoji: '🥬', cat: 'Sucos' },
-  { id: 'd3', name: 'Refrigerante Lata', price: 8, emoji: '🥤', cat: 'Refrigerantes' },
-  { id: 'd4', name: 'Água Mineral', price: 6, emoji: '💧', cat: 'Água' },
-  { id: 'd5', name: 'Água com Gás', price: 7, emoji: '🫧', cat: 'Água' },
-  { id: 'd6', name: 'Cerveja Artesanal', price: 18, emoji: '🍺', cat: 'Cervejas' },
-  { id: 'd7', name: 'Taça de Vinho', price: 22, emoji: '🍷', cat: 'Vinhos' },
+  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, iconCat: 'juice', cat: 'Sucos' },
+  { id: 'd2', name: 'Suco Verde Detox', price: 15, iconCat: 'juice', cat: 'Sucos' },
+  { id: 'd3', name: 'Refrigerante Lata', price: 8, iconCat: 'soda', cat: 'Refrigerantes' },
+  { id: 'd4', name: 'Água Mineral', price: 6, iconCat: 'water', cat: 'Água' },
+  { id: 'd5', name: 'Água com Gás', price: 7, iconCat: 'water', cat: 'Água' },
+  { id: 'd6', name: 'Cerveja Artesanal', price: 18, iconCat: 'beer', cat: 'Cervejas' },
+  { id: 'd7', name: 'Taça de Vinho', price: 22, iconCat: 'wine', cat: 'Vinhos' },
 ];
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -175,7 +175,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <p className="text-xs text-muted-foreground">Código da comanda</p>
             <p className="font-display text-3xl font-bold tracking-widest text-primary mt-1">SN-012</p>
           </div>
-          <p className="text-xs text-muted-foreground mb-4">📱 Este código aparece automaticamente na balança via NFC</p>
+          <p className="text-xs text-muted-foreground mb-4">Este código aparece automaticamente na balança via NFC</p>
           <div className="w-full grid grid-cols-2 gap-2">
             <button onClick={() => onNavigate('stations')} className="py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm">Ver Estações</button>
             <button onClick={() => onNavigate('scale')} className="py-3 border border-border rounded-xl font-semibold text-sm">Ir à Balança</button>
@@ -259,7 +259,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   <span>Parcial</span><span className="text-primary">R$ {(485 * 79.9 / 1000).toFixed(2)}</span>
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground mb-4">💡 Pode voltar e pesar mais vezes!</p>
+              <p className="text-xs text-muted-foreground mb-4">Pode voltar e pesar mais vezes!</p>
               <div className="w-full grid grid-cols-2 gap-2">
                 <button onClick={() => { setWeighHistory(prev => [...prev, 485]); setWeight(0); }} className="py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
                   <RefreshCw className="w-3.5 h-3.5" />Pesar Mais
@@ -289,7 +289,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   const sel = selectedDrinks.find(d => d.id === drink.id);
                   return (
                     <div key={drink.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card mb-1.5">
-                      <span className="text-xl">{drink.emoji}</span>
+                      <ItemIcon cat={drink.iconCat} size="xs" />
                       <div className="flex-1"><p className="text-sm font-medium">{drink.name}</p><p className="text-xs text-muted-foreground">R$ {drink.price}</p></div>
                       {sel ? (
                         <div className="flex items-center gap-2">
@@ -317,11 +317,11 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <Header title="Minha Comanda" back="drinks" />
           <div className="p-3 rounded-xl bg-muted/30 flex items-center gap-3 mb-4">
-            <span className="text-xl">🍽️</span>
+            <ItemIcon cat="buffet" size="sm" />
             <div><p className="font-semibold text-sm">Sabores Noowe</p><p className="text-xs text-muted-foreground">Mesa 12 · Comanda SN-012</p></div>
           </div>
           {/* Food section */}
-          <h3 className="text-xs font-semibold text-muted-foreground mb-2">⚖️ Comida (por peso)</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mb-2">Comida (por peso)</h3>
           {weighHistory.map((w, i) => (
             <div key={i} className="flex items-center justify-between py-2 border-b border-border">
               <span className="text-sm">Pesagem {i+1}</span>
@@ -336,12 +336,12 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <span className="text-primary">R$ {foodTotal.toFixed(2)}</span>
           </div>
           {/* Drinks section */}
-          <h3 className="text-xs font-semibold text-muted-foreground mt-4 mb-2">🥤 Bebidas</h3>
+          <h3 className="text-xs font-semibold text-muted-foreground mt-4 mb-2">Bebidas</h3>
           {selectedDrinks.map(sd => {
             const drink = DRINK_MENU.find(d => d.id === sd.id)!;
             return (
               <div key={sd.id} className="flex items-center justify-between py-2 border-b border-border">
-                <span className="text-sm">{drink.emoji} {drink.name} ×{sd.qty}</span>
+                <span className="text-sm">{drink.name} ×{sd.qty}</span>
                 <span className="text-sm">R$ {(drink.price * sd.qty).toFixed(2)}</span>
               </div>
             );
@@ -403,17 +403,17 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-5 shadow-xl shadow-success/30">
             <Check className="w-12 h-12 text-primary-foreground" />
           </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Bom apetite! 🍽️</h2>
+          <h2 className="font-display text-2xl font-bold mb-2">Bom apetite!</h2>
           <p className="text-sm text-muted-foreground mb-1">Pagamento confirmado — sem fila no caixa!</p>
-          <p className="text-xs text-muted-foreground mb-4">Pode continuar comendo e voltar a pesar 😊</p>
+          <p className="text-xs text-muted-foreground mb-4">Pode continuar comendo e voltar a pesar</p>
           <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
             <Gift className="w-5 h-5 text-primary" />
             <div className="text-left"><p className="text-sm font-semibold">+{Math.round(grandTotal / 2)} pontos ganhos!</p><p className="text-xs text-muted-foreground">Visita #5 — próxima sobremesa grátis!</p></div>
           </div>
           <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 text-left">
-            <p className="text-xs font-semibold mb-1">📊 Seu perfil de buffet</p>
+            <p className="text-xs font-semibold mb-1">Seu perfil de buffet</p>
             <p className="text-[10px] text-muted-foreground">Peso médio por visita: 520g</p>
-            <p className="text-[10px] text-muted-foreground">Estação favorita: Grelhados 🥩</p>
+            <p className="text-[10px] text-muted-foreground">Estação favorita: Grelhados</p>
             <p className="text-[10px] text-muted-foreground">Total em 5 visitas: R$ 287,40</p>
           </div>
           <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>

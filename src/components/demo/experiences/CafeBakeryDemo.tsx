@@ -10,7 +10,7 @@ import {
   Wifi, Battery, Plug, Volume2, Coffee, Gift, QrCode, RefreshCw,
   Search, MapPin, Laptop, ArrowRight, Bell, Heart, Timer,
   Loader2, ChevronRight, Award, Nfc, Smartphone, Wallet,
-  Zap, X, ChevronDown, Users,
+  Zap, X, ChevronDown, Users, Sparkles,
 } from 'lucide-react';
 
 type Screen = 'home' | 'restaurant' | 'qr-scan' | 'work-mode' | 'menu' | 'customize' | 'comanda' | 'payment' | 'payment-success';
@@ -19,26 +19,26 @@ interface CartItem {
   id: string;
   name: string;
   price: number;
-  emoji: string;
+  iconCat: string;
   customizations?: string[];
   isRefill?: boolean;
 }
 
 const CAFE_MENU = [
-  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', emoji: '☕', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
-  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', emoji: '☕', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
-  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', emoji: '☕', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
-  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', emoji: '🥛', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
-  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', emoji: '🧊', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
-  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', emoji: '🍵', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
-  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', emoji: '🌼', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
-  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', emoji: '🍵', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
-  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', emoji: '🥐', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
-  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', emoji: '🧀', refill: false, desc: 'Pão de queijo mineiro quentinho' },
-  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', emoji: '🥪', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
-  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', emoji: '🥧', refill: false, desc: 'Torta caseira com canela e sorvete' },
-  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', emoji: '🍫', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
-  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', emoji: '🍪', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
+  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
+  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
+  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', iconCat: 'coffee', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
+  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
+  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
+  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
+  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
+  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', iconCat: 'tea', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
+  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', iconCat: 'bread', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
+  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', iconCat: 'cheese', refill: false, desc: 'Pão de queijo mineiro quentinho' },
+  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', iconCat: 'sandwich', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
+  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', iconCat: 'dessert', refill: false, desc: 'Torta caseira com canela e sorvete' },
+  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', iconCat: 'brownie', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
+  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', iconCat: 'cookie', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
 ];
 
 const MILK_OPTIONS = ['Integral', 'Desnatado', 'Aveia', 'Amêndoas', 'Coco'];
@@ -59,16 +59,16 @@ export const JOURNEY_STEPS = [
   { step: 6, label: 'Pagamento', screens: ['payment', 'payment-success'] },
 ];
 
-export const SCREEN_INFO: Record<string, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre cafeterias por Wi-Fi, tomadas, nível de ruído e pet friendly.' },
-  'restaurant': { emoji: '☕', title: 'Café Noowe', desc: 'Cafeteria work-friendly com Wi-Fi 150Mbps, tomadas em todas as mesas e personalização completa de bebidas.' },
-  'qr-scan': { emoji: '📷', title: 'QR da Mesa', desc: 'Escaneie o QR Code da mesa e peça sem sair do lugar. Identifica automaticamente tomadas disponíveis.' },
-  'work-mode': { emoji: '💻', title: 'Modo Trabalho', desc: 'Dashboard com Wi-Fi (senha copiável), velocidade, nível de ruído em tempo real, tomadas e timer de sessão.' },
-  'menu': { emoji: '📋', title: 'Cardápio', desc: 'Cafés especiais, chás, salgados e doces. Itens com refil marcados. Personalização completa de bebidas.' },
-  'customize': { emoji: '🎨', title: 'Personalizar Bebida', desc: 'Leite (integral, aveia, amêndoas), tamanho (P/M/G), temperatura, sabor extra e intensidade.' },
-  'comanda': { emoji: '📝', title: 'Comanda', desc: 'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague quando quiser ir embora. PIX, cartão, Apple Pay ou carteira NOOWE.' },
-  'payment-success': { emoji: '✅', title: 'Conta Fechada', desc: 'Pagamento confirmado com stamp card: a cada 10 cafés, o próximo é grátis.' },
+export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre cafeterias por Wi-Fi, tomadas, nível de ruído e pet friendly.' },
+  'restaurant': { title: 'Café Noowe', desc: 'Cafeteria work-friendly com Wi-Fi 150Mbps, tomadas em todas as mesas e personalização completa de bebidas.' },
+  'qr-scan': { title: 'QR da Mesa', desc: 'Escaneie o QR Code da mesa e peça sem sair do lugar. Identifica automaticamente tomadas disponíveis.' },
+  'work-mode': { title: 'Modo Trabalho', desc: 'Dashboard com Wi-Fi (senha copiável), velocidade, nível de ruído em tempo real, tomadas e timer de sessão.' },
+  'menu': { title: 'Cardápio', desc: 'Cafés especiais, chás, salgados e doces. Itens com refil marcados. Personalização completa de bebidas.' },
+  'customize': { title: 'Personalizar Bebida', desc: 'Leite (integral, aveia, amêndoas), tamanho (P/M/G), temperatura, sabor extra e intensidade.' },
+  'comanda': { title: 'Comanda', desc: 'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.' },
+  'payment': { title: 'Pagamento', desc: 'Pague quando quiser ir embora. PIX, cartão, Apple Pay ou carteira NOOWE.' },
+  'payment-success': { title: 'Conta Fechada', desc: 'Pagamento confirmado com stamp card: a cada 10 cafés, o próximo é grátis.' },
 };
 
 interface Props { onNavigate: (s: string) => void; screen: string; }
@@ -98,7 +98,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const categories = [...new Set(CAFE_MENU.map(m => m.cat))];
 
   const addToCartDirect = (item: typeof CAFE_MENU[0]) => {
-    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, emoji: item.emoji }]);
+    setCart(prev => [...prev, { id: item.id + '-' + Date.now(), name: item.name, price: item.price, iconCat: item.iconCat }]);
   };
 
   const addCustomized = () => {
@@ -112,12 +112,12 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     if (extraShot) customs.push('Shot extra');
 
     const totalPrice = selectedItem.price + size.priceAdd + (selectedFlavor ? 3 : 0) + (extraShot ? 4 : 0);
-    setCart(prev => [...prev, { id: selectedItem.id + '-' + Date.now(), name: selectedItem.name, price: totalPrice, emoji: selectedItem.emoji, customizations: customs }]);
+    setCart(prev => [...prev, { id: selectedItem.id + '-' + Date.now(), name: selectedItem.name, price: totalPrice, iconCat: selectedItem.iconCat, customizations: customs }]);
     onNavigate('comanda');
   };
 
   const addRefill = (originalItem: CartItem) => {
-    setCart(prev => [...prev, { id: 'refill-' + Date.now(), name: `Refil ${originalItem.name}`, price: 5, emoji: '♻️', isRefill: true }]);
+    setCart(prev => [...prev, { id: 'refill-' + Date.now(), name: `Refil ${originalItem.name}`, price: 5, iconCat: 'coffee', isRefill: true }]);
   };
 
   switch (screen) {
@@ -265,7 +265,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mb-4"><Check className="w-8 h-8 text-success" /></div>
               <h2 className="font-display text-xl font-bold mb-2">Mesa 3 · Janela</h2>
-              <p className="text-xs text-muted-foreground mb-1">☕ Café Noowe</p>
+              <p className="text-xs text-muted-foreground mb-1">Café Noowe</p>
               <div className="flex items-center gap-3 text-xs mb-5">
                 <span className="flex items-center gap-1 text-success"><Plug className="w-3 h-3" />2 tomadas</span>
                 <span className="flex items-center gap-1 text-success"><Wifi className="w-3 h-3" />Wi-Fi forte</span>
@@ -370,12 +370,12 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   onNavigate('comanda');
                 }
               }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <span className="text-2xl">{item.emoji}</span>
+                <ItemIcon cat={item.iconCat} size="sm" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
-                    {item.refill && <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-semibold">♻️ Refil</span>}
-                    {(item as any).customizable && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-semibold">✨ Custom</span>}
+                    {item.refill && <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-semibold flex items-center gap-0.5"><RefreshCw className="w-2.5 h-2.5" /> Refil</span>}
+                    {(item as any).customizable && <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-semibold flex items-center gap-0.5"><Sparkles className="w-2.5 h-2.5" /> Custom</span>}
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{item.desc}</p>
                   <p className="font-display font-bold text-sm mt-1">R$ {item.price}</p>
@@ -400,7 +400,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="text-center mb-4">
-            <span className="text-5xl">{selectedItem.emoji}</span>
+            <ItemIcon cat={selectedItem.iconCat} size="xl" className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-2">{selectedItem.name}</h2>
             <p className="text-xs text-muted-foreground">{selectedItem.desc}</p>
           </div>
@@ -480,7 +480,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           </div>
 
           <div className="p-3 rounded-xl bg-muted/30 flex items-center gap-3 mb-4">
-            <span className="text-2xl">☕</span>
+            <ItemIcon cat="coffee" size="sm" />
             <div className="flex-1"><p className="font-semibold text-sm">Café Noowe</p><p className="text-xs text-muted-foreground">Mesa 3 · Janela · {sessionMinutes > 0 ? `${sessionMinutes}min` : 'Modo Trabalho'}</p></div>
           </div>
 
@@ -494,7 +494,7 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <>
               {cart.map((c, i) => (
                 <div key={c.id} className={`flex items-center gap-3 py-3 border-b border-border ${c.isRefill ? 'bg-success/5 -mx-1 px-1 rounded-lg' : ''}`}>
-                  <span className="text-xl">{c.emoji}</span>
+                  <ItemIcon cat={c.iconCat} size="xs" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium">{c.name}</p>
                     {c.customizations && <p className="text-[10px] text-primary">{c.customizations.join(' · ')}</p>}

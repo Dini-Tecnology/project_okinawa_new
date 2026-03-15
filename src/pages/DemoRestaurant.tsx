@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext, type OrderStatus, type TableStatus } from '@/contexts/DemoContext';
+import { ItemIcon } from '@/components/demo/DemoShared';
 import {
   ArrowLeft, ArrowRight, Bell, BarChart3, UtensilsCrossed, LayoutGrid, CalendarDays,
   ChefHat, TrendingUp, Users, DollarSign, Clock, Check, Play, Pause,
@@ -183,12 +184,12 @@ const SetupTab = () => {
         <p className="text-sm text-muted-foreground mb-4">Define as funcionalidades disponíveis na plataforma</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           {[
-            { id: 'full-service', label: 'Full Service', desc: 'Mesa com garçom', emoji: '🍽️' },
-            { id: 'casual-dining', label: 'Casual Dining', desc: 'Ambiente descontraído', emoji: '🍕' },
-            { id: 'fast-casual', label: 'Fast Casual', desc: 'Pedido no balcão', emoji: '🥗' },
-            { id: 'cafe', label: 'Café / Padaria', desc: 'Ambiente café', emoji: '☕' },
-            { id: 'bar', label: 'Bar / Pub', desc: 'Foco em bebidas', emoji: '🍺' },
-            { id: 'chefs-table', label: "Chef's Table", desc: 'Experiência premium', emoji: '👨‍🍳' },
+            { id: 'full-service', label: 'Full Service', desc: 'Mesa com garçom', iconCat: 'chef' },
+            { id: 'casual-dining', label: 'Casual Dining', desc: 'Ambiente descontraído', iconCat: 'pizza' },
+            { id: 'fast-casual', label: 'Fast Casual', desc: 'Pedido no balcão', iconCat: 'salad' },
+            { id: 'cafe', label: 'Café / Padaria', desc: 'Ambiente café', iconCat: 'coffee' },
+            { id: 'bar', label: 'Bar / Pub', desc: 'Foco em bebidas', iconCat: 'beer' },
+            { id: 'chefs-table', label: "Chef's Table", desc: 'Experiência premium', iconCat: 'chef' },
           ].map(type => (
             <button
               key={type.id}
@@ -197,7 +198,7 @@ const SetupTab = () => {
                 serviceType === type.id ? 'border-primary bg-primary/5 shadow-glow' : 'border-border hover:border-muted-foreground/30'
               }`}
             >
-              <span className="text-2xl">{type.emoji}</span>
+              <ItemIcon cat={type.iconCat} size="sm" />
               <p className="font-semibold text-sm mt-2">{type.label}</p>
               <p className="text-[10px] text-muted-foreground">{type.desc}</p>
               {serviceType === type.id && <Check className="w-4 h-4 text-primary mt-1" />}

@@ -148,24 +148,24 @@ export const BottomNav: React.FC<{
 export interface ServiceTypeDemo {
   id: string;
   name: string;
-  emoji: string;
+  iconCat: string;
   restaurant: string;
   tagline: string;
   color: string;
 }
 
 export const SERVICE_TYPES: ServiceTypeDemo[] = [
-  { id: 'fine-dining', name: 'Fine Dining', emoji: '🍷', restaurant: 'Bistrô Noowe', tagline: 'Experiência gastronômica premium', color: 'from-rose-900/20 to-amber-900/20' },
-  { id: 'quick-service', name: 'Quick Service', emoji: '⚡', restaurant: 'NOOWE Express', tagline: 'Velocidade e conveniência', color: 'from-yellow-500/20 to-orange-500/20' },
-  { id: 'fast-casual', name: 'Fast Casual', emoji: '🥗', restaurant: 'NOOWE Fresh', tagline: 'Monte seu prato ideal', color: 'from-green-500/20 to-emerald-500/20' },
-  { id: 'cafe-bakery', name: 'Café & Padaria', emoji: '☕', restaurant: 'Café Noowe', tagline: 'Seu espaço, seu ritmo', color: 'from-amber-700/20 to-orange-800/20' },
-  { id: 'buffet', name: 'Buffet', emoji: '🍽️', restaurant: 'Sabores Noowe', tagline: 'Sirva-se à vontade', color: 'from-orange-500/20 to-red-500/20' },
-  { id: 'drive-thru', name: 'Drive-Thru', emoji: '🚗', restaurant: 'NOOWE Drive', tagline: 'Sem sair do carro', color: 'from-blue-500/20 to-cyan-500/20' },
-  { id: 'food-truck', name: 'Food Truck', emoji: '🚚', restaurant: 'Taco Noowe', tagline: 'Comida de rua premium', color: 'from-lime-500/20 to-green-500/20' },
-  { id: 'chefs-table', name: "Chef's Table", emoji: '👨‍🍳', restaurant: 'Mesa do Chef Noowe', tagline: 'Exclusividade absoluta', color: 'from-zinc-800/20 to-stone-700/20' },
-  { id: 'casual-dining', name: 'Casual Dining', emoji: '🍕', restaurant: 'Cantina Noowe', tagline: 'Sabor em família', color: 'from-red-500/20 to-orange-500/20' },
-  { id: 'pub-bar', name: 'Pub & Bar', emoji: '🍺', restaurant: 'Noowe Tap House', tagline: 'Drinks e boa companhia', color: 'from-amber-600/20 to-yellow-700/20' },
-  { id: 'club', name: 'Club & Balada', emoji: '🎵', restaurant: 'NOOWE Club', tagline: 'Noite sem limites', color: 'from-purple-600/20 to-pink-600/20' },
+  { id: 'fine-dining', name: 'Fine Dining', iconCat: 'wine', restaurant: 'Bistrô Noowe', tagline: 'Experiência gastronômica premium', color: 'from-rose-900/20 to-amber-900/20' },
+  { id: 'quick-service', name: 'Quick Service', iconCat: 'quick', restaurant: 'NOOWE Express', tagline: 'Velocidade e conveniência', color: 'from-yellow-500/20 to-orange-500/20' },
+  { id: 'fast-casual', name: 'Fast Casual', iconCat: 'salad', restaurant: 'NOOWE Fresh', tagline: 'Monte seu prato ideal', color: 'from-green-500/20 to-emerald-500/20' },
+  { id: 'cafe-bakery', name: 'Café & Padaria', iconCat: 'coffee', restaurant: 'Café Noowe', tagline: 'Seu espaço, seu ritmo', color: 'from-amber-700/20 to-orange-800/20' },
+  { id: 'buffet', name: 'Buffet', iconCat: 'buffet', restaurant: 'Sabores Noowe', tagline: 'Sirva-se à vontade', color: 'from-orange-500/20 to-red-500/20' },
+  { id: 'drive-thru', name: 'Drive-Thru', iconCat: 'drive', restaurant: 'NOOWE Drive', tagline: 'Sem sair do carro', color: 'from-blue-500/20 to-cyan-500/20' },
+  { id: 'food-truck', name: 'Food Truck', iconCat: 'truck', restaurant: 'Taco Noowe', tagline: 'Comida de rua premium', color: 'from-lime-500/20 to-green-500/20' },
+  { id: 'chefs-table', name: "Chef's Table", iconCat: 'chef', restaurant: 'Mesa do Chef Noowe', tagline: 'Exclusividade absoluta', color: 'from-zinc-800/20 to-stone-700/20' },
+  { id: 'casual-dining', name: 'Casual Dining', iconCat: 'pizza', restaurant: 'Cantina Noowe', tagline: 'Sabor em família', color: 'from-red-500/20 to-orange-500/20' },
+  { id: 'pub-bar', name: 'Pub & Bar', iconCat: 'beer', restaurant: 'Noowe Tap House', tagline: 'Drinks e boa companhia', color: 'from-amber-600/20 to-yellow-700/20' },
+  { id: 'club', name: 'Club & Balada', iconCat: 'music', restaurant: 'NOOWE Club', tagline: 'Noite sem limites', color: 'from-purple-600/20 to-pink-600/20' },
 ];
 
 // ============ JOURNEY STEP TYPE ============
@@ -176,7 +176,6 @@ export interface JourneyStep {
 }
 
 export interface ScreenInfo {
-  emoji: string;
   title: string;
   desc: string;
 }

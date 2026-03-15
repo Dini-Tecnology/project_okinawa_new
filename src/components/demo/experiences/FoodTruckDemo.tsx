@@ -23,19 +23,19 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Retirada & avaliação', screens: ['ready', 'rating'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Descoberta', desc: 'Food trucks com localização em tempo real.' },
-  'map': { emoji: '', title: 'Mapa ao Vivo', desc: 'GPS em tempo real mostra onde cada truck está.' },
-  'truck-detail': { emoji: '', title: 'Taco Noowe', desc: 'Food truck mexicano com fila virtual.' },
-  'schedule': { emoji: '', title: 'Agenda', desc: 'Saiba onde o truck estará nos próximos dias.' },
-  'queue': { emoji: '', title: 'Fila Virtual', desc: 'Entre na fila pelo app e espere onde quiser.' },
-  'menu': { emoji: '', title: 'Cardápio', desc: 'Menu do dia com itens sazonais.' },
-  'item-detail': { emoji: '', title: 'Detalhes', desc: 'Personalize seu taco com extras.' },
-  'cart': { emoji: '', title: 'Carrinho', desc: 'Revise antes de confirmar.' },
-  'payment': { emoji: '', title: 'Pagamento', desc: 'Pague antecipado para agilizar.' },
-  'waiting': { emoji: '', title: 'Preparando', desc: 'Acompanhe o preparo em tempo real.' },
-  'ready': { emoji: '', title: 'Pronto!', desc: 'Retire no truck com seu código.' },
-  'rating': { emoji: '', title: 'Avaliação', desc: 'Avalie e ganhe stamps extras.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Food trucks com localização em tempo real.' },
+  'map': { title: 'Mapa ao Vivo', desc: 'GPS em tempo real mostra onde cada truck está.' },
+  'truck-detail': { title: 'Taco Noowe', desc: 'Food truck mexicano com fila virtual.' },
+  'schedule': { title: 'Agenda', desc: 'Saiba onde o truck estará nos próximos dias.' },
+  'queue': { title: 'Fila Virtual', desc: 'Entre na fila pelo app e espere onde quiser.' },
+  'menu': { title: 'Cardápio', desc: 'Menu do dia com itens sazonais.' },
+  'item-detail': { title: 'Detalhes', desc: 'Personalize seu taco com extras.' },
+  'cart': { title: 'Carrinho', desc: 'Revise antes de confirmar.' },
+  'payment': { title: 'Pagamento', desc: 'Pague antecipado para agilizar.' },
+  'waiting': { title: 'Preparando', desc: 'Acompanhe o preparo em tempo real.' },
+  'ready': { title: 'Pronto!', desc: 'Retire no truck com seu código.' },
+  'rating': { title: 'Avaliação', desc: 'Avalie e ganhe stamps extras.' },
 };
 
 const MENU = [

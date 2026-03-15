@@ -40,24 +40,24 @@ export const JOURNEY_STEPS = [
   { step: 11, label: 'Notificações', screens: ['notifications'] },
 ];
 
-export const SCREEN_INFO: Record<string, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Tela Inicial', desc: 'O cliente descobre restaurantes por proximidade, categoria e avaliação.' },
-  'restaurant': { emoji: '🍽️', title: 'Página do Restaurante', desc: 'Perfil completo com fotos, avaliações, features e acesso rápido ao cardápio e reservas.' },
-  'menu': { emoji: '📋', title: 'Cardápio Digital', desc: 'Menu digital com categorias, tags de alérgenos, tempo de preparo e harmonização IA.' },
-  'item': { emoji: '🍽️', title: 'Detalhe do Prato', desc: 'Detalhe do prato com foto, descrição e adição rápida à comanda.' },
-  'comanda': { emoji: '📝', title: 'Minha Comanda', desc: 'Revisão da comanda com ajuste de quantidades e convite de pessoas.' },
-  'fechar-conta': { emoji: '💳', title: 'Fechar Conta', desc: 'Fluxo integrado: veja quem está na mesa, convide pessoas, escolha dividir ou pagar tudo, selecione modo de divisão, gorjeta e método de pagamento — tudo em uma tela.' },
-  'order-status': { emoji: '👨‍🍳', title: 'Status do Pedido', desc: 'Acompanhamento em tempo real com status individual por item e nome do chef responsável.' },
-  'loyalty': { emoji: '🏆', title: 'Fidelidade', desc: 'Programa de pontos com níveis (Silver→Black), recompensas resgatáveis e histórico.' },
-  'reservations': { emoji: '📅', title: 'Reservas', desc: 'Reserva com convite de amigos, compartilhamento de link e código de confirmação.' },
-  'qr-scan': { emoji: '📷', title: 'QR Code', desc: 'Escaneamento do QR Code da mesa para associação automática.' },
-  'call-waiter': { emoji: '🙋', title: 'Chamar Equipe', desc: 'Chamada discreta: garçom, sommelier ou ajuda geral.' },
-  'profile': { emoji: '👤', title: 'Perfil', desc: 'Perfil do cliente com histórico, favoritos, nível de fidelidade e configurações.' },
-  'virtual-queue': { emoji: '⏱️', title: 'Fila Virtual', desc: 'Fila virtual para restaurantes lotados com acompanhamento em tempo real.' },
-  'my-orders': { emoji: '📦', title: 'Meus Pedidos', desc: 'Histórico de pedidos e pedido ativo.' },
-  'payment-success': { emoji: '✅', title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
-  'notifications': { emoji: '🔔', title: 'Notificações', desc: 'Convites para comanda, fila pronta, pontos ganhos, promoções e status de pedidos.' },
-  'ai-harmonization': { emoji: '🧠', title: 'Harmonização IA', desc: 'A IA sugere combinações perfeitas de pratos e bebidas baseado em suas preferências.' },
+export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
+  'home': { title: 'Tela Inicial', desc: 'O cliente descobre restaurantes por proximidade, categoria e avaliação.' },
+  'restaurant': { title: 'Página do Restaurante', desc: 'Perfil completo com fotos, avaliações, features e acesso rápido ao cardápio e reservas.' },
+  'menu': { title: 'Cardápio Digital', desc: 'Menu digital com categorias, tags de alérgenos, tempo de preparo e harmonização IA.' },
+  'item': { title: 'Detalhe do Prato', desc: 'Detalhe do prato com foto, descrição e adição rápida à comanda.' },
+  'comanda': { title: 'Minha Comanda', desc: 'Revisão da comanda com ajuste de quantidades e convite de pessoas.' },
+  'fechar-conta': { title: 'Fechar Conta', desc: 'Fluxo integrado: veja quem está na mesa, convide pessoas, escolha dividir ou pagar tudo, selecione modo de divisão, gorjeta e método de pagamento — tudo em uma tela.' },
+  'order-status': { title: 'Status do Pedido', desc: 'Acompanhamento em tempo real com status individual por item e nome do chef responsável.' },
+  'loyalty': { title: 'Fidelidade', desc: 'Programa de pontos com níveis (Silver→Black), recompensas resgatáveis e histórico.' },
+  'reservations': { title: 'Reservas', desc: 'Reserva com convite de amigos, compartilhamento de link e código de confirmação.' },
+  'qr-scan': { title: 'QR Code', desc: 'Escaneamento do QR Code da mesa para associação automática.' },
+  'call-waiter': { title: 'Chamar Equipe', desc: 'Chamada discreta: garçom, sommelier ou ajuda geral.' },
+  'profile': { title: 'Perfil', desc: 'Perfil do cliente com histórico, favoritos, nível de fidelidade e configurações.' },
+  'virtual-queue': { title: 'Fila Virtual', desc: 'Fila virtual para restaurantes lotados com acompanhamento em tempo real.' },
+  'my-orders': { title: 'Meus Pedidos', desc: 'Histórico de pedidos e pedido ativo.' },
+  'payment-success': { title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
+  'notifications': { title: 'Notificações', desc: 'Convites para comanda, fila pronta, pontos ganhos, promoções e status de pedidos.' },
+  'ai-harmonization': { title: 'Harmonização IA', desc: 'A IA sugere combinações perfeitas de pratos e bebidas baseado em suas preferências.' },
 };
 
 // ============ HOME ============
@@ -148,7 +148,7 @@ const NotificationsScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ on
     { id: 2, type: 'invite', title: 'Maria te convidou!', desc: 'Junte-se à comanda da Mesa 7 no Bistrô Noowe', time: '5 min', icon: UserPlus, color: 'bg-primary/10 text-primary', unread: true, action: 'Aceitar' },
     { id: 3, type: 'queue', title: 'Sua mesa está pronta!', desc: 'Bistrô Noowe · Mesa 12 está disponível', time: '12 min', icon: Timer, color: 'bg-warning/10 text-warning', unread: true },
     { id: 4, type: 'loyalty', title: '+125 pontos ganhos', desc: 'Visita ao Bistrô Noowe · Total: 1.250 pts', time: '2h', icon: Gift, color: 'bg-accent/10 text-accent' },
-    { id: 5, type: 'promo', title: '🎉 Happy Hour ativo!', desc: 'Drinks com 30% off até 19h no Bistrô Noowe', time: '3h', icon: Sparkles, color: 'bg-secondary/10 text-secondary' },
+    { id: 5, type: 'promo', title: 'Happy Hour ativo!', desc: 'Drinks com 30% off até 19h no Bistrô Noowe', time: '3h', icon: Sparkles, color: 'bg-secondary/10 text-secondary' },
     { id: 6, type: 'order', title: 'Seu pedido está pronto!', desc: 'Tartare de Atum e Filé ao Molho de Vinho', time: 'Ontem', icon: ChefHat, color: 'bg-primary/10 text-primary' },
   ];
   return (
@@ -1157,9 +1157,14 @@ const LoyaltyScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
         ))}
       </div>
       <h3 className="font-display font-semibold text-sm mb-3">Recompensas</h3>
-      {[{ name: 'Sobremesa grátis', points: 500, emoji: '🍰' }, { name: 'Drink da casa', points: 800, emoji: '🍸' }, { name: 'Entrada premium', points: 1200, emoji: '🥗' }, { name: 'Jantar para 2', points: 3000, emoji: '🍽️' }].map((reward, i) => (
+      {[
+        { name: 'Sobremesa grátis', points: 500, cat: 'dessert' },
+        { name: 'Drink da casa', points: 800, cat: 'cocktail' },
+        { name: 'Entrada premium', points: 1200, cat: 'salad' },
+        { name: 'Jantar para 2', points: 3000, cat: 'chef' },
+      ].map((reward, i) => (
         <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors mb-1">
-          <span className="text-2xl">{reward.emoji}</span>
+          <ItemIcon cat={reward.cat} size="sm" />
           <div className="flex-1"><p className="font-semibold text-sm">{reward.name}</p><p className="text-xs text-muted-foreground">{reward.points} pontos</p></div>
           <button className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${loyaltyPoints >= reward.points ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
             {loyaltyPoints >= reward.points ? 'Resgatar' : `${reward.points - loyaltyPoints} pts`}
