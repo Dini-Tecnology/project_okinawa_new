@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDemoContext, type DemoMenuItem } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import {
   ArrowLeft, ArrowRight, Search, MapPin, Star, Clock, Heart,
   Minus, Plus, X, ChevronRight, CreditCard,
@@ -698,60 +699,28 @@ const ComandaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
 // ============ ORDER STATUS ============
 
 const OrderStatusScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
-  const [elapsedMin, setElapsedMin] = useState(8);
-  useEffect(() => { const i = setInterval(() => setElapsedMin(p => p + 1), 30000); return () => clearInterval(i); }, []);
-  const orderItems = [
-    { name: 'Tartare de Atum', status: 'ready' as const, chef: 'Chef Marco', time: '12 min' },
-    { name: 'Filé ao Molho de Vinho', status: 'preparing' as const, chef: 'Chef Ana', time: '~8 min' },
-    { name: 'Crème Brûlée', status: 'pending' as const, chef: 'Pâtissier', time: '~20 min' },
-  ];
-  const statusConfig = {
-    ready: { label: 'Pronto', color: 'bg-success text-primary-foreground', icon: CheckCircle },
-    preparing: { label: 'Preparando', color: 'bg-warning text-primary-foreground', icon: ChefHat },
-    pending: { label: 'Na fila', color: 'bg-muted text-muted-foreground', icon: Clock },
-  };
   return (
-    <div className="pb-4">
-      <div className="bg-gradient-to-br from-primary to-accent p-5 pb-8">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={() => onNavigate('my-orders')} className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center"><ArrowLeft className="w-4 h-4 text-primary-foreground" /></button>
-          <span className="text-xs text-primary-foreground/70 font-medium">Pedido #2847</span>
-          <button onClick={() => onNavigate('call-waiter')} className="w-8 h-8 rounded-full bg-primary-foreground/20 flex items-center justify-center"><HandMetal className="w-4 h-4 text-primary-foreground" /></button>
-        </div>
-        <div className="text-center">
-          <div className="w-16 h-16 rounded-full bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3 animate-pulse"><ChefHat className="w-8 h-8 text-primary-foreground" /></div>
-          <h1 className="text-xl font-bold text-primary-foreground mb-1">Preparando seu pedido</h1>
-          <p className="text-sm text-primary-foreground/70">{elapsedMin} min decorridos · ETA ~15 min</p>
-        </div>
-      </div>
-      <div className="px-5 -mt-4">
-        <div className="bg-card rounded-2xl p-4 shadow-md border border-border mb-4">
-          <div className="flex justify-between text-xs text-muted-foreground mb-2"><span>Recebido</span><span>Preparando</span><span>Pronto</span><span>Entregue</span></div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style={{ width: '55%' }} /></div>
-        </div>
-      </div>
-      <div className="px-5">
-        <h2 className="font-semibold text-sm mb-3">Itens do pedido</h2>
-        <div className="space-y-2">
-          {orderItems.map((item, i) => {
-            const config = statusConfig[item.status];
-            const Icon = config.icon;
-            return (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card">
-                <div className={`w-9 h-9 rounded-lg ${config.color} flex items-center justify-center`}><Icon className="w-4 h-4" /></div>
-                <div className="flex-1"><p className="text-sm font-medium text-foreground">{item.name}</p><p className="text-xs text-muted-foreground">{item.chef} · {item.time}</p></div>
-                <span className={`px-2 py-1 rounded-lg text-[10px] font-semibold ${item.status === 'ready' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>{config.label}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="mt-5 p-4 rounded-xl bg-muted/30 flex items-center gap-3">
-          <Users className="w-5 h-5 text-primary" />
-          <div className="flex-1"><p className="text-sm font-semibold">Mesa 7 · 3 pessoas</p><p className="text-xs text-muted-foreground">Você, Maria e João</p></div>
-          <button onClick={() => onNavigate('fechar-conta')} className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold">Fechar Conta</button>
-        </div>
-      </div>
-    </div>
+    <DemoOrderStatus
+      title="Status do Pedido"
+      subtitle="Mesa 7 · Bistrô Noowe"
+      orderCode="#2847"
+      etaRange="8-20 min"
+      progress={55}
+      steps={ORDER_STEPS.fineDining}
+      activeStep={1}
+      items={[
+        { id: 1, name: 'Tartare de Atum', status: 'ready', eta: '12 min', chef: 'Chef Marco' },
+        { id: 2, name: 'Filé ao Molho de Vinho', status: 'preparing', eta: '~8 min', chef: 'Chef Ana' },
+        { id: 3, name: 'Crème Brûlée', status: 'pending', eta: '~20 min', chef: 'Pâtissier' },
+      ]}
+      onBack={() => onNavigate('comanda')}
+      tableInfo={{
+        label: 'Mesa 7 · 3 pessoas',
+        sublabel: 'Você, Maria e João',
+        actionLabel: 'Fechar Conta',
+        onAction: () => onNavigate('fechar-conta'),
+      }}
+    />
   );
 };
 

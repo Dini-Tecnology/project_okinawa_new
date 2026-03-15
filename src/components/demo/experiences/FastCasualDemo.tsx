@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
@@ -563,37 +564,23 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       );
 
     case 'prep-tracking':
-      const stages = [
-        { label: 'Pedido recebido', desc: 'Cozinha foi notificada', icon: '📩' },
-        { label: 'Preparando base', desc: `${baseItem.name} + ${proteinItem.name}`, icon: '🍳' },
-        { label: 'Montando toppings', desc: `${selectedToppings.length} ingredientes`, icon: '🥬' },
-        { label: 'Controle de qualidade', desc: 'Chef verificando seu bowl', icon: '👨‍🍳' },
-        { label: 'Pronto para retirada!', desc: 'Bandeja #42 · Seu nome está lá', icon: '✅' },
-      ];
       return (
-        <div className="px-5 pb-4">
-          <Header title="Preparando seu Bowl" back="payment" />
-          <div className="text-center mb-5">
-            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3 animate-pulse">
-              <span className="text-3xl">{stages[Math.min(prepStage, 4)].icon}</span>
-            </div>
-            <h2 className="font-display text-lg font-bold">{stages[Math.min(prepStage, 4)].label}</h2>
-            <p className="text-xs text-muted-foreground">{stages[Math.min(prepStage, 4)].desc}</p>
-          </div>
-          <div className="space-y-2">
-            {stages.map((stage, i) => (
-              <div key={i} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${i < prepStage ? 'bg-success/10 border border-success/20' : i === prepStage ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30 border border-transparent'}`}>
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${i < prepStage ? 'bg-success text-primary-foreground' : i === prepStage ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                  {i < prepStage ? <Check className="w-3.5 h-3.5" /> : i === prepStage ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : i + 1}
-                </div>
-                <div className="flex-1">
-                  <p className={`text-xs font-medium ${i <= prepStage ? 'text-foreground' : 'text-muted-foreground'}`}>{stage.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{stage.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <DemoOrderStatus
+          title="Preparando seu Bowl"
+          subtitle="Fast Casual · Montagem artesanal"
+          etaRange="8-10 min"
+          progress={Math.min(95, (prepStage / 5) * 100)}
+          steps={ORDER_STEPS.fastCasual}
+          activeStep={Math.min(prepStage, 4)}
+          items={[
+            { id: 'base', name: `${baseItem.name} + ${proteinItem.name}`, status: prepStage > 1 ? 'ready' : prepStage > 0 ? 'preparing' : 'queued', eta: '3 min' },
+            { id: 'toppings', name: `${selectedToppings.length} toppings selecionados`, status: prepStage > 2 ? 'ready' : prepStage > 1 ? 'preparing' : 'queued', eta: '2 min' },
+            { id: 'sauce', name: `${selectedSauces.length} molhos`, status: prepStage > 3 ? 'ready' : prepStage > 2 ? 'preparing' : 'queued', eta: '1 min' },
+          ]}
+          onBack={() => onNavigate('payment')}
+          pickupCode="#42"
+          helpOptions={['Alterar toppings', 'Verificar alérgenos', 'Falar com atendente']}
+        />
       );
 
     case 'ready':

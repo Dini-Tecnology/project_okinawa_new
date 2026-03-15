@@ -4,6 +4,7 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
@@ -544,50 +545,30 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       );
 
     case 'preparing': {
-      const stages = [
-        { label: 'Pedido recebido', icon: CheckCircle, desc: 'Enviado para a cozinha' },
-        { label: 'Preparando', icon: ChefHat, desc: 'Chef montando seu pedido' },
-        { label: 'Conferência', icon: Search, desc: 'Verificação de qualidade' },
-        { label: 'Pronto!', icon: Zap, desc: 'Disponível no balcão express' },
+      const prepItems = cart.length > 0 ? cart.map((c, i) => ({
+        id: c.id,
+        name: c.name,
+        status: (prepStage > i + 1 ? 'ready' : prepStage > i ? 'preparing' : 'queued') as 'ready' | 'preparing' | 'queued',
+        eta: `${Math.max(1, (estTime || 5) - prepStage * 2)} min`,
+        quantity: c.qty,
+      })) : [
+        { id: 'q1', name: 'Smash Burger Classic', status: 'preparing' as const, eta: '3 min', quantity: 1 },
+        { id: 'q5', name: 'Batata Frita G', status: 'queued' as const, eta: '4 min', quantity: 1 },
       ];
       return (
-        <div className="flex flex-col h-full">
-          <div className="bg-gradient-to-br from-primary to-accent p-5 pb-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-primary-foreground/20 flex items-center justify-center mx-auto mb-3 animate-pulse">
-              <ChefHat className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-lg font-bold text-primary-foreground">Preparando seu pedido</h1>
-            <p className="text-sm text-primary-foreground/70">Tempo estimado: ~{estTime || 5} min</p>
-          </div>
-
-          <div className="px-5 -mt-4 flex-1">
-            <div className="bg-card rounded-2xl p-5 shadow-md border border-border mb-4">
-              <p className="text-xs text-muted-foreground mb-3 text-center">Seu código de retirada</p>
-              <p className="font-display text-4xl font-bold tracking-widest text-primary text-center">NE-847</p>
-              <p className="text-xs text-muted-foreground mt-2 text-center">Balcão Express · NOOWE Express</p>
-            </div>
-
-            {/* Live stages */}
-            <div className="space-y-3">
-              {stages.map((stage, i) => {
-                const isActive = prepStage === i;
-                const isDone = prepStage > i;
-                return (
-                  <div key={i} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${isDone ? 'bg-success/10 border border-success/20' : isActive ? 'bg-primary/10 border border-primary/20' : 'bg-muted/30 border border-transparent'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isDone ? 'bg-success' : isActive ? 'bg-primary animate-pulse' : 'bg-muted'}`}>
-                      {isDone ? <Check className="w-4 h-4 text-primary-foreground" /> : <stage.icon className={`w-4 h-4 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'}`} />}
-                    </div>
-                    <div className="flex-1">
-                      <p className={`text-sm font-medium ${isDone ? 'text-success' : isActive ? 'text-primary' : 'text-muted-foreground'}`}>{stage.label}</p>
-                      <p className="text-[10px] text-muted-foreground">{stage.desc}</p>
-                    </div>
-                    {isActive && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <DemoOrderStatus
+          title="Preparo ao Vivo"
+          subtitle="NOOWE Express"
+          orderCode="NE-847"
+          etaRange={`~${estTime || 5} min`}
+          progress={Math.min(95, (prepStage / 4) * 100)}
+          steps={ORDER_STEPS.quickService}
+          activeStep={Math.min(prepStage, 3)}
+          items={prepItems}
+          onBack={() => onNavigate('payment')}
+          pickupCode="NE-847"
+          helpOptions={['Cancelar pedido', 'Alterar item', 'Falar com atendente']}
+        />
       );
     }
 
