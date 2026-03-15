@@ -130,7 +130,7 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         <div className="px-5 pb-4">
           <div className="pt-2 pb-4 flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Bom dia 👋</p>
+              <p className="text-sm text-muted-foreground">Bom dia</p>
               <h1 className="font-display text-xl font-bold">Pedido rápido</h1>
             </div>
             <button className="relative w-9 h-9 rounded-full bg-muted flex items-center justify-center">
