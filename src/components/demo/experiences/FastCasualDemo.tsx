@@ -323,7 +323,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-2">
             {PROTEINS.map(p => (
               <button key={p.id} onClick={() => setProtein(p.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${protein === p.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'}`}>
-                <span className="text-2xl">{p.emoji}</span>
+                <FoodImg id={p.imgId} size="sm" alt={p.name} />
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">{p.name}</p>
                   <p className="text-[10px] text-muted-foreground">{p.desc}</p>
