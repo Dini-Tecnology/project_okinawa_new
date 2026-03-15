@@ -291,7 +291,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {MENU.map(item => (
               <button key={item.id} onClick={() => onNavigate('cart')} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={MENU_CAT_MAP[item.cat] || item.cat.toLowerCase()} size="md" />
+                <FoodImg id={item.imgId} size="md" alt={item.name} />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-semibold text-sm">{item.name}</p>
