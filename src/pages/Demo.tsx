@@ -1,12 +1,16 @@
 /**
- * Demo Landing Page
+ * Demo Landing Page — Next Level
  * Entry point for the NOOWE Demo System
  */
 
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import { Smartphone, Monitor, ArrowRight, Utensils, Users, BarChart3, CreditCard, Star, ChefHat } from 'lucide-react';
+import {
+  Smartphone, Monitor, ArrowRight, Utensils, Users, BarChart3,
+  CreditCard, Star, ChefHat, QrCode, Timer, HandMetal, Gift,
+  Settings, BookOpen, UserPlus, CalendarDays, Sparkles, Shield,
+} from 'lucide-react';
 
 const Demo = () => {
   return (
@@ -22,9 +26,9 @@ const Demo = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5" />
           <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
           
-          <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20">
+          <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-16">
             {/* Nav */}
-            <div className="flex items-center justify-between mb-20">
+            <div className="flex items-center justify-between mb-16">
               <Link to="/" className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm font-display">N</span>
@@ -47,11 +51,11 @@ const Demo = () => {
               
               <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-6">
                 Experimente a NOOWE
-                <span className="block text-primary">na prática</span>
+                <span className="block text-gradient-primary">na prática</span>
               </h1>
               
               <p className="text-lg text-muted-foreground mb-12 max-w-xl mx-auto leading-relaxed">
-                Navegue pelo app como um cliente faria, ou opere o painel do restaurante com pedidos, mesas e analytics em tempo real.
+                Navegue pelo app como um cliente faria, ou opere o painel completo do restaurante com pedidos, equipe e analytics.
               </p>
             </div>
 
@@ -70,19 +74,22 @@ const Demo = () => {
                   </div>
                   <div>
                     <h2 className="font-display text-xl font-bold mb-1">Demo Cliente</h2>
-                    <p className="text-sm text-muted-foreground">Veja como seus clientes usariam o app</p>
+                    <p className="text-sm text-muted-foreground">A experiência completa do seu cliente</p>
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-8">
+                <div className="space-y-2.5 mb-8">
                   {[
-                    { icon: Utensils, text: 'Navegar o menu digital interativo' },
-                    { icon: CreditCard, text: 'Fazer pedido e pagar com split' },
-                    { icon: Star, text: 'Acumular pontos de fidelidade' },
-                    { icon: Users, text: 'Reservar mesa e convidar amigos' },
+                    { icon: Utensils, text: 'Menu digital interativo com harmonização IA' },
+                    { icon: QrCode, text: 'Escanear QR Code da mesa' },
+                    { icon: CreditCard, text: 'Pedido, pagamento e split de conta' },
+                    { icon: HandMetal, text: 'Chamar garçom ou sommelier discretamente' },
+                    { icon: Timer, text: 'Fila virtual com acompanhamento' },
+                    { icon: Gift, text: 'Programa de fidelidade com níveis' },
+                    { icon: CalendarDays, text: 'Reservas com convite de amigos' },
                   ].map(({ icon: Icon, text }, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <Icon className="w-4 h-4 text-primary/60" />
+                      <Icon className="w-4 h-4 text-primary/60 shrink-0" />
                       <span>{text}</span>
                     </div>
                   ))}
@@ -107,19 +114,22 @@ const Demo = () => {
                   </div>
                   <div>
                     <h2 className="font-display text-xl font-bold mb-1">Demo Restaurante</h2>
-                    <p className="text-sm text-muted-foreground">Opere o painel como dono ou gerente</p>
+                    <p className="text-sm text-muted-foreground">O painel completo para seu negócio</p>
                   </div>
                 </div>
 
-                <div className="space-y-3 mb-8">
+                <div className="space-y-2.5 mb-8">
                   {[
                     { icon: BarChart3, text: 'Dashboard com métricas em tempo real' },
                     { icon: Monitor, text: 'Mapa de mesas com status ao vivo' },
-                    { icon: ChefHat, text: 'KDS da cozinha e bar simulados' },
-                    { icon: Users, text: 'Gestão de reservas e fila virtual' },
+                    { icon: ChefHat, text: 'KDS de cozinha e bar simulados' },
+                    { icon: Settings, text: 'Configuração do restaurante e tipo de serviço' },
+                    { icon: UserPlus, text: 'Gestão de equipe, funções e escalas' },
+                    { icon: BookOpen, text: 'Editor de cardápio completo' },
+                    { icon: Users, text: 'Reservas e fila virtual' },
                   ].map(({ icon: Icon, text }, i) => (
                     <div key={i} className="flex items-center gap-3 text-sm text-muted-foreground">
-                      <Icon className="w-4 h-4 text-secondary/60" />
+                      <Icon className="w-4 h-4 text-secondary/60 shrink-0" />
                       <span>{text}</span>
                     </div>
                   ))}
@@ -141,15 +151,15 @@ const Demo = () => {
           </div>
         </section>
 
-        {/* Features preview strip */}
+        {/* Features strip */}
         <section className="border-t border-border bg-muted/30 py-12">
           <div className="max-w-6xl mx-auto px-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
               {[
-                { value: '16+', label: 'Telas interativas' },
-                { value: 'Real-time', label: 'Simulação ao vivo' },
+                { value: '14+', label: 'Telas do cliente' },
+                { value: '9', label: 'Módulos do restaurante' },
                 { value: '30+', label: 'Itens no menu' },
-                { value: '∞', label: 'Pedidos simulados' },
+                { value: 'Real-time', label: 'Simulação ao vivo' },
               ].map((stat, i) => (
                 <div key={i}>
                   <div className="font-display text-2xl font-bold text-foreground">{stat.value}</div>
