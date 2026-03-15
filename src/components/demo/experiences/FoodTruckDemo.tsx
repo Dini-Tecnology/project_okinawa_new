@@ -39,15 +39,15 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
 };
 
 const MENU = [
-  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos' },
-  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos' },
-  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos' },
-  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos' },
-  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas' },
-  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos' },
-  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, desc: 'Com doce de leite e canela', cat: 'Sobremesas' },
-  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas' },
-  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, desc: 'Arroz, canela e baunilha', cat: 'Bebidas' },
+  { id: 't1', name: 'Taco al Pastor (3un)', price: 35, cal: 480, desc: 'Carne suína marinada, abacaxi, coentro', popular: true, cat: 'Tacos', imgId: 'taco' },
+  { id: 't2', name: 'Taco de Carnitas (3un)', price: 38, cal: 520, desc: 'Carne desfiada, cebola roxa, limão', cat: 'Tacos', imgId: 'taco' },
+  { id: 't3', name: 'Taco Vegetariano (3un)', price: 30, cal: 350, desc: 'Cogumelos, pimentão, guacamole', cat: 'Tacos', imgId: 'taco' },
+  { id: 'b1', name: 'Burrito Carne Asada', price: 38, cal: 680, desc: 'Carne grelhada, arroz, feijão, queijo', cat: 'Burritos', imgId: 'burrito' },
+  { id: 'q1', name: 'Quesadilla Frango', price: 28, cal: 450, desc: 'Frango, queijo derretido, jalapeño', cat: 'Quesadillas', imgId: 'quesadilla' },
+  { id: 'n1', name: 'Nachos Supreme', price: 32, cal: 590, desc: 'Tortilla, carne, guacamole, sour cream', cat: 'Petiscos', imgId: 'nachos' },
+  { id: 'c1', name: 'Churros (4un)', price: 18, cal: 320, desc: 'Com doce de leite e canela', cat: 'Sobremesas', imgId: 'churros' },
+  { id: 'a1', name: 'Agua Fresca Hibisco', price: 12, cal: 80, desc: 'Hibisco com limão, sem açúcar', cat: 'Bebidas', imgId: 'hibiscus' },
+  { id: 'a2', name: 'Agua Fresca Horchata', price: 12, cal: 120, desc: 'Arroz, canela e baunilha', cat: 'Bebidas', imgId: 'horchata' },
 ];
 
 const MENU_CAT_MAP: Record<string, string> = {
