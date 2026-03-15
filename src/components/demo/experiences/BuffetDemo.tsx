@@ -23,17 +23,17 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Pagamento sem fila', screens: ['payment', 'payment-success'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre buffets por peso ou preço fixo.' },
-  'restaurant': { emoji: '🍽️', title: 'Sabores Noowe', desc: 'Buffet self-service com balança inteligente.' },
-  'checkin': { emoji: '📱', title: 'Check-in', desc: 'Check-in digital vincula sua comanda automaticamente.' },
-  'stations': { emoji: '🍖', title: 'Estações', desc: 'Veja o que está disponível em cada estação, ao vivo.' },
-  'scale': { emoji: '⚖️', title: 'Balança', desc: 'QR Code na balança registra o peso automaticamente.' },
-  'scale-history': { emoji: '📊', title: 'Pesagens', desc: 'Histórico de pesagens — volte quantas vezes quiser.' },
-  'drinks': { emoji: '🥤', title: 'Bebidas', desc: 'Peça bebidas pelo app — entregam na mesa.' },
-  'comanda': { emoji: '📝', title: 'Comanda', desc: 'Comanda ao vivo: comida por peso + bebidas + sobremesa.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague sem fila no caixa.' },
-  'payment-success': { emoji: '✅', title: 'Sucesso', desc: 'Pagamento confirmado com pontos e stamps.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre buffets por peso ou preço fixo.' },
+  'restaurant': { title: 'Sabores Noowe', desc: 'Buffet self-service com balança inteligente.' },
+  'checkin': { title: 'Check-in', desc: 'Check-in digital vincula sua comanda automaticamente.' },
+  'stations': { title: 'Estações', desc: 'Veja o que está disponível em cada estação, ao vivo.' },
+  'scale': { title: 'Balança', desc: 'QR Code na balança registra o peso automaticamente.' },
+  'scale-history': { title: 'Pesagens', desc: 'Histórico de pesagens — volte quantas vezes quiser.' },
+  'drinks': { title: 'Bebidas', desc: 'Peça bebidas pelo app — entregam na mesa.' },
+  'comanda': { title: 'Comanda', desc: 'Comanda ao vivo: comida por peso + bebidas + sobremesa.' },
+  'payment': { title: 'Pagamento', desc: 'Pague sem fila no caixa.' },
+  'payment-success': { title: 'Sucesso', desc: 'Pagamento confirmado com pontos e stamps.' },
 };
 
 const STATIONS = [
@@ -46,13 +46,13 @@ const STATIONS = [
 ];
 
 const DRINK_MENU = [
-  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, emoji: '🧃', cat: 'Sucos' },
-  { id: 'd2', name: 'Suco Verde Detox', price: 15, emoji: '🥬', cat: 'Sucos' },
-  { id: 'd3', name: 'Refrigerante Lata', price: 8, emoji: '🥤', cat: 'Refrigerantes' },
-  { id: 'd4', name: 'Água Mineral', price: 6, emoji: '💧', cat: 'Água' },
-  { id: 'd5', name: 'Água com Gás', price: 7, emoji: '🫧', cat: 'Água' },
-  { id: 'd6', name: 'Cerveja Artesanal', price: 18, emoji: '🍺', cat: 'Cervejas' },
-  { id: 'd7', name: 'Taça de Vinho', price: 22, emoji: '🍷', cat: 'Vinhos' },
+  { id: 'd1', name: 'Suco Natural (500ml)', price: 12, iconCat: 'juice', cat: 'Sucos' },
+  { id: 'd2', name: 'Suco Verde Detox', price: 15, iconCat: 'juice', cat: 'Sucos' },
+  { id: 'd3', name: 'Refrigerante Lata', price: 8, iconCat: 'soda', cat: 'Refrigerantes' },
+  { id: 'd4', name: 'Água Mineral', price: 6, iconCat: 'water', cat: 'Água' },
+  { id: 'd5', name: 'Água com Gás', price: 7, iconCat: 'water', cat: 'Água' },
+  { id: 'd6', name: 'Cerveja Artesanal', price: 18, iconCat: 'beer', cat: 'Cervejas' },
+  { id: 'd7', name: 'Taça de Vinho', price: 22, iconCat: 'wine', cat: 'Vinhos' },
 ];
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }

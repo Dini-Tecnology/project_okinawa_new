@@ -19,26 +19,26 @@ interface CartItem {
   id: string;
   name: string;
   price: number;
-  emoji: string;
+  iconCat: string;
   customizations?: string[];
   isRefill?: boolean;
 }
 
 const CAFE_MENU = [
-  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', emoji: '☕', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
-  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', emoji: '☕', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
-  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', emoji: '☕', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
-  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', emoji: '🥛', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
-  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', emoji: '🧊', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
-  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', emoji: '🍵', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
-  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', emoji: '🌼', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
-  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', emoji: '🍵', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
-  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', emoji: '🥐', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
-  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', emoji: '🧀', refill: false, desc: 'Pão de queijo mineiro quentinho' },
-  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', emoji: '🥪', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
-  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', emoji: '🥧', refill: false, desc: 'Torta caseira com canela e sorvete' },
-  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', emoji: '🍫', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
-  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', emoji: '🍪', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
+  { id: 'c1', name: 'Espresso', price: 8, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso duplo, grãos torrados na casa' },
+  { id: 'c2', name: 'Cappuccino', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso, leite vaporizado e espuma cremosa' },
+  { id: 'c3', name: 'Café Filtrado', price: 10, cat: 'Cafés', iconCat: 'coffee', refill: true, desc: 'Coado na hora, blend da casa. Refil R$ 5', customizable: true },
+  { id: 'c4', name: 'Latte', price: 18, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Espresso com leite cremoso, opção de flavors', customizable: true },
+  { id: 'c5', name: 'Cold Brew', price: 16, cat: 'Cafés', iconCat: 'coffee', refill: false, desc: 'Café extraído a frio por 24h, suave e refrescante' },
+  { id: 'c6', name: 'Chá Verde', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Chá verde premium. Refil R$ 5' },
+  { id: 'c7', name: 'Chá de Camomila', price: 12, cat: 'Chás', iconCat: 'tea', refill: true, desc: 'Camomila orgânica. Refil R$ 5' },
+  { id: 'c8', name: 'Matcha Latte', price: 20, cat: 'Chás', iconCat: 'tea', refill: false, desc: 'Matcha japonês com leite de aveia', customizable: true },
+  { id: 'c9', name: 'Croissant Misto', price: 14, cat: 'Salgados', iconCat: 'bread', refill: false, desc: 'Croissant artesanal com queijo e presunto' },
+  { id: 'c10', name: 'Pão de Queijo (6un)', price: 12, cat: 'Salgados', iconCat: 'cheese', refill: false, desc: 'Pão de queijo mineiro quentinho' },
+  { id: 'c11', name: 'Sanduíche Caprese', price: 22, cat: 'Salgados', iconCat: 'sandwich', refill: false, desc: 'Mussarela de búfala, tomate, manjericão, pesto' },
+  { id: 'c12', name: 'Torta de Maçã', price: 16, cat: 'Doces', iconCat: 'dessert', refill: false, desc: 'Torta caseira com canela e sorvete' },
+  { id: 'c13', name: 'Brownie', price: 14, cat: 'Doces', iconCat: 'brownie', refill: false, desc: 'Brownie de chocolate 70% com nozes' },
+  { id: 'c14', name: 'Cookie & Cream', price: 12, cat: 'Doces', iconCat: 'cookie', refill: false, desc: 'Cookie artesanal com sorvete de baunilha' },
 ];
 
 const MILK_OPTIONS = ['Integral', 'Desnatado', 'Aveia', 'Amêndoas', 'Coco'];
@@ -59,16 +59,16 @@ export const JOURNEY_STEPS = [
   { step: 6, label: 'Pagamento', screens: ['payment', 'payment-success'] },
 ];
 
-export const SCREEN_INFO: Record<string, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '🏠', title: 'Descoberta', desc: 'Encontre cafeterias por Wi-Fi, tomadas, nível de ruído e pet friendly.' },
-  'restaurant': { emoji: '☕', title: 'Café Noowe', desc: 'Cafeteria work-friendly com Wi-Fi 150Mbps, tomadas em todas as mesas e personalização completa de bebidas.' },
-  'qr-scan': { emoji: '📷', title: 'QR da Mesa', desc: 'Escaneie o QR Code da mesa e peça sem sair do lugar. Identifica automaticamente tomadas disponíveis.' },
-  'work-mode': { emoji: '💻', title: 'Modo Trabalho', desc: 'Dashboard com Wi-Fi (senha copiável), velocidade, nível de ruído em tempo real, tomadas e timer de sessão.' },
-  'menu': { emoji: '📋', title: 'Cardápio', desc: 'Cafés especiais, chás, salgados e doces. Itens com refil marcados. Personalização completa de bebidas.' },
-  'customize': { emoji: '🎨', title: 'Personalizar Bebida', desc: 'Leite (integral, aveia, amêndoas), tamanho (P/M/G), temperatura, sabor extra e intensidade.' },
-  'comanda': { emoji: '📝', title: 'Comanda', desc: 'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.' },
-  'payment': { emoji: '💳', title: 'Pagamento', desc: 'Pague quando quiser ir embora. PIX, cartão, Apple Pay ou carteira NOOWE.' },
-  'payment-success': { emoji: '✅', title: 'Conta Fechada', desc: 'Pagamento confirmado com stamp card: a cada 10 cafés, o próximo é grátis.' },
+export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Encontre cafeterias por Wi-Fi, tomadas, nível de ruído e pet friendly.' },
+  'restaurant': { title: 'Café Noowe', desc: 'Cafeteria work-friendly com Wi-Fi 150Mbps, tomadas em todas as mesas e personalização completa de bebidas.' },
+  'qr-scan': { title: 'QR da Mesa', desc: 'Escaneie o QR Code da mesa e peça sem sair do lugar. Identifica automaticamente tomadas disponíveis.' },
+  'work-mode': { title: 'Modo Trabalho', desc: 'Dashboard com Wi-Fi (senha copiável), velocidade, nível de ruído em tempo real, tomadas e timer de sessão.' },
+  'menu': { title: 'Cardápio', desc: 'Cafés especiais, chás, salgados e doces. Itens com refil marcados. Personalização completa de bebidas.' },
+  'customize': { title: 'Personalizar Bebida', desc: 'Leite (integral, aveia, amêndoas), tamanho (P/M/G), temperatura, sabor extra e intensidade.' },
+  'comanda': { title: 'Comanda', desc: 'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.' },
+  'payment': { title: 'Pagamento', desc: 'Pague quando quiser ir embora. PIX, cartão, Apple Pay ou carteira NOOWE.' },
+  'payment-success': { title: 'Conta Fechada', desc: 'Pagamento confirmado com stamp card: a cada 10 cafés, o próximo é grátis.' },
 };
 
 interface Props { onNavigate: (s: string) => void; screen: string; }

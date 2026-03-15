@@ -25,20 +25,20 @@ export const JOURNEY_STEPS = [
   { step: 9, label: 'Foto & encerramento', screens: ['photo', 'finale'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Experiências', desc: 'Descubra experiências gastronômicas exclusivas.' },
-  'detail': { emoji: '', title: 'Mesa do Chef', desc: 'Jantar exclusivo para 8 com Chef Ricardo Oliveira.' },
-  'reservation': { emoji: '', title: 'Reserva', desc: 'Escolha data, convidados e garanta sua vaga.' },
-  'dietary': { emoji: '', title: 'Dieta', desc: 'Alergias, restrições e preferências alimentares.' },
-  'wine-pref': { emoji: '', title: 'Vinhos', desc: 'Perfil de preferências para harmonização.' },
-  'payment': { emoji: '', title: 'Pagamento', desc: 'Pré-pagamento integral para confirmação.' },
-  'countdown': { emoji: '', title: 'Contagem', desc: 'Faltam poucos dias para sua experiência.' },
-  'welcome': { emoji: '', title: 'Boas-vindas', desc: 'Recepção com champagne e apresentação.' },
-  'course-1': { emoji: '', title: 'Amuse-Bouche', desc: 'Primeiro curso com história do chef.' },
-  'course-2': { emoji: '', title: 'Prato Principal', desc: 'Wagyu A5 com harmonização do sommelier.' },
-  'course-3': { emoji: '', title: 'Sobremesa', desc: 'Grand finale com soufflé e espumante.' },
-  'photo': { emoji: '', title: 'Foto', desc: 'Registro com o chef e menu assinado.' },
-  'finale': { emoji: '', title: 'Certificado', desc: 'Certificado digital e avaliação da experiência.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Experiências', desc: 'Descubra experiências gastronômicas exclusivas.' },
+  'detail': { title: 'Mesa do Chef', desc: 'Jantar exclusivo para 8 com Chef Ricardo Oliveira.' },
+  'reservation': { title: 'Reserva', desc: 'Escolha data, convidados e garanta sua vaga.' },
+  'dietary': { title: 'Dieta', desc: 'Alergias, restrições e preferências alimentares.' },
+  'wine-pref': { title: 'Vinhos', desc: 'Perfil de preferências para harmonização.' },
+  'payment': { title: 'Pagamento', desc: 'Pré-pagamento integral para confirmação.' },
+  'countdown': { title: 'Contagem', desc: 'Faltam poucos dias para sua experiência.' },
+  'welcome': { title: 'Boas-vindas', desc: 'Recepção com champagne e apresentação.' },
+  'course-1': { title: 'Amuse-Bouche', desc: 'Primeiro curso com história do chef.' },
+  'course-2': { title: 'Prato Principal', desc: 'Wagyu A5 com harmonização do sommelier.' },
+  'course-3': { title: 'Sobremesa', desc: 'Grand finale com soufflé e espumante.' },
+  'photo': { title: 'Foto', desc: 'Registro com o chef e menu assinado.' },
+  'finale': { title: 'Certificado', desc: 'Certificado digital e avaliação da experiência.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }

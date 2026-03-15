@@ -23,18 +23,18 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Retirada & avaliação', screens: ['pickup', 'done'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Descoberta', desc: 'Peça no caminho sem sair do carro.' },
-  'restaurant': { emoji: '', title: 'NOOWE Drive', desc: 'Drive-thru inteligente com GPS.' },
-  'menu': { emoji: '', title: 'Menu Drive', desc: 'Combos e individuais otimizados para levar.' },
-  'customize': { emoji: '', title: 'Personalizar', desc: 'Customize ingredientes, extras e observações.' },
-  'cart': { emoji: '', title: 'Carrinho', desc: 'Revise e confirme antes de pagar.' },
-  'payment': { emoji: '', title: 'Pagamento', desc: 'Pague antecipado — retirada express.' },
-  'gps-tracking': { emoji: '', title: 'GPS Ativo', desc: 'Rastreamento em tempo real da sua aproximação.' },
-  'geofence': { emoji: '', title: 'Geofencing', desc: 'A 500m, a cozinha finaliza seu pedido.' },
-  'lane-assign': { emoji: '', title: 'Pista Designada', desc: 'Siga para a pista indicada pelo app.' },
-  'pickup': { emoji: '', title: 'Retirada', desc: 'Pedido pronto e pago — retire na janela.' },
-  'done': { emoji: '', title: 'Concluído', desc: 'Entrega sem espera. Avalie a experiência.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Peça no caminho sem sair do carro.' },
+  'restaurant': { title: 'NOOWE Drive', desc: 'Drive-thru inteligente com GPS.' },
+  'menu': { title: 'Menu Drive', desc: 'Combos e individuais otimizados para levar.' },
+  'customize': { title: 'Personalizar', desc: 'Customize ingredientes, extras e observações.' },
+  'cart': { title: 'Carrinho', desc: 'Revise e confirme antes de pagar.' },
+  'payment': { title: 'Pagamento', desc: 'Pague antecipado — retirada express.' },
+  'gps-tracking': { title: 'GPS Ativo', desc: 'Rastreamento em tempo real da sua aproximação.' },
+  'geofence': { title: 'Geofencing', desc: 'A 500m, a cozinha finaliza seu pedido.' },
+  'lane-assign': { title: 'Pista Designada', desc: 'Siga para a pista indicada pelo app.' },
+  'pickup': { title: 'Retirada', desc: 'Pedido pronto e pago — retire na janela.' },
+  'done': { title: 'Concluído', desc: 'Entrega sem espera. Avalie a experiência.' },
 };
 
 const MENU_ITEMS = [

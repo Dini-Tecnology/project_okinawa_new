@@ -33,22 +33,22 @@ export const JOURNEY_STEPS = [
   { step: 9, label: 'Avaliação & fidelidade', screens: ['review'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Descoberta', desc: 'Restaurantes casuais com filtros inteligentes.' },
-  'restaurant': { emoji: '', title: 'Cantina Noowe', desc: 'Perfil completo com fotos, avaliações e badges.' },
-  'entry-choice': { emoji: '', title: 'Entrada', desc: 'Walk-in com fila inteligente ou reserva antecipada.' },
-  'waitlist': { emoji: '', title: 'Lista de Espera', desc: 'Posição em tempo real com notificação push.' },
-  'waitlist-bar': { emoji: '', title: 'Pedir na Espera', desc: 'Peça drinks enquanto aguarda — vai pra comanda.' },
-  'family-mode': { emoji: '', title: 'Modo Família', desc: 'Cardápio kids, cadeirão e kit de atividades.' },
-  'family-activities': { emoji: '', title: 'Atividades Kids', desc: 'Jogos e colorir enquanto espera a comida.' },
-  'menu': { emoji: '', title: 'Cardápio', desc: 'Menu com alérgenos, popularidade e fotos.' },
-  'item-detail': { emoji: '', title: 'Detalhe do Prato', desc: 'Ingredientes, alérgenos e personalização.' },
-  'comanda': { emoji: '', title: 'Comanda', desc: 'Pedidos organizados por pessoa da mesa.' },
-  'split': { emoji: '', title: 'Dividir Conta', desc: '4 modos: meus itens, igual, por item, valor fixo.' },
-  'split-by-item': { emoji: '', title: 'Divisão por Item', desc: 'Arraste itens para cada pessoa.' },
-  'tip': { emoji: '', title: 'Gorjeta', desc: 'Gorjeta sugerida com base no serviço.' },
-  'payment-success': { emoji: '', title: 'Pagamento', desc: 'Confirmação com pontos de fidelidade.' },
-  'review': { emoji: '', title: 'Avaliação', desc: 'Avalie comida, serviço e ambiente.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Restaurantes casuais com filtros inteligentes.' },
+  'restaurant': { title: 'Cantina Noowe', desc: 'Perfil completo com fotos, avaliações e badges.' },
+  'entry-choice': { title: 'Entrada', desc: 'Walk-in com fila inteligente ou reserva antecipada.' },
+  'waitlist': { title: 'Lista de Espera', desc: 'Posição em tempo real com notificação push.' },
+  'waitlist-bar': { title: 'Pedir na Espera', desc: 'Peça drinks enquanto aguarda — vai pra comanda.' },
+  'family-mode': { title: 'Modo Família', desc: 'Cardápio kids, cadeirão e kit de atividades.' },
+  'family-activities': { title: 'Atividades Kids', desc: 'Jogos e colorir enquanto espera a comida.' },
+  'menu': { title: 'Cardápio', desc: 'Menu com alérgenos, popularidade e fotos.' },
+  'item-detail': { title: 'Detalhe do Prato', desc: 'Ingredientes, alérgenos e personalização.' },
+  'comanda': { title: 'Comanda', desc: 'Pedidos organizados por pessoa da mesa.' },
+  'split': { title: 'Dividir Conta', desc: '4 modos: meus itens, igual, por item, valor fixo.' },
+  'split-by-item': { title: 'Divisão por Item', desc: 'Arraste itens para cada pessoa.' },
+  'tip': { title: 'Gorjeta', desc: 'Gorjeta sugerida com base no serviço.' },
+  'payment-success': { title: 'Pagamento', desc: 'Confirmação com pontos de fidelidade.' },
+  'review': { title: 'Avaliação', desc: 'Avalie comida, serviço e ambiente.' },
 };
 
 interface MenuItem {

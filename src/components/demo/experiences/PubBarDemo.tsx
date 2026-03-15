@@ -29,21 +29,21 @@ export const JOURNEY_STEPS = [
   { step: 9, label: 'Fechar Tab', screens: ['close-tab', 'tab-success'] },
 ];
 
-export const SCREEN_INFO: Record<Screen, { emoji: string; title: string; desc: string }> = {
-  'home': { emoji: '', title: 'Descoberta', desc: 'Bares com tab digital e happy hour ativo.' },
-  'restaurant': { emoji: '', title: 'Noowe Tap House', desc: 'Pub com 20 torneiras e tab digital.' },
-  'open-tab': { emoji: '', title: 'Abrir Tab', desc: 'Pré-autorização no cartão — paga só o que beber.' },
-  'group-tab': { emoji: '', title: 'Tab Compartilhado', desc: 'Amigos entram no tab e registram seus pedidos.' },
-  'happy-hour': { emoji: '', title: 'Happy Hour', desc: 'Descontos automáticos em chopp e drinks.' },
-  'tap-list': { emoji: '', title: 'Torneiras', desc: 'Lista completa com ABV, IBU e estilo.' },
-  'drink-detail': { emoji: '', title: 'Detalhe', desc: 'Ficha completa do chopp ou drink.' },
-  'round-builder': { emoji: '', title: 'Montar Rodada', desc: 'Monte a rodada para todo o grupo.' },
-  'round-confirm': { emoji: '', title: 'Rodada Enviada', desc: 'Pedido confirmado no balcão.' },
-  'repeat-round': { emoji: '', title: 'Repetir Rodada', desc: 'Mesmo pedido com um toque.' },
-  'tab-live': { emoji: '', title: 'Tab ao Vivo', desc: 'Consumo em tempo real por pessoa.' },
-  'tab-limit': { emoji: '', title: 'Alerta de Limite', desc: 'Defina limites de gasto no tab.' },
-  'close-tab': { emoji: '', title: 'Fechar Tab', desc: 'Divisão por consumo ou igual.' },
-  'tab-success': { emoji: '', title: 'Tab Fechado', desc: 'Resumo final com pontos ganhos.' },
+export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
+  'home': { title: 'Descoberta', desc: 'Bares com tab digital e happy hour ativo.' },
+  'restaurant': { title: 'Noowe Tap House', desc: 'Pub com 20 torneiras e tab digital.' },
+  'open-tab': { title: 'Abrir Tab', desc: 'Pré-autorização no cartão — paga só o que beber.' },
+  'group-tab': { title: 'Tab Compartilhado', desc: 'Amigos entram no tab e registram seus pedidos.' },
+  'happy-hour': { title: 'Happy Hour', desc: 'Descontos automáticos em chopp e drinks.' },
+  'tap-list': { title: 'Torneiras', desc: 'Lista completa com ABV, IBU e estilo.' },
+  'drink-detail': { title: 'Detalhe', desc: 'Ficha completa do chopp ou drink.' },
+  'round-builder': { title: 'Montar Rodada', desc: 'Monte a rodada para todo o grupo.' },
+  'round-confirm': { title: 'Rodada Enviada', desc: 'Pedido confirmado no balcão.' },
+  'repeat-round': { title: 'Repetir Rodada', desc: 'Mesmo pedido com um toque.' },
+  'tab-live': { title: 'Tab ao Vivo', desc: 'Consumo em tempo real por pessoa.' },
+  'tab-limit': { title: 'Alerta de Limite', desc: 'Defina limites de gasto no tab.' },
+  'close-tab': { title: 'Fechar Tab', desc: 'Divisão por consumo ou igual.' },
+  'tab-success': { title: 'Tab Fechado', desc: 'Resumo final com pontos ganhos.' },
 };
 
 interface Drink {
