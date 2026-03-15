@@ -293,7 +293,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="px-5 space-y-2">
             {BASES.map(b => (
               <button key={b.id} onClick={() => setBase(b.id)} className={`w-full flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all ${base === b.id ? 'border-primary bg-primary/10 shadow-sm' : 'border-border bg-card'}`}>
-                <span className="text-2xl">{b.emoji}</span>
+                <FoodImg id={b.imgId} size="sm" alt={b.name} />
                 <div className="flex-1 text-left">
                   <p className="font-semibold text-sm">{b.name}</p>
                   <p className="text-[10px] text-muted-foreground">{b.desc}</p>
