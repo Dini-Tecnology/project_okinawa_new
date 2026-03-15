@@ -485,7 +485,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             {BOTTLES.map(bottle => (
               <button key={bottle.id} onClick={() => { setSelectedBottle(bottle); onNavigate('bottle-detail'); }}
                 className="w-full flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={bottle.iconCat} size="md" />
+                <FoodImg id={bottle.imgId} size="md" alt={bottle.name} />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm">{bottle.name}</p>
                   <p className="text-[10px] text-muted-foreground">{bottle.desc}</p>
