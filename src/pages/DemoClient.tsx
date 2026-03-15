@@ -66,7 +66,7 @@ type NavTab = 'explore' | 'orders' | 'scan' | 'loyalty' | 'profile';
 
 const getNavTab = (screen: Screen): NavTab => {
   if (['home', 'restaurant'].includes(screen)) return 'explore';
-  if (['menu', 'item', 'comanda', 'fechar-conta', 'split-by-item', 'order-status', 'my-orders', 'call-waiter', 'payment-success', 'ai-harmonization'].includes(screen)) return 'orders';
+  if (['menu', 'item', 'comanda', 'fechar-conta', 'order-status', 'my-orders', 'call-waiter', 'payment-success', 'ai-harmonization'].includes(screen)) return 'orders';
   if (['qr-scan'].includes(screen)) return 'scan';
   if (['loyalty'].includes(screen)) return 'loyalty';
   if (['profile', 'reservations', 'virtual-queue', 'notifications'].includes(screen)) return 'profile';
