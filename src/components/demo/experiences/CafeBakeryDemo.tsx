@@ -20,6 +20,7 @@ interface CartItem {
   name: string;
   price: number;
   iconCat: string;
+  imgId: string;
   customizations?: string[];
   isRefill?: boolean;
 }
