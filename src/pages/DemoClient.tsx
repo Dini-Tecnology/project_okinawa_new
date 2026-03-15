@@ -57,7 +57,7 @@ const GuidedHint: React.FC<{ text: string; pulse?: boolean }> = ({ text, pulse =
 
 type Screen =
   | 'home' | 'restaurant' | 'menu' | 'item' | 'comanda'
-  | 'fechar-conta' | 'split-by-item'
+  | 'fechar-conta'
   | 'order-status' | 'loyalty' | 'reservations'
   | 'qr-scan' | 'call-waiter' | 'profile' | 'virtual-queue' | 'my-orders'
   | 'payment-success' | 'notifications' | 'ai-harmonization';
