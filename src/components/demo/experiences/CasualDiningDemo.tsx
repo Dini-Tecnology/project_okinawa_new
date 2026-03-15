@@ -515,7 +515,7 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="space-y-2">
             {filtered.map(item => (
               <button key={item.id} onClick={() => { setSelectedItem(item); onNavigate('item-detail'); }} className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
-                <ItemIcon cat={MENU_CAT_MAP[item.cat] || item.cat.toLowerCase()} size="md" />
+                <FoodImg id={item.imgId || 'food-generic'} size="md" alt={item.name} />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <p className="font-semibold text-sm truncate">{item.name}</p>
