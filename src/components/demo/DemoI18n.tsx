@@ -3548,7 +3548,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Dividir': 'Dividir',
     'Dois blends 150g, duplo cheddar, bacon crocante, molho especial': 'Dos blends 150g, doble cheddar, tocino crocante, salsa especial',
     'Don Julio Reposado': 'Don Julio Reposado',
-    'Drink da casa': 'Trago de la casa',
+    // 'Drink da casa' — moved to Fine Dining section
     'Drink pronto — retire no bar indicado.': 'Trago listo — retira en el bar indicado.',
     'Drinks': 'Tragos',
     'Drinks e boa companhia': 'Tragos y buena compañía',
