@@ -1174,8 +1174,8 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Enviar Avaliação': 'Submit Review',
     'Escolha até 2 molhos artesanais': 'Choose up to 2 artisan sauces',
     'Fast Food Premium · Tempo médio 5 min': 'Premium Fast Food · Average time 5 min',
+    'Fast Casual · Bowls · Wraps · Sucos': 'Fast Casual · Bowls · Wraps · Juices',
     'Foto com Chef Ricardo': 'Photo with Chef Ricardo',
-    'Garçom exclusivo + mixers cortesia': 'Exclusive waiter + complimentary mixers',
     'Grátis': 'Free',
     'Grátis ilimitados · Premium com custo extra': 'Unlimited free · Premium at extra cost',
     'HH até 20:00': 'HH until 8:00 PM',
@@ -3500,9 +3500,9 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Estorno': 'Reembolso',
     'Exclusividade absoluta': 'Exclusividad absoluta',
     'Fast Casual · Montagem artesanal': 'Fast Casual · Montaje artesanal',
+    'Fast Casual · Bowls · Wraps · Sucos': 'Fast Casual · Bowls · Wraps · Jugos',
     'Fast Food Premium · R$ · 350m': 'Fast Food Premium · $$ · 350m',
     'Fechamento e métricas do dia': 'Cierre y métricas del día',
-    'Ficha do chopp: ABV, IBU, harmonização.': 'Ficha del chopp: ABV, IBU, maridaje.',
     'Fichas técnicas de drinks': 'Fichas técnicas de tragos',
     'Fila de drinks e pedidos do bar': 'Fila de tragos y pedidos del bar',
     'Filé': 'Filete',
@@ -4066,10 +4066,27 @@ function applyReplacements(text: string, replacements: ReplacementRule[]) {
   return replacements.reduce((acc, [pattern, replacement]) => acc.replace(pattern, replacement), text);
 }
 
+function normalizeTranslationKey(text: string) {
+  return text.replace(/\s+/g, ' ').trim();
+}
+
+const NORMALIZED_EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, string>> = {
+  en: Object.fromEntries(
+    Object.entries(EXACT_TEXT_TRANSLATIONS.en).map(([key, value]) => [normalizeTranslationKey(key), value]),
+  ),
+  es: Object.fromEntries(
+    Object.entries(EXACT_TEXT_TRANSLATIONS.es).map(([key, value]) => [normalizeTranslationKey(key), value]),
+  ),
+};
+
+function getExactTranslation(text: string, lang: Exclude<DemoLang, 'pt'>) {
+  return EXACT_TEXT_TRANSLATIONS[lang][text] ?? NORMALIZED_EXACT_TEXT_TRANSLATIONS[lang][normalizeTranslationKey(text)];
+}
+
 export function translateDemoText(text: string, lang: DemoLang): string {
   if (!text || lang === 'pt') return text;
 
-  const exact = EXACT_TEXT_TRANSLATIONS[lang as Exclude<DemoLang, 'pt'>]?.[text];
+  const exact = getExactTranslation(text, lang as Exclude<DemoLang, 'pt'>);
   if (exact) return exact;
 
   const replacements = lang === 'en' ? EN_REPLACEMENTS : ES_REPLACEMENTS;
@@ -4129,8 +4146,16 @@ export function DemoAutoTranslate({ children }: { children: ReactNode }) {
       for (const attr of TRANSLATABLE_ATTRS) {
         const current = element.getAttribute(attr);
         if (!current || !current.trim()) continue;
-        if (!(attr in originals)) originals[attr] = current;
-        const translated = translateDemoText(originals[attr], lang);
+
+        const storedOriginal = originals[attr];
+        const storedTranslated = storedOriginal ? translateDemoText(storedOriginal, lang) : null;
+        const nextOriginal = !storedOriginal || (current !== storedOriginal && current !== storedTranslated)
+          ? current
+          : storedOriginal;
+
+        originals[attr] = nextOriginal;
+
+        const translated = translateDemoText(nextOriginal, lang);
         if (current !== translated) {
           element.setAttribute(attr, translated);
         }
@@ -4144,9 +4169,16 @@ export function DemoAutoTranslate({ children }: { children: ReactNode }) {
         const textNode = node as Text;
         const currentText = textNode.nodeValue ?? '';
         if (!currentText.trim()) return;
-        if (!textMapRef.current.has(textNode)) textMapRef.current.set(textNode, currentText);
-        const original = textMapRef.current.get(textNode) ?? currentText;
-        const translated = translateDemoText(original, lang);
+
+        const storedOriginal = textMapRef.current.get(textNode);
+        const storedTranslated = storedOriginal ? translateDemoText(storedOriginal, lang) : null;
+        const nextOriginal = !storedOriginal || (currentText !== storedOriginal && currentText !== storedTranslated)
+          ? currentText
+          : storedOriginal;
+
+        textMapRef.current.set(textNode, nextOriginal);
+
+        const translated = translateDemoText(nextOriginal, lang);
         if (textNode.nodeValue !== translated) {
           textNode.nodeValue = translated;
         }
