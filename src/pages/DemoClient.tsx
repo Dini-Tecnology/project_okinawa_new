@@ -76,7 +76,7 @@ const DemoClientInner = () => {
   const [serviceType, setServiceType] = useState('fine-dining');
   const [currentScreen, setCurrentScreen] = useState('home');
   const { cart } = useDemoContext();
-  const { t } = useDemoI18n();
+  const { t, translateText } = useDemoI18n();
   const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
 
   const config = DEMO_REGISTRY[serviceType];
@@ -88,7 +88,11 @@ const DemoClientInner = () => {
   }, [serviceType]);
 
   const activeServiceType = SERVICE_TYPES.find(s => s.id === serviceType);
-  const info = config?.info[currentScreen] || { title: 'Demo', desc: '' };
+  const rawInfo = config?.info[currentScreen] || { title: 'Demo', desc: '' };
+  const info = {
+    title: translateText(rawInfo.title),
+    desc: translateText(rawInfo.desc),
+  };
   const currentStepIdx = config?.steps.findIndex(s => s.screens.includes(currentScreen)) ?? -1;
 
   const handleTabChange = (tab: NavTab) => {

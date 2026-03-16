@@ -9,6 +9,7 @@ import {
   Droplets, Sandwich, CakeSlice, IceCream, Soup, Fish, Egg,
   Cherry, Grape, Pizza, Salad,
 } from 'lucide-react';
+import { useDemoI18n } from './DemoI18n';
 
 // ============ ITEM ICON — Replaces emojis with consistent Lucide icons ============
 const CATEGORY_ICONS: Record<string, React.FC<{ className?: string }>> = {
