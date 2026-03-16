@@ -988,7 +988,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '4 modos: meus itens, igual, por item, valor fixo.': '4 modes: my items, equal, by item, fixed amount.',
     'Divisão por Item': 'Split by Item',
     'Arraste itens para cada pessoa.': 'Drag items to each person.',
-    'Gorjeta': 'Tip',
+    
     'Gorjeta sugerida com base no serviço.': 'Suggested tip based on service.',
     'Avaliação': 'Review',
     'Avalie comida, serviço e ambiente.': 'Rate food, service and ambiance.',
