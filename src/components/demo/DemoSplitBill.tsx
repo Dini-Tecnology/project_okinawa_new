@@ -115,7 +115,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
         {/* People at table */}
         <div className="bg-card rounded-2xl p-4 shadow-lg border border-border">
           <h2 className="font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" />Na mesa
+            <Users className="w-4 h-4 text-primary" />{translateText('Na mesa')}
           </h2>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {people.map((person) => (
@@ -134,12 +134,12 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
                 }`}>
                   {person.paid ? <Check className="w-4 h-4" /> : person.initial}
                 </div>
-                <p className="text-xs font-medium text-foreground truncate">{person.name.split(' ')[0]}</p>
+                <p className="text-xs font-medium text-foreground truncate">{translateText(person.name.split(' ')[0])}</p>
                 {person.amount !== undefined && (
                   <p className="text-[10px] text-muted-foreground font-semibold">R$ {person.amount}</p>
                 )}
                 {person.paid && (
-                  <p className="text-[10px] text-success font-semibold">✓ Pago</p>
+                  <p className="text-[10px] text-success font-semibold">✓ {translateText('Pago')}</p>
                 )}
               </div>
             ))}
@@ -148,7 +148,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
 
         {/* Split Modes */}
         <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-          <h2 className="font-semibold text-foreground text-sm mb-3">Como dividir?</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Como dividir?')}</h2>
           <div className="grid grid-cols-2 gap-2">
             {modes.map((mode) => (
               <button
@@ -171,8 +171,8 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
                 </div>
                 <p className={`text-xs font-semibold ${
                   splitMode === mode.id ? 'text-primary' : 'text-foreground'
-                }`}>{mode.name}</p>
-                <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
+                }`}>{translateText(mode.name)}</p>
+                <p className="text-[10px] text-muted-foreground">{translateText(mode.desc)}</p>
               </button>
             ))}
           </div>
