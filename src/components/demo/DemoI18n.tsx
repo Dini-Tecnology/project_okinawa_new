@@ -1562,7 +1562,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Voltar ao Modo Trabalho': 'Back to Work Mode',
     'Obrigado pela visita': 'Thank you for visiting',
     'Cartão Fidelidade Café · 8/10 selos': 'Coffee Loyalty Card · 8/10 stamps',
-    'Café & Padaria · R$$ · 200m': 'Café & Bakery · $$ · 200m',
+    // 'Café & Padaria · R$$ · 200m' — already exists above
     '2 disponíveis nesta mesa': '2 available at this table',
     'Morno': 'Warm',
     'Gelado': 'Iced',
