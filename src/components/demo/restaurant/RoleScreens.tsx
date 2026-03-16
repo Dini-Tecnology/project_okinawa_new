@@ -9,7 +9,7 @@ import {
   Package, AlertCircle, CheckCircle2, XCircle, ChefHat, Wine,
   Timer, Flame, ArrowUp, ArrowDown, TrendingUp, UtensilsCrossed,
   BarChart3, Eye, Zap, Phone, UserCheck, X, BookOpen,
-  Droplets, CookingPot, Beer,
+  Droplets, CookingPot, Beer, Smartphone,
 } from 'lucide-react';
 import { useDemoContext, type OrderStatus } from '@/contexts/DemoContext';
 import { GuidedHint } from '@/components/demo/DemoShared';
