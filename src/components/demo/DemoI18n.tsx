@@ -3606,7 +3606,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Ingredientes frescos': 'Ingredientes frescos',
     'Iniciar preparo': 'Iniciar preparación',
     'Insumos e alertas': 'Insumos y alertas',
-    'Jantar para 2': 'Cena para 2',
+    // 'Jantar para 2' — moved to Fine Dining section
     'Johnnie Walker Black': 'Johnnie Walker Black',
     'João': 'João',
     'KDS Bar': 'KDS Bar',
