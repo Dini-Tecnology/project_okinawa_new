@@ -807,7 +807,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Open bar completo': 'Full open bar',
     'Área VIP inclusa': 'VIP area included',
     'restantes': 'remaining',
-    'Simular Chegada': 'Simulate Arrival',
     'Skip — Camarote VIP': 'Skip — VIP Booth',
     'Tab digital aberto': 'Digital tab opened',
     'Consumo rastreado em tempo real': 'Consumption tracked in real-time',
