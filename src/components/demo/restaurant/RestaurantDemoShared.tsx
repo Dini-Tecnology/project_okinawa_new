@@ -19,7 +19,9 @@ export type RestaurantScreen =
   // New role-specific screens
   | 'manager-ops' | 'approvals' | 'barman-station' | 'drink-recipes'
   | 'cook-station' | 'stock' | 'waiter-calls' | 'waiter-tips'
-  | 'floor-flow' | 'daily-report';
+  | 'floor-flow' | 'daily-report'
+  // Enhanced waiter screens
+  | 'waiter-table-detail' | 'waiter-payment' | 'waiter-actions';
 
 export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
