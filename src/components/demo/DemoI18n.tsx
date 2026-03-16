@@ -353,7 +353,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'GPS rastreia você': 'GPS tracks you',
     'Geofencing (500m)': 'Geofencing (500m)',
     'Pista designada': 'Designated lane',
-    'Retirada & avaliação': 'Pickup & rating',
+    
     'Descobrir no mapa': 'Discover on map',
     'Ver food truck': 'View food truck',
     'Preparo ao vivo': 'Live preparation',
