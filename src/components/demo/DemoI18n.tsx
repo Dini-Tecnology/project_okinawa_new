@@ -4713,6 +4713,8 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '50% em Chopes': '50% en Chopes',
     'Aguardar Aproximação': 'Esperar Aproximación',
     'Processar na Maquininha': 'Procesar en la Máquina',
+    'à sua frente': 'delante de ti',
+    'Você é o próximo!': '¡Eres el siguiente!',
 
   },
 };
