@@ -3440,6 +3440,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Pessoas': 'Personas',
     'Pesar Mais': 'Pesar Más',
     'Peso médio: 520g · Estação favorita: Grelhados': 'Peso promedio: 520g · Estación favorita: Parrilla',
+    'Ocupação': 'Ocupación',
     'Pet Friendly': 'Pet Friendly',
     'Peça': 'Pide',
     'Peça agora. Pague antes. Retire sem espera.': 'Pide ahora. Paga antes. Retira sin espera.',
