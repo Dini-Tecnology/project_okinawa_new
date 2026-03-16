@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext } from '@/contexts/DemoContext';
 import { PhoneShell, BottomNav, SERVICE_TYPES, ItemIcon, type NavTab } from '@/components/demo/DemoShared';
+import { DemoI18nProvider, DemoLangSelector, useDemoI18n } from '@/components/demo/DemoI18n';
 import {
   ArrowLeft, Check, ChevronRight, Search, QrCode, Gift, User,
   UtensilsCrossed, Zap,
@@ -75,6 +76,7 @@ const DemoClientInner = () => {
   const [serviceType, setServiceType] = useState('fine-dining');
   const [currentScreen, setCurrentScreen] = useState('home');
   const { cart } = useDemoContext();
+  const { t } = useDemoI18n();
   const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
 
   const config = DEMO_REGISTRY[serviceType];
@@ -97,21 +99,22 @@ const DemoClientInner = () => {
   return (
     <>
       <Helmet>
-        <title>Demo Cliente | NOOWE — Experiência Interativa</title>
-        <meta name="description" content="Experimente o app NOOWE como um cliente real. 11 tipos de serviço, jornadas completas e interativas." />
+        <title>{t('client', 'title')}</title>
+        <meta name="description" content={t('client', 'metaDesc')} />
       </Helmet>
 
       <div className="min-h-screen bg-muted/30 flex flex-col items-center py-6 px-4">
         {/* Header */}
         <div className="w-full max-w-7xl flex items-center justify-between mb-4">
           <Link to="/demo" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" />Voltar à demo
+            <ArrowLeft className="w-4 h-4" />{t('shared', 'backToDemo')}
           </Link>
           <div className="flex items-center gap-3">
+            <DemoLangSelector />
             <Link to="/demo/restaurant" className="px-3 py-1.5 rounded-full border border-border text-xs font-medium hover:bg-muted transition-colors">
-              Ver Demo Restaurante →
+              {t('shared', 'viewRestaurantDemo')}
             </Link>
-            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">Demo Cliente</span>
+            <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">{t('shared', 'demoClient')}</span>
           </div>
         </div>
 
@@ -119,7 +122,7 @@ const DemoClientInner = () => {
         <div className="w-full max-w-7xl mb-6">
           <div className="flex items-center gap-3 mb-3">
             <Zap className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-foreground">Escolha a experiência</h2>
+            <h2 className="text-sm font-semibold text-foreground">{t('client', 'chooseExperience')}</h2>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {SERVICE_TYPES.map((st) => {
@@ -160,8 +163,8 @@ const DemoClientInner = () => {
         <div className="flex gap-8 items-start max-w-7xl w-full justify-center">
           {/* Journey sidebar */}
           <div className="hidden md:block w-60 shrink-0 sticky top-8">
-            <h2 className="font-display text-sm font-bold mb-1 text-foreground">Jornada do Cliente</h2>
-            <p className="text-xs text-muted-foreground mb-4">Siga os passos ou explore livremente</p>
+            <h2 className="font-display text-sm font-bold mb-1 text-foreground">{t('client', 'clientJourney')}</h2>
+            <p className="text-xs text-muted-foreground mb-4">{t('shared', 'followSteps')}</p>
             <div className="space-y-0.5">
               {config?.steps.map(({ step, label, screens }) => {
                 const isActive = screens.includes(currentScreen);
@@ -224,21 +227,21 @@ const DemoClientInner = () => {
                   </div>
                 ))}
                 {(config?.steps.length ?? 0) > 5 && (
-                  <p className="text-xs text-muted-foreground/60">+{(config?.steps.length ?? 0) - 5} etapas na jornada</p>
+                  <p className="text-xs text-muted-foreground/60">+{(config?.steps.length ?? 0) - 5} {t('shared', 'stepsInJourney')}</p>
                 )}
               </div>
             </div>
 
             <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10">
-              <h3 className="font-display font-bold mb-2">Quer isso no seu restaurante?</h3>
-              <p className="text-xs text-muted-foreground mb-4">Leve a experiência NOOWE para seus clientes.</p>
+              <h3 className="font-display font-bold mb-2">{t('shared', 'wantThis')}</h3>
+              <p className="text-xs text-muted-foreground mb-4">{t('shared', 'ctaDescClient')}</p>
               <a
                 href="https://wa.me/5511999999999?text=Olá! Vi a demo do app cliente da NOOWE e gostaria de saber mais."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-glow"
               >
-                Falar com a equipe
+                {t('shared', 'talkToTeam')}
               </a>
             </div>
           </div>
@@ -249,9 +252,11 @@ const DemoClientInner = () => {
 };
 
 const DemoClient = () => (
-  <DemoProvider>
-    <DemoClientInner />
-  </DemoProvider>
+  <DemoI18nProvider>
+    <DemoProvider>
+      <DemoClientInner />
+    </DemoProvider>
+  </DemoI18nProvider>
 );
 
 export default DemoClient;

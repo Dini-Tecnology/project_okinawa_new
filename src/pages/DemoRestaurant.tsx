@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext } from '@/contexts/DemoContext';
 import { PhoneShell } from '@/components/demo/DemoShared';
+import { DemoI18nProvider, DemoLangSelector, useDemoI18n } from '@/components/demo/DemoI18n';
 import { ArrowLeft, Check, ChevronRight, Zap } from 'lucide-react';
 import {
   ROLE_CONFIG,
@@ -19,11 +20,11 @@ import {
 import { MobileRestaurantScreen } from '@/components/demo/restaurant/MobileRestaurantScreens';
 
 // ============ JOURNEY STEPS ADAPTER ============
-// Convert ROLE_JOURNEYS (RoleJourneyStage[]) to DemoClient's format (step + label + screens[])
 
 interface RoleJourneyStep {
   step: number;
   label: string;
+  screenKey: string;
   screens: RestaurantScreen[];
 }
 
@@ -31,6 +32,7 @@ function buildJourneySteps(role: StaffRole): RoleJourneyStep[] {
   return ROLE_JOURNEYS[role].map((stage, index) => ({
     step: index + 1,
     label: stage.label,
+    screenKey: stage.screen,
     screens: [stage.screen],
   }));
 }
@@ -41,11 +43,25 @@ const DemoRestaurantInner = () => {
   const [activeRole, setActiveRole] = useState<StaffRole>('owner');
   const [currentScreen, setCurrentScreen] = useState<RestaurantScreen>('dashboard');
   const { restaurant } = useDemoContext();
+  const { lang, t } = useDemoI18n();
 
   const roleConfig = useMemo(() => ROLE_CONFIG.find(r => r.id === activeRole)!, [activeRole]);
   const steps = useMemo(() => buildJourneySteps(activeRole), [activeRole]);
-  const info = SCREEN_INFO[currentScreen] || { title: 'Demo', desc: '' };
+
+  // Translated screen info
+  const info = {
+    title: t('screenTitles', currentScreen) !== currentScreen ? t('screenTitles', currentScreen) : (SCREEN_INFO[currentScreen]?.title || 'Demo'),
+    desc: t('screenDescs', currentScreen) !== currentScreen ? t('screenDescs', currentScreen) : (SCREEN_INFO[currentScreen]?.desc || ''),
+  };
   const currentStepIdx = steps.findIndex(s => s.screens.includes(currentScreen));
+
+  // Translated role helpers
+  const roleLabel = (id: StaffRole) => t('roles', id);
+  const roleDesc = (id: StaffRole) => t('roleDescs', id);
+  const stepLabel = (screenKey: string) => {
+    const translated = t('journeySteps', screenKey);
+    return translated !== screenKey ? translated : screenKey;
+  };
 
   // Reset screen when role changes
   useEffect(() => {
@@ -55,41 +71,39 @@ const DemoRestaurantInner = () => {
   return (
     <>
       <Helmet>
-        <title>Demo Restaurante | NOOWE — Experiência Interativa</title>
-        <meta
-          name="description"
-          content="Experimente o app restaurante da NOOWE com 7 perfis operacionais, 22 telas especializadas e jornadas guiadas interativas."
-        />
+        <title>{t('restaurant', 'title')}</title>
+        <meta name="description" content={t('restaurant', 'metaDesc')} />
       </Helmet>
 
       <div className="min-h-screen bg-muted/30 flex flex-col items-center py-6 px-4">
-        {/* Header — identical pattern to DemoClient */}
+        {/* Header */}
         <div className="w-full max-w-7xl flex items-center justify-between mb-4">
           <Link
             to="/demo"
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Voltar à demo
+            {t('shared', 'backToDemo')}
           </Link>
           <div className="flex items-center gap-3">
+            <DemoLangSelector />
             <Link
               to="/demo/client"
               className="px-3 py-1.5 rounded-full border border-border text-xs font-medium hover:bg-muted transition-colors"
             >
-              Ver Demo Cliente →
+              {t('shared', 'viewClientDemo')}
             </Link>
             <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-              Demo Restaurante
+              {t('shared', 'demoRestaurant')}
             </span>
           </div>
         </div>
 
-        {/* Role Selector — mirrors Service Type Selector from DemoClient */}
+        {/* Role Selector */}
         <div className="w-full max-w-7xl mb-6">
           <div className="flex items-center gap-3 mb-3">
             <Zap className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-semibold text-foreground">Escolha o perfil</h2>
+            <h2 className="text-sm font-semibold text-foreground">{t('restaurant', 'chooseProfile')}</h2>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             {ROLE_CONFIG.map(role => {
@@ -110,9 +124,9 @@ const DemoRestaurantInner = () => {
                   </div>
                   <div className="text-left">
                     <p className={`text-xs font-semibold ${isActive ? 'text-primary' : 'text-foreground'}`}>
-                      {role.label}
+                      {roleLabel(role.id)}
                     </p>
-                    <p className="text-[10px] text-muted-foreground hidden sm:block">{role.desc}</p>
+                    <p className="text-[10px] text-muted-foreground hidden sm:block">{roleDesc(role.id)}</p>
                   </div>
                 </button>
               );
@@ -120,7 +134,7 @@ const DemoRestaurantInner = () => {
           </div>
         </div>
 
-        {/* Active role banner — mirrors active service type banner */}
+        {/* Active role banner */}
         <div className="w-full max-w-7xl mb-4">
           <div
             className={`flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r ${roleConfig.gradient} border border-border/50`}
@@ -131,22 +145,22 @@ const DemoRestaurantInner = () => {
             <div>
               <h1 className="font-display text-lg font-bold text-foreground">{restaurant.name}</h1>
               <p className="text-sm text-muted-foreground">
-                {roleConfig.label} · {roleConfig.desc}
+                {roleLabel(activeRole)} · {roleDesc(activeRole)}
               </p>
             </div>
           </div>
         </div>
 
-        {/* Main content: sidebar + phone + info — EXACT same layout as DemoClient */}
+        {/* Main content: sidebar + phone + info */}
         <div className="flex gap-8 items-start max-w-7xl w-full justify-center">
-          {/* Journey sidebar — hidden md:block w-60 */}
+          {/* Journey sidebar */}
           <div className="hidden md:block w-60 shrink-0 sticky top-8">
             <h2 className="font-display text-sm font-bold mb-1 text-foreground">
-              Jornada do {roleConfig.label}
+              {t('restaurant', 'journeyOf')} {roleLabel(activeRole)}
             </h2>
-            <p className="text-xs text-muted-foreground mb-4">Siga os passos ou explore livremente</p>
+            <p className="text-xs text-muted-foreground mb-4">{t('shared', 'followSteps')}</p>
             <div className="space-y-0.5">
-              {steps.map(({ step, label, screens }) => {
+              {steps.map(({ step, screenKey, screens }) => {
                 const isActive = screens.includes(currentScreen);
                 const isPast = currentStepIdx > steps.findIndex(s => s.step === step);
                 return (
@@ -171,7 +185,7 @@ const DemoRestaurantInner = () => {
                     <span
                       className={`text-xs ${isActive ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}
                     >
-                      {label}
+                      {stepLabel(screenKey)}
                     </span>
                   </button>
                 );
@@ -179,7 +193,7 @@ const DemoRestaurantInner = () => {
             </div>
           </div>
 
-          {/* Phone — using the SAME PhoneShell from DemoShared */}
+          {/* Phone */}
           <div className="relative">
             <PhoneShell>
               <MobileRestaurantScreen
@@ -191,32 +205,30 @@ const DemoRestaurantInner = () => {
             </PhoneShell>
           </div>
 
-          {/* Info sidebar — hidden xl:block w-72 */}
+          {/* Info sidebar */}
           <div className="hidden xl:block w-72 shrink-0 sticky top-8">
-            {/* Current screen info */}
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
               <h3 className="font-display font-bold mb-2">{info.title}</h3>
               <p className="text-sm text-muted-foreground">{info.desc}</p>
             </div>
 
-            {/* Role journey features */}
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
               <h3 className="font-display font-bold text-sm mb-3 flex items-center gap-2">
                 <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${roleConfig.bgClass}`}>
                   <roleConfig.icon className={`w-3.5 h-3.5 ${roleConfig.colorClass}`} />
                 </div>
-                {roleConfig.label}
+                {roleLabel(activeRole)}
               </h3>
               <div className="space-y-2">
-                {steps.slice(0, 5).map(({ step, label }) => (
+                {steps.slice(0, 5).map(({ step, screenKey }) => (
                   <div key={step} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Check className="w-3 h-3 text-success shrink-0" />
-                    <span>{label}</span>
+                    <span>{stepLabel(screenKey)}</span>
                   </div>
                 ))}
                 {steps.length > 5 && (
                   <p className="text-xs text-muted-foreground/60">
-                    +{steps.length - 5} etapas na jornada
+                    +{steps.length - 5} {t('shared', 'stepsInJourney')}
                   </p>
                 )}
               </div>
@@ -224,7 +236,7 @@ const DemoRestaurantInner = () => {
 
             {/* Other roles quick switch */}
             <div className="p-5 rounded-2xl bg-card border border-border mb-5">
-              <h3 className="font-display font-bold text-sm mb-3">Outros perfis</h3>
+              <h3 className="font-display font-bold text-sm mb-3">{t('shared', 'otherProfiles')}</h3>
               <div className="space-y-1.5">
                 {ROLE_CONFIG.filter(r => r.id !== activeRole).map(role => {
                   const RIcon = role.icon;
@@ -238,8 +250,8 @@ const DemoRestaurantInner = () => {
                         <RIcon className={`w-3.5 h-3.5 ${role.colorClass}`} />
                       </div>
                       <div>
-                        <p className="text-xs font-medium text-foreground">{role.label}</p>
-                        <p className="text-[10px] text-muted-foreground">{role.desc}</p>
+                        <p className="text-xs font-medium text-foreground">{roleLabel(role.id)}</p>
+                        <p className="text-[10px] text-muted-foreground">{roleDesc(role.id)}</p>
                       </div>
                     </button>
                   );
@@ -249,17 +261,15 @@ const DemoRestaurantInner = () => {
 
             {/* CTA */}
             <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/10">
-              <h3 className="font-display font-bold mb-2">Quer isso no seu restaurante?</h3>
-              <p className="text-xs text-muted-foreground mb-4">
-                Leve a experiência NOOWE para sua operação.
-              </p>
+              <h3 className="font-display font-bold mb-2">{t('shared', 'wantThis')}</h3>
+              <p className="text-xs text-muted-foreground mb-4">{t('shared', 'ctaDesc')}</p>
               <a
                 href="https://wa.me/5511999999999?text=Olá! Vi a demo do app restaurante da NOOWE e gostaria de saber mais."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-center py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm shadow-glow"
               >
-                Falar com a equipe
+                {t('shared', 'talkToTeam')}
               </a>
             </div>
           </div>
@@ -270,9 +280,11 @@ const DemoRestaurantInner = () => {
 };
 
 const DemoRestaurant = () => (
-  <DemoProvider>
-    <DemoRestaurantInner />
-  </DemoProvider>
+  <DemoI18nProvider>
+    <DemoProvider>
+      <DemoRestaurantInner />
+    </DemoProvider>
+  </DemoI18nProvider>
 );
 
 export default DemoRestaurant;
