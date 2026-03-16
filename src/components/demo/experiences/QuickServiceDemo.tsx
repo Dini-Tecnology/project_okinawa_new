@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
+import DemoPayment from '../DemoPayment';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
