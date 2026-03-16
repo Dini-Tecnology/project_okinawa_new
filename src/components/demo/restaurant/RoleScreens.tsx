@@ -593,7 +593,7 @@ export const StockScreen: React.FC<{ onNavigate: (screen: string) => void }> = (
   );
 };
 
-// ============ WAITER CALLS ============
+// ============ WAITER CALLS (Enhanced) ============
 
 export const WaiterCallsScreen: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
   const { notifications } = useDemoContext();
@@ -601,20 +601,36 @@ export const WaiterCallsScreen: React.FC<{ onNavigate: (screen: string) => void 
   const [attended, setAttended] = useState<string[]>([]);
 
   const mockCalls = [
-    { id: 'wc1', table: 3, type: 'waiter' as const, message: 'Cliente solicitou o garçom', time: '2min atrás', urgent: false },
-    { id: 'wc2', table: 8, type: 'manager' as const, message: 'Solicita falar com gerente', time: '5min atrás', urgent: true },
-    { id: 'wc3', table: 1, type: 'waiter' as const, message: 'Pedido de sobremesa', time: '8min atrás', urgent: false },
-    { id: 'wc4', table: 5, type: 'bill' as const, message: 'Solicita a conta', time: '3min atrás', urgent: false },
+    { id: 'wc1', table: 3, type: 'garcom' as const, message: 'Cliente solicitou o garçom', time: '2min atrás', urgent: false, reason: 'Dúvida sobre harmonização', category: 'Atendimento' },
+    { id: 'wc2', table: 8, type: 'gerente' as const, message: 'Solicita falar com gerente', time: '5min atrás', urgent: true, reason: 'Reclamação sobre tempo de espera do prato', category: 'Escalação' },
+    { id: 'wc3', table: 1, type: 'garcom' as const, message: 'Pedido de sobremesa', time: '8min atrás', urgent: false, reason: 'Quer ver cardápio de sobremesas', category: 'Pedido' },
+    { id: 'wc4', table: 5, type: 'ajuda' as const, message: 'Precisa de assistência especial', time: '1min atrás', urgent: true, reason: 'Acessibilidade — cadeira especial necessária', category: 'Acessibilidade' },
+    { id: 'wc5', table: 10, type: 'garcom' as const, message: 'Questão sobre alérgenos', time: '4min atrás', urgent: false, reason: 'Cliente com restrição alimentar — intolerância a glúten', category: 'Segurança' },
   ];
 
   return (
     <div className="space-y-6">
       <GuidedHint text="Chamados em tempo real — atenda discretamente sem que o cliente precise levantar a mão" />
 
-      <div className="grid grid-cols-3 gap-4">
+      {/* Urgent banner */}
+      {mockCalls.filter(c => c.urgent && !attended.includes(c.id)).length > 0 && (
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-destructive/10 border border-destructive/20 animate-pulse">
+          <Bell className="w-5 h-5 text-destructive" />
+          <div>
+            <p className="text-sm font-bold text-destructive">{mockCalls.filter(c => c.urgent && !attended.includes(c.id)).length} chamado(s) urgente(s)!</p>
+            <p className="text-xs text-destructive/70">Prioridade máxima — atenda imediatamente</p>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-4 gap-4">
         <div className="bg-card rounded-xl border border-border p-4 text-center">
           <p className="font-display text-3xl font-bold text-warning">{mockCalls.filter(c => !attended.includes(c.id)).length}</p>
           <p className="text-xs text-muted-foreground">Pendentes</p>
+        </div>
+        <div className="bg-card rounded-xl border border-border p-4 text-center">
+          <p className="font-display text-3xl font-bold text-destructive">{mockCalls.filter(c => c.urgent && !attended.includes(c.id)).length}</p>
+          <p className="text-xs text-muted-foreground">Urgentes</p>
         </div>
         <div className="bg-card rounded-xl border border-border p-4 text-center">
           <p className="font-display text-3xl font-bold text-success">{attended.length}</p>
@@ -627,7 +643,7 @@ export const WaiterCallsScreen: React.FC<{ onNavigate: (screen: string) => void 
       </div>
 
       <div className="space-y-3">
-        {mockCalls.map(call => {
+        {mockCalls.sort((a, b) => (b.urgent ? 1 : 0) - (a.urgent ? 1 : 0)).map(call => {
           const isAttended = attended.includes(call.id);
           return (
             <div key={call.id} className={`bg-card rounded-xl border-2 p-4 transition-all ${
@@ -642,11 +658,13 @@ export const WaiterCallsScreen: React.FC<{ onNavigate: (screen: string) => void 
                   {call.table}
                 </div>
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <p className="font-semibold">{call.message}</p>
                     {call.urgent && <span className="px-2 py-0.5 rounded-full bg-destructive/10 text-destructive text-[10px] font-bold">URGENTE</span>}
+                    <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[10px] font-medium">{call.category}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">Mesa {call.table} · {call.time}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{call.reason}</p>
+                  <p className="text-[10px] text-muted-foreground">Mesa {call.table} · {call.time}</p>
                 </div>
                 {!isAttended ? (
                   <button onClick={() => setAttended([...attended, call.id])} className="px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-glow">
@@ -662,6 +680,231 @@ export const WaiterCallsScreen: React.FC<{ onNavigate: (screen: string) => void 
           );
         })}
       </div>
+    </div>
+  );
+};
+
+// ============ WAITER PAYMENT (TAP to Pay, PIX, Card) ============
+
+export const WaiterPaymentScreen: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
+  const { tables, orders } = useDemoContext();
+  const myTables = tables.filter(t => ['occupied', 'billing'].includes(t.status));
+  const [step, setStep] = useState<'select' | 'method' | 'processing' | 'done'>('select');
+  const [selectedTable, setSelectedTable] = useState<number | null>(null);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+
+  const paymentMethods = [
+    { id: 'tap', label: 'TAP to Pay (NFC)', desc: 'Aproxime o cartão do cliente na parte traseira do celular', icon: '📱', highlight: true },
+    { id: 'pix', label: 'PIX QR Code', desc: 'Gerar código para pagamento instantâneo', icon: '📲', highlight: false },
+    { id: 'card', label: 'Cartão (chip/senha)', desc: 'Crédito ou débito — insira o cartão', icon: '💳', highlight: false },
+    { id: 'cash', label: 'Dinheiro', desc: 'Pagamento em espécie com confirmação', icon: '💵', highlight: false },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <GuidedHint text="Transforme o celular em uma maquininha — TAP to Pay, PIX, cartão ou dinheiro para clientes sem app" />
+
+      {step === 'select' && (
+        <>
+          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl border border-border p-5">
+            <h3 className="font-display font-bold text-lg">Cobrar na Mesa</h3>
+            <p className="text-sm text-muted-foreground mt-1">Selecione a mesa para processar o pagamento de clientes sem app</p>
+          </div>
+          <div className="space-y-3">
+            {myTables.map(table => {
+              const tableOrders = orders.filter(o => o.tableNumber === table.number && !['paid'].includes(o.status));
+              const guestsWithoutApp = Math.floor(Math.random() * 2) + 1;
+              return (
+                <button key={table.id} onClick={() => { setSelectedTable(table.number); setStep('method'); }}
+                  className="w-full text-left bg-card rounded-xl border border-border p-4 hover:border-primary/30 transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center font-display text-xl font-bold text-primary">{table.number}</div>
+                    <div className="flex-1">
+                      <p className="font-semibold">{table.customerName}</p>
+                      <p className="text-xs text-muted-foreground">{table.seats} pessoas · {tableOrders.length} pedido(s)</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="px-2 py-0.5 rounded-full bg-warning/10 text-warning text-[10px] font-bold">{guestsWithoutApp} sem app</span>
+                        <span className="text-[10px] text-muted-foreground">Precisam pagamento via garçom</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-display text-xl font-bold text-primary">R$ {table.orderTotal || 0}</p>
+                      <p className="text-[10px] text-muted-foreground">Total da mesa</p>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {step === 'method' && (
+        <>
+          <div className="flex items-center gap-3">
+            <button onClick={() => setStep('select')} className="p-2 rounded-lg hover:bg-muted"><X className="w-4 h-4" /></button>
+            <div>
+              <h3 className="font-display font-bold">Mesa {selectedTable}</h3>
+              <p className="text-sm text-muted-foreground">Valor: R$ {myTables.find(t => t.number === selectedTable)?.orderTotal || 0}</p>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 text-center">
+            <p className="text-sm text-muted-foreground">Valor a cobrar</p>
+            <p className="font-display text-4xl font-bold text-primary mt-2">R$ {myTables.find(t => t.number === selectedTable)?.orderTotal || 0}</p>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-semibold">Selecione o método:</p>
+            {paymentMethods.map(method => (
+              <button key={method.id} onClick={() => { setSelectedMethod(method.id); setStep('processing'); }}
+                className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border-2 transition-all ${
+                  method.highlight ? 'border-primary bg-primary/5 hover:bg-primary/10' : 'border-border bg-card hover:bg-muted/30'
+                }`}>
+                <span className="text-3xl">{method.icon}</span>
+                <div className="flex-1">
+                  <p className="font-semibold">{method.label}</p>
+                  <p className="text-xs text-muted-foreground">{method.desc}</p>
+                </div>
+                {method.highlight && <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold">RECOMENDADO</span>}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+
+      {step === 'processing' && (
+        <div className="text-center py-12 space-y-6">
+          <div className="w-28 h-28 rounded-full bg-primary/10 flex items-center justify-center mx-auto animate-pulse">
+            {selectedMethod === 'tap' && <Phone className="w-14 h-14 text-primary" />}
+            {selectedMethod === 'pix' && <div className="w-20 h-20 rounded-xl bg-muted border-2 border-foreground/20 flex items-center justify-center text-lg font-bold">QR</div>}
+            {selectedMethod === 'card' && <DollarSign className="w-14 h-14 text-primary" />}
+            {selectedMethod === 'cash' && <DollarSign className="w-14 h-14 text-primary" />}
+          </div>
+          {selectedMethod === 'tap' && (
+            <>
+              <h3 className="font-display text-2xl font-bold">Aproxime o Cartão</h3>
+              <p className="text-muted-foreground">Peça ao cliente para aproximar o cartão na parte traseira do celular</p>
+              <div className="flex items-center gap-2 justify-center text-sm text-muted-foreground">
+                <div className="w-2 h-2 rounded-full bg-primary animate-ping" />
+                Aguardando aproximação...
+              </div>
+            </>
+          )}
+          {selectedMethod === 'pix' && (
+            <>
+              <h3 className="font-display text-2xl font-bold">QR Code PIX</h3>
+              <p className="text-muted-foreground">Mostre o QR ao cliente para pagamento via PIX</p>
+              <div className="w-40 h-40 mx-auto bg-muted rounded-xl border-4 border-foreground/10 flex items-center justify-center">
+                <div className="grid grid-cols-7 gap-0.5">
+                  {Array.from({ length: 49 }).map((_, i) => (
+                    <div key={i} className={`w-3.5 h-3.5 rounded-sm ${Math.random() > 0.4 ? 'bg-foreground' : 'bg-background'}`} />
+                  ))}
+                </div>
+              </div>
+              <button className="px-4 py-2 rounded-xl border border-border text-sm font-medium">Copiar código PIX</button>
+            </>
+          )}
+          {selectedMethod === 'card' && (
+            <>
+              <h3 className="font-display text-2xl font-bold">Insira o Cartão</h3>
+              <p className="text-muted-foreground">Aguardando inserção do cartão com chip/senha...</p>
+            </>
+          )}
+          {selectedMethod === 'cash' && (
+            <>
+              <h3 className="font-display text-2xl font-bold">Pagamento em Dinheiro</h3>
+              <p className="text-muted-foreground">R$ {myTables.find(t => t.number === selectedTable)?.orderTotal || 0} — confirme o recebimento</p>
+            </>
+          )}
+          <button onClick={() => setStep('done')} className="px-8 py-3 rounded-xl bg-success text-success-foreground font-semibold text-sm shadow-glow">
+            {selectedMethod === 'cash' ? 'Confirmar Recebimento' : 'Simular Aprovação'}
+          </button>
+        </div>
+      )}
+
+      {step === 'done' && (
+        <div className="text-center py-12 space-y-6">
+          <div className="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="w-12 h-12 text-success" />
+          </div>
+          <h3 className="font-display text-2xl font-bold text-success">Pagamento Aprovado!</h3>
+          <p className="text-muted-foreground">Mesa {selectedTable} · R$ {myTables.find(t => t.number === selectedTable)?.orderTotal || 0}</p>
+          <div className="flex gap-3 justify-center">
+            <button className="px-5 py-2.5 rounded-xl border border-border text-sm font-semibold">Enviar Recibo</button>
+            <button className="px-5 py-2.5 rounded-xl border border-border text-sm font-semibold">Imprimir</button>
+            <button onClick={() => { setStep('select'); setSelectedTable(null); }} className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
+              Nova Cobrança
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ WAITER ACTIONS (Execute on behalf of client) ============
+
+export const WaiterActionsScreen: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
+  const { tables, orders } = useDemoContext();
+  const myTables = tables.filter(t => ['occupied', 'billing'].includes(t.status));
+
+  const ACTIONS = [
+    { id: 'add-item', label: 'Adicionar Item ao Pedido', desc: 'Inclua um item no pedido do cliente', icon: Plus, color: 'text-primary', bg: 'bg-primary/10' },
+    { id: 'request-bill', label: 'Solicitar Conta', desc: 'Gerar conta para o cliente fechar no app ou via garçom', icon: DollarSign, color: 'text-warning', bg: 'bg-warning/10' },
+    { id: 'split-bill', label: 'Dividir Conta', desc: 'Dividir conta entre os convidados da mesa', icon: Users, color: 'text-secondary', bg: 'bg-secondary/10' },
+    { id: 'call-manager', label: 'Chamar Gerente', desc: 'Escalar situação para aprovação ou resolução', icon: Shield, color: 'text-destructive', bg: 'bg-destructive/10' },
+    { id: 'courtesy', label: 'Solicitar Cortesia', desc: 'Requer aprovação do gerente — aniversários, compensações', icon: Star, color: 'text-accent-foreground', bg: 'bg-accent/10' },
+    { id: 'cancel-item', label: 'Cancelar Item', desc: 'Requer aprovação do gerente antes de efetivar', icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10' },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <GuidedHint text="Execute ações pelo cliente — quando alguém precisar de ajuda com o app, você faz por ele" />
+
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl border border-border p-5">
+        <h3 className="font-display font-bold text-lg">Ações na Mesa</h3>
+        <p className="text-sm text-muted-foreground mt-1">Quando o cliente precisar de ajuda com o app, execute a ação por ele. Algumas ações requerem aprovação do gerente.</p>
+      </div>
+
+      {myTables.map(table => {
+        const tableOrders = orders.filter(o => o.tableNumber === table.number && !['paid'].includes(o.status));
+        return (
+          <div key={table.id} className="bg-card rounded-xl border border-border overflow-hidden">
+            {/* Table header */}
+            <div className="flex items-center gap-3 p-4 border-b border-border bg-muted/20">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center font-display font-bold text-primary">{table.number}</div>
+              <div className="flex-1">
+                <p className="font-semibold">{table.customerName}</p>
+                <p className="text-xs text-muted-foreground">{table.seats} pessoas · {tableOrders.length} pedido(s) · R$ {table.orderTotal || 0}</p>
+              </div>
+              <div className="flex gap-1">
+                {[true, true, false].map((hasApp, i) => (
+                  <div key={i} className={`w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                    hasApp ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+                  }`}>
+                    {hasApp ? '✓' : '?'}
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Actions grid */}
+            <div className="grid grid-cols-2 gap-0">
+              {ACTIONS.map(action => (
+                <button key={action.id} className="flex items-start gap-3 p-4 border-b border-r border-border last:border-r-0 hover:bg-muted/20 transition-colors text-left">
+                  <div className={`w-9 h-9 rounded-xl ${action.bg} flex items-center justify-center shrink-0`}>
+                    <action.icon className={`w-4 h-4 ${action.color}`} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{action.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{action.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 };
