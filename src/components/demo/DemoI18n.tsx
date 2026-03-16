@@ -1250,8 +1250,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Economia Happy Hour': 'Happy Hour savings',
     'Cobrado no seu tab digital': 'Charged to your digital tab',
     'Frente ao palco · 8-12 pessoas': 'Front of stage · 8-12 people',
-    'Comida italiana casual · Ambiente familiar': 'Casual Italian food · Family atmosphere',
-    'Ver cardápio e favoritar': 'View menu and bookmark',
     '· Espera: ~25 min': '· Wait: ~25 min',
     'Recompensas': 'Rewards',
     'Seus Pontos': 'Your Points',
