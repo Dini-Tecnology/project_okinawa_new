@@ -181,10 +181,7 @@ const LIVE_FEED = [
 ];
 
 // Richer guest data with individual orders
-const TABLE_GUESTS_DATA: Record<number, Array<{
-  id: string; name: string; hasApp: boolean; paid: boolean; method?: string;
-  orders: Array<{ id: string; item: string; qty: number; price: number; status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'cancelled'; sentAt: string }>;
-}>> = {
+const TABLE_GUESTS_DATA: Record<number, TableGuest[]> = {
   1: [
     { id: 'g1-1', name: 'Maria S.', hasApp: true, paid: false, orders: [
       { id: 'oi1', item: 'Tartare de Atum', qty: 1, price: 58, status: 'served', sentAt: '18:32' },
