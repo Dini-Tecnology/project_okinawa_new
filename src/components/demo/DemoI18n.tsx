@@ -212,7 +212,7 @@ export function DemoLangSelector() {
             }`}
             title={LANG_META[l].label}
           >
-            <span className="text-sm leading-none">{LANG_META[l].flag}</span>
+            
             <span>{LANG_META[l].label}</span>
           </button>
         );
