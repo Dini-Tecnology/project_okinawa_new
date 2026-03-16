@@ -10,6 +10,7 @@ import {
   Package, Truck, MapPin, Scale, Flame, Wine,
   type LucideIcon,
 } from 'lucide-react';
+import { useDemoI18n } from './DemoI18n';
 
 // ============ TYPES ============
 
@@ -186,6 +187,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
   tableInfo,
   helpOptions = ['Dúvidas sobre o pedido', 'Solicitar algo especial', 'Reportar problema'],
 }) => {
+  const { translateText } = useDemoI18n();
   const [showHelp, setShowHelp] = useState(false);
 
   return (
@@ -241,7 +243,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
                     <span className={`text-[10px] mt-1.5 font-medium text-center leading-tight ${
                       isActive ? 'text-primary-foreground' : 'text-primary-foreground/60'
                     }`}>
-                      {step.label}
+                      {translateText(step.label)}
                     </span>
                   </div>
                   {index < steps.length - 1 && (
@@ -262,7 +264,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
         <div className="mx-4 bg-card rounded-3xl p-4 shadow-lg border border-border mb-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-muted-foreground text-sm">Tempo estimado</p>
+              <p className="text-muted-foreground text-sm">{translateText('Tempo estimado')}</p>
               <p className="text-3xl font-bold text-foreground">{etaRange}</p>
             </div>
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -280,7 +282,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
         {/* Pickup Code Card (for counter-pickup services) */}
         {pickupCode && (
           <div className="mx-4 bg-card rounded-2xl p-4 shadow-md border border-border mb-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Código de retirada</p>
+            <p className="text-xs text-muted-foreground mb-1">{translateText('Código de retirada')}</p>
             <p className="font-display text-3xl font-bold tracking-widest text-primary">{pickupCode}</p>
           </div>
         )}
@@ -288,7 +290,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
         {/* Items Status */}
         <div className="px-4 mb-4">
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-            Seus itens
+            {translateText('Seus itens')}
           </h2>
           <div className="space-y-3">
             {items.map((item) => {
@@ -308,14 +310,14 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
                       )}
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${config.badgeCls}`}>
-                      {config.label}
+                      {translateText(config.label)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     {item.chef && (
                       <span className="text-muted-foreground flex items-center gap-1">
                         <ChefHat className="w-3.5 h-3.5" />
-                        {item.chef}
+                        {translateText(item.chef)}
                       </span>
                     )}
                     <span className="text-primary font-medium ml-auto">~{item.eta}</span>
@@ -333,15 +335,15 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
               <MapPin className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">{tableInfo.label}</p>
-              <p className="text-xs text-muted-foreground">{tableInfo.sublabel}</p>
+              <p className="text-sm font-semibold text-foreground">{translateText(tableInfo.label)}</p>
+              <p className="text-xs text-muted-foreground">{translateText(tableInfo.sublabel)}</p>
             </div>
             {tableInfo.actionLabel && tableInfo.onAction && (
               <button
                 onClick={tableInfo.onAction}
                 className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold"
               >
-                {tableInfo.actionLabel}
+                {translateText(tableInfo.actionLabel)}
               </button>
             )}
           </div>
@@ -357,8 +359,8 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
               <Bell className="w-5 h-5 text-background" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-background font-semibold text-sm">Precisa de ajuda?</p>
-              <p className="text-muted-foreground text-xs">Chamar equipe discretamente</p>
+              <p className="text-background font-semibold text-sm">{translateText('Precisa de ajuda?')}</p>
+              <p className="text-muted-foreground text-xs">{translateText('Chamar equipe discretamente')}</p>
             </div>
             <MessageCircle className="w-4 h-4 text-muted-foreground" />
           </button>
@@ -370,7 +372,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
                   key={i}
                   className="w-full py-3 rounded-xl bg-muted text-foreground font-medium text-sm hover:bg-muted/80 transition-colors"
                 >
-                  {opt}
+                  {translateText(opt)}
                 </button>
               ))}
             </div>
@@ -385,7 +387,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
               className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2"
             >
               {actionButton.icon && <actionButton.icon className="w-5 h-5" />}
-              {actionButton.label}
+              {translateText(actionButton.label)}
             </button>
           </div>
         )}

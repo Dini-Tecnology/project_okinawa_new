@@ -7,6 +7,7 @@ import {
   ArrowLeft, CreditCard, Users, User, Check, DollarSign,
   Receipt, type LucideIcon,
 } from 'lucide-react';
+import { useDemoI18n } from './DemoI18n';
 
 // ============ TYPES ============
 
@@ -87,6 +88,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
   onProceed,
   ctaLabel,
 }) => {
+  const { translateText } = useDemoI18n();
   const [splitMode, setSplitMode] = useState<SplitMode>(defaultMode);
 
   return (
@@ -113,7 +115,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
         {/* People at table */}
         <div className="bg-card rounded-2xl p-4 shadow-lg border border-border">
           <h2 className="font-semibold text-foreground text-sm mb-3 flex items-center gap-2">
-            <Users className="w-4 h-4 text-primary" />Na mesa
+            <Users className="w-4 h-4 text-primary" />{translateText('Na mesa')}
           </h2>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {people.map((person) => (
@@ -132,12 +134,12 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
                 }`}>
                   {person.paid ? <Check className="w-4 h-4" /> : person.initial}
                 </div>
-                <p className="text-xs font-medium text-foreground truncate">{person.name.split(' ')[0]}</p>
+                <p className="text-xs font-medium text-foreground truncate">{translateText(person.name.split(' ')[0])}</p>
                 {person.amount !== undefined && (
                   <p className="text-[10px] text-muted-foreground font-semibold">R$ {person.amount}</p>
                 )}
                 {person.paid && (
-                  <p className="text-[10px] text-success font-semibold">✓ Pago</p>
+                  <p className="text-[10px] text-success font-semibold">✓ {translateText('Pago')}</p>
                 )}
               </div>
             ))}
@@ -146,7 +148,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
 
         {/* Split Modes */}
         <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-          <h2 className="font-semibold text-foreground text-sm mb-3">Como dividir?</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Como dividir?')}</h2>
           <div className="grid grid-cols-2 gap-2">
             {modes.map((mode) => (
               <button
@@ -169,8 +171,8 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
                 </div>
                 <p className={`text-xs font-semibold ${
                   splitMode === mode.id ? 'text-primary' : 'text-foreground'
-                }`}>{mode.name}</p>
-                <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
+                }`}>{translateText(mode.name)}</p>
+                <p className="text-[10px] text-muted-foreground">{translateText(mode.desc)}</p>
               </button>
             ))}
           </div>
@@ -186,12 +188,12 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
                     line.highlight === 'success' ? 'text-success' :
                     line.highlight === 'warning' ? 'text-warning' :
                     'text-muted-foreground'
-                  }>{line.label}</span>
+                  }>{translateText(line.label)}</span>
                   <span className={
                     line.highlight === 'success' ? 'text-success font-medium' :
                     line.highlight === 'warning' ? 'text-warning font-medium' :
                     'text-foreground'
-                  }>{line.value}</span>
+                  }>{translateText(line.value)}</span>
                 </div>
               ))}
             </div>
@@ -201,9 +203,9 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
         {/* Your amount highlight */}
         {yourAmount && (
           <div className="bg-primary/5 rounded-2xl p-4 border border-primary/20">
-            <p className="text-xs font-semibold text-foreground mb-1">Você paga:</p>
+            <p className="text-xs font-semibold text-foreground mb-1">{translateText('Você paga')}:</p>
             <div className="flex justify-between font-bold text-lg">
-              <span className="text-foreground">Total</span>
+              <span className="text-foreground">{translateText('Total')}</span>
               <span className="text-primary">{yourAmount}</span>
             </div>
           </div>
@@ -217,7 +219,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
           className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-2xl shadow-xl shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5" />
-          {ctaLabel || 'Prosseguir para Pagamento'}
+          {translateText(ctaLabel || 'Prosseguir para Pagamento')}
         </button>
       </div>
     </div>

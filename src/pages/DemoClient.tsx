@@ -76,7 +76,7 @@ const DemoClientInner = () => {
   const [serviceType, setServiceType] = useState('fine-dining');
   const [currentScreen, setCurrentScreen] = useState('home');
   const { cart } = useDemoContext();
-  const { t } = useDemoI18n();
+  const { t, translateText } = useDemoI18n();
   const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
 
   const config = DEMO_REGISTRY[serviceType];
@@ -88,7 +88,11 @@ const DemoClientInner = () => {
   }, [serviceType]);
 
   const activeServiceType = SERVICE_TYPES.find(s => s.id === serviceType);
-  const info = config?.info[currentScreen] || { title: 'Demo', desc: '' };
+  const rawInfo = config?.info[currentScreen] || { title: 'Demo', desc: '' };
+  const info = {
+    title: translateText(rawInfo.title),
+    desc: translateText(rawInfo.desc),
+  };
   const currentStepIdx = config?.steps.findIndex(s => s.screens.includes(currentScreen)) ?? -1;
 
   const handleTabChange = (tab: NavTab) => {
@@ -154,7 +158,7 @@ const DemoClientInner = () => {
             <div className={`flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r ${activeServiceType?.color || ''} border border-border/50`}>
               <ItemIcon cat={activeServiceType?.iconCat || 'generic'} size="lg" />
               <div>
-                <h1 className="font-display text-lg font-bold text-foreground">{activeServiceType?.restaurant}</h1>
+                <h1 className="font-display text-lg font-bold text-foreground">{activeServiceType ? translateText(activeServiceType.restaurant) : ''}</h1>
                 <p className="text-sm text-muted-foreground">{activeServiceType ? t('serviceTypes', activeServiceType.id) : ''} · {activeServiceType ? t('serviceTypeTaglines', activeServiceType.id) : ''}</p>
               </div>
             </div>
@@ -185,7 +189,7 @@ const DemoClientInner = () => {
                       }`}>
                         {isPast && !isActive ? <Check className="w-3 h-3" /> : step}
                       </div>
-                      <span className={`text-xs ${isActive ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>{label}</span>
+                      <span className={`text-xs ${isActive ? 'font-semibold text-foreground' : 'text-muted-foreground'}`}>{translateText(label)}</span>
                     </button>
                   );
                 })}
@@ -223,7 +227,7 @@ const DemoClientInner = () => {
                   {config?.steps.slice(0, 5).map(({ step, label }) => (
                     <div key={step} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Check className="w-3 h-3 text-success shrink-0" />
-                      <span>{label}</span>
+                      <span>{translateText(label)}</span>
                     </div>
                   ))}
                   {(config?.steps.length ?? 0) > 5 && (

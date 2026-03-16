@@ -8,6 +8,7 @@ import {
   ArrowLeft, CreditCard, QrCode, Smartphone, Wallet, Check,
   Award, Clock, Zap, Gift, type LucideIcon,
 } from 'lucide-react';
+import { useDemoI18n } from './DemoI18n';
 
 // ============ TYPES ============
 
@@ -94,6 +95,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
   onConfirm,
   estimatedTime,
 }) => {
+  const { translateText } = useDemoI18n();
   const [selectedPayment, setSelectedPayment] = useState(fullMethodGrid ? 'pix' : 'card');
   const [tipPercent, setTipPercent] = useState(defaultTip);
   const [usedPoints, setUsedPoints] = useState(false);
@@ -128,8 +130,8 @@ const DemoPayment: React.FC<PaymentConfig> = ({
               <Award className="w-5 h-5 text-accent" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-foreground">{loyalty.title}</p>
-              <p className="text-xs text-muted-foreground">{loyalty.subtitle}</p>
+              <p className="text-sm font-semibold text-foreground">{translateText(loyalty.title)}</p>
+              <p className="text-xs text-muted-foreground">{translateText(loyalty.subtitle)}</p>
             </div>
             {loyalty.actionLabel && (
               <button
@@ -140,7 +142,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                     : 'bg-accent/20 text-accent'
                 }`}
               >
-                {usedPoints ? '✓ Usado' : loyalty.actionLabel}
+                {usedPoints ? `✓ ${translateText('Usado')}` : translateText(loyalty.actionLabel)}
               </button>
             )}
           </div>
@@ -149,7 +151,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
         {/* Tip Selector */}
         {showTip && (
           <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-            <h2 className="font-semibold text-foreground text-sm mb-3">Gorjeta</h2>
+            <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Gorjeta')}</h2>
             <div className="flex gap-2">
               {[0, 10, 15, 20].map((p) => (
                 <button
@@ -162,7 +164,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                   }`}
                 >
                   <p className={`text-sm font-bold ${tipPercent === p ? 'text-primary' : 'text-foreground'}`}>
-                    {p === 0 ? 'Sem' : `${p}%`}
+                    {p === 0 ? translateText('Sem') : `${p}%`}
                   </p>
                   {p > 0 && tipBase > 0 && (
                     <p className="text-[9px] text-muted-foreground">
@@ -177,7 +179,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
 
         {/* Payment Methods */}
         <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-          <h2 className="font-semibold text-foreground text-sm mb-3">Forma de pagamento</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Forma de pagamento')}</h2>
           {fullMethodGrid ? (
             <div className="grid grid-cols-3 gap-2">
               {FULL_METHODS.map((method) => (
@@ -195,7 +197,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                   }`} />
                   <span className={`text-xs font-medium ${
                     selectedPayment === method.id ? 'text-primary' : 'text-muted-foreground'
-                  }`}>{method.name}</span>
+                  }`}>{translateText(method.name)}</span>
                 </button>
               ))}
             </div>
@@ -213,8 +215,8 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                 >
                   <method.icon className="w-5 h-5 text-muted-foreground" />
                   <div className="flex-1 text-left">
-                    <p className="text-sm font-semibold">{method.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{method.detail}</p>
+                    <p className="text-sm font-semibold">{translateText(method.name)}</p>
+                    <p className="text-[10px] text-muted-foreground">{translateText(method.detail)}</p>
                   </div>
                   {selectedPayment === method.id && <Check className="w-4 h-4 text-primary" />}
                 </button>
@@ -245,7 +247,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                 : infoBanner.variant === 'warning'
                   ? 'text-warning'
                   : 'text-primary'
-            }`}>{infoBanner.text}</span>
+            }`}>{translateText(infoBanner.text)}</span>
           </div>
         )}
 
@@ -253,13 +255,13 @@ const DemoPayment: React.FC<PaymentConfig> = ({
         {estimatedTime && (
           <div className="p-3 rounded-xl bg-muted/30 flex items-center gap-2">
             <Clock className="w-4 h-4 text-primary" />
-            <span className="text-xs font-medium">Preparo estimado: <strong>{estimatedTime}</strong></span>
+            <span className="text-xs font-medium">{translateText('Preparo estimado')}: <strong>{estimatedTime}</strong></span>
           </div>
         )}
 
         {/* Summary Card */}
         <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-          <h3 className="font-semibold text-foreground text-sm mb-3">Resumo</h3>
+          <h3 className="font-semibold text-foreground text-sm mb-3">{translateText('Resumo')}</h3>
           <div className="space-y-2">
             {items.map((item, i) => (
               <div key={i} className="flex justify-between text-sm">
@@ -268,23 +270,23 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                   item.highlight === 'warning' ? 'text-warning' :
                   item.highlight === 'accent' ? 'text-accent' :
                   'text-muted-foreground'
-                }>{item.label}</span>
+                }>{translateText(item.label)}</span>
                 <span className={
                   item.highlight === 'success' ? 'text-success font-medium' :
                   item.highlight === 'warning' ? 'text-warning font-medium' :
                   item.highlight === 'accent' ? 'text-accent font-medium' :
                   'text-foreground'
-                }>{item.value}</span>
+                }>{translateText(item.value)}</span>
               </div>
             ))}
             {showTip && tipPercent > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Gorjeta ({tipPercent}%)</span>
+                <span className="text-muted-foreground">{translateText('Gorjeta')} ({tipPercent}%)</span>
                 <span>R$ {tipAmount}</span>
               </div>
             )}
             <div className="border-t border-border pt-2 mt-1 flex justify-between">
-              <span className="font-semibold text-foreground">{totalLabel}</span>
+              <span className="font-semibold text-foreground">{translateText(totalLabel)}</span>
               <span className="font-bold text-xl text-primary">{total}</span>
             </div>
           </div>
@@ -298,7 +300,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
           className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-2xl shadow-xl shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5" />
-          {ctaLabel || `Pagar ${total}`}
+          {translateText(ctaLabel || `Pagar ${total}`)}
         </button>
       </div>
     </div>
