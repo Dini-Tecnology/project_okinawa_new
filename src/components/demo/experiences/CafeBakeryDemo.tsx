@@ -541,84 +541,31 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <div className="flex items-center justify-between py-4">
-            <button onClick={() => onNavigate('comanda')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-            <h1 className="font-display font-bold">Pagamento</h1>
-            <div className="w-8" />
-          </div>
-
-          {/* Loyalty */}
-          <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 mb-4 flex items-center gap-3">
-            <Award className="w-5 h-5 text-accent" />
-            <div className="flex-1">
-              <p className="text-xs font-semibold">Café #8 de 10!</p>
-              <p className="text-[10px] text-muted-foreground">Mais 2 cafés e o próximo é grátis ☕</p>
-            </div>
-          </div>
-
-          {/* Payment methods */}
-          <h2 className="font-semibold text-sm mb-3">Forma de pagamento</h2>
-          <div className="grid grid-cols-3 gap-2 mb-5">
-            {[
-              { id: 'pix', name: 'PIX', icon: QrCode },
-              { id: 'credit', name: 'Crédito', icon: CreditCard },
-              { id: 'apple', name: 'Apple Pay', icon: Smartphone },
-              { id: 'google', name: 'Google Pay', icon: Smartphone },
-              { id: 'tap', name: 'TAP to Pay', icon: Nfc },
-              { id: 'wallet', name: 'Carteira', icon: Wallet },
-            ].map((method) => (
-              <button key={method.id} onClick={() => setSelectedPayment(method.id)} className={`p-3 rounded-xl border-2 text-center transition-all ${selectedPayment === method.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                <method.icon className={`w-5 h-5 mx-auto mb-1 ${selectedPayment === method.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`text-xs font-medium ${selectedPayment === method.id ? 'text-primary' : 'text-muted-foreground'}`}>{method.name}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Summary */}
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Itens ({cart.length})</span><span>R$ {cartTotal}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Sessão: {sessionMinutes}min</span><span className="text-success">Grátis</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total</span><span className="text-primary">R$ {cartTotal}</span></div>
-          </div>
-
-          <button onClick={() => onNavigate('payment-success')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Pagar R$ {cartTotal}
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle={`Café Noowe · ${sessionMinutes}min de sessão`}
+          total={`R$ ${cartTotal}`}
+          items={[
+            { label: `Itens (${cart.length})`, value: `R$ ${cartTotal}` },
+            { label: `Sessão: ${sessionMinutes}min`, value: 'Grátis', highlight: 'success' },
+          ]}
+          loyalty={{ title: 'Café #8 de 10!', subtitle: 'Mais 2 cafés e o próximo é grátis ☕' }}
+          fullMethodGrid={true}
+          onBack={() => onNavigate('comanda')}
+          onConfirm={() => onNavigate('payment-success')}
+        />
       );
 
     case 'payment-success':
       return (
-        <div className="flex flex-col items-center justify-center h-full px-5 text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-6 shadow-xl shadow-success/30">
-            <Check className="w-12 h-12 text-primary-foreground" />
-          </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Conta Fechada! ☕</h2>
-          <p className="text-sm text-muted-foreground mb-2">Obrigado pela visita — volte sempre!</p>
-          <p className="text-xs text-muted-foreground mb-5">Sessão: {sessionMinutes}min · Mesa 3</p>
-
-          {/* Stamp card */}
-          <div className="w-full p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-4">
-            <div className="flex items-center gap-2 mb-3"><Gift className="w-4 h-4 text-primary" /><span className="text-sm font-bold">Cartão Fidelidade Café</span></div>
-            <div className="flex gap-1.5 mb-2">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div key={i} className={`flex-1 h-6 rounded-md flex items-center justify-center ${i < 8 ? 'bg-primary' : 'bg-muted'}`}>
-                  {i < 8 ? <Check className="w-3 h-3 text-primary-foreground" /> : i === 8 ? <span className="text-[10px] text-muted-foreground">☕</span> : null}
-                </div>
-              ))}
-            </div>
-            <p className="text-xs text-muted-foreground">8 de 10 · Mais 2 cafés e o próximo é <span className="text-primary font-bold">GRÁTIS!</span></p>
-          </div>
-
-          <div className="w-full p-3 rounded-xl bg-success/10 border border-success/20 mb-4 flex items-center gap-3">
-            <Award className="w-5 h-5 text-success" />
-            <div className="text-left"><p className="text-sm font-semibold text-success">+{Math.round(cartTotal / 5)} pontos ganhos!</p></div>
-          </div>
-
-          <div className="w-full space-y-2">
-            <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
-          </div>
+        <DemoPaymentSuccess
+          heading="Conta Fechada! ☕"
+          subtitle={`Obrigado pela visita — Sessão: ${sessionMinutes}min · Mesa 3`}
+          loyaltyReward={{ points: `+${Math.round(cartTotal / 5)} pontos ganhos!`, description: '8 de 10 cafés — mais 2 e o próximo é GRÁTIS!' }}
+          badge={{ text: 'Cartão Fidelidade Café · 8/10 selos' }}
+          secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
+        />
+      );
         </div>
       );
 
