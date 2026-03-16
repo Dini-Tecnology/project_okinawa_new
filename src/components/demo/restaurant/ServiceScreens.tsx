@@ -343,10 +343,6 @@ export const WaiterScreen: React.FC<{ onNavigate: (screen: string) => void }> = 
                         <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0">
                           <span className="text-xs font-semibold text-primary">{item.quantity}x</span>
                           <span className="text-xs flex-1">{item.menuItem.name}</span>
-                          <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
-                            item.status === 'ready' ? 'bg-success/10 text-success' :
-                            item.status === 'preparing' ? 'bg-warning/10 text-warning' : 'bg-muted text-muted-foreground'
-                          }`}>{item.status === 'ready' ? 'PRONTO' : item.status === 'preparing' ? 'PREPARANDO' : 'PENDENTE'}</span>
                           <span className="text-xs">R$ {item.menuItem.price * item.quantity}</span>
                         </div>
                       )) : <p className="text-xs text-muted-foreground">Nenhum pedido ativo</p>}
