@@ -1285,6 +1285,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Sobremesas': 'Desserts',
     'Burgers': 'Burgers',
     'Combos': 'Combos',
+    'Carrinho': 'Cart',
     'Acompanhamentos': 'Sides',
     'Individuais': 'Individual',
     'Cafés especiais': 'Specialty Coffees',
