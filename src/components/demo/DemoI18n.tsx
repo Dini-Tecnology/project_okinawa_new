@@ -171,20 +171,8 @@ export const DEMO_TRANSLATIONS = {
 const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, string>> = {
   en: {
     // ── Common UI ──
-    'Modo mobile': 'Mobile mode',
-    'Perfil ativo': 'Active profile',
-    'DEMO INTERATIVA': 'INTERACTIVE DEMO',
-    'Escolha o papel e veja a operação sob a ótica de cada equipe.': 'Choose a role and view the operation from each team\'s perspective.',
-    'Configuração resumida': 'Configuration summary',
-    'Ir para dashboard': 'Go to dashboard',
 
     // ── Greetings ──
-    'Bom dia': 'Good morning',
-    'Boa tarde': 'Good afternoon',
-    'Boa noite': 'Good evening',
-    'Bom almoço': 'Good lunch',
-    'Olá': 'Hello',
-    'Com fome?': 'Hungry?',
     'No caminho?': 'On the road?',
     'Sábado à noite': 'Saturday night',
     'Sexta-feira, 18:30': 'Friday, 6:30 PM',
@@ -1104,7 +1092,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Clientes Recorrentes': 'Returning Customers',
     'já visitaram antes': 'visited before',
     'Horários de Pico': 'Peak Hours',
-    'Baixo': 'Low',
     'Alto': 'High',
     'Desempenho da Equipe': 'Team Performance',
     'Sommelier': 'Sommelier',
@@ -1140,7 +1127,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
 
     // ── Owner role: Orders ──
     'Gerencie todos os pedidos — confirme, acompanhe o preparo e controle as entregas': 'Manage all orders — confirm, track preparation and control deliveries',
-    'Todos': 'All',
     'Pendentes': 'Pending',
     'Confirmados': 'Confirmed',
     'Prontos': 'Ready',
@@ -1332,9 +1318,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '10% desconto fidelidade': '10% loyalty discount',
 
     // ── Manager role: Stock ──
-    'Controle de estoque com alertas automáticos de nível baixo': 'Stock control with automatic low-level alerts',
-    'Crítico': 'Critical',
-    'Baixo Estoque': 'Low Stock',
     'Destilados': 'Spirits',
     'Mixers': 'Mixers',
     'Frutas': 'Fruits',
@@ -2566,7 +2549,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Ingredientes Frescos': 'Fresh Ingredients',
     'Ingredientes frescos': 'Fresh ingredients',
     'Iniciar preparo': 'Start prep',
-    'Insumos e alertas': 'Supplies and alerts',
     // 'Jantar para 2' — moved to Fine Dining section
     'Johnnie Walker Black': 'Johnnie Walker Black',
     'João': 'João',
@@ -2750,6 +2732,37 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     // VirtualQueueScreen (dynamic)
     'à sua frente': 'ahead of you',
     'Você é o próximo!': 'You\'re next!',
+
+    // ── Chef role: journey & screen info ──
+    'KDS e gestão de cardápio': 'KDS and menu management',
+    'Tickets e fila de preparo': 'Tickets and prep queue',
+    'Itens, fichas técnicas e preparo': 'Items, tech sheets and prep',
+    'Estoque Cozinha': 'Kitchen Stock',
+    'KDS — Cozinha': 'KDS — Kitchen',
+    'Display de tickets com timers e prioridades': 'Ticket display with timers and priorities',
+    'Estação de Preparo': 'Prep Station',
+    'Tickets da sua estação com timers': 'Your station tickets with timers',
+    'Controle de Estoque': 'Stock Control',
+    'Insumos, alertas de nível baixo e reposição': 'Supplies, low-level alerts and restocking',
+    'Categorias, itens, preços e fichas técnicas': 'Categories, items, prices and tech sheets',
+    // ── Chef role: Cook Station ──
+    'Visão simplificada para o cozinheiro — foco nos tickets da sua estação': 'Simplified view for the cook — focus on your station tickets',
+    '🔥 Grelhados': '🔥 Grill',
+    '❄️ Frios': '❄️ Cold',
+    '🍝 Massas': '🍝 Pasta',
+    '▶ INICIAR PREPARO': '▶ START PREP',
+    '✓ PRONTO': '✓ DONE',
+    'min preparo': 'min prep',
+    // ── Chef role: Stock Screen ──
+    'Controle de estoque com alertas automáticos de nível baixo': 'Stock control with automatic low-level alerts',
+    'Baixo': 'Low',
+    'Crítico': 'Critical',
+    'Todos': 'All',
+    'Baixo Estoque': 'Low Stock',
+    'Tickets da sua estação de preparo': 'Your prep station tickets',
+    'Visão geral da cozinha': 'Kitchen overview',
+    'Insumos e alertas': 'Supplies and alerts',
+
   },
   es: {
     // ── Common UI ──
@@ -3353,7 +3366,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Clientes Recorrentes': 'Clientes Recurrentes',
     'já visitaram antes': 'ya visitaron antes',
     'Horários de Pico': 'Horarios Pico',
-    'Baixo': 'Bajo',
     'Alto': 'Alto',
     'Desempenho da Equipe': 'Rendimiento del Equipo',
     'Sommelier': 'Sommelier',
@@ -3389,7 +3401,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
 
     // ── Owner role: Orders ──
     'Gerencie todos os pedidos — confirme, acompanhe o preparo e controle as entregas': 'Gestiona todos los pedidos — confirma, sigue la preparación y controla las entregas',
-    'Todos': 'Todos',
     'Pendentes': 'Pendientes',
     'Confirmados': 'Confirmados',
     'Prontos': 'Listos',
@@ -3585,9 +3596,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '10% desconto fidelidade': '10% descuento fidelidad',
 
     // ── Manager role: Stock ──
-    'Controle de estoque com alertas automáticos de nível baixo': 'Control de inventario con alertas automáticas de nivel bajo',
-    'Crítico': 'Crítico',
-    'Baixo Estoque': 'Inventario Bajo',
     'Destilados': 'Destilados',
     'Mixers': 'Mixers',
     'Frutas': 'Frutas',
@@ -5099,7 +5107,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Ingredientes Frescos': 'Ingredientes Frescos',
     'Ingredientes frescos': 'Ingredientes frescos',
     'Iniciar preparo': 'Iniciar preparación',
-    'Insumos e alertas': 'Insumos y alertas',
     // 'Jantar para 2' — moved to Fine Dining section
     'Johnnie Walker Black': 'Johnnie Walker Black',
     'João': 'João',
@@ -5298,6 +5305,37 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '⏳ Reabastecendo': '⏳ Reabasteciendo',
     '✓ Fresco': '✓ Fresco',
     '✓ Registrado': '✓ Registrado',
+
+    // ── Chef role: journey & screen info ──
+    'KDS e gestão de cardápio': 'KDS y gestión de menú',
+    'Tickets e fila de preparo': 'Tickets y cola de preparación',
+    'Itens, fichas técnicas e preparo': 'Ítems, fichas técnicas y preparación',
+    'Estoque Cozinha': 'Stock Cocina',
+    'KDS — Cozinha': 'KDS — Cocina',
+    'Display de tickets com timers e prioridades': 'Display de tickets con timers y prioridades',
+    'Estação de Preparo': 'Estación de Preparación',
+    'Tickets da sua estação com timers': 'Tickets de tu estación con timers',
+    'Controle de Estoque': 'Control de Stock',
+    'Insumos, alertas de nível baixo e reposição': 'Insumos, alertas de nivel bajo y reposición',
+    'Categorias, itens, preços e fichas técnicas': 'Categorías, ítems, precios y fichas técnicas',
+    // ── Chef role: Cook Station ──
+    'Visão simplificada para o cozinheiro — foco nos tickets da sua estação': 'Vista simplificada para el cocinero — foco en los tickets de tu estación',
+    '🔥 Grelhados': '🔥 Parrilla',
+    '❄️ Frios': '❄️ Fríos',
+    '🍝 Massas': '🍝 Pastas',
+    '▶ INICIAR PREPARO': '▶ INICIAR PREPARACIÓN',
+    '✓ PRONTO': '✓ LISTO',
+    'min preparo': 'min preparación',
+    // ── Chef role: Stock Screen ──
+    'Controle de estoque com alertas automáticos de nível baixo': 'Control de stock con alertas automáticas de nivel bajo',
+    'Baixo': 'Bajo',
+    'Crítico': 'Crítico',
+    'Todos': 'Todos',
+    'Baixo Estoque': 'Stock Bajo',
+    'Tickets da sua estação de preparo': 'Tickets de tu estación de preparación',
+    'Visão geral da cozinha': 'Vista general de la cocina',
+    'Insumos e alertas': 'Insumos y alertas',
+
 
   },
 };
