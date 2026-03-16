@@ -3246,6 +3246,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Amuse-Bouche': 'Amuse-Bouche',
     'Analisando combinações...': 'Analizando combinaciones...',
     'Anfitrião': 'Anfitrión',
+    'Balança Inteligente': 'Balanza Inteligente',
     'Ao Ar Livre': 'Al aire libre',
     'Apenas 3 vagas restantes para Sáb, 22 Mar': 'Solo 3 lugares restantes para Sáb, 22 Mar',
     'Aqui agora': 'Aquí ahora',
