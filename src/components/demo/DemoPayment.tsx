@@ -95,6 +95,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
   onConfirm,
   estimatedTime,
 }) => {
+  const { translateText } = useDemoI18n();
   const [selectedPayment, setSelectedPayment] = useState(fullMethodGrid ? 'pix' : 'card');
   const [tipPercent, setTipPercent] = useState(defaultTip);
   const [usedPoints, setUsedPoints] = useState(false);
