@@ -2373,6 +2373,105 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Wrap Proteico': 'Protein Wrap',
     'ou': 'or',
     '•••• 4242 · Visa': '•••• 4242 · Visa',
+
+    // ── End-to-End Audit: Missing Strings ──
+    // CallWaiterScreen
+    'Acessibilidade ou necessidades especiais': 'Accessibility or special needs',
+    'Assistência': 'Assistance',
+    'Dúvidas sobre Pratos': 'Questions about Dishes',
+    'Falar com responsável': 'Speak with manager',
+    'Informar problema com pedido': 'Report order issue',
+    'Modificações ou pedidos personalizados': 'Modifications or custom orders',
+    'Perguntar sobre ingredientes ou preparo': 'Ask about ingredients or preparation',
+    'Recomendação': 'Recommendation',
+    'Solicitar refil de bebida': 'Request drink refill',
+    'Sugestões do chef ou harmonizações': 'Chef suggestions or pairings',
+    // CheckoutScreen
+    'Cartão de Crédito': 'Credit Card',
+    'Cartão de Débito': 'Debit Card',
+    'Débito direto na conta': 'Direct debit from account',
+    'Parcele em até 12x': 'Pay in up to 12 installments',
+    'Transferência instantânea': 'Instant transfer',
+    // DietaryFiltersSheet
+    'Baixo Sódio': 'Low Sodium',
+    'Frutos do Mar': 'Seafood',
+    'Livre de glúten': 'Gluten free',
+    'Livre de laticínios': 'Dairy free',
+    'Livre de oleaginosas': 'Nut free',
+    'Livre de ovos': 'Egg free',
+    'Reduzido em sal': 'Reduced salt',
+    'Sem carne ou peixe': 'No meat or fish',
+    'Vegetariano + frutos do mar': 'Vegetarian + seafood',
+    // DigitalReceiptScreen
+    'Filé Mignon ao Molho Madeira': 'Filet Mignon with Madeira Sauce',
+    'Ponto médio': 'Medium',
+    'Rua das Flores, 123 - Jardins': 'Rua das Flores, 123 - Jardins',
+    'Água com Gás 500ml': 'Sparkling Water 500ml',
+    // DishBuilderScreen
+    'Obrigatório: escolha 1': 'Required: choose 1',
+    // ExploreScreen
+    'Café & Doces': 'Café & Sweets',
+    'Café Central': 'Café Central',
+    'Sabor do Campo': 'Sabor do Campo',
+    '💰 Promoções': '💰 Deals',
+    '📍 Próximos': '📍 Nearby',
+    // NewReservationScreen
+    'Sáb': 'Sat',
+    '🎂 Aniversário': '🎂 Birthday',
+    '🎉 Celebração': '🎉 Celebration',
+    '💑 Aniversário de Casamento': '💑 Wedding Anniversary',
+    '💕 Encontro Romântico': '💕 Romantic Date',
+    '💼 Negócios': '💼 Business',
+    // PairingAssistantScreen
+    'Acompanhamento clássico para carnes, eleva a experiência gastronômica': 'Classic accompaniment for meats, elevates the dining experience',
+    'Chocolate belga com sorvete': 'Belgian chocolate with ice cream',
+    'Cremoso com óleo de trufa': 'Creamy with truffle oil',
+    'Encorpado com notas de frutas negras': 'Full-bodied with dark fruit notes',
+    'Finalização perfeita após pratos robustos como o filé': 'Perfect finish after robust dishes like the filet',
+    'Harmoniza perfeitamente com o Filé Mignon, realçando os sabores do molho madeira': 'Pairs perfectly with the Filet Mignon, enhancing the Madeira sauce flavors',
+    'Limpa o paladar entre os pratos, mantendo a experiência fresca': 'Cleanses the palate between courses, keeping the experience fresh',
+    'O amargor complementa a cremosidade do risoto de funghi': 'The bitterness complements the creaminess of the mushroom risotto',
+    'Purê de Batata Trufado': 'Truffle Mashed Potatoes',
+    // ReservationsScreen
+    'Nenhuma reserva em andamento': 'No ongoing reservations',
+    'Próximas': 'Upcoming',
+    'Você ainda não fez reservas': 'You haven\'t made any reservations yet',
+    'Você não tem reservas futuras': 'You have no upcoming reservations',
+    // RoleDashboardScreen
+    'Atendimento de mesas': 'Table service',
+    'Chef de Cozinha': 'Head Chef',
+    'Gestão de bebidas': 'Beverage management',
+    'Gestão de pedidos e cozinha': 'Order and kitchen management',
+    'Reservas e recepção': 'Reservations and reception',
+    // ServiceTypeConfigScreen
+    'Cliente faz pedido pelo celular': 'Customer orders via mobile',
+    'Customização de pratos pelo cliente': 'Customer dish customization',
+    'Divisão de Conta': 'Bill Split',
+    'Escolha o tipo do seu estabelecimento': 'Choose your establishment type',
+    'Mapa de Mesas': 'Table Map',
+    'Monte seu Prato': 'Build your Dish',
+    'Pedido pelo App': 'Order via App',
+    'Pedidos e entrega na mesa': 'Orders and table delivery',
+    'Serviço na Mesa': 'Table Service',
+    'Sistema de fila com estimativa de espera': 'Queue system with wait estimate',
+    'Visualização interativa do salão': 'Interactive floor visualization',
+    // SplitByItemScreen
+    'Cartão': 'Card',
+    'Confirme seu pagamento': 'Confirm your payment',
+    'Instantâneo': 'Instant',
+    'Revise a divisão': 'Review the split',
+    'Selecione itens para cada pessoa': 'Select items for each person',
+    // SplitPaymentScreen
+    'Aguardando pagamento dos demais': 'Waiting for others to pay',
+    'João Pedro': 'João Pedro',
+    'Você (Principal)': 'You (Primary)',
+    // StaffManagementScreen
+    'Almoço': 'Lunch',
+    // TabScreen
+    '50% em Chopes': '50% off Draft Beers',
+    // WaiterScreen
+    'Aguardar Aproximação': 'Wait for Approach',
+    'Processar na Maquininha': 'Process on Card Machine',
   },
   es: {
     // ── Common UI ──
