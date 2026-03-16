@@ -654,66 +654,25 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'split':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Dividir Conta" back="comanda" />
-          <GuidedHint text="Escolha como dividir — cada pessoa pode pagar independente" />
-          <div className="grid grid-cols-2 gap-2 mb-5">
-            {[
-              { id: 'mine' as const, name: 'Meus Itens', desc: `R$ ${myTotal + Math.round(myTotal * 0.1)}`, icon: User },
-              { id: 'equal' as const, name: 'Partes Iguais', desc: `R$ ${equalSplit} cada`, icon: Scale },
-              { id: 'by-item' as const, name: 'Por Item', desc: 'Selecione os itens', icon: Receipt },
-              { id: 'fixed' as const, name: 'Valor Fixo', desc: 'Defina o valor', icon: Wallet },
-            ].map(mode => (
-              <button key={mode.id} onClick={() => setSplitMode(mode.id)} className={`p-4 rounded-2xl border-2 text-left ${splitMode === mode.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center mb-1">
-                  <mode.icon className="w-4 h-4 text-primary" />
-                </div>
-                <p className={`text-xs font-semibold ${splitMode === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.name}</p>
-                <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
-              </button>
-            ))}
-          </div>
-
-          {splitMode === 'mine' && (
-            <div className="p-4 rounded-xl bg-card border border-border mb-4">
-              <p className="text-xs font-semibold mb-2">Seus itens:</p>
-              {orders.filter(o => o.who === 'Você').map((o, i) => (
-                <div key={i} className="flex justify-between text-sm py-1 border-b border-border/50 last:border-0">
-                  <span>{o.item.name}</span><span className="font-semibold">R$ {o.item.price}</span>
-                </div>
-              ))}
-              <div className="border-t border-border pt-2 mt-2">
-                <div className="flex justify-between text-xs"><span className="text-muted-foreground">Itens compartilhados (÷{PEOPLE.length})</span><span>R$ {Math.round(barOrders.reduce((s, o) => s + o.price, 0) / PEOPLE.length)}</span></div>
-                <div className="flex justify-between text-xs mt-1"><span className="text-muted-foreground">Serviço (10%)</span><span>R$ {Math.round(myTotal * 0.1)}</span></div>
-                <div className="flex justify-between font-bold text-lg mt-2"><span>Você paga</span><span className="text-primary">R$ {myTotal + Math.round(myTotal * 0.1) + Math.round(barOrders.reduce((s, o) => s + o.price, 0) / PEOPLE.length)}</span></div>
-              </div>
-            </div>
-          )}
-
-          {splitMode === 'equal' && (
-            <div className="p-4 rounded-xl bg-card border border-border mb-4">
-              <p className="text-xs font-semibold mb-3">Divisão igual entre {PEOPLE.length}:</p>
-              {PEOPLE.map(p => (
-                <div key={p.id} className="flex items-center gap-2 py-2 border-b border-border/50 last:border-0">
-                  <div className={`w-6 h-6 rounded-full ${p.color} flex items-center justify-center text-primary-foreground text-[9px] font-bold`}>{p.name[0]}</div>
-                  <span className="text-sm flex-1">{p.name}</span>
-                  <span className="font-semibold text-sm">R$ {equalSplit}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {splitMode === 'by-item' && (
-            <button onClick={() => onNavigate('split-by-item')} className="w-full p-4 rounded-xl border border-primary/30 bg-primary/5 text-center mb-4">
-              <p className="text-sm font-semibold text-primary">Abrir seleção de itens</p>
-              <p className="text-[10px] text-muted-foreground">Arraste cada item para quem vai pagar</p>
-            </button>
-          )}
-
-          <button onClick={() => onNavigate('tip')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" /> Prosseguir para Pagamento
-          </button>
-        </div>
+        <DemoSplitBill
+          title="Dividir Conta"
+          subtitle={`Cantina Noowe · ${PEOPLE.length} pessoas`}
+          total={`R$ ${subtotal + service}`}
+          people={PEOPLE.map(p => ({
+            id: p.id,
+            name: p.name,
+            color: p.color,
+            initial: p.name[0],
+            amount: orders.filter(o => o.who === p.name).reduce((s, o) => s + o.item.price * o.qty, 0),
+          }))}
+          summaryLines={[
+            { label: 'Subtotal', value: `R$ ${subtotal}` },
+            { label: 'Serviço (10%)', value: `R$ ${service}` },
+          ]}
+          yourAmount={`R$ ${myTotal + Math.round(myTotal * 0.1)}`}
+          onBack={() => onNavigate('comanda')}
+          onProceed={() => onNavigate('tip')}
+        />
       );
 
     case 'split-by-item':
@@ -741,74 +700,37 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'tip':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Gorjeta & Pagamento" back="split" />
-          <div className="text-center mb-4">
-            <p className="text-sm text-muted-foreground mb-1">Como foi o serviço?</p>
-            <div className="flex justify-center gap-1 mb-3">
-              {[1, 2, 3, 4, 5].map(s => (
-                <Star key={s} className={`w-7 h-7 ${s <= 4 ? 'text-accent fill-accent' : 'text-muted'}`} />
-              ))}
-            </div>
-          </div>
-          <p className="text-xs font-semibold mb-2">Gorjeta sugerida</p>
-          <div className="flex gap-2 mb-4">
-            {[0, 10, 15, 20].map(p => (
-              <button key={p} onClick={() => setTipPct(p)} className={`flex-1 py-3 rounded-xl text-center border-2 ${tipPct === p ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                <p className={`text-sm font-bold ${tipPct === p ? 'text-primary' : 'text-foreground'}`}>{p === 0 ? 'Sem' : `${p}%`}</p>
-                <p className="text-[9px] text-muted-foreground">{p === 0 ? '' : `R$ ${Math.round(subtotal * p / 100)}`}</p>
-              </button>
-            ))}
-          </div>
-          <div className="p-4 rounded-xl bg-card border border-border mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Seus itens</span><span>R$ {myTotal}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Serviço (10%)</span><span>R$ {Math.round(myTotal * 0.1)}</span></div>
-            {tipPct > 0 && <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Gorjeta ({tipPct}%)</span><span>R$ {Math.round(myTotal * tipPct / 100)}</span></div>}
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
-              <span>Total</span>
-              <span className="text-primary">R$ {myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}</span>
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-card border border-border mb-4">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">•••• 4242</p><p className="text-[10px] text-muted-foreground">Visa Crédito</p></div>
-              <Check className="w-4 h-4 text-success" />
-            </div>
-          </div>
-          <button onClick={() => onNavigate('payment-success')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" /> Pagar R$ {myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}
-          </button>
-        </div>
+        <DemoPayment
+          title="Gorjeta & Pagamento"
+          subtitle="Cantina Noowe · Casual Dining"
+          total={`R$ ${myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}`}
+          items={[
+            { label: 'Seus itens', value: `R$ ${myTotal}` },
+            { label: 'Serviço (10%)', value: `R$ ${Math.round(myTotal * 0.1)}` },
+          ]}
+          showTip={true}
+          defaultTip={tipPct}
+          tipBase={myTotal}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('split')}
+          onConfirm={() => onNavigate('payment-success')}
+          ctaLabel={`Pagar R$ ${myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}`}
+        />
       );
 
     case 'payment-success':
       return (
-        <div className="flex flex-col items-center justify-center h-full px-5 text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-5 shadow-xl shadow-success/30">
-            <Check className="w-12 h-12 text-primary-foreground" />
-          </div>
-          <h2 className="font-display text-2xl font-bold mb-1">Pagamento Confirmado!</h2>
-          <p className="text-sm text-muted-foreground mb-4">Cantina Noowe agradece sua visita</p>
-          <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Pago por você</span><span className="font-semibold">R$ {myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}</span></div>
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Status mesa</span><span className="text-success font-semibold">3/4 pagaram</span></div>
-          </div>
-          <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
-            <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left">
-              <p className="text-sm font-semibold">+35 pontos ganhos!</p>
-              <p className="text-[10px] text-muted-foreground">Próxima sobremesa kids grátis em 2 visitas</p>
-            </div>
-          </div>
-          <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center gap-3">
-            <Trophy className="w-4 h-4 text-accent" />
-            <p className="text-xs text-muted-foreground">Selo de família ganho! Nível: Família Bronze</p>
-          </div>
-          <button onClick={() => onNavigate('review')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
-            Avaliar Experiência
-          </button>
-        </div>
+        <DemoPaymentSuccess
+          heading="Pagamento Confirmado!"
+          subtitle="Cantina Noowe agradece sua visita"
+          summaryItems={[
+            { label: 'Pago por você', value: `R$ ${myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}` },
+            { label: 'Status mesa', value: '3/4 pagaram', highlight: 'success' },
+          ]}
+          loyaltyReward={{ points: '+35 pontos ganhos!', description: 'Próxima sobremesa kids grátis em 2 visitas' }}
+          badge={{ icon: Trophy, text: 'Selo de família ganho! Nível: Família Bronze' }}
+          primaryAction={{ label: 'Avaliar Experiência', onClick: () => onNavigate('review') }}
+        />
       );
 
     case 'review':

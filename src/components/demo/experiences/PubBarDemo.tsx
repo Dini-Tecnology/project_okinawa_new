@@ -727,128 +727,72 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     /* ═══ STAGE 8 & 9: SPLIT & PAYMENT ═══ */
     case 'split':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Dividir Conta" back="tab-live" />
-          <div className="p-4 rounded-xl bg-card border border-border mb-4">
-            <h3 className="font-semibold text-sm mb-3">Resumo</h3>
-            {FRIENDS.filter(f => f.status !== 'pending').map(f => {
-              const personTotal = getPersonTotal(f.name);
-              return (
-                <div key={f.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-7 h-7 rounded-full ${f.color} flex items-center justify-center text-primary-foreground text-xs font-bold`}>{f.initial}</div>
-                    <p className="text-sm font-medium">{f.name}</p>
-                  </div>
-                  <span className="font-semibold text-sm">R$ {personTotal}</span>
-                </div>
-              );
-            })}
-            <div className="border-t-2 border-border pt-3 mt-2 space-y-1">
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>R$ {tabTotal}</span></div>
-              {coverCredit > 0 && <div className="flex justify-between text-sm"><span className="text-success">Crédito cover</span><span className="text-success">-R$ {coverCredit}</span></div>}
-              {hhSavings > 0 && <div className="flex justify-between text-sm"><span className="text-warning">Economia HH</span><span className="text-warning">-R$ {hhSavings}</span></div>}
-              <div className="flex justify-between font-display font-bold text-lg mt-1"><span>Total</span><span className="text-primary">R$ {Math.max(0, tabTotal - coverCredit)}</span></div>
-            </div>
-          </div>
-          <p className="text-xs font-semibold mb-2">Como dividir?</p>
-          <div className="grid grid-cols-3 gap-2 mb-4">
-            {[
-              { mode: 'consumption' as const, label: 'Por Consumo', desc: 'Cada um paga o seu', icon: DollarSign },
-              { mode: 'equal' as const, label: 'Igual', desc: `R$ ${Math.ceil((tabTotal - coverCredit) / 3)} cada`, icon: Users },
-              { mode: 'selective' as const, label: 'Seletivo', desc: 'Escolher itens', icon: UtensilsCrossed },
-            ].map(opt => (
-              <button key={opt.mode} onClick={() => setSplitMode(opt.mode)} className={`p-3 rounded-xl border-2 text-center ${splitMode === opt.mode ? 'border-primary bg-primary/10' : 'border-border'}`}>
-                <opt.icon className={`w-4 h-4 mx-auto mb-1 ${splitMode === opt.mode ? 'text-primary' : 'text-muted-foreground'}`} />
-                <p className="text-[10px] font-semibold">{opt.label}</p>
-                <p className="text-[8px] text-muted-foreground">{opt.desc}</p>
-              </button>
-            ))}
-          </div>
-          {splitMode === 'consumption' && (
-            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
-              <p className="text-xs font-semibold mb-1">Você paga:</p>
-              <div className="flex justify-between font-bold text-lg"><span>Total</span><span className="text-primary">R$ {getPersonTotal('Você')}</span></div>
-            </div>
-          )}
-          <button onClick={() => onNavigate('payment')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" /> Pagar
-          </button>
-        </div>
+        <DemoSplitBill
+          title="Dividir Conta"
+          subtitle={`Noowe Tap House · Mesa 7`}
+          total={`R$ ${Math.max(0, tabTotal - coverCredit)}`}
+          people={FRIENDS.filter(f => f.status !== 'pending').map(f => ({
+            id: f.id,
+            name: f.name,
+            color: f.color,
+            initial: f.initial,
+            amount: getPersonTotal(f.name),
+          }))}
+          modes={[
+            { id: 'individual', name: 'Por Consumo', desc: 'Cada um paga o seu', icon: DollarSign },
+            { id: 'equal', name: 'Igual', desc: `R$ ${Math.ceil((tabTotal - coverCredit) / 3)} cada`, icon: Users },
+            { id: 'selective', name: 'Seletivo', desc: 'Escolher itens', icon: UtensilsCrossed },
+          ]}
+          summaryLines={[
+            { label: 'Subtotal', value: `R$ ${tabTotal}` },
+            ...(coverCredit > 0 ? [{ label: 'Crédito cover', value: `-R$ ${coverCredit}`, highlight: 'success' as const }] : []),
+            ...(hhSavings > 0 ? [{ label: 'Economia HH', value: `-R$ ${hhSavings}`, highlight: 'warning' as const }] : []),
+          ]}
+          yourAmount={`R$ ${getPersonTotal('Você')}`}
+          onBack={() => onNavigate('tab-live')}
+          onProceed={() => onNavigate('payment')}
+          ctaLabel="Pagar"
+        />
       );
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="split" />
-          <div className="text-center mb-5">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-              <CreditCard className="w-8 h-8 text-primary" />
-            </div>
-            <h2 className="font-display text-lg font-bold">Confirmar pagamento</h2>
-            <p className="font-display text-2xl font-bold text-primary mt-1">R$ {getPersonTotal('Você')}</p>
-          </div>
-          <div className="space-y-2 mb-4">
-            {[
-              { method: 'Cartão pré-autorizado', detail: '•••• 4242 · Visa', selected: true },
-              { method: 'PIX', detail: 'Pagamento instantâneo', selected: false },
-            ].map((m, i) => (
-              <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border-2 ${m.selected ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
-                <CreditCard className="w-5 h-5 text-muted-foreground" />
-                <div className="flex-1"><p className="text-sm font-semibold">{m.method}</p><p className="text-[10px] text-muted-foreground">{m.detail}</p></div>
-                {m.selected && <Check className="w-4 h-4 text-primary" />}
-              </div>
-            ))}
-          </div>
-          <div className="p-3 rounded-xl bg-muted/30 mb-4 space-y-1 text-xs text-muted-foreground">
-            <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Crédito cover de R$ {coverCredit} aplicado</p>
-            <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Pré-autorização será liquidada</p>
-          </div>
-          <button onClick={() => onNavigate('post')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
-            <Check className="w-5 h-5" /> Confirmar · R$ {getPersonTotal('Você')}
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="Noowe Tap House · Mesa 7"
+          total={`R$ ${getPersonTotal('Você')}`}
+          items={[
+            { label: 'Seu consumo', value: `R$ ${getPersonTotal('Você')}` },
+            ...(coverCredit > 0 ? [{ label: 'Crédito cover aplicado', value: `-R$ ${coverCredit}`, highlight: 'success' as const }] : []),
+          ]}
+          infoBanner={{ icon: Check, text: 'Pré-autorização será liquidada', variant: 'success' }}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('split')}
+          onConfirm={() => onNavigate('post')}
+          ctaLabel={`Confirmar · R$ ${getPersonTotal('Você')}`}
+        />
       );
 
     /* ═══ STAGE 10: POST-EXPERIENCE ═══ */
     case 'post':
       return (
-        <div className="flex flex-col items-center justify-center h-full px-5 text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center mb-5 shadow-xl shadow-amber-500/30">
-            <Beer className="w-12 h-12 text-primary-foreground" />
-          </div>
-          <h2 className="font-display text-2xl font-bold mb-1">Conta Fechada!</h2>
-          <p className="text-sm text-muted-foreground mb-4">Noowe Tap House agradece</p>
-          <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Você consumiu</span><span className="font-semibold">R$ {getPersonTotal('Você')}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-success">Crédito cover</span><span className="text-success">-R$ {coverCredit}</span></div>
-            {hhSavings > 0 && <div className="flex justify-between text-sm mb-1"><span className="text-warning">Economia HH</span><span className="text-warning">-R$ {hhSavings}</span></div>}
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Status</span><span className="text-success font-semibold flex items-center gap-1"><Check className="w-3 h-3" /> Todos pagaram</span></div>
-          </div>
-          <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
-            <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left">
-              <p className="text-sm font-semibold">+45 pontos ganhos!</p>
-              <p className="text-[10px] text-muted-foreground">Próximo chopp grátis em 3 visitas</p>
-            </div>
-          </div>
-          <div className="w-full flex gap-2 mb-3">
-            {['Ótimos chopps', 'Atendimento top', 'Happy hour show'].map(tag => (
-              <button key={tag} className="flex-1 px-2 py-1.5 rounded-full bg-muted text-[9px] text-muted-foreground">{tag}</button>
-            ))}
-          </div>
-          <div className="w-full flex items-center justify-center gap-1 mb-3">
-            {[1, 2, 3, 4, 5].map(s => (
-              <Star key={s} className={`w-7 h-7 ${s <= 4 ? 'text-accent fill-accent' : 'text-muted'}`} />
-            ))}
-          </div>
-          <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center gap-3">
-            <Trophy className="w-4 h-4 text-accent" />
-            <p className="text-xs text-muted-foreground">Selo "Bar Regular" conquistado!</p>
-          </div>
-          <button onClick={() => onNavigate('discovery')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">
-            Voltar ao Início
-          </button>
-        </div>
+        <DemoPaymentSuccess
+          heading="Conta Fechada!"
+          subtitle="Noowe Tap House agradece"
+          icon={Beer}
+          gradientFrom="from-accent"
+          gradientTo="to-accent/80"
+          shadowColor="shadow-accent/30"
+          summaryItems={[
+            { label: 'Você consumiu', value: `R$ ${getPersonTotal('Você')}` },
+            ...(coverCredit > 0 ? [{ label: 'Crédito cover', value: `-R$ ${coverCredit}`, highlight: 'success' as const }] : []),
+            ...(hhSavings > 0 ? [{ label: 'Economia HH', value: `-R$ ${hhSavings}`, highlight: 'warning' as const }] : []),
+            { label: 'Status', value: 'Todos pagaram', highlight: 'success' as const },
+          ]}
+          loyaltyReward={{ points: '+45 pontos ganhos!', description: 'Próximo chopp grátis em 3 visitas' }}
+          badge={{ icon: Trophy, text: 'Selo "Bar Regular" conquistado!' }}
+          secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('discovery') }}
+        />
       );
 
     default: return null;
