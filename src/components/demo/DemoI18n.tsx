@@ -3530,9 +3530,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Hambúrguer de grão de bico, rúcula, tomate seco, tahini': 'Hamburguesa de garbanzo, rúcula, tomate seco, tahini',
     'Harmoniza com taninos encorpados': 'Armoniza con taninos corpulentos',
     'Hibisco com limão, sem açúcar': 'Hibisco con limón, sin azúcar',
-    'Ingredientes
-Frescos': 'Ingredientes
-Frescos',
+    'Ingredientes Frescos': 'Ingredientes Frescos',
     'Ingredientes frescos': 'Ingredientes frescos',
     'Iniciar preparo': 'Iniciar preparación',
     'Insumos e alertas': 'Insumos y alertas',
