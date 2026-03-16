@@ -3418,6 +3418,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'O chef personaliza para você': 'El chef personaliza para ti',
     'Open bar completo': 'Open bar completo',
     'Opções veganas': 'Opciones veganas',
+    'Opções Hoje': 'Opciones Hoy',
     'Ovo': 'Huevo',
     'Pago por outros': 'Pagado por otros',
     'Pague': 'Paga',
