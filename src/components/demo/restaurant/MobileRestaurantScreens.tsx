@@ -363,40 +363,71 @@ const MobileWaiter: React.FC = () => {
   const { orders, tables, notifications } = useDemoContext();
   const waiterCalls = notifications.filter(n => n.type === 'waiter_call' && !n.read);
   const myTables = tables.filter(t => ['occupied', 'billing'].includes(t.status));
+  const activeOrders = orders.filter(o => !['paid', 'delivered'].includes(o.status));
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         <CompactStat label="Mesas" value={String(myTables.length)} tone="primary" />
+        <CompactStat label="Pedidos" value={String(activeOrders.length)} tone="info" />
         <CompactStat label="Chamados" value={String(waiterCalls.length)} tone="warning" />
         <CompactStat label="Gorjetas" value="R$ 410" tone="success" />
       </div>
+
+      {/* Urgent call banner */}
+      {waiterCalls.length > 0 && (
+        <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-destructive/10 border border-destructive/20 animate-pulse">
+          <Bell className="h-4 w-4 text-destructive" />
+          <p className="text-[11px] font-semibold text-destructive">{waiterCalls.length} chamado(s) pendente(s)!</p>
+        </div>
+      )}
+
       <MobileSection title="Minhas mesas">
         <div className="space-y-2">
-          {myTables.map(table => (
-            <div key={table.id} className="rounded-2xl border border-border bg-card p-3">
-              <div className="flex items-center justify-between gap-2">
-                <div>
-                  <p className="text-sm font-semibold">Mesa {table.number}</p>
-                  <p className="text-[11px] text-muted-foreground">{table.customerName} · {table.seats} lugares</p>
+          {myTables.map(table => {
+            const tableOrders = orders.filter(o => o.tableNumber === table.number && !['paid'].includes(o.status));
+            const hasCall = waiterCalls.some(c => c.message.includes(`Mesa ${table.number}`));
+            return (
+              <div key={table.id} className={`rounded-2xl border-2 p-3 ${
+                hasCall ? 'border-destructive/30 bg-destructive/5' :
+                table.status === 'billing' ? 'border-warning/30 bg-warning/5' : 'border-border bg-card'
+              }`}>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-display font-bold text-sm ${
+                      hasCall ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
+                    }`}>{table.number}</div>
+                    <div>
+                      <p className="text-sm font-semibold">{table.customerName}</p>
+                      <p className="text-[10px] text-muted-foreground">{table.seats} pessoas · {tableOrders.length} pedido(s)</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xs font-semibold text-primary">{table.orderTotal ? `R$ ${table.orderTotal}` : '—'}</span>
+                    {hasCall && <p className="text-[8px] font-bold text-destructive">CHAMADO!</p>}
+                    {table.status === 'billing' && <p className="text-[8px] font-bold text-warning">PAGTO</p>}
+                  </div>
                 </div>
-                <span className="text-xs font-semibold text-primary">{table.orderTotal ? `R$ ${table.orderTotal}` : '—'}</span>
+                {/* Order items preview */}
+                {tableOrders.length > 0 && (
+                  <div className="mt-2 flex gap-1 flex-wrap">
+                    {tableOrders[0].items.slice(0, 2).map((item, i) => (
+                      <span key={i} className="text-[9px] bg-muted px-1.5 py-0.5 rounded-full text-muted-foreground">{item.quantity}x {item.menuItem.name}</span>
+                    ))}
+                  </div>
+                )}
+                {/* Guest status */}
+                <div className="mt-2 flex items-center gap-1">
+                  {[true, true, false].slice(0, Math.min(3, table.seats)).map((hasApp, i) => (
+                    <div key={i} className={`w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold ${
+                      hasApp ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
+                    }`}>{hasApp ? '✓' : '?'}</div>
+                  ))}
+                  <span className="text-[9px] text-muted-foreground ml-1">2 com app · 1 sem app</span>
+                </div>
               </div>
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                {orders.filter(order => order.tableNumber === table.number && !['paid'].includes(order.status)).length} pedido(s) ativo(s)
-              </p>
-            </div>
-          ))}
-        </div>
-      </MobileSection>
-      <MobileSection title="Chamados">
-        <div className="space-y-2">
-          {waiterCalls.length ? waiterCalls.map(call => (
-            <div key={call.id} className="rounded-2xl border border-destructive/20 bg-destructive/5 p-3">
-              <p className="text-xs font-semibold text-foreground">{call.message}</p>
-              <p className="mt-1 text-[11px] text-muted-foreground">{formatTimeAgo(call.timestamp)}</p>
-            </div>
-          )) : <div className="rounded-2xl border border-border bg-card p-3 text-[11px] text-muted-foreground">Nenhum chamado agora.</div>}
+            );
+          })}
         </div>
       </MobileSection>
     </div>
