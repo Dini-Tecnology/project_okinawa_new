@@ -548,7 +548,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     // ── Buffet specific ──
     'Buffet Self-Service': 'Self-Service Buffet',
     'Sirva-se à vontade · R$ 79,90/kg': 'Serve yourself freely · R$ 79.90/kg',
-    'Opções Hoje': "Today's Options",
     '✓ Incluso': '✓ Included',
     'Fraldinha acabou de sair da churrasqueira!': 'Flank steak just came off the grill!',
     'Arroz sendo reabastecido · 3 min': 'Rice being restocked · 3 min',
