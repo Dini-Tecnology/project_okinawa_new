@@ -35,32 +35,31 @@ const ScreenRenderer: React.FC<{
   screen: RestaurantScreen;
   onNavigate: (s: string) => void;
   onSelectRole: (r: StaffRole) => void;
-  viewMode: ViewMode;
-}> = ({ screen, onNavigate, onSelectRole, viewMode }) => {
+}> = ({ screen, onNavigate, onSelectRole }) => {
   switch (screen) {
-    case 'welcome': return <WelcomeScreen onNavigate={onNavigate} onSelectRole={onSelectRole} viewMode={viewMode} />;
-    case 'setup': return <SetupScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'dashboard': return <DashboardScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'table-map': return <TableMapScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'orders': return <OrdersScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'kds-kitchen': return <KDSScreen view="kitchen" onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'kds-bar': return <KDSScreen view="bar" onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'maitre': return <MaitreScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'waiter': return <WaiterScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'menu-editor': return <MenuEditorScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'team': return <TeamScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'analytics': return <AnalyticsScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'manager-ops': return <ManagerOpsScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'approvals': return <ApprovalsScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'barman-station': return <BarmanStationScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'drink-recipes': return <DrinkRecipesScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'cook-station': return <CookStationScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'stock': return <StockScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'waiter-calls': return <WaiterCallsScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'waiter-tips': return <WaiterTipsScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'floor-flow': return <FloorFlowScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    case 'daily-report': return <DailyReportScreen onNavigate={onNavigate} viewMode={viewMode} />;
-    default: return <WelcomeScreen onNavigate={onNavigate} onSelectRole={onSelectRole} viewMode={viewMode} />;
+    case 'welcome': return <WelcomeScreen onNavigate={onNavigate} onSelectRole={onSelectRole} />;
+    case 'setup': return <SetupScreen onNavigate={onNavigate} />;
+    case 'dashboard': return <DashboardScreen onNavigate={onNavigate} />;
+    case 'table-map': return <TableMapScreen onNavigate={onNavigate} />;
+    case 'orders': return <OrdersScreen onNavigate={onNavigate} />;
+    case 'kds-kitchen': return <KDSScreen view="kitchen" onNavigate={onNavigate} />;
+    case 'kds-bar': return <KDSScreen view="bar" onNavigate={onNavigate} />;
+    case 'maitre': return <MaitreScreen onNavigate={onNavigate} />;
+    case 'waiter': return <WaiterScreen onNavigate={onNavigate} />;
+    case 'menu-editor': return <MenuEditorScreen onNavigate={onNavigate} />;
+    case 'team': return <TeamScreen onNavigate={onNavigate} />;
+    case 'analytics': return <AnalyticsScreen onNavigate={onNavigate} />;
+    case 'manager-ops': return <ManagerOpsScreen onNavigate={onNavigate} />;
+    case 'approvals': return <ApprovalsScreen onNavigate={onNavigate} />;
+    case 'barman-station': return <BarmanStationScreen onNavigate={onNavigate} />;
+    case 'drink-recipes': return <DrinkRecipesScreen onNavigate={onNavigate} />;
+    case 'cook-station': return <CookStationScreen onNavigate={onNavigate} />;
+    case 'stock': return <StockScreen onNavigate={onNavigate} />;
+    case 'waiter-calls': return <WaiterCallsScreen onNavigate={onNavigate} />;
+    case 'waiter-tips': return <WaiterTipsScreen onNavigate={onNavigate} />;
+    case 'floor-flow': return <FloorFlowScreen onNavigate={onNavigate} />;
+    case 'daily-report': return <DailyReportScreen onNavigate={onNavigate} />;
+    default: return <WelcomeScreen onNavigate={onNavigate} onSelectRole={onSelectRole} />;
   }
 };
 
