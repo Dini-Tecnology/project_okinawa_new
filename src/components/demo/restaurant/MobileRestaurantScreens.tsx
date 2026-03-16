@@ -605,7 +605,7 @@ const MobileStock: React.FC = () => (
 
 const MobileCalls: React.FC = () => {
   const { notifications } = useDemoContext();
-  const waiterCalls = notifications.filter(item => item.type === 'waiter_call');
+  const [attended, setAttended] = useState<string[]>([]);
   const mockCalls = [
     { id: 'mc1', table: 3, message: 'Dúvida sobre prato', time: '2min', urgent: false, category: 'Atendimento' },
     { id: 'mc2', table: 8, message: 'Reclamação — tempo de espera', time: '5min', urgent: true, category: 'Escalação' },
@@ -620,23 +620,34 @@ const MobileCalls: React.FC = () => {
           <p className="text-[10px] font-semibold text-destructive">{mockCalls.filter(c => c.urgent).length} urgente(s)!</p>
         </div>
       )}
-      {mockCalls.map(call => (
-        <div key={call.id} className={`rounded-2xl border-2 p-3 ${call.urgent ? 'border-destructive/20 bg-destructive/5' : 'border-border bg-card'}`}>
-          <div className="flex items-center gap-3">
-            <div className={`flex h-9 w-9 items-center justify-center rounded-xl font-display font-bold text-sm ${
-              call.urgent ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
-            }`}>{call.table}</div>
-            <div className="flex-1">
-              <div className="flex items-center gap-1">
-                <p className="text-xs font-semibold">{call.message}</p>
-                {call.urgent && <span className="px-1 py-0.5 rounded bg-destructive/10 text-destructive text-[7px] font-bold">URGENTE</span>}
+      {mockCalls.map(call => {
+        const done = attended.includes(call.id);
+        return (
+          <div key={call.id} className={`rounded-2xl border-2 p-3 ${
+            done ? 'border-success/20 bg-success/5 opacity-60' :
+            call.urgent ? 'border-destructive/20 bg-destructive/5' : 'border-border bg-card'
+          }`}>
+            <div className="flex items-center gap-3">
+              <div className={`flex h-9 w-9 items-center justify-center rounded-xl font-display font-bold text-sm ${
+                done ? 'bg-success/10 text-success' :
+                call.urgent ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'
+              }`}>{call.table}</div>
+              <div className="flex-1">
+                <div className="flex items-center gap-1">
+                  <p className="text-xs font-semibold">{call.message}</p>
+                  {call.urgent && !done && <span className="px-1 py-0.5 rounded bg-destructive/10 text-destructive text-[7px] font-bold">URGENTE</span>}
+                </div>
+                <p className="text-[10px] text-muted-foreground">Mesa {call.table} · {call.time} atrás · {call.category}</p>
               </div>
-              <p className="text-[10px] text-muted-foreground">Mesa {call.table} · {call.time} atrás · {call.category}</p>
+              {done ? (
+                <span className="flex items-center gap-1 text-success text-[10px] font-semibold"><CheckCircle2 className="w-3.5 h-3.5" /></span>
+              ) : (
+                <button onClick={() => setAttended(prev => [...prev, call.id])} className="px-2 py-1 rounded-lg bg-primary text-primary-foreground text-[10px] font-semibold">Atender</button>
+              )}
             </div>
-            <button className="px-2 py-1 rounded-lg bg-primary text-primary-foreground text-[10px] font-semibold">Atender</button>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
@@ -646,15 +657,15 @@ const MobilePayment: React.FC = () => {
   const myTables = tables.filter(t => ['occupied', 'billing'].includes(t.status));
   return (
     <div className="space-y-3">
-      <div className="rounded-2xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 p-3">
-        <p className="text-xs font-semibold">Quem precisa pagar?</p>
-        <p className="text-[10px] text-muted-foreground mt-0.5">Acompanhe quem pagou pelo app e cobre quem precisa</p>
+      <div className="rounded-2xl bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10 p-3">
+        <p className="text-xs font-semibold">Cobrança inteligente</p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Pagamentos via app aparecem automaticamente. Cobre apenas quem precisa.</p>
       </div>
       {myTables.map(table => {
         const guests = [
-          { name: table.customerName || 'Titular', hasApp: true, paid: true, amount: Math.round((table.orderTotal || 0) * 0.4) },
-          { name: 'Convidado 2', hasApp: true, paid: false, amount: Math.round((table.orderTotal || 0) * 0.35) },
-          { name: 'Convidado 3', hasApp: false, paid: false, amount: Math.round((table.orderTotal || 0) * 0.25) },
+          { name: table.customerName || 'Titular', hasApp: true, paid: true, amount: Math.round((table.orderTotal || 0) * 0.4), method: 'Apple Pay' },
+          { name: 'Convidado 2', hasApp: true, paid: false, amount: Math.round((table.orderTotal || 0) * 0.35), method: null },
+          { name: 'Convidado 3', hasApp: false, paid: false, amount: Math.round((table.orderTotal || 0) * 0.25), method: null },
         ].slice(0, Math.min(3, table.seats));
         const paidPct = Math.round((guests.filter(g => g.paid).length / guests.length) * 100);
         return (
@@ -665,7 +676,14 @@ const MobilePayment: React.FC = () => {
                 <p className="text-xs font-semibold">{table.customerName}</p>
                 <p className="text-[10px] text-muted-foreground">R$ {table.orderTotal || 0}</p>
               </div>
-              <span className="text-[10px] font-bold text-success">{paidPct}%</span>
+              {/* Mini progress ring */}
+              <div className="relative w-9 h-9">
+                <svg className="w-9 h-9 -rotate-90" viewBox="0 0 36 36">
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
+                  <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--success))" strokeWidth="3" strokeDasharray={`${(paidPct / 100) * 94} 94`} strokeLinecap="round" />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-[7px] font-bold">{paidPct}%</span>
+              </div>
             </div>
             <div className="p-2 space-y-1">
               {guests.map((guest, i) => (
@@ -674,10 +692,10 @@ const MobilePayment: React.FC = () => {
                 }`}>
                   <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[7px] font-bold ${
                     guest.paid ? 'bg-success/10 text-success' : guest.hasApp ? 'bg-info/10 text-info' : 'bg-warning/10 text-warning'
-                  }`}>{guest.paid ? '✓' : guest.hasApp ? 'A' : '!'}</div>
+                  }`}>{guest.paid ? '✓' : guest.hasApp ? '📱' : '!'}</div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[11px] font-medium truncate">{guest.name}</p>
-                    <p className="text-[9px] text-muted-foreground">{guest.paid ? 'Pago' : guest.hasApp ? 'No app' : 'Sem app'}</p>
+                    <p className="text-[9px] text-muted-foreground">{guest.paid ? `Pago via ${guest.method}` : guest.hasApp ? 'No app' : 'Sem app'}</p>
                   </div>
                   <span className="text-[10px] font-semibold">R$ {guest.amount}</span>
                   {!guest.paid && !guest.hasApp && (
@@ -694,14 +712,16 @@ const MobilePayment: React.FC = () => {
 };
 
 const MobileActions: React.FC = () => {
+  const [handled, setHandled] = useState<string[]>([]);
   const situations = [
-    { table: 5, title: 'Prato pronto — retirar', detail: '2x Filé ao Molho · Chef Felipe', urgency: 'critical' as const, action: 'Retirar' },
-    { table: 10, title: 'Sobremesa pronta', detail: 'Petit Gâteau · Cozinheiro Thiago', urgency: 'critical' as const, action: 'Servir' },
-    { table: 3, title: 'Cliente quer pedir', detail: 'Convidado sem app', urgency: 'high' as const, action: 'Fazer pedido' },
-    { table: 1, title: 'Conta solicitada', detail: '1 sem app — cobrar via garçom', urgency: 'high' as const, action: 'Cobrar' },
-    { table: 8, title: 'Cortesia — aniversário', detail: 'Solicitar ao gerente', urgency: 'medium' as const, action: 'Solicitar' },
+    { id: 'ma1', table: 5, title: 'Prato pronto — retirar', detail: '2x Filé ao Molho · Chef Felipe · 2min', urgency: 'critical' as const, action: 'Retirar' },
+    { id: 'ma2', table: 10, title: 'Sobremesa pronta', detail: 'Petit Gâteau · Cozinheiro Thiago · 1min', urgency: 'critical' as const, action: 'Servir' },
+    { id: 'ma3', table: 3, title: 'Cliente quer pedir', detail: 'Convidado sem app — fazer pedido por ele', urgency: 'high' as const, action: 'Fazer pedido' },
+    { id: 'ma4', table: 1, title: 'Conta solicitada', detail: '1 sem app — cobrar via garçom', urgency: 'high' as const, action: 'Cobrar' },
+    { id: 'ma5', table: 8, title: 'Cortesia — aniversário', detail: 'Solicitar ao gerente Marina', urgency: 'medium' as const, action: 'Solicitar' },
   ];
-  const criticals = situations.filter(s => s.urgency === 'critical');
+  const active = situations.filter(s => !handled.includes(s.id));
+  const criticals = active.filter(s => s.urgency === 'critical');
 
   return (
     <div className="space-y-2">
@@ -711,28 +731,38 @@ const MobileActions: React.FC = () => {
           <p className="text-[10px] font-bold text-destructive">{criticals.length} prato(s) pronto(s)!</p>
         </div>
       )}
-      {situations.map((item, i) => (
-        <div key={i} className={`rounded-2xl border-2 overflow-hidden ${
+      {active.map(item => (
+        <div key={item.id} className={`rounded-2xl border-2 overflow-hidden ${
           item.urgency === 'critical' ? 'border-destructive/30 bg-destructive/5' :
           item.urgency === 'high' ? 'border-warning/20 bg-card' : 'border-border bg-card'
         }`}>
           <div className="flex items-center gap-2.5 p-2.5">
             <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-display font-bold text-xs ${
-              item.urgency === 'critical' ? 'bg-destructive/10 text-destructive' :
+              item.urgency === 'critical' ? 'bg-destructive/10 text-destructive animate-pulse' :
               item.urgency === 'high' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info'
             }`}>{item.table}</div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold">{item.title}</p>
+              <div className="flex items-center gap-1">
+                <p className="text-xs font-semibold">{item.title}</p>
+                {item.urgency === 'critical' && <span className="px-1 py-0.5 rounded bg-destructive/10 text-destructive text-[7px] font-bold">AGORA</span>}
+              </div>
               <p className="text-[9px] text-muted-foreground">{item.detail}</p>
             </div>
           </div>
-          <button className={`w-full py-2 text-[10px] font-bold border-t ${
+          <button onClick={() => setHandled(prev => [...prev, item.id])} className={`w-full py-2 text-[10px] font-bold border-t ${
             item.urgency === 'critical' ? 'border-destructive/20 bg-destructive text-destructive-foreground' :
             item.urgency === 'high' ? 'border-warning/20 bg-warning/10 text-warning' :
             'border-border bg-muted/20 text-primary'
           }`}>{item.action} →</button>
         </div>
       ))}
+      {active.length === 0 && (
+        <div className="text-center py-8">
+          <CheckCircle2 className="w-8 h-8 text-success/30 mx-auto mb-2" />
+          <p className="text-sm font-semibold text-success">Tudo em dia!</p>
+          <p className="text-[10px] text-muted-foreground">Nenhuma ação pendente</p>
+        </div>
+      )}
     </div>
   );
 };

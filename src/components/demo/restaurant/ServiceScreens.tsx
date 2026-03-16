@@ -156,489 +156,601 @@ export const MaitreScreen: React.FC<{ onNavigate: (screen: string) => void }> = 
   );
 };
 
-// ============ WAITER VIEW (Phone Shell) — Completely Redesigned ============
+// ============ WAITER VIEW (Phone Shell) — Command Center Redesign ============
+
+const KITCHEN_PIPELINE = [
+  { id: 'k1', dish: 'Filé ao Molho de Vinho', qty: 2, table: 5, chef: 'Chef Felipe', status: 'ready' as const, readyAgo: 3, sla: 20, elapsed: 22 },
+  { id: 'k2', dish: 'Petit Gâteau', qty: 1, table: 10, chef: 'Cozinheiro Thiago', status: 'ready' as const, readyAgo: 1, sla: 12, elapsed: 11 },
+  { id: 'k3', dish: 'Risotto de Cogumelos', qty: 1, table: 3, chef: 'Chef Felipe', status: 'preparing' as const, readyAgo: 0, sla: 25, elapsed: 18 },
+  { id: 'k4', dish: 'Salmão Grelhado', qty: 1, table: 8, chef: 'Cozinheiro Ana', status: 'preparing' as const, readyAgo: 0, sla: 22, elapsed: 8 },
+  { id: 'k5', dish: 'Tiramisu', qty: 2, table: 1, chef: 'Cozinheiro Thiago', status: 'preparing' as const, readyAgo: 0, sla: 15, elapsed: 5 },
+];
+
+const LIVE_FEED = [
+  { id: 'lf1', time: 'agora', table: 5, event: 'Prato pronto para retirar', detail: '2x Filé ao Molho de Vinho — Chef Felipe', type: 'kitchen_ready' as const, urgency: 'critical' as const },
+  { id: 'lf2', time: '1min', table: 10, event: 'Sobremesa pronta', detail: '1x Petit Gâteau — Cozinheiro Thiago', type: 'kitchen_ready' as const, urgency: 'critical' as const },
+  { id: 'lf3', time: '2min', table: 3, event: 'Cliente chamou o garçom', detail: 'Convidado 3 sem app quer fazer pedido', type: 'call' as const, urgency: 'high' as const },
+  { id: 'lf4', time: '3min', table: 8, event: 'Pagamento recebido pelo app', detail: 'Rafael C. pagou R$ 85 via Apple Pay', type: 'payment' as const, urgency: 'info' as const },
+  { id: 'lf5', time: '5min', table: 1, event: 'Conta solicitada', detail: '1 convidado sem app precisa de cobrança', type: 'payment_needed' as const, urgency: 'high' as const },
+  { id: 'lf6', time: '8min', table: 10, event: 'Cortesia solicitada', detail: 'Aniversário — solicitar Petit Gâteau ao gerente', type: 'approval' as const, urgency: 'medium' as const },
+  { id: 'lf7', time: '12min', table: 5, event: 'Novo pedido registrado', detail: '1x Tiramisu + 1x Café Espresso via app', type: 'order' as const, urgency: 'info' as const },
+];
+
+const TABLE_GUESTS = (table: { customerName?: string; orderTotal?: number; seats: number; number: number }) => [
+  { name: table.customerName || 'Titular', hasApp: true, paid: true, amount: Math.round((table.orderTotal || 0) * 0.4), items: ['Filé ao Molho', 'Suco Natural'], status: 'served' as const },
+  { name: 'Convidado 2', hasApp: true, paid: false, amount: Math.round((table.orderTotal || 0) * 0.35), items: ['Risotto', 'Vinho Tinto'], status: 'eating' as const },
+  { name: 'Convidado 3', hasApp: false, paid: false, amount: Math.round((table.orderTotal || 0) * 0.25), items: ['Salmão Grelhado'], status: 'waiting_food' as const },
+].slice(0, Math.min(3, table.seats));
 
 export const WaiterScreen: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
   const { orders, tables, notifications } = useDemoContext();
-  const [waiterScreen, setWaiterScreen] = useState<'tables' | 'calls' | 'payment' | 'actions'>('tables');
+  const [waiterTab, setWaiterTab] = useState<'live' | 'tables' | 'kitchen' | 'charge'>('live');
   const myTables = tables.filter(t => ['occupied', 'billing'].includes(t.status));
   const waiterCalls = notifications.filter(n => n.type === 'waiter_call' && !n.read);
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
-  const [paymentStep, setPaymentStep] = useState<'select' | 'method' | 'processing' | 'done'>('select');
-  const [selectedPayMethod, setSelectedPayMethod] = useState<string | null>(null);
+  const [paymentStep, setPaymentStep] = useState<'guests' | 'method' | 'processing' | 'done'>('guests');
+  const [selectedGuest, setSelectedGuest] = useState<string | null>(null);
+  const [handledItems, setHandledItems] = useState<string[]>([]);
+  const [pickedUp, setPickedUp] = useState<string[]>([]);
 
   const activeOrders = orders.filter(o => !['paid', 'delivered'].includes(o.status));
+  const readyDishes = KITCHEN_PIPELINE.filter(d => d.status === 'ready' && !pickedUp.includes(d.id));
+  const activeFeed = LIVE_FEED.filter(f => !handledItems.includes(f.id));
 
   return (
     <div className="space-y-6">
-      <GuidedHint text="App completo do garçom — mesas, chamados, cobrança TAP to Pay e ações pelo cliente" />
+      <GuidedHint text="Central de comando do garçom — feed ao vivo, pipeline da cozinha e terminal de cobrança" />
 
       <div className="flex justify-center">
         <PhoneShell>
-          <div className="bg-background min-h-full">
-            {/* Waiter App Header */}
-            <div className="bg-gradient-to-r from-primary to-primary/80 px-5 pt-2 pb-5">
+          <div className="bg-background min-h-full flex flex-col">
+            {/* Header — status bar */}
+            <div className="bg-gradient-to-r from-primary via-primary/90 to-accent px-4 pt-2 pb-4">
               <div className="flex items-center justify-between mb-3">
                 <div>
-                  <p className="text-primary-foreground/70 text-xs">Olá, Bruno 👋</p>
-                  <p className="text-primary-foreground font-display font-bold text-lg">Central do Garçom</p>
+                  <p className="text-primary-foreground/60 text-[10px] font-medium">Turno das 18h</p>
+                  <p className="text-primary-foreground font-display font-bold text-base">Bruno — Garçom</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
+                  {readyDishes.length > 0 && (
+                    <div className="relative">
+                      <div className="w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center animate-pulse">
+                        <ChefHat className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center">{readyDishes.length}</span>
+                    </div>
+                  )}
                   <div className="relative">
                     <Bell className="w-5 h-5 text-primary-foreground" />
-                    {waiterCalls.length > 0 && (
-                      <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center animate-pulse">
-                        {waiterCalls.length}
-                      </span>
-                    )}
+                    {waiterCalls.length > 0 && <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center animate-pulse">{waiterCalls.length}</span>}
                   </div>
                 </div>
               </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-4 gap-2">
+              {/* Quick metrics */}
+              <div className="grid grid-cols-4 gap-1.5">
                 {[
-                  { label: 'Mesas', value: myTables.length.toString(), icon: '🪑' },
-                  { label: 'Pedidos', value: activeOrders.length.toString(), icon: '📋' },
-                  { label: 'Chamados', value: waiterCalls.length.toString(), icon: '🔔' },
-                  { label: 'Gorjetas', value: 'R$ 410', icon: '💰' },
+                  { label: 'Mesas', value: myTables.length.toString(), urgent: false },
+                  { label: 'Retirar', value: readyDishes.length.toString(), urgent: readyDishes.length > 0 },
+                  { label: 'Chamados', value: (waiterCalls.length || activeFeed.filter(f => f.type === 'call').length).toString(), urgent: waiterCalls.length > 0 },
+                  { label: 'Gorjetas', value: 'R$410', urgent: false },
                 ].map((s, i) => (
-                  <div key={i} className="bg-primary-foreground/10 rounded-xl p-2 text-center">
-                    <p className="text-primary-foreground font-display font-bold text-sm">{s.value}</p>
-                    <p className="text-primary-foreground/60 text-[9px]">{s.label}</p>
+                  <div key={i} className={`rounded-lg p-1.5 text-center ${s.urgent ? 'bg-destructive/20' : 'bg-primary-foreground/10'}`}>
+                    <p className={`font-display font-bold text-sm ${s.urgent ? 'text-destructive-foreground' : 'text-primary-foreground'}`}>{s.value}</p>
+                    <p className="text-primary-foreground/50 text-[8px]">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Tab Bar — 4 tabs */}
-            <div className="flex border-b border-border">
+            {/* Tab navigation */}
+            <div className="flex border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
               {[
-                { id: 'tables' as const, label: 'Mesas', icon: LayoutGridIcon, badge: 0 },
-                { id: 'calls' as const, label: 'Chamados', icon: Bell, badge: waiterCalls.length },
-                { id: 'payment' as const, label: 'Cobrar', icon: Smartphone, badge: 0 },
-                { id: 'actions' as const, label: 'Ações', icon: HandPlatter, badge: 0 },
+                { id: 'live' as const, label: 'Ao Vivo', badge: activeFeed.filter(f => f.urgency !== 'info').length },
+                { id: 'tables' as const, label: 'Mesas', badge: 0 },
+                { id: 'kitchen' as const, label: 'Cozinha', badge: readyDishes.length },
+                { id: 'charge' as const, label: 'Cobrar', badge: 0 },
               ].map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => { setWaiterScreen(tab.id); setSelectedTable(null); setPaymentStep('select'); }}
-                  className={`flex-1 py-3 text-[11px] font-semibold border-b-2 transition-colors relative ${
-                    waiterScreen === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
+                  onClick={() => { setWaiterTab(tab.id); setSelectedTable(null); setPaymentStep('guests'); setSelectedGuest(null); }}
+                  className={`flex-1 py-2.5 text-[10px] font-semibold border-b-2 transition-all relative ${
+                    waiterTab === tab.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground'
                   }`}
                 >
                   {tab.label}
                   {tab.badge > 0 && (
-                    <span className="absolute top-1 right-1/4 w-4 h-4 rounded-full bg-destructive text-destructive-foreground text-[8px] font-bold flex items-center justify-center">
-                      {tab.badge}
-                    </span>
+                    <span className={`absolute top-1 right-1/4 w-4 h-4 rounded-full text-[7px] font-bold flex items-center justify-center ${
+                      tab.id === 'kitchen' ? 'bg-destructive text-destructive-foreground animate-pulse' : 'bg-primary text-primary-foreground'
+                    }`}>{tab.badge}</span>
                   )}
                 </button>
               ))}
             </div>
 
-            {/* Content */}
-            <div className="p-4 space-y-3">
-              {/* === MESAS TAB === */}
-              {waiterScreen === 'tables' && !selectedTable && myTables.map(table => {
-                const tableOrders = orders.filter(o => o.tableNumber === table.number && !['paid'].includes(o.status));
-                const hasUrgent = waiterCalls.some(c => c.message.includes(`Mesa ${table.number}`));
-                return (
-                  <button key={table.id} onClick={() => setSelectedTable(table.number)} className={`w-full text-left bg-card rounded-xl border-2 p-4 transition-all ${
-                    hasUrgent ? 'border-destructive/40 bg-destructive/5' :
-                    table.status === 'billing' ? 'border-warning/40 bg-warning/5' : 'border-border'
-                  }`}>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-display font-bold ${
-                          hasUrgent ? 'bg-destructive/10 text-destructive animate-pulse' :
-                          table.status === 'billing' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
-                        }`}>
-                          {table.number}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-sm">{table.customerName}</p>
-                          <p className="text-[10px] text-muted-foreground">{table.seats} pessoas · {table.occupiedSince ? `${Math.round((Date.now() - table.occupiedSince.getTime()) / 60000)}min` : '—'}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        {table.orderTotal && <span className="font-display font-bold text-sm text-primary">R$ {table.orderTotal}</span>}
-                        {hasUrgent && <p className="text-[9px] font-bold text-destructive mt-0.5">CHAMADO!</p>}
-                        {table.status === 'billing' && <p className="text-[9px] font-bold text-warning mt-0.5">PAGAMENTO</p>}
-                      </div>
-                    </div>
-                    {/* Order items preview */}
-                    {tableOrders.length > 0 && (
-                      <div className="mt-2 flex items-center gap-2 flex-wrap">
-                        {tableOrders[0].items.slice(0, 3).map((item, i) => (
-                          <span key={i} className="text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{item.quantity}x {item.menuItem.name}</span>
-                        ))}
-                        {tableOrders[0].items.length > 3 && <span className="text-[10px] text-muted-foreground">+{tableOrders[0].items.length - 3}</span>}
-                      </div>
-                    )}
-                    {/* Payment status indicators */}
-                    <div className="mt-2 flex items-center gap-2">
-                      {tableOrders.map((o, i) => (
-                        <div key={i} className="flex items-center gap-1">
-                          <div className={`w-2 h-2 rounded-full ${
-                            o.status === 'ready' ? 'bg-success' :
-                            o.status === 'preparing' ? 'bg-warning animate-pulse' :
-                            o.status === 'confirmed' ? 'bg-info' : 'bg-muted-foreground/30'
-                          }`} />
-                          <span className="text-[9px] text-muted-foreground capitalize">{o.status}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground/30 absolute right-4 top-1/2 -translate-y-1/2" />
-                  </button>
-                );
-              })}
+            {/* Content area */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="p-3 space-y-2.5">
 
-              {/* === TABLE DETAIL === */}
-              {waiterScreen === 'tables' && selectedTable && (() => {
-                const table = myTables.find(t => t.number === selectedTable);
-                const tableOrders = orders.filter(o => o.tableNumber === selectedTable && !['paid'].includes(o.status));
-                if (!table) return null;
-                return (
-                  <div className="space-y-3">
-                    <button onClick={() => setSelectedTable(null)} className="flex items-center gap-1 text-xs text-primary font-semibold">
-                      <ChevronLeft className="w-4 h-4" /> Voltar
-                    </button>
-                    <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-xl p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-display text-2xl font-bold">Mesa {table.number}</p>
-                          <p className="text-sm text-muted-foreground">{table.customerName} · {table.seats} pessoas</p>
-                        </div>
-                        <span className="font-display text-xl font-bold text-primary">R$ {table.orderTotal || 0}</span>
-                      </div>
-                    </div>
-
-                    {/* Guest payment status */}
-                    <div className="bg-card rounded-xl border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Status dos Clientes</p>
-                      {[
-                        { name: table.customerName || 'Cliente 1', hasApp: true, paid: false, amount: 'R$ 85' },
-                        { name: 'Convidado 2', hasApp: true, paid: false, amount: 'R$ 62' },
-                        { name: 'Convidado 3', hasApp: false, paid: false, amount: 'R$ 45' },
-                      ].map((guest, i) => (
-                        <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0">
-                          <div className={`w-2 h-2 rounded-full ${guest.hasApp ? 'bg-success' : 'bg-muted-foreground/30'}`} />
-                          <span className="text-xs flex-1">{guest.name}</span>
-                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${guest.hasApp ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'}`}>
-                            {guest.hasApp ? 'App' : 'Sem app'}
-                          </span>
-                          <span className="text-xs font-semibold">{guest.amount}</span>
-                        </div>
-                      ))}
-                      <div className="mt-2 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-success to-success/60 rounded-full" style={{ width: '33%' }} />
-                      </div>
-                      <p className="text-[10px] text-muted-foreground mt-1">1 de 3 pagaram · 33% da conta</p>
-                    </div>
-
-                    {/* Order items */}
-                    <div className="bg-card rounded-xl border border-border p-3">
-                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Pedidos</p>
-                      {tableOrders.length > 0 ? tableOrders[0].items.map((item, i) => (
-                        <div key={i} className="flex items-center gap-2 py-1.5 border-b border-border last:border-0">
-                          <span className="text-xs font-semibold text-primary">{item.quantity}x</span>
-                          <span className="text-xs flex-1">{item.menuItem.name}</span>
-                          <span className="text-xs">R$ {item.menuItem.price * item.quantity}</span>
-                        </div>
-                      )) : <p className="text-xs text-muted-foreground">Nenhum pedido ativo</p>}
-                    </div>
-
-                    {/* Quick actions */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <button onClick={() => { setWaiterScreen('payment'); setSelectedTable(selectedTable); }} className="flex items-center gap-2 p-3 rounded-xl bg-primary text-primary-foreground text-xs font-semibold">
-                        <Smartphone className="w-4 h-4" /> Cobrar
-                      </button>
-                      <button className="flex items-center gap-2 p-3 rounded-xl bg-secondary text-secondary-foreground text-xs font-semibold">
-                        <Plus className="w-4 h-4" /> Novo pedido
-                      </button>
-                      <button className="flex items-center gap-2 p-3 rounded-xl border border-border text-xs font-semibold">
-                        <Shield className="w-4 h-4" /> Cortesia
-                      </button>
-                      <button className="flex items-center gap-2 p-3 rounded-xl border border-border text-xs font-semibold">
-                        <AlertCircle className="w-4 h-4" /> Chamar gerente
-                      </button>
-                    </div>
-                  </div>
-                );
-              })()}
-
-              {/* === CHAMADOS TAB === */}
-              {waiterScreen === 'calls' && (
-                <div className="space-y-3">
-                  {/* Urgent banner */}
-                  {waiterCalls.filter(c => c.type === 'waiter_call').length > 0 && (
-                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20 text-xs font-semibold text-destructive animate-pulse">
-                      <Bell className="w-4 h-4" />
-                      {waiterCalls.length} chamado(s) pendente(s) — atenda agora!
-                    </div>
-                  )}
-                  {[
-                    { id: 'wc1', table: 3, type: 'garcom', message: 'Cliente solicitou o garçom', time: '2min', urgent: false, reason: 'Dúvida sobre prato' },
-                    { id: 'wc2', table: 8, type: 'gerente', message: 'Solicita falar com gerente', time: '5min', urgent: true, reason: 'Reclamação sobre tempo de espera' },
-                    { id: 'wc3', table: 1, type: 'garcom', message: 'Pedido de sobremesa', time: '8min', urgent: false, reason: 'Quer ver cardápio de sobremesas' },
-                    { id: 'wc4', table: 5, type: 'ajuda', message: 'Precisa de assistência', time: '1min', urgent: true, reason: 'Acessibilidade — precisa de cadeira especial' },
-                  ].map(call => (
-                    <div key={call.id} className={`rounded-xl border-2 p-3 ${
-                      call.urgent ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-card'
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold ${
-                          call.urgent ? 'bg-destructive/10 text-destructive animate-pulse' : 'bg-primary/10 text-primary'
-                        }`}>
-                          {call.table}
+                {/* ═══ AO VIVO — Real-time activity stream ═══ */}
+                {waiterTab === 'live' && (
+                  <>
+                    {readyDishes.length > 0 && (
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20">
+                        <div className="w-8 h-8 rounded-lg bg-destructive/20 flex items-center justify-center animate-pulse">
+                          <ChefHat className="w-4 h-4 text-destructive" />
                         </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <p className="text-sm font-semibold">{call.message}</p>
-                            {call.urgent && <span className="px-1.5 py-0.5 rounded bg-destructive/10 text-destructive text-[8px] font-bold">URGENTE</span>}
-                          </div>
-                          <p className="text-[10px] text-muted-foreground">{call.reason} · {call.time} atrás</p>
+                          <p className="text-[11px] font-bold text-destructive">{readyDishes.length} prato(s) esperando retirada!</p>
+                          <p className="text-[9px] text-destructive/70">A cozinha está aguardando</p>
                         </div>
-                        <button className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold">
-                          Atender
-                        </button>
+                        <button onClick={() => setWaiterTab('kitchen')} className="px-2.5 py-1 rounded-lg bg-destructive text-destructive-foreground text-[9px] font-bold">Ver</button>
                       </div>
-                    </div>
-                  ))}
-                  {waiterCalls.length === 0 && (
-                    <div className="text-center py-10">
-                      <Bell className="w-10 h-10 text-muted-foreground/20 mx-auto mb-2" />
-                      <p className="text-sm text-muted-foreground">Nenhum chamado no momento</p>
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
 
-              {/* === COBRAR — Task-oriented flow === */}
-              {waiterScreen === 'payment' && (
-                <div className="space-y-3">
-                  {paymentStep === 'select' && (
-                    <>
-                      {/* Who needs to pay? — contextual, not a boring list */}
-                      <div className="rounded-xl bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/10 p-3">
-                        <p className="text-xs font-semibold text-foreground">Quem precisa pagar?</p>
-                        <p className="text-[10px] text-muted-foreground">Clientes sem app precisam de cobrança via garçom</p>
-                      </div>
-                      {myTables.map(table => {
-                        const guestsMock = [
-                          { name: table.customerName || 'Titular', hasApp: true, paid: true, amount: Math.round((table.orderTotal || 0) * 0.4) },
-                          { name: 'Convidado 2', hasApp: true, paid: false, amount: Math.round((table.orderTotal || 0) * 0.35) },
-                          { name: 'Convidado 3', hasApp: false, paid: false, amount: Math.round((table.orderTotal || 0) * 0.25) },
-                        ].slice(0, Math.min(3, table.seats));
-                        const unpaid = guestsMock.filter(g => !g.paid);
-                        const needsWaiter = guestsMock.filter(g => !g.hasApp && !g.paid);
-                        if (unpaid.length === 0) return null;
-                        return (
-                          <div key={table.id} className="bg-card rounded-xl border border-border overflow-hidden">
-                            <div className="flex items-center gap-3 p-3 bg-muted/20 border-b border-border">
-                              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center font-display font-bold text-primary">{table.number}</div>
-                              <div className="flex-1">
-                                <p className="text-sm font-semibold">{table.customerName}</p>
-                                <p className="text-[10px] text-muted-foreground">R$ {table.orderTotal || 0} total</p>
+                    {activeFeed.map(item => {
+                      const config = {
+                        kitchen_ready: { icon: ChefHat, color: 'text-destructive', bg: 'bg-destructive/10', border: 'border-destructive/20', action: 'Retirar' },
+                        call: { icon: Bell, color: 'text-warning', bg: 'bg-warning/10', border: 'border-warning/20', action: 'Atender' },
+                        payment: { icon: Check, color: 'text-success', bg: 'bg-success/10', border: 'border-success/20', action: null },
+                        payment_needed: { icon: Smartphone, color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', action: 'Cobrar' },
+                        approval: { icon: Shield, color: 'text-info', bg: 'bg-info/10', border: 'border-info/20', action: 'Solicitar' },
+                        order: { icon: BookOpen, color: 'text-muted-foreground', bg: 'bg-muted', border: 'border-border', action: null },
+                      }[item.type];
+                      const Icon = config.icon;
+                      return (
+                        <div key={item.id} className={`rounded-xl border ${config.border} overflow-hidden ${item.urgency === 'critical' ? 'ring-1 ring-destructive/20' : ''}`}>
+                          <div className="flex items-start gap-2.5 p-2.5">
+                            <div className={`w-9 h-9 rounded-lg ${config.bg} flex items-center justify-center shrink-0 ${item.urgency === 'critical' ? 'animate-pulse' : ''}`}>
+                              <Icon className={`w-4 h-4 ${config.color}`} />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[9px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded">M{item.table}</span>
+                                <span className="text-[9px] text-muted-foreground">{item.time}</span>
+                                {item.urgency === 'critical' && <span className="px-1.5 py-0.5 rounded bg-destructive/10 text-destructive text-[7px] font-bold animate-pulse">AGORA</span>}
                               </div>
-                              {/* Progress ring */}
-                              <div className="relative w-10 h-10">
-                                <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
-                                  <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
-                                  <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--success))" strokeWidth="3" strokeDasharray={`${(guestsMock.filter(g => g.paid).length / guestsMock.length) * 94} 94`} strokeLinecap="round" />
-                                </svg>
-                                <span className="absolute inset-0 flex items-center justify-center text-[9px] font-bold">
-                                  {guestsMock.filter(g => g.paid).length}/{guestsMock.length}
-                                </span>
+                              <p className="text-[11px] font-semibold mt-0.5">{item.event}</p>
+                              <p className="text-[9px] text-muted-foreground">{item.detail}</p>
+                            </div>
+                          </div>
+                          {config.action && (
+                            <button
+                              onClick={() => {
+                                setHandledItems(prev => [...prev, item.id]);
+                                if (item.type === 'payment_needed') { setWaiterTab('charge'); setSelectedTable(item.table); }
+                                if (item.type === 'kitchen_ready') { setWaiterTab('kitchen'); }
+                              }}
+                              className={`w-full py-2 text-[10px] font-bold border-t ${config.border} ${
+                                item.urgency === 'critical' ? 'bg-destructive text-destructive-foreground' :
+                                item.urgency === 'high' ? `${config.bg} ${config.color}` : `bg-muted/30 ${config.color}`
+                              }`}
+                            >
+                              {config.action} →
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+
+                    {activeFeed.length === 0 && (
+                      <div className="text-center py-12">
+                        <Check className="w-10 h-10 text-success/30 mx-auto mb-2" />
+                        <p className="font-display font-bold text-success text-sm">Tudo tranquilo!</p>
+                        <p className="text-[10px] text-muted-foreground">Nenhuma ação pendente</p>
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* ═══ MESAS — Table overview + drill-down ═══ */}
+                {waiterTab === 'tables' && !selectedTable && (
+                  <>
+                    {myTables.map(table => {
+                      const guests = TABLE_GUESTS(table);
+                      const paidPct = Math.round((guests.filter(g => g.paid).length / guests.length) * 100);
+                      const tableOrders = orders.filter(o => o.tableNumber === table.number && !['paid'].includes(o.status));
+                      const hasCall = waiterCalls.some(c => c.message.includes(`Mesa ${table.number}`)) || LIVE_FEED.some(f => f.table === table.number && f.type === 'call');
+                      const hasReady = KITCHEN_PIPELINE.some(d => d.table === table.number && d.status === 'ready' && !pickedUp.includes(d.id));
+                      return (
+                        <button key={table.id} onClick={() => setSelectedTable(table.number)} className={`w-full text-left rounded-xl border-2 overflow-hidden transition-all ${
+                          hasCall ? 'border-warning/40 bg-warning/5' :
+                          hasReady ? 'border-destructive/30 bg-destructive/5' :
+                          table.status === 'billing' ? 'border-info/30 bg-info/5' : 'border-border bg-card'
+                        }`}>
+                          <div className="p-3">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2.5">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-sm ${
+                                  hasReady ? 'bg-destructive/10 text-destructive animate-pulse' :
+                                  hasCall ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
+                                }`}>{table.number}</div>
+                                <div>
+                                  <p className="font-semibold text-xs">{table.customerName}</p>
+                                  <p className="text-[9px] text-muted-foreground">{table.seats} pessoas · {table.occupiedSince ? `${Math.round((Date.now() - table.occupiedSince.getTime()) / 60000)}min` : '—'}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <span className="font-display font-bold text-xs text-primary">R$ {table.orderTotal || 0}</span>
+                                <div className="flex items-center gap-1 mt-0.5">
+                                  {hasReady && <span className="text-[7px] font-bold text-destructive bg-destructive/10 px-1 rounded">PRATO</span>}
+                                  {hasCall && <span className="text-[7px] font-bold text-warning bg-warning/10 px-1 rounded">CHAMADO</span>}
+                                </div>
                               </div>
                             </div>
-                            <div className="p-2.5 space-y-1.5">
-                              {guestsMock.map((guest, i) => (
-                                <div key={i} className={`flex items-center gap-2 p-2 rounded-lg ${guest.paid ? 'opacity-40' : needsWaiter.includes(guest) ? 'bg-warning/5 border border-warning/20' : ''}`}>
-                                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold ${
-                                    guest.paid ? 'bg-success/10 text-success' : guest.hasApp ? 'bg-info/10 text-info' : 'bg-warning/10 text-warning'
-                                  }`}>
-                                    {guest.paid ? '✓' : guest.hasApp ? 'A' : '!'}
-                                  </div>
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs font-medium truncate">{guest.name}</p>
-                                    <p className="text-[9px] text-muted-foreground">
-                                      {guest.paid ? 'Pago pelo app' : guest.hasApp ? 'Aguardando no app' : 'Precisa do garçom'}
-                                    </p>
-                                  </div>
-                                  <span className="text-xs font-semibold">R$ {guest.amount}</span>
-                                  {!guest.paid && !guest.hasApp && (
-                                    <button onClick={() => { setSelectedTable(table.number); setPaymentStep('method'); }}
-                                      className="px-2.5 py-1 rounded-lg bg-primary text-primary-foreground text-[10px] font-bold">
-                                      Cobrar
-                                    </button>
-                                  )}
+                            {/* Guest avatars with status */}
+                            <div className="flex items-center gap-1 mt-1">
+                              {guests.map((g, i) => (
+                                <div key={i} className="flex items-center gap-1">
+                                  <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[7px] font-bold ${
+                                    g.paid ? 'bg-success/20 text-success' : g.hasApp ? 'bg-info/20 text-info' : 'bg-warning/20 text-warning'
+                                  }`}>{g.paid ? '✓' : g.hasApp ? '📱' : '!'}</div>
                                 </div>
                               ))}
+                              <div className="flex-1 h-1.5 bg-muted rounded-full ml-2 overflow-hidden">
+                                <div className="h-full bg-gradient-to-r from-success to-success/60 rounded-full transition-all" style={{ width: `${paidPct}%` }} />
+                              </div>
+                              <span className="text-[8px] font-bold text-muted-foreground ml-1">{paidPct}%</span>
                             </div>
                           </div>
-                        );
-                      })}
-                    </>
-                  )}
+                        </button>
+                      );
+                    })}
+                  </>
+                )}
 
-                  {paymentStep === 'method' && (
-                    <>
-                      <button onClick={() => setPaymentStep('select')} className="flex items-center gap-1 text-xs text-primary font-semibold">
-                        <ChevronLeft className="w-4 h-4" /> Voltar
+                {/* ═══ TABLE DETAIL — Full command center ═══ */}
+                {waiterTab === 'tables' && selectedTable && (() => {
+                  const table = myTables.find(t => t.number === selectedTable);
+                  if (!table) return null;
+                  const guests = TABLE_GUESTS(table);
+                  const paidPct = Math.round((guests.filter(g => g.paid).length / guests.length) * 100);
+                  const tableDishes = KITCHEN_PIPELINE.filter(d => d.table === selectedTable);
+                  const tableOrders = orders.filter(o => o.tableNumber === selectedTable && !['paid'].includes(o.status));
+
+                  return (
+                    <div className="space-y-2.5">
+                      <button onClick={() => setSelectedTable(null)} className="flex items-center gap-1 text-[10px] text-primary font-semibold">
+                        <ChevronLeft className="w-3 h-3" /> Todas as mesas
                       </button>
-                      <div className="rounded-xl bg-gradient-to-br from-primary/10 to-secondary/10 p-4 text-center">
-                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Mesa {selectedTable} · Convidado 3</p>
-                        <p className="font-display text-3xl font-bold text-primary mt-1">R$ {Math.round((myTables.find(t => t.number === selectedTable)?.orderTotal || 0) * 0.25)}</p>
+
+                      {/* Table header */}
+                      <div className="bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 rounded-xl p-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-display text-xl font-bold">Mesa {table.number}</p>
+                            <p className="text-[10px] text-muted-foreground">{table.customerName} · {table.seats} pessoas · {table.occupiedSince ? `${Math.round((Date.now() - table.occupiedSince.getTime()) / 60000)}min` : '—'}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="font-display text-lg font-bold text-primary">R$ {table.orderTotal || 0}</span>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden w-16">
+                                <div className="h-full bg-success rounded-full" style={{ width: `${paidPct}%` }} />
+                              </div>
+                              <span className="text-[8px] font-bold">{paidPct}%</span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        {[
-                          { id: 'tap', label: 'TAP to Pay', desc: 'Encoste o cartão', icon: Smartphone, highlight: true },
-                          { id: 'pix', label: 'PIX', desc: 'QR Code instantâneo', icon: Smartphone, highlight: false },
-                          { id: 'card', label: 'Cartão', desc: 'Chip e senha', icon: DollarSign, highlight: false },
-                          { id: 'cash', label: 'Dinheiro', desc: 'Confirmar recebimento', icon: DollarSign, highlight: false },
-                        ].map(m => (
-                          <button key={m.id} onClick={() => { setSelectedPayMethod(m.id); setPaymentStep('processing'); }}
-                            className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
-                              m.highlight ? 'border-primary bg-primary/5' : 'border-border bg-card'
+
+                      {/* Guest cards — the heart of the table view */}
+                      <div className="space-y-1.5">
+                        <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold px-1">Clientes na mesa</p>
+                        {guests.map((guest, i) => {
+                          const statusConfig = {
+                            served: { label: 'Servido', color: 'text-success', bg: 'bg-success/10' },
+                            eating: { label: 'Comendo', color: 'text-primary', bg: 'bg-primary/10' },
+                            waiting_food: { label: 'Aguardando prato', color: 'text-warning', bg: 'bg-warning/10' },
+                          }[guest.status];
+                          return (
+                            <div key={i} className={`rounded-xl border p-2.5 ${
+                              guest.paid ? 'border-success/20 bg-success/5 opacity-70' :
+                              !guest.hasApp ? 'border-warning/30 bg-warning/5' : 'border-border bg-card'
                             }`}>
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${m.highlight ? 'bg-primary/10' : 'bg-muted'}`}>
-                              <m.icon className={`w-5 h-5 ${m.highlight ? 'text-primary' : 'text-muted-foreground'}`} />
+                              <div className="flex items-center gap-2">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold ${
+                                  guest.paid ? 'bg-success/20 text-success' : guest.hasApp ? 'bg-info/20 text-info' : 'bg-warning/20 text-warning'
+                                }`}>{guest.paid ? '✓' : guest.hasApp ? '📱' : '!'}</div>
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-1.5">
+                                    <p className="text-[11px] font-semibold truncate">{guest.name}</p>
+                                    <span className={`px-1 py-0.5 rounded text-[7px] font-bold ${guest.hasApp ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'}`}>
+                                      {guest.hasApp ? 'APP' : 'SEM APP'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className={`text-[8px] font-medium ${statusConfig.color}`}>{statusConfig.label}</span>
+                                    <span className="text-[8px] text-muted-foreground">· {guest.items.join(', ')}</span>
+                                  </div>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[11px] font-bold">R$ {guest.amount}</p>
+                                  {guest.paid ? (
+                                    <span className="text-[7px] text-success font-medium">Pago ✓</span>
+                                  ) : !guest.hasApp ? (
+                                    <button onClick={() => { setWaiterTab('charge'); setSelectedTable(table.number); setSelectedGuest(guest.name); setPaymentStep('method'); }}
+                                      className="mt-0.5 px-2 py-0.5 rounded bg-primary text-primary-foreground text-[8px] font-bold">Cobrar</button>
+                                  ) : (
+                                    <span className="text-[7px] text-info font-medium">No app</span>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-left flex-1">
-                              <p className="text-sm font-semibold">{m.label}</p>
-                              <p className="text-[10px] text-muted-foreground">{m.desc}</p>
+                          );
+                        })}
+                      </div>
+
+                      {/* Kitchen pipeline for this table */}
+                      {tableDishes.length > 0 && (
+                        <div className="space-y-1.5">
+                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-semibold px-1">Pipeline cozinha</p>
+                          {tableDishes.map(dish => (
+                            <div key={dish.id} className={`rounded-xl border p-2.5 flex items-center gap-2.5 ${
+                              dish.status === 'ready' && !pickedUp.includes(dish.id) ? 'border-destructive/30 bg-destructive/5' : 'border-border bg-card'
+                            }`}>
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                                dish.status === 'ready' ? 'bg-success/10' : 'bg-warning/10'
+                              }`}>
+                                {dish.status === 'ready' ? <Check className="w-4 h-4 text-success" /> : <Clock className="w-4 h-4 text-warning" />}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[11px] font-semibold truncate">{dish.qty}x {dish.dish}</p>
+                                <p className="text-[9px] text-muted-foreground">{dish.chef} · {dish.elapsed}min</p>
+                              </div>
+                              {dish.status === 'ready' && !pickedUp.includes(dish.id) ? (
+                                <button onClick={() => setPickedUp(prev => [...prev, dish.id])}
+                                  className="px-2 py-1 rounded-lg bg-destructive text-destructive-foreground text-[9px] font-bold animate-pulse">Retirar</button>
+                              ) : dish.status === 'preparing' ? (
+                                <div className="w-12">
+                                  <div className="h-1 bg-muted rounded-full overflow-hidden">
+                                    <div className="h-full bg-warning rounded-full" style={{ width: `${(dish.elapsed / dish.sla) * 100}%` }} />
+                                  </div>
+                                  <p className="text-[7px] text-muted-foreground text-center mt-0.5">{dish.sla - dish.elapsed}min</p>
+                                </div>
+                              ) : (
+                                <span className="text-[9px] text-success font-medium">Retirado ✓</span>
+                              )}
                             </div>
-                            {m.highlight && <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[8px] font-bold">RÁPIDO</span>}
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Quick actions */}
+                      <div className="grid grid-cols-3 gap-1.5 pt-1">
+                        {[
+                          { label: 'Fazer pedido', icon: Plus, color: 'bg-primary text-primary-foreground' },
+                          { label: 'Cobrar mesa', icon: Smartphone, color: 'bg-secondary text-secondary-foreground', onClick: () => { setWaiterTab('charge'); setSelectedTable(table.number); } },
+                          { label: 'Chamar gerente', icon: Shield, color: 'border border-border text-foreground' },
+                        ].map((a, i) => (
+                          <button key={i} onClick={a.onClick} className={`flex flex-col items-center gap-1 p-2.5 rounded-xl text-[9px] font-semibold ${a.color}`}>
+                            <a.icon className="w-4 h-4" /> {a.label}
                           </button>
                         ))}
                       </div>
-                    </>
-                  )}
-
-                  {paymentStep === 'processing' && (
-                    <div className="text-center py-6 space-y-4">
-                      {selectedPayMethod === 'pix' ? (
-                        <>
-                          <p className="text-xs text-muted-foreground">Mostre ao cliente</p>
-                          <div className="w-36 h-36 mx-auto bg-card rounded-2xl border-2 border-border p-3 flex items-center justify-center">
-                            <div className="grid grid-cols-7 gap-px">
-                              {Array.from({ length: 49 }).map((_, i) => (
-                                <div key={i} className={`w-3 h-3 ${Math.random() > 0.4 ? 'bg-foreground' : 'bg-transparent'}`} />
-                              ))}
-                            </div>
-                          </div>
-                          <p className="font-display font-bold text-lg">PIX · R$ {Math.round((myTables.find(t => t.number === selectedTable)?.orderTotal || 0) * 0.25)}</p>
-                          <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
-                            <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" /> Aguardando confirmação
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                            <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center animate-pulse">
-                              <Smartphone className="w-8 h-8 text-primary" />
-                            </div>
-                          </div>
-                          <p className="font-display font-bold text-lg">
-                            {selectedPayMethod === 'tap' ? 'Aproxime o cartão' : selectedPayMethod === 'card' ? 'Insira o cartão' : 'Confirme o valor'}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {selectedPayMethod === 'tap' ? 'Peça ao cliente encostar o cartão no celular' : selectedPayMethod === 'card' ? 'Insira o chip e aguarde a senha' : `R$ ${Math.round((myTables.find(t => t.number === selectedTable)?.orderTotal || 0) * 0.25)} em espécie`}
-                          </p>
-                          <div className="flex items-center gap-2 justify-center text-xs text-muted-foreground">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" /> Processando...
-                          </div>
-                        </>
-                      )}
-                      <button onClick={() => setPaymentStep('done')} className="w-full py-3 rounded-xl bg-success text-success-foreground font-semibold text-sm">
-                        Confirmar Pagamento
-                      </button>
                     </div>
-                  )}
+                  );
+                })()}
 
-                  {paymentStep === 'done' && (
-                    <div className="text-center py-8 space-y-3">
-                      <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto">
-                        <Check className="w-8 h-8 text-success" />
-                      </div>
-                      <p className="font-display font-bold text-success">Pagamento confirmado!</p>
-                      <p className="text-xs text-muted-foreground">Mesa {selectedTable} · Convidado 3</p>
-                      <div className="flex gap-2 justify-center mt-4">
-                        <button className="px-3 py-1.5 rounded-lg border border-border text-[11px] font-semibold">Recibo</button>
-                        <button onClick={() => { setPaymentStep('select'); setSelectedTable(null); }}
-                          className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold">Próximo</button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* === AÇÕES — Situational, not a button dump === */}
-              {waiterScreen === 'actions' && (
-                <div className="space-y-3">
-                  {/* Live feed of things needing action */}
-                  {[
-                    { table: 5, situation: 'Prato pronto na cozinha', detail: '2x Filé ao Molho · Chef Felipe marcou como pronto há 2min', urgency: 'high' as const, action: 'Retirar e servir', actionType: 'pickup' as const },
-                    { table: 3, situation: 'Cliente sem app quer pedir', detail: 'Mesa com 1 convidado sem o app instalado', urgency: 'medium' as const, action: 'Fazer pedido', actionType: 'order' as const },
-                    { table: 8, situation: 'Pedido de sobremesa', detail: 'Cliente quer ver cardápio de sobremesas', urgency: 'low' as const, action: 'Mostrar cardápio', actionType: 'menu' as const },
-                    { table: 10, situation: 'Cortesia solicitada', detail: 'Aniversário — solicitar cortesia de sobremesa ao gerente', urgency: 'medium' as const, action: 'Pedir ao gerente', actionType: 'approval' as const },
-                    { table: 1, situation: 'Conta solicitada', detail: '1 convidado sem app precisa de cobrança via garçom', urgency: 'medium' as const, action: 'Cobrar', actionType: 'payment' as const },
-                  ].map((item, i) => (
-                    <div key={i} className={`rounded-xl border-2 overflow-hidden ${
-                      item.urgency === 'high' ? 'border-destructive/30 bg-destructive/5' :
-                      item.urgency === 'medium' ? 'border-warning/20 bg-card' : 'border-border bg-card'
-                    }`}>
-                      <div className="p-3">
-                        <div className="flex items-start gap-3">
-                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold shrink-0 ${
-                            item.urgency === 'high' ? 'bg-destructive/10 text-destructive' :
-                            item.urgency === 'medium' ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'
-                          }`}>
-                            {item.table}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-1.5">
-                              <p className="text-sm font-semibold">{item.situation}</p>
-                              {item.urgency === 'high' && (
-                                <span className="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive text-[8px] font-bold animate-pulse">
-                                  <div className="w-1 h-1 rounded-full bg-destructive" /> AGORA
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">{item.detail}</p>
-                          </div>
+                {/* ═══ COZINHA — Kitchen pipeline ═══ */}
+                {waiterTab === 'kitchen' && (
+                  <>
+                    {readyDishes.length > 0 && (
+                      <div className="flex items-center gap-2 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20 animate-pulse">
+                        <ChefHat className="w-5 h-5 text-destructive" />
+                        <div>
+                          <p className="text-[11px] font-bold text-destructive">{readyDishes.length} prato(s) para retirar agora!</p>
+                          <p className="text-[9px] text-destructive/70">Tempo é qualidade — retire e sirva</p>
                         </div>
                       </div>
-                      <button className={`w-full py-2.5 text-xs font-semibold border-t transition-colors ${
-                        item.urgency === 'high'
-                          ? 'border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20'
-                          : item.urgency === 'medium'
-                            ? 'border-warning/20 bg-warning/5 text-warning hover:bg-warning/10'
-                            : 'border-border bg-muted/20 text-primary hover:bg-muted/40'
-                      }`}>
-                        {item.action} →
-                      </button>
-                    </div>
-                  ))}
+                    )}
 
-                  {/* Quick actions bottom bar */}
-                  <div className="pt-2 border-t border-border">
-                    <p className="text-[9px] uppercase tracking-wider text-muted-foreground mb-2">Ações rápidas</p>
-                    <div className="flex gap-2">
-                      {[
-                        { label: 'Novo pedido', icon: Plus },
-                        { label: 'Chamar gerente', icon: Shield },
-                        { label: 'Transferir mesa', icon: ArrowRight },
-                      ].map((a, i) => (
-                        <button key={i} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border border-border text-[10px] font-semibold text-muted-foreground hover:bg-muted/30">
-                          <a.icon className="w-3 h-3" /> {a.label}
-                        </button>
+                    {/* Ready dishes — urgent */}
+                    {readyDishes.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-[9px] uppercase tracking-wider text-destructive font-bold px-1 flex items-center gap-1">
+                          <div className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" /> PRONTO — RETIRAR
+                        </p>
+                        {readyDishes.map(dish => (
+                          <div key={dish.id} className="rounded-xl border-2 border-destructive/30 bg-destructive/5 p-3">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-10 h-10 rounded-xl bg-destructive/10 flex items-center justify-center font-display font-bold text-sm text-destructive">{dish.table}</div>
+                              <div className="flex-1">
+                                <p className="text-xs font-bold">{dish.qty}x {dish.dish}</p>
+                                <p className="text-[9px] text-muted-foreground">{dish.chef} · pronto há {dish.readyAgo}min</p>
+                              </div>
+                              <button onClick={() => setPickedUp(prev => [...prev, dish.id])}
+                                className="px-3 py-2 rounded-xl bg-destructive text-destructive-foreground text-[10px] font-bold shadow-lg">
+                                Retirar ✓
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Preparing dishes */}
+                    <div className="space-y-1.5">
+                      <p className="text-[9px] uppercase tracking-wider text-warning font-bold px-1 flex items-center gap-1">
+                        <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" /> PREPARANDO
+                      </p>
+                      {KITCHEN_PIPELINE.filter(d => d.status === 'preparing').map(dish => (
+                        <div key={dish.id} className="rounded-xl border border-border bg-card p-3">
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-10 h-10 rounded-xl bg-warning/10 flex items-center justify-center font-display font-bold text-sm text-warning">{dish.table}</div>
+                            <div className="flex-1">
+                              <p className="text-xs font-semibold">{dish.qty}x {dish.dish}</p>
+                              <p className="text-[9px] text-muted-foreground">{dish.chef}</p>
+                            </div>
+                            <div className="w-14 text-right">
+                              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                                <div className="h-full bg-warning rounded-full transition-all" style={{ width: `${Math.min((dish.elapsed / dish.sla) * 100, 100)}%` }} />
+                              </div>
+                              <p className={`text-[8px] font-bold mt-0.5 ${dish.elapsed > dish.sla ? 'text-destructive' : 'text-muted-foreground'}`}>
+                                {dish.elapsed > dish.sla ? `+${dish.elapsed - dish.sla}min` : `${dish.sla - dish.elapsed}min`}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  </div>
-                </div>
-              )}
+
+                    {/* Picked up */}
+                    {pickedUp.length > 0 && (
+                      <div className="space-y-1.5">
+                        <p className="text-[9px] uppercase tracking-wider text-success font-bold px-1">✓ SERVIDO</p>
+                        {KITCHEN_PIPELINE.filter(d => pickedUp.includes(d.id)).map(dish => (
+                          <div key={dish.id} className="rounded-xl border border-success/20 bg-success/5 p-2.5 opacity-60">
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-lg bg-success/10 flex items-center justify-center text-success text-xs font-bold">{dish.table}</div>
+                              <p className="text-[11px] text-muted-foreground">{dish.qty}x {dish.dish}</p>
+                              <Check className="w-4 h-4 text-success ml-auto" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* ═══ COBRAR — Payment terminal ═══ */}
+                {waiterTab === 'charge' && (
+                  <>
+                    {paymentStep === 'guests' && (
+                      <>
+                        <div className="rounded-xl bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/10 p-3">
+                          <p className="text-[11px] font-semibold">Cobrança inteligente</p>
+                          <p className="text-[9px] text-muted-foreground mt-0.5">Quem pagou pelo app aparece automaticamente. Cobre apenas quem precisa do garçom.</p>
+                        </div>
+                        {myTables.map(table => {
+                          const guests = TABLE_GUESTS(table);
+                          const paidCount = guests.filter(g => g.paid).length;
+                          const needsWaiter = guests.filter(g => !g.paid && !g.hasApp);
+                          const waitingApp = guests.filter(g => !g.paid && g.hasApp);
+                          return (
+                            <div key={table.id} className="rounded-xl border border-border bg-card overflow-hidden">
+                              <div className="flex items-center gap-2.5 p-2.5 bg-muted/20 border-b border-border">
+                                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center font-display font-bold text-primary text-sm">{table.number}</div>
+                                <div className="flex-1">
+                                  <p className="text-xs font-semibold">{table.customerName}</p>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className="text-[9px] text-success font-medium">{paidCount} pago</span>
+                                    {waitingApp.length > 0 && <span className="text-[9px] text-info">· {waitingApp.length} no app</span>}
+                                    {needsWaiter.length > 0 && <span className="text-[9px] text-warning font-bold">· {needsWaiter.length} sem app</span>}
+                                  </div>
+                                </div>
+                                {/* Progress ring */}
+                                <div className="relative w-10 h-10">
+                                  <svg className="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                                    <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--muted))" strokeWidth="3" />
+                                    <circle cx="18" cy="18" r="15" fill="none" stroke="hsl(var(--success))" strokeWidth="3" strokeDasharray={`${(paidCount / guests.length) * 94} 94`} strokeLinecap="round" />
+                                  </svg>
+                                  <span className="absolute inset-0 flex items-center justify-center text-[8px] font-bold">{paidCount}/{guests.length}</span>
+                                </div>
+                              </div>
+                              <div className="p-2 space-y-1">
+                                {guests.map((guest, i) => (
+                                  <div key={i} className={`flex items-center gap-2 p-2 rounded-lg ${
+                                    guest.paid ? 'opacity-40' : !guest.hasApp ? 'bg-warning/5 border border-warning/15' : ''
+                                  }`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[7px] font-bold ${
+                                      guest.paid ? 'bg-success/20 text-success' : guest.hasApp ? 'bg-info/20 text-info' : 'bg-warning/20 text-warning'
+                                    }`}>{guest.paid ? '✓' : guest.hasApp ? '📱' : '!'}</div>
+                                    <div className="flex-1 min-w-0">
+                                      <p className="text-[10px] font-medium truncate">{guest.name}</p>
+                                      <p className="text-[8px] text-muted-foreground">{guest.paid ? 'Pago via app' : guest.hasApp ? 'Pagando pelo app' : 'Precisa do garçom'}</p>
+                                    </div>
+                                    <span className="text-[10px] font-semibold">R$ {guest.amount}</span>
+                                    {!guest.paid && !guest.hasApp && (
+                                      <button onClick={() => { setSelectedTable(table.number); setSelectedGuest(guest.name); setPaymentStep('method'); }}
+                                        className="px-2 py-1 rounded-lg bg-primary text-primary-foreground text-[8px] font-bold">Cobrar</button>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                    {paymentStep === 'method' && (
+                      <div className="space-y-3">
+                        <button onClick={() => { setPaymentStep('guests'); setSelectedGuest(null); }} className="flex items-center gap-1 text-[10px] text-primary font-semibold">
+                          <ChevronLeft className="w-3 h-3" /> Voltar
+                        </button>
+                        <div className="rounded-2xl bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10 p-4 text-center">
+                          <p className="text-[9px] uppercase tracking-wider text-muted-foreground">Mesa {selectedTable} · {selectedGuest || 'Convidado'}</p>
+                          <p className="font-display text-3xl font-bold text-primary mt-1">R$ {Math.round((myTables.find(t => t.number === selectedTable)?.orderTotal || 0) * 0.25)}</p>
+                          <p className="text-[9px] text-muted-foreground mt-1">Selecione como cobrar</p>
+                        </div>
+                        <div className="space-y-1.5">
+                          {[
+                            { id: 'tap', label: 'TAP to Pay (NFC)', desc: 'Encoste o cartão no celular', highlight: true, icon: '📱' },
+                            { id: 'pix', label: 'PIX QR Code', desc: 'Gere o QR e mostre ao cliente', highlight: false, icon: '⚡' },
+                            { id: 'card', label: 'Cartão (Chip/Senha)', desc: 'Maquininha vinculada', highlight: false, icon: '💳' },
+                            { id: 'cash', label: 'Dinheiro', desc: 'Confirme valor recebido', highlight: false, icon: '💵' },
+                          ].map(m => (
+                            <button key={m.id} onClick={() => setPaymentStep('processing')}
+                              className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                                m.highlight ? 'border-primary bg-primary/5 shadow-sm' : 'border-border bg-card'
+                              }`}>
+                              <span className="text-lg">{m.icon}</span>
+                              <div className="text-left flex-1">
+                                <p className="text-xs font-semibold">{m.label}</p>
+                                <p className="text-[9px] text-muted-foreground">{m.desc}</p>
+                              </div>
+                              {m.highlight && <span className="px-1.5 py-0.5 rounded bg-success/10 text-success text-[7px] font-bold">RECOMENDADO</span>}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {paymentStep === 'processing' && (
+                      <div className="text-center py-8 space-y-4">
+                        <div className="relative w-28 h-28 mx-auto">
+                          <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-ping" />
+                          <div className="absolute inset-2 rounded-full border-4 border-primary/30 animate-pulse" />
+                          <div className="absolute inset-4 rounded-full bg-primary/10 flex items-center justify-center">
+                            <Smartphone className="w-10 h-10 text-primary" />
+                          </div>
+                        </div>
+                        <div>
+                          <p className="font-display font-bold text-base">Aproxime o cartão</p>
+                          <p className="text-[10px] text-muted-foreground mt-1">Peça ao cliente encostar o cartão no celular</p>
+                        </div>
+                        <div className="flex items-center gap-2 justify-center text-[10px] text-primary">
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-ping" /> Aguardando...
+                        </div>
+                        <div className="space-y-2 pt-2">
+                          <button onClick={() => setPaymentStep('done')} className="w-full py-3 rounded-xl bg-success text-success-foreground font-semibold text-sm">
+                            Confirmar Pagamento
+                          </button>
+                          <button onClick={() => setPaymentStep('method')} className="w-full py-2 rounded-xl border border-border text-xs text-muted-foreground">
+                            Trocar método
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {paymentStep === 'done' && (
+                      <div className="text-center py-10 space-y-3">
+                        <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto">
+                          <Check className="w-8 h-8 text-success" />
+                        </div>
+                        <p className="font-display font-bold text-success">Pagamento confirmado!</p>
+                        <p className="text-[10px] text-muted-foreground">Mesa {selectedTable} · {selectedGuest || 'Convidado'}</p>
+                        <p className="text-[10px] text-muted-foreground">Recibo enviado automaticamente</p>
+                        <div className="flex gap-2 justify-center pt-2">
+                          <button className="px-3 py-1.5 rounded-lg border border-border text-[10px] font-semibold">Imprimir recibo</button>
+                          <button onClick={() => { setPaymentStep('guests'); setSelectedGuest(null); setSelectedTable(null); }}
+                            className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-[10px] font-semibold">Próximo →</button>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+
+              </div>
             </div>
           </div>
         </PhoneShell>
