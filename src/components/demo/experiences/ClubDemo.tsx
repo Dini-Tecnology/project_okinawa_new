@@ -1,6 +1,10 @@
 /**
  * Club & Balada Demo — NOOWE Club
- * Jornada autêntica: descobrir → ingresso/lista → fila → pulseira → amigos → pedir → camarote → encerrar
+ * 
+ * 10-Stage Service Blueprint:
+ * 1. Discovery → 2. Decision (ticket/list) → 3. Arrival (QR check-in)
+ * 4. Venue (menu) → 5. Order (floor/VIP) → 6. Continuous Consumption
+ * 7. Bill (min spend tracker) → 8. Split → 9. Payment → 10. Post
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
@@ -9,52 +13,51 @@ import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
   Users, Timer, ArrowRight, Music, Ticket, Crown, MapPin, UserPlus,
   Share2, Copy, Sparkles, Lock, Eye, ChevronRight, Bell, Car, ThumbsUp,
-  Search, Heart, AlertTriangle, Zap, Wine, Beer, UtensilsCrossed,
-  GlassWater, Building, ScanLine, Smartphone, Navigation,
-  Locate, PartyPopper, ShieldCheck, Shirt, Tag,
+  Search, Heart, AlertTriangle, Zap, Wine, Beer,
+  GlassWater, Building, ScanLine, Tag, PartyPopper,
+  ShieldCheck, DollarSign, TrendingUp,
 } from 'lucide-react';
 
 type Screen =
-  | 'home' | 'club-detail' | 'lineup' | 'tickets' | 'digital-ticket'
-  | 'promoter-list' | 'virtual-queue' | 'wristband'
-  | 'find-friends' | 'floor-order' | 'order-pickup'
-  | 'vip-table' | 'vip-map' | 'bottle-service' | 'min-spend'
-  | 'coat-check' | 'close' | 'rate';
+  | 'discovery' | 'event-detail' | 'lineup'
+  | 'tickets' | 'digital-ticket' | 'promoter-list'
+  | 'virtual-queue' | 'check-in'
+  | 'floor-menu' | 'order-pickup'
+  | 'vip-table' | 'vip-map' | 'bottle-service'
+  | 'min-spend' | 'split' | 'payment'
+  | 'post' | 'rate';
 
 export const JOURNEY_STEPS = [
-  { step: 1, label: 'Descobrir evento', screens: ['home', 'club-detail'] },
-  { step: 2, label: 'Ver lineup', screens: ['lineup'] },
-  { step: 3, label: 'Comprar ingresso', screens: ['tickets', 'digital-ticket'] },
-  { step: 4, label: 'Lista do Promoter', screens: ['promoter-list'] },
-  { step: 5, label: 'Fila virtual', screens: ['virtual-queue'] },
-  { step: 6, label: 'Ativar pulseira', screens: ['wristband'] },
-  { step: 7, label: 'Encontrar amigos', screens: ['find-friends'] },
-  { step: 8, label: 'Pedir da pista', screens: ['floor-order', 'order-pickup'] },
-  { step: 9, label: 'Camarote VIP', screens: ['vip-table', 'vip-map'] },
-  { step: 10, label: 'Bottle & consumação', screens: ['bottle-service', 'min-spend'] },
-  { step: 11, label: 'Guardar pertences', screens: ['coat-check'] },
-  { step: 12, label: 'Encerrar noite', screens: ['close', 'rate'] },
+  { step: 1, label: 'Descoberta', screens: ['discovery', 'event-detail', 'lineup'] },
+  { step: 2, label: 'Decisão / Ingresso', screens: ['tickets', 'digital-ticket', 'promoter-list'] },
+  { step: 3, label: 'Chegada & Check-in', screens: ['virtual-queue', 'check-in'] },
+  { step: 4, label: 'Cardápio & Pedido', screens: ['floor-menu', 'order-pickup'] },
+  { step: 5, label: 'Camarote VIP', screens: ['vip-table', 'vip-map'] },
+  { step: 6, label: 'Bottle Service', screens: ['bottle-service'] },
+  { step: 7, label: 'Conta & Consumação', screens: ['min-spend'] },
+  { step: 8, label: 'Dividir & Pagar', screens: ['split', 'payment'] },
+  { step: 9, label: 'Pós-experiência', screens: ['post', 'rate'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
-  'home': { title: 'Eventos', desc: 'As melhores noites da cidade com lotação em tempo real.' },
-  'club-detail': { title: 'NOOWE Club', desc: 'Detalhes, lineup e lotação do evento.' },
+  'discovery': { title: 'Eventos', desc: 'Descubra eventos com lotação em tempo real e amigos indo.' },
+  'event-detail': { title: 'NOOWE Club', desc: 'Detalhes do evento: lineup, ocupação, ingressos.' },
   'lineup': { title: 'Lineup', desc: 'DJs, horários e gêneros da noite.' },
   'tickets': { title: 'Ingressos', desc: 'Lotes com preço dinâmico — compre antes, pague menos.' },
-  'digital-ticket': { title: 'Ingresso Digital', desc: 'QR animado anti-fraude no seu celular.' },
-  'promoter-list': { title: 'Lista do Promoter', desc: 'Entrada na lista ou fluxo de aniversariante.' },
-  'virtual-queue': { title: 'Fila Virtual', desc: 'Sua posição na fila sem ficar no frio.' },
-  'wristband': { title: 'Pulseira Digital', desc: 'Ative a pulseira NFC e vincule créditos.' },
-  'find-friends': { title: 'Encontrar Amigos', desc: 'Veja onde seus amigos estão no club.' },
-  'floor-order': { title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
-  'order-pickup': { title: 'Retirada', desc: 'Seu drink está pronto — retire no bar indicado.' },
-  'vip-table': { title: 'Camarotes', desc: 'Opções de camarote com consumação mínima.' },
-  'vip-map': { title: 'Mapa VIP', desc: 'Escolha a posição do seu camarote no club.' },
-  'bottle-service': { title: 'Bottle Service', desc: 'Garrafas premium com mixers inclusos.' },
-  'min-spend': { title: 'Consumação', desc: 'Tracker da consumação mínima em tempo real.' },
-  'coat-check': { title: 'Guarda-Volumes', desc: 'Entregue pertences e retire com QR — sem fila.' },
-  'close': { title: 'Encerramento', desc: 'Resumo completo da noite e Uber integrado.' },
-  'rate': { title: 'Avaliação', desc: 'Avalie a noite por categoria e ganhe pontos.' },
+  'digital-ticket': { title: 'Ingresso Digital', desc: 'QR animado anti-fraude no celular.' },
+  'promoter-list': { title: 'Lista & Aniversário', desc: 'Lista do promoter ou solicitação de aniversário.' },
+  'virtual-queue': { title: 'Fila Virtual', desc: 'Posição na fila sem esperar fisicamente.' },
+  'check-in': { title: 'Check-in', desc: 'QR validado na porta — tab abre automaticamente.' },
+  'floor-menu': { title: 'Pedir da Pista', desc: 'Peça drinks sem sair da pista.' },
+  'order-pickup': { title: 'Retirada', desc: 'Drink pronto — retire no bar indicado.' },
+  'vip-table': { title: 'Camarotes', desc: 'Opções VIP com consumação mínima.' },
+  'vip-map': { title: 'Mapa', desc: 'Escolha a posição do camarote.' },
+  'bottle-service': { title: 'Garrafas', desc: 'Cardápio premium com mixers inclusos.' },
+  'min-spend': { title: 'Consumação', desc: 'Tracker de consumação mínima em tempo real.' },
+  'split': { title: 'Dividir', desc: 'Divida o camarote entre o grupo.' },
+  'payment': { title: 'Pagamento', desc: 'Pague sua parte e saia.' },
+  'post': { title: 'Noite Encerrada', desc: 'Resumo da noite com pontos e Uber.' },
+  'rate': { title: 'Avaliação', desc: 'Avalie a noite por categoria.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -84,19 +87,19 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const minimum = 3000;
   const progress = Math.round((consumed / minimum) * 100);
   const [queuePos, setQueuePos] = useState(12);
-  const [countdown, setCountdown] = useState({ h: 3, m: 42 });
+  const [countdown] = useState({ h: 3, m: 42 });
   const [guests] = useState([
-    { name: 'Você', status: 'confirmed' as const, zone: 'Pista' },
-    { name: 'Pedro', status: 'confirmed' as const, zone: 'Bar 2' },
-    { name: 'Camila', status: 'confirmed' as const, zone: 'Pista' },
-    { name: 'Rafael', status: 'pending' as const, zone: '—' },
-    { name: 'Julia', status: 'declined' as const, zone: '—' },
+    { name: 'Você', status: 'confirmed' as const },
+    { name: 'Pedro', status: 'confirmed' as const },
+    { name: 'Camila', status: 'confirmed' as const },
+    { name: 'Rafael', status: 'pending' as const },
+    { name: 'Julia', status: 'declined' as const },
   ]);
-  const [wristbandBalance, setWristbandBalance] = useState(260); // entry credit + deposit
-  const [coatItems] = useState([
-    { id: 'c1', desc: 'Jaqueta preta', code: 'GV-041' },
-    { id: 'c2', desc: 'Bolsa pequena', code: 'GV-042' },
-  ]);
+  const [splitMode, setSplitMode] = useState<'consumption' | 'equal'>('consumption');
+  const ticketPrice = ticketType === 'pista' ? 60 : ticketType === 'vip' ? 120 : 200;
+  const entryCredit = ticketType === 'pista' ? 60 : 0;
+  const vipDeposit = 1200;
+  const totalCredits = entryCredit + vipDeposit;
 
   useEffect(() => {
     if (screen === 'virtual-queue') {
@@ -104,8 +107,6 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       return () => clearInterval(t);
     }
   }, [screen]);
-
-  const ticketPrice = ticketType === 'pista' ? 60 : ticketType === 'vip' ? 120 : 200;
 
   const Header: React.FC<{ title: string; back: Screen; right?: React.ReactNode }> = ({ title, back, right }) => (
     <div className="flex items-center justify-between py-4">
@@ -116,29 +117,26 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   );
 
   switch (screen) {
-    /* ─── 1. DESCOBERTA ─── */
-    case 'home':
+    /* ═══ STAGE 1: DISCOVERY ═══ */
+    case 'discovery':
       return (
         <div className="px-5 pb-4">
           <div className="pt-2 pb-3">
             <p className="text-sm text-muted-foreground">Sábado à noite</p>
-            <h1 className="font-display text-xl font-bold">Eventos & Clubs</h1>
+            <h1 className="font-display text-xl font-bold">Onde sair hoje?</h1>
           </div>
           <div className="flex items-center gap-2 mb-4">
             <div className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/50 border border-border">
               <Search className="w-4 h-4 text-muted-foreground" />
-              <span className="text-xs text-muted-foreground">Buscar eventos...</span>
+              <span className="text-xs text-muted-foreground">Buscar eventos, clubs...</span>
             </div>
-            <button className="p-2.5 rounded-xl bg-muted/50 border border-border">
-              <Heart className="w-4 h-4 text-muted-foreground" />
-            </button>
+            <button className="p-2.5 rounded-xl bg-muted/50 border border-border"><Heart className="w-4 h-4 text-muted-foreground" /></button>
           </div>
           <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-4">
             {['Hoje', 'Este fds', 'Tech House', 'Funk', 'Sertanejo', 'Open Bar'].map((f, i) => (
               <button key={f} className={`px-3 py-1.5 rounded-full text-[10px] font-medium whitespace-nowrap ${i === 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{f}</button>
             ))}
           </div>
-
           {/* Amigos indo */}
           <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/10 mb-3 flex items-center gap-3">
             <div className="flex -space-x-2">
@@ -148,9 +146,8 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
             <p className="text-xs"><span className="font-semibold">Pedro e Camila</span> <span className="text-muted-foreground">vão no NOOWE Club</span></p>
           </div>
-
-          <GuidedHint text="Compre ingressos, reserve camarote e controle gastos pelo app" />
-          <button onClick={() => onNavigate('club-detail')} className="w-full text-left mb-3">
+          <GuidedHint text="Discovery inteligente: eventos por gênero, amigos e lotação" />
+          <button onClick={() => onNavigate('event-detail')} className="w-full text-left mb-3">
             <div className="rounded-2xl overflow-hidden border border-border bg-card">
               <div className="h-32 bg-gradient-to-br from-purple-600/30 to-pink-600/30 flex items-center justify-center relative">
                 <ItemIcon cat="club" size="hero" />
@@ -179,35 +176,34 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
-    case 'club-detail':
+    case 'event-detail':
       return (
         <div className="px-5 pb-4">
-          <Header title="NOOWE Club" back="home" right={<button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><Share2 className="w-4 h-4" /></button>} />
+          <Header title="NOOWE Club" back="discovery" right={<button className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><Share2 className="w-4 h-4" /></button>} />
           <div className="text-center mb-4">
             <ItemIcon cat="club" size="hero" className="mx-auto" />
             <h2 className="font-display text-xl font-bold mt-2">Tech House Night</h2>
             <p className="text-sm text-muted-foreground">Sáb, 22 Mar · 23:00 - 06:00</p>
             <p className="text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1"><MapPin className="w-3 h-3" /> Vila Olímpia, São Paulo</p>
           </div>
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="grid grid-cols-4 gap-2 mb-4">
             {[
               { label: 'Lotação', value: '72%', color: 'text-warning' },
-              { label: 'Na fila', value: `${queuePos}`, color: 'text-primary' },
+              { label: 'Fila', value: `~${queuePos}min`, color: 'text-primary' },
+              { label: 'Ingressos', value: 'Lote 2', color: 'text-accent' },
               { label: 'Camarotes', value: '3 livres', color: 'text-success' },
             ].map(s => (
-              <div key={s.label} className="p-3 rounded-xl bg-muted/30 text-center">
-                <p className={`font-bold text-sm ${s.color}`}>{s.value}</p>
-                <p className="text-[9px] text-muted-foreground">{s.label}</p>
+              <div key={s.label} className="p-2 rounded-xl bg-muted/30 text-center">
+                <p className={`font-bold text-[10px] ${s.color}`}>{s.value}</p>
+                <p className="text-[8px] text-muted-foreground">{s.label}</p>
               </div>
             ))}
           </div>
-          <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4">
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-400" />
-              <div>
-                <p className="text-xs font-semibold">Começa em {countdown.h}h {countdown.m}min</p>
-                <p className="text-[10px] text-muted-foreground">Portões abrem às 22:30</p>
-              </div>
+          <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4 flex items-center gap-2">
+            <Clock className="w-4 h-4 text-purple-400" />
+            <div>
+              <p className="text-xs font-semibold">Começa em {countdown.h}h {countdown.m}min</p>
+              <p className="text-[10px] text-muted-foreground">Portões abrem às 22:30</p>
             </div>
           </div>
           <div className="space-y-2 mb-4">
@@ -218,7 +214,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <Ticket className="w-5 h-5" /> Comprar Ingresso
             </button>
             <button onClick={() => onNavigate('promoter-list')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
-              <Tag className="w-4 h-4" /> Entrar na Lista / Aniversário
+              <Tag className="w-4 h-4" /> Lista / Aniversário
             </button>
             <button onClick={() => onNavigate('vip-table')} className="w-full py-3.5 bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-600/20 rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
               <Crown className="w-4 h-4 text-accent" /> Reservar Camarote VIP
@@ -227,11 +223,10 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
-    /* ─── 2. LINEUP ─── */
     case 'lineup':
       return (
         <div className="px-5 pb-4">
-          <Header title="Lineup" back="club-detail" />
+          <Header title="Lineup" back="event-detail" />
           <div className="space-y-3 mb-4">
             {[
               { name: 'DJ Marcos', time: '23:00 - 01:00', genre: 'Tech House', bio: 'Residente NOOWE · 8 anos', headliner: false },
@@ -262,20 +257,20 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
-    /* ─── 3. INGRESSOS ─── */
+    /* ═══ STAGE 2: DECISION — TICKETS / LIST ═══ */
     case 'tickets':
       return (
         <div className="px-5 pb-4">
-          <Header title="Ingressos" back="club-detail" />
+          <Header title="Ingressos" back="event-detail" />
           <div className="p-3 rounded-xl bg-warning/10 border border-warning/20 mb-4 flex items-center gap-2">
             <Timer className="w-4 h-4 text-warning" />
             <span className="text-xs text-warning font-medium">Lote 2 · Últimas unidades · Preço sobe em 2h</span>
           </div>
           <div className="space-y-3 mb-5">
             {[
-              { id: 'pista' as const, name: 'Pista', price: 60, original: 80, desc: 'Acesso à pista principal', perks: ['Entrada após 23:30', 'R$ 60 vira crédito na pulseira'], avail: 23 },
-              { id: 'vip' as const, name: 'VIP', price: 120, original: 150, desc: 'Área VIP + 1 drink incluso', perks: ['Entrada prioritária', 'Área exclusiva', '1 drink cortesia'], avail: 15 },
-              { id: 'open' as const, name: 'Open Bar', price: 200, original: 250, desc: 'Open bar premium até 03:00', perks: ['Entrada prioritária', 'Open bar completo', 'Área VIP inclusa'], avail: 8 },
+              { id: 'pista' as const, name: 'Pista', price: 60, original: 80, desc: 'Acesso à pista', perks: ['Entrada após 23:30', 'R$ 60 vira crédito consumação'], avail: 23 },
+              { id: 'vip' as const, name: 'VIP', price: 120, original: 150, desc: 'Área VIP + 1 drink', perks: ['Entrada prioritária', 'Área exclusiva', '1 drink cortesia'], avail: 15 },
+              { id: 'open' as const, name: 'Open Bar', price: 200, original: 250, desc: 'Open bar até 03:00', perks: ['Entrada prioritária', 'Open bar completo', 'Área VIP inclusa'], avail: 8 },
             ].map(ticket => (
               <button key={ticket.id} onClick={() => setTicketType(ticket.id)} className={`w-full p-4 rounded-xl border-2 text-left transition-all ${ticketType === ticket.id ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
                 <div className="flex items-center justify-between mb-2">
@@ -321,21 +316,19 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <div className="absolute inset-0 rounded-xl border-2 border-primary/30 animate-pulse" />
             </div>
             <p className="font-display text-2xl font-bold tracking-widest text-primary mb-1">NC-847</p>
-            <p className="text-[10px] text-muted-foreground">
-              {ticketType === 'pista' ? 'Pista' : ticketType === 'vip' ? 'VIP' : 'Open Bar'} · R$ {ticketPrice}
-            </p>
+            <p className="text-[10px] text-muted-foreground">{ticketType === 'pista' ? 'Pista' : ticketType === 'vip' ? 'VIP' : 'Open Bar'} · R$ {ticketPrice}</p>
             <div className="absolute left-0 top-1/2 w-4 h-8 -ml-2 bg-background rounded-r-full" />
             <div className="absolute right-0 top-1/2 w-4 h-8 -mr-2 bg-background rounded-l-full" />
           </div>
           {ticketType === 'pista' && (
-            <div className="p-3 rounded-xl bg-success/10 border border-success/20 mb-4 flex items-center gap-2">
+            <div className="p-3 rounded-xl bg-success/10 border border-success/20 mb-3 flex items-center gap-2">
               <Zap className="w-4 h-4 text-success" />
-              <span className="text-xs text-success font-medium">R$ 60 será creditado na pulseira na entrada</span>
+              <span className="text-xs text-success font-medium">R$ 60 convertido em crédito de consumação</span>
             </div>
           )}
           <div className="p-3 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4">
             <p className="text-xs font-semibold mb-1 flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-purple-500" /> QR anti-fraude</p>
-            <p className="text-[10px] text-muted-foreground">O código muda a cada 30 segundos — impossível clonar</p>
+            <p className="text-[10px] text-muted-foreground">Código muda a cada 30s — impossível clonar</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => onNavigate('promoter-list')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
@@ -348,22 +341,15 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
-    /* ─── 4. LISTA DO PROMOTER / ANIVERSÁRIO ─── */
     case 'promoter-list':
       return (
         <div className="px-5 pb-4">
           <Header title="Lista & Aniversário" back="digital-ticket" />
-          
-          {/* Promoter list */}
+          {/* Promoter */}
           <div className="p-4 rounded-xl bg-card border border-border mb-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                <Tag className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-bold">Lista do Promoter</p>
-                <p className="text-[10px] text-muted-foreground">Entrada com desconto ou gratuita</p>
-              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"><Tag className="w-5 h-5 text-primary-foreground" /></div>
+              <div><p className="text-sm font-bold">Lista do Promoter</p><p className="text-[10px] text-muted-foreground">Entrada com desconto ou gratuita</p></div>
             </div>
             <div className="space-y-2 mb-3">
               {[
@@ -379,44 +365,31 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 </button>
               ))}
             </div>
-            <button className="w-full py-3 bg-primary/10 text-primary rounded-xl text-sm font-semibold">
-              Colocar nome na lista
-            </button>
+            <button className="w-full py-3 bg-primary/10 text-primary rounded-xl text-sm font-semibold">Colocar nome na lista</button>
           </div>
-
           {/* Aniversário */}
           <div className="p-4 rounded-xl bg-gradient-to-r from-pink-500/5 to-purple-500/5 border border-pink-500/20 mb-4">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center">
-                <PartyPopper className="w-5 h-5 text-primary-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-bold">Aniversariante?</p>
-                <p className="text-[10px] text-muted-foreground">Entrada grátis + benefícios exclusivos</p>
-              </div>
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center"><PartyPopper className="w-5 h-5 text-primary-foreground" /></div>
+              <div><p className="text-sm font-bold">Aniversariante?</p><p className="text-[10px] text-muted-foreground">Entrada grátis + benefícios</p></div>
             </div>
             <div className="space-y-1.5 text-xs text-muted-foreground mb-3">
-              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Entrada gratuita para você + 1 acompanhante</p>
-              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Garrafa de espumante cortesia</p>
-              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Decoração na mesa VIP</p>
+              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Entrada gratuita + 1 acompanhante</p>
+              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Espumante cortesia</p>
+              <p className="flex items-center gap-2"><Check className="w-3 h-3 text-success" /> Decoração na mesa</p>
             </div>
-            <div className="p-3 rounded-lg bg-muted/30 mb-3">
-              <p className="text-[10px] text-muted-foreground">Documento necessário para verificação na entrada</p>
-            </div>
+            <p className="text-[10px] text-muted-foreground mb-3">Documento necessário para verificação</p>
             <button className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-primary-foreground rounded-xl text-sm font-semibold flex items-center justify-center gap-2">
               <PartyPopper className="w-4 h-4" /> Solicitar Aniversário
             </button>
           </div>
-
           {/* Convidados */}
           <div className="mb-4">
             <p className="text-xs font-semibold mb-2">Seus convidados</p>
             <div className="space-y-2">
               {guests.map((g, i) => (
                 <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border ${g.status === 'confirmed' ? 'border-success/30 bg-success/5' : g.status === 'pending' ? 'border-warning/30 bg-warning/5' : 'border-border bg-muted/30'}`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${g.status === 'confirmed' ? 'bg-success text-primary-foreground' : g.status === 'pending' ? 'bg-warning text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                    {g.name[0]}
-                  </div>
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${g.status === 'confirmed' ? 'bg-success text-primary-foreground' : g.status === 'pending' ? 'bg-warning text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>{g.name[0]}</div>
                   <div className="flex-1">
                     <p className="text-sm font-semibold">{g.name}</p>
                     <p className="text-[10px] text-muted-foreground flex items-center gap-1">
@@ -429,14 +402,11 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               ))}
             </div>
           </div>
-
-          <button onClick={() => onNavigate('virtual-queue')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
-            Continuar
-          </button>
+          <button onClick={() => onNavigate('virtual-queue')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">Continuar</button>
         </div>
       );
 
-    /* ─── 5. FILA VIRTUAL ─── */
+    /* ═══ STAGE 3: ARRIVAL ═══ */
     case 'virtual-queue':
       return (
         <div className="px-5 pb-4">
@@ -446,152 +416,87 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <div className="absolute inset-0 rounded-full border-4 border-muted" />
               <div className="absolute inset-0 rounded-full border-4 border-purple-500 border-t-transparent animate-spin" style={{ animationDuration: '3s' }} />
               <div className="absolute inset-0 flex items-center justify-center">
-                <div>
-                  <p className="font-display text-3xl font-bold text-purple-500">{queuePos}</p>
-                  <p className="text-[9px] text-muted-foreground">na fila</p>
-                </div>
+                <div><p className="font-display text-3xl font-bold text-purple-500">{queuePos}</p><p className="text-[9px] text-muted-foreground">na fila</p></div>
               </div>
             </div>
             <p className="text-sm text-muted-foreground">Estimativa: ~{queuePos * 2} min</p>
           </div>
-
           <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-4">
             <p className="text-xs font-bold mb-2">Enquanto espera:</p>
             <div className="space-y-1.5 text-xs text-muted-foreground">
-              <p className="flex items-center gap-1.5"><Smartphone className="w-3 h-3 text-primary" /> Pode sair da fila física — notificaremos você</p>
-              <p className="flex items-center gap-1.5"><GlassWater className="w-3 h-3 text-primary" /> Peça drinks e retire no bar da entrada</p>
+              <p className="flex items-center gap-1.5"><Bell className="w-3 h-3 text-primary" /> Notificamos quando chegar sua vez</p>
+              <p className="flex items-center gap-1.5"><GlassWater className="w-3 h-3 text-primary" /> Peça drinks pelo app e retire no bar da entrada</p>
               <p className="flex items-center gap-1.5"><Users className="w-3 h-3 text-primary" /> Convidados confirmados entram com você</p>
             </div>
           </div>
-
           {queuePos <= 2 && (
             <div className="p-4 rounded-xl bg-success/10 border border-success/20 mb-4 text-center animate-pulse">
               <Bell className="w-5 h-5 text-success mx-auto mb-1" />
-              <p className="text-sm font-bold text-success">Quase lá!</p>
+              <p className="text-sm font-bold text-success">Sua vez!</p>
               <p className="text-xs text-muted-foreground">Dirija-se à entrada · Tolerância: 5 min</p>
             </div>
           )}
-
-          <button onClick={() => onNavigate('wristband')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-semibold shadow-glow flex items-center justify-center gap-2 mb-2">
-            <ScanLine className="w-5 h-5" /> Simular Entrada (Pular fila)
+          <button onClick={() => onNavigate('check-in')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-semibold shadow-glow flex items-center justify-center gap-2 mb-2">
+            <ScanLine className="w-5 h-5" /> Simular Chegada
           </button>
           <button onClick={() => onNavigate('vip-table')} className="w-full py-3 bg-gradient-to-r from-amber-600/20 to-yellow-600/20 border border-amber-600/20 rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
-            <Crown className="w-4 h-4 text-accent" /> Skip a fila — Camarote VIP
+            <Crown className="w-4 h-4 text-accent" /> Skip — Camarote VIP
           </button>
         </div>
       );
 
-    /* ─── 6. ATIVAR PULSEIRA ─── */
-    case 'wristband':
+    case 'check-in':
       return (
         <div className="px-5 pb-4">
-          <Header title="Pulseira Digital" back="virtual-queue" />
+          <Header title="Check-in" back="virtual-queue" />
           <div className="text-center mb-5">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-3 relative">
-              <Smartphone className="w-10 h-10 text-primary" />
-              <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-success flex items-center justify-center">
-                <Zap className="w-3.5 h-3.5 text-primary-foreground" />
-              </div>
+            <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-3">
+              <Check className="w-10 h-10 text-success" />
             </div>
-            <h2 className="font-display text-xl font-bold">Pulseira Ativada!</h2>
-            <p className="text-sm text-muted-foreground">NFC vinculado ao seu app — pague com o pulso</p>
+            <h2 className="font-display text-xl font-bold">Entrada Validada!</h2>
+            <p className="text-sm text-muted-foreground">NOOWE Club · Tech House Night</p>
           </div>
-
-          {/* Saldo da pulseira */}
-          <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 mb-4 text-center">
-            <p className="text-xs text-muted-foreground mb-1">Saldo disponível</p>
-            <p className="font-display text-3xl font-bold text-primary">R$ {wristbandBalance}</p>
-            <div className="flex items-center justify-center gap-3 mt-2 text-[10px] text-muted-foreground">
-              <span className="flex items-center gap-1"><Ticket className="w-3 h-3 text-success" /> Ingresso: +R$ 60</span>
-              <span className="flex items-center gap-1"><CreditCard className="w-3 h-3 text-primary" /> Depósito: +R$ 200</span>
+          {/* Tab aberto automaticamente */}
+          <div className="p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
+            <p className="text-sm font-bold mb-2">Tab digital aberto</p>
+            <div className="space-y-1.5 text-xs text-muted-foreground">
+              <p className="flex items-center gap-2"><CreditCard className="w-3 h-3 text-primary" /> Cartão vinculado: •••• 4242</p>
+              {entryCredit > 0 && <p className="flex items-center gap-2"><Zap className="w-3 h-3 text-success" /> Crédito de entrada: R$ {entryCredit}</p>}
+              <p className="flex items-center gap-2"><DollarSign className="w-3 h-3 text-primary" /> Consumo rastreado em tempo real</p>
             </div>
           </div>
-
-          <div className="space-y-2 mb-4 text-xs text-muted-foreground">
-            <p className="flex items-center gap-2"><Zap className="w-3 h-3 text-primary" /> Aproxime o pulso no leitor de qualquer bar</p>
-            <p className="flex items-center gap-2"><CreditCard className="w-3 h-3 text-primary" /> Débito automático do saldo + cartão se exceder</p>
-            <p className="flex items-center gap-2"><Eye className="w-3 h-3 text-primary" /> Acompanhe gastos em tempo real pelo app</p>
+          <GuidedHint text="Peça drinks pelo app, pague no final — tudo registrado" />
+          <div className="space-y-2">
+            <button onClick={() => onNavigate('floor-menu')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-semibold shadow-glow flex items-center justify-center gap-2">
+              <GlassWater className="w-5 h-5" /> Pedir Drink
+            </button>
+            <button onClick={() => onNavigate('vip-table')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-2">
+              <Crown className="w-4 h-4 text-accent" /> Ver Camarotes
+            </button>
           </div>
-
-          <GuidedHint text="Tudo paga pela pulseira — sem carteira, sem filas no caixa" />
-          <button onClick={() => onNavigate('find-friends')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold shadow-glow flex items-center justify-center gap-2">
-            <Navigation className="w-5 h-5" /> Encontrar Amigos
-          </button>
-          <button onClick={() => onNavigate('floor-order')} className="w-full mt-2 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-            <GlassWater className="w-4 h-4" /> Pedir Drink
-          </button>
         </div>
       );
 
-    /* ─── 7. ENCONTRAR AMIGOS ─── */
-    case 'find-friends':
+    /* ═══ STAGE 4 & 5: ORDER ═══ */
+    case 'floor-menu':
       return (
         <div className="px-5 pb-4">
-          <Header title="Encontrar Amigos" back="wristband" />
-          <GuidedHint text="Veja em que zona do club seus amigos estão" />
-          
-          {/* Mapa simplificado */}
-          <div className="p-4 rounded-2xl bg-gradient-to-b from-muted/50 to-muted/20 border border-border mb-4 relative" style={{ height: 200 }}>
-            <div className="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg bg-purple-500/20 text-[10px] font-bold text-purple-500 flex items-center gap-1"><Music className="w-3 h-3" /> PALCO</div>
-            <div className="absolute top-14 left-1/2 -translate-x-1/2 w-28 h-14 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[10px] text-muted-foreground">
-              PISTA
-            </div>
-            {/* Amigos no mapa */}
-            <div className="absolute top-16 left-8 flex flex-col items-center">
-              <div className="w-7 h-7 rounded-full bg-pink-500 flex items-center justify-center text-primary-foreground text-[10px] font-bold border-2 border-primary-foreground shadow-lg">C</div>
-              <span className="text-[8px] text-muted-foreground mt-0.5">Camila</span>
-            </div>
-            <div className="absolute bottom-12 right-6 flex flex-col items-center">
-              <div className="w-7 h-7 rounded-full bg-blue-500 flex items-center justify-center text-primary-foreground text-[10px] font-bold border-2 border-primary-foreground shadow-lg">P</div>
-              <span className="text-[8px] text-muted-foreground mt-0.5">Pedro</span>
-            </div>
-            <div className="absolute bottom-4 right-4 px-2 py-1 rounded bg-amber-500/20 text-[8px] text-amber-600 flex items-center gap-0.5"><GlassWater className="w-2.5 h-2.5" /> Bar 2</div>
-            <div className="absolute bottom-4 left-4 px-2 py-1 rounded bg-amber-500/20 text-[8px] text-amber-600 flex items-center gap-0.5"><GlassWater className="w-2.5 h-2.5" /> Bar 1</div>
-          </div>
-
-          {/* Lista de amigos com zonas */}
-          <div className="space-y-2 mb-4">
-            {guests.filter(g => g.status === 'confirmed').map((g, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card">
-                <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-sm font-bold">{g.name[0]}</div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">{g.name}</p>
-                  <p className="text-[10px] text-muted-foreground flex items-center gap-1"><Locate className="w-2.5 h-2.5" /> {g.zone}</p>
-                </div>
-                <button className="px-2.5 py-1 rounded-lg bg-primary/10 text-[10px] text-primary font-semibold flex items-center gap-0.5">
-                  <Navigation className="w-2.5 h-2.5" /> Ir
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <div className="p-3 rounded-xl bg-muted/30 mb-4">
-            <p className="text-[10px] text-muted-foreground flex items-center gap-1"><Lock className="w-3 h-3" /> Localização compartilhada só com amigos confirmados · Atualiza a cada 30s</p>
-          </div>
-
-          <button onClick={() => onNavigate('floor-order')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold flex items-center justify-center gap-2 shadow-glow">
-            <GlassWater className="w-5 h-5" /> Pedir Drink
-          </button>
-        </div>
-      );
-
-    /* ─── 8. PEDIR DA PISTA ─── */
-    case 'floor-order':
-      return (
-        <div className="px-5 pb-4">
-          <Header title="Pedir da Pista" back="find-friends" />
+          <Header title="Pedir da Pista" back="check-in" right={
+            <button onClick={() => onNavigate('min-spend')} className="relative p-2"><DollarSign className="w-5 h-5 text-primary" /></button>
+          } />
           <GuidedHint text="Peça sem sair da pista — retire no bar mais perto" />
           <div className="p-3 rounded-xl bg-primary/5 border border-primary/10 mb-3">
-            <p className="text-xs font-medium flex items-center gap-1"><MapPin className="w-3 h-3 text-primary" /> Bar mais próximo: <span className="font-bold text-primary">Bar Pista Central</span> · 15m</p>
+            <p className="text-xs font-medium flex items-center gap-1"><MapPin className="w-3 h-3 text-primary" /> Bar mais próximo: <span className="font-bold text-primary">Bar Pista Central</span></p>
           </div>
-          {/* Saldo pulseira */}
-          <div className="p-2.5 rounded-xl bg-purple-500/5 border border-purple-500/20 mb-3 flex items-center justify-between">
-            <span className="text-xs text-purple-500 flex items-center gap-1"><Zap className="w-3 h-3" /> Saldo pulseira</span>
-            <span className="text-sm font-bold text-purple-500">R$ {wristbandBalance}</span>
-          </div>
+          {entryCredit > 0 && (
+            <div className="p-2 rounded-xl bg-success/5 border border-success/20 mb-3 flex items-center justify-between">
+              <span className="text-[10px] text-success flex items-center gap-1"><Zap className="w-3 h-3" /> Crédito entrada</span>
+              <span className="text-xs font-bold text-success">R$ {entryCredit}</span>
+            </div>
+          )}
           <div className="space-y-2 mb-4">
             {FLOOR_DRINKS.map((d, i) => (
-              <button key={i} onClick={() => { setWristbandBalance(prev => prev - d.price); setConsumed(prev => prev + d.price); onNavigate('order-pickup'); }}
+              <button key={i} onClick={() => { setConsumed(prev => prev + d.price); onNavigate('order-pickup'); }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl border border-border bg-card text-left">
                 <FoodImg id={d.imgId} size="sm" alt={d.name} />
                 <div className="flex-1"><p className="font-semibold text-sm">{d.name}</p></div>
@@ -608,46 +513,46 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <div className="w-20 h-20 rounded-full bg-success/10 flex items-center justify-center mb-4">
             <Check className="w-10 h-10 text-success" />
           </div>
-          <h2 className="font-display text-xl font-bold mb-1">Pedido Confirmado!</h2>
-          <p className="text-sm text-muted-foreground mb-1">Pago via pulseira NFC</p>
-          <p className="text-xs text-muted-foreground mb-4 flex items-center gap-1"><Timer className="w-3 h-3" /> Pronto em ~3 min</p>
+          <h2 className="font-display text-xl font-bold mb-1">Pedido Enviado!</h2>
+          <p className="text-sm text-muted-foreground mb-1">Cobrado no seu tab digital</p>
+          {/* Status pipeline */}
+          <div className="w-full flex items-center justify-center gap-3 my-4">
+            {['Recebido', 'Preparando', 'Pronto'].map((st, i) => (
+              <React.Fragment key={st}>
+                {i > 0 && <div className={`h-0.5 w-6 ${i <= 1 ? 'bg-primary' : 'bg-muted'}`} />}
+                <div className="flex flex-col items-center gap-1">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${i <= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
+                    {i === 0 ? <Check className="w-4 h-4" /> : i === 1 ? <Timer className="w-4 h-4 animate-pulse" /> : <GlassWater className="w-4 h-4" />}
+                  </div>
+                  <span className={`text-[9px] font-medium ${i <= 1 ? 'text-primary' : 'text-muted-foreground'}`}>{st}</span>
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
           <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-4">
             <p className="text-xs font-bold mb-1">Retire no Bar Pista Central</p>
-            <p className="text-[10px] text-muted-foreground">Apresente o celular ou aproxime a pulseira</p>
-            <div className="mt-3 flex items-center justify-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center">
-                <QrCode className="w-6 h-6" />
-              </div>
-              <span className="font-display text-lg font-bold text-primary">PD-312</span>
-            </div>
-          </div>
-          <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Saldo pulseira</span>
-            <span className="text-sm font-bold text-purple-500">R$ {wristbandBalance}</span>
+            <p className="text-[10px] text-muted-foreground">Mostre o código no app</p>
+            <p className="font-display text-lg font-bold text-primary mt-2">PD-312</p>
           </div>
           <div className="flex gap-2 w-full">
-            <button onClick={() => onNavigate('vip-table')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Crown className="w-4 h-4 text-accent" /> Camarote
-            </button>
-            <button onClick={() => onNavigate('find-friends')} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Navigation className="w-4 h-4" /> Amigos
-            </button>
+            <button onClick={() => onNavigate('floor-menu')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm">Pedir Mais</button>
+            <button onClick={() => onNavigate('min-spend')} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm">Ver Conta</button>
           </div>
         </div>
       );
 
-    /* ─── 9. CAMAROTE VIP ─── */
+    /* ═══ STAGE 5: VIP TABLE ═══ */
     case 'vip-table':
       return (
         <div className="px-5 pb-4">
-          <Header title="Camarotes VIP" back="club-detail" />
-          <GuidedHint text="Escolha o camarote e veja a posição no mapa" />
+          <Header title="Camarotes VIP" back="event-detail" />
+          <GuidedHint text="Depósito vira crédito de consumação — você não perde" />
           <div className="space-y-3 mb-4">
             {[
               { name: 'Lounge', people: '6-8', min: 2000, deposit: 800, avail: true, pos: 'Lateral pista' },
               { name: 'Premium', people: '8-12', min: 3000, deposit: 1200, avail: true, pos: 'Frente palco', recommended: true },
               { name: 'Stage', people: '10-15', min: 5000, deposit: 2000, avail: false, pos: 'Palco' },
-              { name: 'Sky Box', people: '15-20', min: 8000, deposit: 3000, avail: true, pos: 'Terraço panorâmico' },
+              { name: 'Sky Box', people: '15-20', min: 8000, deposit: 3000, avail: true, pos: 'Terraço' },
             ].map((table, i) => (
               <button key={i} onClick={() => table.avail ? onNavigate('vip-map') : undefined}
                 className={`w-full p-4 rounded-xl border-2 text-left ${table.recommended ? 'border-primary bg-primary/5' : table.avail ? 'border-border bg-card' : 'border-border bg-muted/30 opacity-50'}`}>
@@ -673,12 +578,12 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
       return (
         <div className="px-5 pb-4">
           <Header title="Mapa do Club" back="vip-table" />
-          <div className="p-4 rounded-2xl bg-gradient-to-b from-muted/50 to-muted/20 border border-border mb-4 relative" style={{ height: 220 }}>
+          <div className="p-4 rounded-2xl bg-gradient-to-b from-muted/50 to-muted/20 border border-border mb-4 relative" style={{ height: 200 }}>
             <div className="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-lg bg-purple-500/20 text-[10px] font-bold text-purple-500 flex items-center gap-1"><Music className="w-3 h-3" /> PALCO</div>
-            <div className="absolute top-16 left-1/2 -translate-x-1/2 w-32 h-16 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-[10px] text-muted-foreground">PISTA</div>
-            <div className="absolute bottom-16 left-4 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground opacity-50">Lounge</div>
-            <div className="absolute bottom-16 right-4 px-2 py-1.5 rounded-lg bg-primary/20 border-2 border-primary text-[9px] text-primary font-bold animate-pulse flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Premium</div>
-            <div className="absolute top-12 right-3 px-2 py-1.5 rounded-lg bg-muted/50 border border-border text-[9px] text-muted-foreground line-through">Stage</div>
+            <div className="absolute top-14 left-1/2 -translate-x-1/2 w-28 h-14 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[10px] text-muted-foreground">PISTA</div>
+            <div className="absolute bottom-14 left-4 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground opacity-50">Lounge</div>
+            <div className="absolute bottom-14 right-4 px-2 py-1.5 rounded-lg bg-primary/20 border-2 border-primary text-[9px] text-primary font-bold animate-pulse flex items-center gap-0.5"><Check className="w-2.5 h-2.5" /> Premium</div>
+            <div className="absolute top-10 right-3 px-2 py-1.5 rounded-lg bg-muted/50 border border-border text-[9px] text-muted-foreground line-through">Stage</div>
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-2 py-1.5 rounded-lg bg-muted border border-border text-[9px] text-muted-foreground flex items-center gap-0.5"><Building className="w-2.5 h-2.5" /> Sky Box</div>
             <div className="absolute bottom-3 right-3 px-2 py-1 rounded bg-amber-500/20 text-[8px] text-amber-600 flex items-center gap-0.5"><GlassWater className="w-2.5 h-2.5" /> Bar</div>
           </div>
@@ -687,7 +592,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             <div className="text-xs text-muted-foreground space-y-0.5">
               <p className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-primary" /> Frente ao palco · 8-12 pessoas</p>
               <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Consumação mínima: R$ 3.000</p>
-              <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Depósito (convertido): R$ 1.200</p>
+              <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Depósito: R$ 1.200 (vira crédito)</p>
               <p className="flex items-center gap-1.5"><Wine className="w-3 h-3 text-primary" /> Garçom exclusivo + mixers cortesia</p>
             </div>
           </div>
@@ -697,9 +602,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               {guests.filter(g => g.status === 'confirmed').map((g, i) => (
                 <div key={i} className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground text-xs font-bold">{g.name[0]}</div>
               ))}
-              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center">
-                <UserPlus className="w-4 h-4 text-muted-foreground" />
-              </div>
+              <div className="w-9 h-9 rounded-full border-2 border-dashed border-border flex items-center justify-center"><UserPlus className="w-4 h-4 text-muted-foreground" /></div>
             </div>
           </div>
           <button onClick={() => onNavigate('bottle-service')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow">
@@ -708,7 +611,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
-    /* ─── 10. BOTTLE SERVICE & CONSUMAÇÃO ─── */
+    /* ═══ STAGE 6: CONTINUOUS CONSUMPTION ═══ */
     case 'bottle-service':
       return (
         <div className="px-5 pb-4">
@@ -726,27 +629,25 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                   <p className="font-semibold text-sm">{bottle.name}</p>
                   <p className="text-[10px] text-muted-foreground">{bottle.desc}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-display font-bold text-sm">R$ {bottle.price}</p>
-                </div>
+                <p className="font-display font-bold text-sm shrink-0">R$ {bottle.price}</p>
               </button>
             ))}
           </div>
         </div>
       );
 
+    /* ═══ STAGE 7: THE BILL ═══ */
     case 'min-spend':
       return (
         <div className="px-5 pb-4">
-          <Header title="Consumação" back="bottle-service" right={
-            <button onClick={() => onNavigate('floor-order')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><Plus className="w-4 h-4" /></button>
+          <Header title="Conta" back="bottle-service" right={
+            <button onClick={() => onNavigate('floor-menu')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><Plus className="w-4 h-4" /></button>
           } />
+          {/* Minimum spend tracker */}
           <div className="p-5 rounded-2xl bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 mb-4">
             <div className="flex items-center justify-between mb-3">
               <p className="text-sm font-bold">Consumação Mínima</p>
-              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${progress >= 100 ? 'bg-success/20 text-success' : progress >= 50 ? 'bg-warning/20 text-warning' : 'bg-destructive/20 text-destructive'}`}>
-                {progress}%
-              </span>
+              <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${progress >= 100 ? 'bg-success/20 text-success' : progress >= 50 ? 'bg-warning/20 text-warning' : 'bg-destructive/20 text-destructive'}`}>{progress}%</span>
             </div>
             <div className="h-4 bg-muted rounded-full overflow-hidden mb-3 relative">
               <div className={`h-full rounded-full transition-all ${progress >= 100 ? 'bg-success' : 'bg-gradient-to-r from-purple-500 to-pink-500'}`} style={{ width: `${Math.min(progress, 100)}%` }} />
@@ -756,7 +657,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div><p className="text-xs font-bold">R$ {consumed.toLocaleString()}</p><p className="text-[9px] text-muted-foreground">Consumido</p></div>
-              <div><p className="text-xs font-bold text-success">-R$ 1.380</p><p className="text-[9px] text-muted-foreground">Créditos</p></div>
+              <div><p className="text-xs font-bold text-success">-R$ {totalCredits.toLocaleString()}</p><p className="text-[9px] text-muted-foreground">Créditos</p></div>
               <div><p className="text-xs font-bold text-warning">R$ {Math.max(0, minimum - consumed).toLocaleString()}</p><p className="text-[9px] text-muted-foreground">Faltam</p></div>
             </div>
           </div>
@@ -770,85 +671,87 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               { item: 'Moët Chandon', who: 'Camila', price: 650, time: '02:50' },
             ].map((order, i) => (
               <div key={i} className="flex items-center gap-3 py-2.5 border-b border-border/50">
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{order.item}</p>
-                  <p className="text-[10px] text-muted-foreground">{order.who} · {order.time}</p>
-                </div>
+                <div className="flex-1"><p className="text-sm font-medium">{order.item}</p><p className="text-[10px] text-muted-foreground">{order.who} · {order.time}</p></div>
                 <span className="text-sm font-semibold">R$ {order.price}</span>
               </div>
             ))}
           </div>
 
           <div className="flex gap-2 mb-3">
-            <button onClick={() => onNavigate('bottle-service')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Wine className="w-4 h-4" /> Garrafas
-            </button>
-            <button onClick={() => onNavigate('coat-check')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Shirt className="w-4 h-4" /> Guarda-Volumes
-            </button>
+            <button onClick={() => onNavigate('bottle-service')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><Wine className="w-4 h-4" /> Garrafas</button>
+            <button onClick={() => onNavigate('floor-menu')} className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><GlassWater className="w-4 h-4" /> Drinks</button>
           </div>
-          <button onClick={() => onNavigate('close')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow">
-            Encerrar Noite
+          <button onClick={() => onNavigate('split')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow">
+            Fechar Conta
           </button>
         </div>
       );
 
-    /* ─── 11. GUARDA-VOLUMES ─── */
-    case 'coat-check':
+    /* ═══ STAGE 8 & 9: SPLIT & PAYMENT ═══ */
+    case 'split':
       return (
         <div className="px-5 pb-4">
-          <Header title="Guarda-Volumes" back="min-spend" />
+          <Header title="Dividir Conta" back="min-spend" />
+          <div className="p-4 rounded-xl bg-card border border-border mb-4">
+            <div className="space-y-1 mb-3">
+              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Consumido total</span><span>R$ {consumed.toLocaleString()}</span></div>
+              <div className="flex justify-between text-sm"><span className="text-success">Créditos (ingresso + depósito)</span><span className="text-success">-R$ {totalCredits.toLocaleString()}</span></div>
+              <div className="border-t-2 border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>A dividir</span><span className="text-primary">R$ {Math.max(0, consumed - totalCredits).toLocaleString()}</span></div>
+            </div>
+          </div>
+          <p className="text-xs font-semibold mb-2">Como dividir?</p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <button onClick={() => setSplitMode('consumption')} className={`p-3 rounded-xl border-2 text-center ${splitMode === 'consumption' ? 'border-primary bg-primary/10' : 'border-border'}`}>
+              <DollarSign className={`w-4 h-4 mx-auto mb-1 ${splitMode === 'consumption' ? 'text-primary' : 'text-muted-foreground'}`} />
+              <p className="text-[10px] font-semibold">Por Consumo</p>
+              <p className="text-[8px] text-muted-foreground">Cada um paga o seu</p>
+            </button>
+            <button onClick={() => setSplitMode('equal')} className={`p-3 rounded-xl border-2 text-center ${splitMode === 'equal' ? 'border-primary bg-primary/10' : 'border-border'}`}>
+              <Users className={`w-4 h-4 mx-auto mb-1 ${splitMode === 'equal' ? 'text-primary' : 'text-muted-foreground'}`} />
+              <p className="text-[10px] font-semibold">Igual</p>
+              <p className="text-[8px] text-muted-foreground">R$ {Math.ceil(Math.max(0, consumed - totalCredits) / 3)} cada</p>
+            </button>
+          </div>
+          <div className="p-3 rounded-xl bg-muted/30 mb-4 text-xs text-muted-foreground">
+            <p className="flex items-center gap-1.5"><AlertTriangle className="w-3 h-3 text-warning" /> Se o grupo não atingir o mínimo, o host é responsável pelo restante (regra CL-010)</p>
+          </div>
+          <button onClick={() => onNavigate('payment')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
+            <CreditCard className="w-5 h-5" /> Pagar Minha Parte
+          </button>
+        </div>
+      );
+
+    case 'payment':
+      return (
+        <div className="px-5 pb-4">
+          <Header title="Pagamento" back="split" />
           <div className="text-center mb-5">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-              <Shirt className="w-8 h-8 text-primary" />
+              <CreditCard className="w-8 h-8 text-primary" />
             </div>
-            <h2 className="font-display text-lg font-bold">Seus Pertences</h2>
-            <p className="text-sm text-muted-foreground">Entregue e retire com QR — sem fila no final</p>
+            <h2 className="font-display text-lg font-bold">Confirmar pagamento</h2>
+            <p className="font-display text-2xl font-bold text-primary mt-1">R$ {splitMode === 'equal' ? Math.ceil(Math.max(0, consumed - totalCredits) / 3) : Math.ceil(Math.max(0, consumed - totalCredits) * 0.4)}</p>
           </div>
-
-          <GuidedHint text="Entregue itens no balcão — receba um QR para retirar depois" />
-
           <div className="space-y-2 mb-4">
-            {coatItems.map(item => (
-              <div key={item.id} className="p-4 rounded-xl border border-border bg-card">
-                <div className="flex items-center justify-between mb-2">
-                  <div>
-                    <p className="text-sm font-semibold">{item.desc}</p>
-                    <p className="text-[10px] text-muted-foreground">Código: {item.code}</p>
-                  </div>
-                  <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
-                    <QrCode className="w-5 h-5" />
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 text-[10px] text-success">
-                  <ShieldCheck className="w-3 h-3" /> Guardado com segurança
-                </div>
+            {[
+              { method: 'Cartão vinculado', detail: '•••• 4242 · Visa', selected: true },
+              { method: 'PIX', detail: 'Pagamento instantâneo', selected: false },
+            ].map((m, i) => (
+              <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border-2 ${m.selected ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
+                <CreditCard className="w-5 h-5 text-muted-foreground" />
+                <div className="flex-1"><p className="text-sm font-semibold">{m.method}</p><p className="text-[10px] text-muted-foreground">{m.detail}</p></div>
+                {m.selected && <Check className="w-4 h-4 text-primary" />}
               </div>
             ))}
           </div>
-
-          <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border-2 border-dashed border-border mb-4">
-            <Plus className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Guardar mais um item</span>
-          </button>
-
-          <div className="p-3 rounded-xl bg-muted/30 mb-4">
-            <p className="text-xs font-semibold mb-1">Como funciona a retirada?</p>
-            <div className="space-y-1 text-[10px] text-muted-foreground">
-              <p className="flex items-center gap-1.5"><ScanLine className="w-3 h-3 text-primary" /> Apresente o QR no balcão na saída</p>
-              <p className="flex items-center gap-1.5"><Zap className="w-3 h-3 text-primary" /> Sem fila — retire em segundos</p>
-              <p className="flex items-center gap-1.5"><CreditCard className="w-3 h-3 text-primary" /> Custo: R$ 10 por item (cobrado na pulseira)</p>
-            </div>
-          </div>
-
-          <button onClick={() => onNavigate('close')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
-            Encerrar Noite
+          <button onClick={() => onNavigate('post')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+            <Check className="w-5 h-5" /> Confirmar Pagamento
           </button>
         </div>
       );
 
-    /* ─── 12. ENCERRAR NOITE ─── */
-    case 'close':
+    /* ═══ STAGE 10: POST-EXPERIENCE ═══ */
+    case 'post':
       return (
         <div className="flex flex-col items-center justify-center h-full px-5 text-center">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-5 shadow-xl shadow-purple-500/30">
@@ -858,39 +761,21 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           <p className="text-sm text-muted-foreground mb-4">NOOWE Club · Tech House Night</p>
           <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
             <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Consumido total</span><span>R$ {consumed.toLocaleString()}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-success">Créditos (ingresso + depósito)</span><span className="text-success">-R$ 1.380</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Guarda-volumes (2 itens)</span><span>R$ 20</span></div>
-            <div className="border-t-2 border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
-              <span>Total pago</span>
-              <span className="text-primary">R$ {Math.max(0, consumed - 1380 + 20).toLocaleString()}</span>
-            </div>
+            <div className="flex justify-between text-sm mb-1"><span className="text-success">Créditos aplicados</span><span className="text-success">-R$ {totalCredits.toLocaleString()}</span></div>
+            <div className="border-t-2 border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total pago</span><span className="text-primary">R$ {Math.max(0, consumed - totalCredits).toLocaleString()}</span></div>
           </div>
           <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
             <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left">
-              <p className="text-sm font-semibold">+200 pontos ganhos!</p>
-              <p className="text-[10px] text-muted-foreground">Acesso VIP garantido no próximo evento</p>
-            </div>
+            <div className="text-left"><p className="text-sm font-semibold">+200 pontos ganhos!</p><p className="text-[10px] text-muted-foreground">Acesso VIP no próximo evento</p></div>
           </div>
           <div className="w-full grid grid-cols-3 gap-2 mb-4">
-            {[
-              { label: 'Tempo na casa', value: '5h 30min' },
-              { label: 'Drinks pedidos', value: '12' },
-              { label: 'Garrafas', value: '2' },
-            ].map(s => (
-              <div key={s.label} className="p-2 rounded-xl bg-muted/30 text-center">
-                <p className="text-xs font-bold">{s.value}</p>
-                <p className="text-[8px] text-muted-foreground">{s.label}</p>
-              </div>
+            {[{ label: 'Tempo', value: '5h 30min' }, { label: 'Drinks', value: '12' }, { label: 'Garrafas', value: '2' }].map(s => (
+              <div key={s.label} className="p-2 rounded-xl bg-muted/30 text-center"><p className="text-xs font-bold">{s.value}</p><p className="text-[8px] text-muted-foreground">{s.label}</p></div>
             ))}
           </div>
           <div className="w-full flex gap-2 mb-3">
-            <button onClick={() => onNavigate('rate')} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Star className="w-4 h-4" /> Avaliar
-            </button>
-            <button className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1">
-              <Car className="w-4 h-4" /> Uber
-            </button>
+            <button onClick={() => onNavigate('rate')} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><Star className="w-4 h-4" /> Avaliar</button>
+            <button className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><Car className="w-4 h-4" /> Uber</button>
           </div>
         </div>
       );
@@ -898,7 +783,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     case 'rate':
       return (
         <div className="px-5 pb-4">
-          <Header title="Avaliação" back="close" />
+          <Header title="Avaliação" back="post" />
           <div className="text-center mb-4">
             <ItemIcon cat="music" size="xl" className="mx-auto" />
             <h2 className="font-display text-lg font-bold mt-2">Como foi a noite?</h2>
@@ -921,11 +806,11 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </div>
           ))}
           <div className="flex gap-2 flex-wrap mb-4">
-            {['Som incrível', 'DJ top', 'Ótimos drinks', 'Pulseira prática', 'Camarote 10/10'].map(tag => (
+            {['Som incrível', 'DJ top', 'Ótimos drinks', 'Boa lotação', 'Camarote top'].map(tag => (
               <button key={tag} className="px-2.5 py-1 rounded-full bg-muted text-[10px] text-muted-foreground">{tag}</button>
             ))}
           </div>
-          <button onClick={() => onNavigate('home')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+          <button onClick={() => onNavigate('discovery')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
             <ThumbsUp className="w-5 h-5" /> Enviar Avaliação
           </button>
         </div>
