@@ -3080,7 +3080,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'molhos': 'salsas',
     '320 pontos disponíveis': '320 puntos disponibles',
     'NOOWE Fresh · Fast Casual': 'NOOWE Fresh · Fast Casual',
-    'Equivale a R$ 3,20 de desconto': 'Equivale a R$ 3,20 de descuento',
 
     // ── Fine Dining Missing Items ──
     'Sushi Kenzo': 'Sushi Kenzo',
