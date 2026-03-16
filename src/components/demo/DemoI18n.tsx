@@ -2714,6 +2714,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Tickets da sua estação de preparo': 'Your prep station tickets',
     'Visão geral da cozinha': 'Kitchen overview',
     'Insumos e alertas': 'Supplies and alerts',
+    'Estação de preparo': 'Prep station',
 
   },
   es: {
@@ -5314,6 +5315,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'itens com alerta': 'ítems con alerta',
     'Fichas técnicas padronizadas — ingredientes, medidas e apresentação': 'Fichas técnicas estandarizadas — ingredientes, medidas y presentación',
     'Fila de drinks e pedidos do bar': 'Cola de drinks y pedidos del bar',
+    'Estação de preparo': 'Estación de preparación',
 
 
   },
