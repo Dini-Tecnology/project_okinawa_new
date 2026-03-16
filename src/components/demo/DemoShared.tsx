@@ -114,6 +114,8 @@ export const BottomNav: React.FC<{
   cartCount?: number;
   notifCount?: number;
 }> = ({ activeTab, onTabChange, cartCount = 0, notifCount = 0 }) => {
+  const { translateText } = useDemoI18n();
+
   const tabs: { id: NavTab; icon: React.FC<{ className?: string }>; label: string; badge?: number }[] = [
     { id: 'explore', icon: Search, label: 'Explorar' },
     { id: 'orders', icon: UtensilsCrossed, label: 'Pedidos', badge: cartCount },
@@ -138,7 +140,7 @@ export const BottomNav: React.FC<{
               )}
             </div>
           )}
-          <span className={`text-[9px] ${activeTab === id ? 'text-primary font-semibold' : 'text-muted-foreground'} ${id === 'scan' ? 'mt-0' : ''}`}>{label}</span>
+          <span className={`text-[9px] ${activeTab === id ? 'text-primary font-semibold' : 'text-muted-foreground'} ${id === 'scan' ? 'mt-0' : ''}`}>{translateText(label)}</span>
         </button>
       ))}
     </div>

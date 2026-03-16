@@ -227,7 +227,7 @@ const DemoClientInner = () => {
                   {config?.steps.slice(0, 5).map(({ step, label }) => (
                     <div key={step} className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Check className="w-3 h-3 text-success shrink-0" />
-                      <span>{label}</span>
+                      <span>{translateText(label)}</span>
                     </div>
                   ))}
                   {(config?.steps.length ?? 0) > 5 && (
