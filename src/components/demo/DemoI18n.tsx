@@ -5586,7 +5586,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Selecione a mesa para processar o pagamento de clientes sem app': 'Seleccione la mesa para procesar el pago de clientes sin app',
     'sem app': 'sin app',
     'Precisam pagamento via garçom': 'Necesitan pago vía mesero',
-    'Total da mesa': 'Total de la mesa',
     'Selecione a mesa para cobrar:': 'Seleccione la mesa para cobrar:',
     'TAP to Pay (NFC)': 'TAP to Pay (NFC)',
     'Aproxime o cartão do cliente na parte traseira do celular': 'Acerque la tarjeta del cliente a la parte trasera del celular',
@@ -5637,7 +5636,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Adicionar item': 'Agregar ítem',
     'Add item': 'Agregar ítem',
     'Transferir mesa': 'Transferir mesa',
-    'Ver cardápio': 'Ver menú',
     'Novo pedido': 'Nuevo pedido',
     'com app': 'con app',
     // ── Waiter: Enhanced table detail ──
