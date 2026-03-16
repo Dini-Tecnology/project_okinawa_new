@@ -25,7 +25,7 @@ const BrandIdentity = lazy(() => import("./pages/BrandIdentity"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Demo = lazy(() => import("./pages/Demo"));
 const DemoClient = lazy(() => import("./pages/DemoClient"));
-
+const DemoRestaurant = lazy(() => import("./pages/DemoRestaurant"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -66,7 +66,7 @@ const App = () => (
                     <Route path="/admin" element={<AdminDashboard />} />
                     <Route path="/demo" element={<Demo />} />
                     <Route path="/demo/client" element={<DemoClient />} />
-                    
+                    <Route path="/demo/restaurant" element={<DemoRestaurant />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </div>
