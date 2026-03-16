@@ -1095,7 +1095,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'pessoas': 'people',
     'vagas': 'spots',
     'Cursos': 'Courses',
-    'Vinhos': 'Wines',
+    
     'Café Noowe': 'Café Noowe',
     'Bistrô Noowe': 'Bistrô Noowe',
     'Mais opções': 'More options',
