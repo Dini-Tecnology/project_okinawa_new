@@ -88,6 +88,7 @@ const DemoSplitBill: React.FC<SplitBillConfig> = ({
   onProceed,
   ctaLabel,
 }) => {
+  const { translateText } = useDemoI18n();
   const [splitMode, setSplitMode] = useState<SplitMode>(defaultMode);
 
   return (
