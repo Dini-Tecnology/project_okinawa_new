@@ -3482,6 +3482,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Retire no Bar Pista Central': 'Retira en el Bar Pista Central',
     'Rua Oscar Freire, 432 - Jardins, São Paulo': 'Rua Oscar Freire, 432 - Jardins, São Paulo',
     'Sabores Noowe': 'Sabores Noowe',
+    'Sabores Noowe · Buffet': 'Sabores Noowe · Buffet',
     'Satisfação': 'Satisfacción',
     'Selecione os itens que você paga': 'Selecciona los ítems que tú pagas',
     'Selecione suas preferências e nossa IA sugerirá a combinação perfeita': 'Selecciona tus preferencias y nuestra IA sugerirá la combinación perfecta',
