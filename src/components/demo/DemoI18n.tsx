@@ -1307,7 +1307,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Sua parte': 'Tu parte',
 
     // ── Payment ──
-    'Pagamento': 'Pago',
+    
     'Forma de pagamento': 'Forma de pago',
     'Crédito': 'Crédito',
     'Carteira': 'Billetera',
