@@ -975,7 +975,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Perfil completo com fotos, avaliações e badges.': 'Complete profile with photos, reviews and badges.',
     
     'Walk-in com fila inteligente ou reserva antecipada.': 'Walk-in with smart queue or advance reservation.',
-    'Lista de Espera': 'Waitlist',
+    
     'Posição em tempo real com notificação push.': 'Real-time position with push notification.',
     'Pedir na Espera': 'Order While Waiting',
     'Peça drinks enquanto aguarda — vai pra comanda.': 'Order drinks while waiting — goes to your tab.',
