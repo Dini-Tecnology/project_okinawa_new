@@ -101,8 +101,10 @@ export const ROLE_JOURNEYS: Record<StaffRole, RoleJourneyStage[]> = {
   ],
   waiter: [
     { screen: 'waiter', label: 'Minhas Mesas', icon: LayoutGrid, desc: 'Mesas atribuídas e pedidos' },
+    { screen: 'waiter-calls', label: 'Chamados', icon: Bell, desc: 'Chamados em tempo real dos clientes' },
+    { screen: 'waiter-payment', label: 'Cobrar / TAP', icon: Smartphone, desc: 'Processar pagamento na mesa' },
+    { screen: 'waiter-actions', label: 'Ações na Mesa', icon: HandPlatter, desc: 'Executar ações pelo cliente' },
     { screen: 'orders', label: 'Pedidos Ativos', icon: UtensilsCrossed, desc: 'Pedidos das suas mesas' },
-    { screen: 'waiter-calls', label: 'Chamados', icon: Bell, desc: 'Chamados de clientes' },
     { screen: 'waiter-tips', label: 'Gorjetas', icon: DollarSign, desc: 'Suas gorjetas do dia' },
   ],
 };
