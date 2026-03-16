@@ -938,7 +938,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Menu digital com categorias, tags de alérgenos, tempo de preparo e harmonização IA.': 'Digital menu with categories, allergen tags, prep time and AI pairing.',
     'Detalhe do Prato': 'Dish Detail',
     'Detalhe do prato com foto, descrição e adição rápida à comanda.': 'Dish detail with photo, description and quick add to order.',
-    'Minha Comanda': 'My Order',
+    
     'Revisão da comanda com ajuste de quantidades e convite de pessoas.': 'Order review with quantity adjustments and guest invites.',
     'Fechar Conta': 'Close Tab',
     'Configure como a conta será dividida, convide pessoas e revise sua parte antes de seguir para o pagamento.': 'Configure how the bill will be split, invite people and review your share before proceeding to payment.',
