@@ -2686,7 +2686,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Padaria Artesanal': 'Panadería Artesanal',
     'Chá & Companhia': 'Té y Compañía',
     'Pequeno': 'Pequeño',
-    'Grande': 'Grande',
     '8 de 10 cafés — mais 2 e o próximo é GRÁTIS!': '¡8 de 10 cafés — 2 más y el próximo es GRATIS!',
 
     // ── Casual Dining Missing Items ──
@@ -2704,9 +2703,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Caça ao Tesouro': 'Búsqueda del Tesoro',
     'Chef Mirim': 'Chef Junior',
     'Próxima sobremesa kids grátis em 2 visitas': 'Próximo postre kids gratis en 2 visitas',
-    'Maria': 'María',
-    'João': 'João',
-    'Sofia': 'Sofía',
 
     // ── Chef's Table Missing Items ──
     'Nível Gold desbloqueado': 'Nivel Gold desbloqueado',
@@ -2714,10 +2710,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     // ── Club Missing Items ──
     'Grey Goose': 'Grey Goose',
     'Moët Chandon': 'Moët Chandon',
-    'Johnnie Walker Black': 'Johnnie Walker Black',
-    'Balde Cerveja (6)': 'Balde de Cerveza (6)',
-    'Don Julio Reposado': 'Don Julio Reposado',
-    'Gin Tônica': 'Gin Tonic',
     'Vodka Red Bull': 'Vodka Red Bull',
     'Shot Tequila': 'Shot de Tequila',
     'DJ Marcos': 'DJ Marcos',
