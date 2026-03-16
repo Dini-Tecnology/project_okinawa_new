@@ -696,12 +696,13 @@ export const MobileRestaurantScreen: React.FC<{
   onNavigate: (screen: string) => void;
   onSelectRole: (role: StaffRole) => void;
 }> = ({ screen, activeRole, onNavigate, onSelectRole }) => {
-  const title = SCREEN_INFO[screen]?.title;
+  const { t, translateText } = useDemoI18n();
+  const title = translateText(SCREEN_INFO[screen]?.title || '');
 
   return (
     <div className="space-y-4 pb-4">
       <div className="rounded-2xl border border-border bg-card px-3 py-2">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Modo mobile</p>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Modo mobile')}</p>
         <p className="mt-1 text-sm font-semibold text-foreground">{title}</p>
       </div>
 
@@ -729,8 +730,8 @@ export const MobileRestaurantScreen: React.FC<{
       {screen === 'daily-report' && <MobileDailyReport />}
 
       <div className="rounded-2xl border border-border bg-card p-3">
-        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Perfil ativo</p>
-        <p className="mt-1 text-xs font-semibold text-foreground">{ROLE_CONFIG.find(role => role.id === activeRole)?.label}</p>
+        <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Perfil ativo')}</p>
+        <p className="mt-1 text-xs font-semibold text-foreground">{t('roles', activeRole)}</p>
       </div>
     </div>
   );

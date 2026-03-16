@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext } from '@/contexts/DemoContext';
 import { PhoneShell } from '@/components/demo/DemoShared';
-import { DemoI18nProvider, DemoLangSelector, useDemoI18n } from '@/components/demo/DemoI18n';
+import { DemoAutoTranslate, DemoI18nProvider, DemoLangSelector, useDemoI18n } from '@/components/demo/DemoI18n';
 import { ArrowLeft, Check, ChevronRight, Zap } from 'lucide-react';
 import {
   ROLE_CONFIG,
