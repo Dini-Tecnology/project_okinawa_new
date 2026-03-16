@@ -654,7 +654,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Cozinha alertada': 'Kitchen alerted',
     'Preparo iniciado': 'Prep started',
     'Geofencing ativado': 'Geofencing activated',
-    'Pista designada': 'Designated lane',
+    
     'Dirija-se à pista': 'Head to the lane',
     'Peça': 'Order',
     'Pague': 'Pay',
