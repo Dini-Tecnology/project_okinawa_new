@@ -2750,6 +2750,37 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     // VirtualQueueScreen (dynamic)
     'à sua frente': 'ahead of you',
     'Você é o próximo!': 'You\'re next!',
+
+    // ── Chef role: journey & screen info ──
+    'KDS e gestão de cardápio': 'KDS and menu management',
+    'Tickets e fila de preparo': 'Tickets and prep queue',
+    'Itens, fichas técnicas e preparo': 'Items, tech sheets and prep',
+    'Estoque Cozinha': 'Kitchen Stock',
+    'KDS — Cozinha': 'KDS — Kitchen',
+    'Display de tickets com timers e prioridades': 'Ticket display with timers and priorities',
+    'Estação de Preparo': 'Prep Station',
+    'Tickets da sua estação com timers': 'Your station tickets with timers',
+    'Controle de Estoque': 'Stock Control',
+    'Insumos, alertas de nível baixo e reposição': 'Supplies, low-level alerts and restocking',
+    'Categorias, itens, preços e fichas técnicas': 'Categories, items, prices and tech sheets',
+    // ── Chef role: Cook Station ──
+    'Visão simplificada para o cozinheiro — foco nos tickets da sua estação': 'Simplified view for the cook — focus on your station tickets',
+    '🔥 Grelhados': '🔥 Grill',
+    '❄️ Frios': '❄️ Cold',
+    '🍝 Massas': '🍝 Pasta',
+    '▶ INICIAR PREPARO': '▶ START PREP',
+    '✓ PRONTO': '✓ DONE',
+    'min preparo': 'min prep',
+    // ── Chef role: Stock Screen ──
+    'Controle de estoque com alertas automáticos de nível baixo': 'Stock control with automatic low-level alerts',
+    'Baixo': 'Low',
+    'Crítico': 'Critical',
+    'Todos': 'All',
+    'Baixo Estoque': 'Low Stock',
+    'Tickets da sua estação de preparo': 'Your prep station tickets',
+    'Visão geral da cozinha': 'Kitchen overview',
+    'Insumos e alertas': 'Supplies and alerts',
+
   },
   es: {
     // ── Common UI ──
@@ -5298,6 +5329,37 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     '⏳ Reabastecendo': '⏳ Reabasteciendo',
     '✓ Fresco': '✓ Fresco',
     '✓ Registrado': '✓ Registrado',
+
+    // ── Chef role: journey & screen info ──
+    'KDS e gestão de cardápio': 'KDS y gestión de menú',
+    'Tickets e fila de preparo': 'Tickets y cola de preparación',
+    'Itens, fichas técnicas e preparo': 'Ítems, fichas técnicas y preparación',
+    'Estoque Cozinha': 'Stock Cocina',
+    'KDS — Cozinha': 'KDS — Cocina',
+    'Display de tickets com timers e prioridades': 'Display de tickets con timers y prioridades',
+    'Estação de Preparo': 'Estación de Preparación',
+    'Tickets da sua estação com timers': 'Tickets de tu estación con timers',
+    'Controle de Estoque': 'Control de Stock',
+    'Insumos, alertas de nível baixo e reposição': 'Insumos, alertas de nivel bajo y reposición',
+    'Categorias, itens, preços e fichas técnicas': 'Categorías, ítems, precios y fichas técnicas',
+    // ── Chef role: Cook Station ──
+    'Visão simplificada para o cozinheiro — foco nos tickets da sua estação': 'Vista simplificada para el cocinero — foco en los tickets de tu estación',
+    '🔥 Grelhados': '🔥 Parrilla',
+    '❄️ Frios': '❄️ Fríos',
+    '🍝 Massas': '🍝 Pastas',
+    '▶ INICIAR PREPARO': '▶ INICIAR PREPARACIÓN',
+    '✓ PRONTO': '✓ LISTO',
+    'min preparo': 'min preparación',
+    // ── Chef role: Stock Screen ──
+    'Controle de estoque com alertas automáticos de nível baixo': 'Control de stock con alertas automáticas de nivel bajo',
+    'Baixo': 'Bajo',
+    'Crítico': 'Crítico',
+    'Todos': 'Todos',
+    'Baixo Estoque': 'Stock Bajo',
+    'Tickets da sua estação de preparo': 'Tickets de tu estación de preparación',
+    'Visão geral da cozinha': 'Vista general de la cocina',
+    'Insumos e alertas': 'Insumos y alertas',
+
 
   },
 };
