@@ -1273,7 +1273,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Senha: noowe2026': 'Password: noowe2026',
     'Baseado nos itens do pedido': 'Based on order items',
     'Escolha data, convidados e garanta sua vaga': 'Choose date, guests and secure your spot',
-    'Escolha data, convidados e garanta sua vaga.': 'Choose date, guests and secure your spot.',
     'Sem sabor': 'No flavor',
     'Mais intensidade': 'More intensity',
     'Cada um paga o que pediu': 'Each pays for what they ordered',
