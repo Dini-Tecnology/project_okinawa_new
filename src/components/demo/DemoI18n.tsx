@@ -1290,7 +1290,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Pendente': 'Pendiente',
     'Recusou': 'Rechazó',
     'Pista': 'Pista',
-    'Simular Chegada': 'Simular llegada',
 
     // ── AI Harmonization ──
     'Harmonização IA': 'Maridaje IA',
