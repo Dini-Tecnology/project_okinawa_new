@@ -309,14 +309,14 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
                       )}
                     </div>
                     <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${config.badgeCls}`}>
-                      {config.label}
+                      {translateText(config.label)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     {item.chef && (
                       <span className="text-muted-foreground flex items-center gap-1">
                         <ChefHat className="w-3.5 h-3.5" />
-                        {item.chef}
+                        {translateText(item.chef)}
                       </span>
                     )}
                     <span className="text-primary font-medium ml-auto">~{item.eta}</span>
@@ -334,15 +334,15 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
               <MapPin className="w-5 h-5 text-primary" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold text-foreground">{tableInfo.label}</p>
-              <p className="text-xs text-muted-foreground">{tableInfo.sublabel}</p>
+              <p className="text-sm font-semibold text-foreground">{translateText(tableInfo.label)}</p>
+              <p className="text-xs text-muted-foreground">{translateText(tableInfo.sublabel)}</p>
             </div>
             {tableInfo.actionLabel && tableInfo.onAction && (
               <button
                 onClick={tableInfo.onAction}
                 className="px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold"
               >
-                {tableInfo.actionLabel}
+                {translateText(tableInfo.actionLabel)}
               </button>
             )}
           </div>
@@ -358,8 +358,8 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
               <Bell className="w-5 h-5 text-background" />
             </div>
             <div className="flex-1 text-left">
-              <p className="text-background font-semibold text-sm">Precisa de ajuda?</p>
-              <p className="text-muted-foreground text-xs">Chamar equipe discretamente</p>
+              <p className="text-background font-semibold text-sm">{translateText('Precisa de ajuda?')}</p>
+              <p className="text-muted-foreground text-xs">{translateText('Chamar equipe discretamente')}</p>
             </div>
             <MessageCircle className="w-4 h-4 text-muted-foreground" />
           </button>
