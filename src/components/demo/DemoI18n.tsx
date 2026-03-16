@@ -114,6 +114,9 @@ export const DEMO_TRANSLATIONS = {
     waiter: { pt: 'Minhas Mesas', en: 'My Tables', es: 'Mis Mesas' },
     'waiter-calls': { pt: 'Chamados', en: 'Calls', es: 'Llamados' },
     'waiter-tips': { pt: 'Gorjetas', en: 'Tips', es: 'Propinas' },
+    'waiter-payment': { pt: 'Cobrar / TAP', en: 'Charge / TAP', es: 'Cobrar / TAP' },
+    'waiter-actions': { pt: 'Ações na Mesa', en: 'Table Actions', es: 'Acciones en Mesa' },
+    'waiter-table-detail': { pt: 'Detalhe da Mesa', en: 'Table Detail', es: 'Detalle de Mesa' },
   },
   screenTitles: {
     welcome: { pt: 'Bem-vindo ao NOOWE', en: 'Welcome to NOOWE', es: 'Bienvenido a NOOWE' },
