@@ -4,6 +4,8 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoPayment from '../DemoPayment';
+import DemoPaymentSuccess from '../DemoPaymentSuccess';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, CreditCard, Gift, QrCode,
@@ -369,55 +371,35 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="comanda" />
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 mb-4 flex items-center gap-3">
-            <Zap className="w-5 h-5 text-primary" />
-            <div><p className="text-xs font-semibold">Pague pelo app — sem fila no caixa!</p><p className="text-[10px] text-muted-foreground">Seu gasto saiu imediatamente da comanda</p></div>
-          </div>
-          {/* Payment method */}
-          <div className="p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">•••• 4242</p><p className="text-xs text-muted-foreground">Visa · Crédito</p></div>
-              <Check className="w-4 h-4 text-success" />
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Comida ({totalWeight}g)</span><span>R$ {foodTotal.toFixed(2)}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Bebidas</span><span>R$ {drinksTotal.toFixed(2)}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Serviço (10%)</span><span>R$ {serviceCharge.toFixed(2)}</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
-              <span>Total</span><span className="text-primary">R$ {grandTotal.toFixed(2)}</span>
-            </div>
-          </div>
-          <button onClick={() => onNavigate('payment-success')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Pagar R$ {grandTotal.toFixed(2)}
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="Sabores Noowe · Buffet"
+          total={`R$ ${grandTotal.toFixed(2)}`}
+          totalLabel="Total"
+          items={[
+            { label: `Comida (${totalWeight}g)`, value: `R$ ${foodTotal.toFixed(2)}` },
+            { label: 'Bebidas', value: `R$ ${drinksTotal.toFixed(2)}` },
+            { label: 'Serviço (10%)', value: `R$ ${serviceCharge.toFixed(2)}` },
+          ]}
+          infoBanner={{ icon: Zap, text: 'Pague pelo app — sem fila no caixa!', variant: 'primary' }}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('comanda')}
+          onConfirm={() => onNavigate('payment-success')}
+        />
       );
 
     case 'payment-success':
       return (
-        <div className="flex flex-col items-center justify-center h-full px-5 text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-5 shadow-xl shadow-success/30">
-            <Check className="w-12 h-12 text-primary-foreground" />
-          </div>
-          <h2 className="font-display text-2xl font-bold mb-2">Bom apetite!</h2>
-          <p className="text-sm text-muted-foreground mb-1">Pagamento confirmado — sem fila no caixa!</p>
-          <p className="text-xs text-muted-foreground mb-4">Pode continuar comendo e voltar a pesar</p>
-          <div className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
-            <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left"><p className="text-sm font-semibold">+{Math.round(grandTotal / 2)} pontos ganhos!</p><p className="text-xs text-muted-foreground">Visita #5 — próxima sobremesa grátis!</p></div>
-          </div>
-          <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 text-left">
-            <p className="text-xs font-semibold mb-1">Seu perfil de buffet</p>
-            <p className="text-[10px] text-muted-foreground">Peso médio por visita: 520g</p>
-            <p className="text-[10px] text-muted-foreground">Estação favorita: Grelhados</p>
-            <p className="text-[10px] text-muted-foreground">Total em 5 visitas: R$ 287,40</p>
-          </div>
-          <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
-        </div>
+        <DemoPaymentSuccess
+          heading="Bom apetite!"
+          subtitle="Pagamento confirmado — sem fila no caixa!"
+          summaryItems={[
+            { label: 'Total pago', value: `R$ ${grandTotal.toFixed(2)}` },
+          ]}
+          loyaltyReward={{ points: `+${Math.round(grandTotal / 2)} pontos ganhos!`, description: 'Visita #5 — próxima sobremesa grátis!' }}
+          badge={{ text: 'Peso médio: 520g · Estação favorita: Grelhados' }}
+          secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
+        />
       );
 
     default: return null;

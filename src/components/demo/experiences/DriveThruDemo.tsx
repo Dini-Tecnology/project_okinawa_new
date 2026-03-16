@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
+import DemoPayment from '../DemoPayment';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Car, ArrowRight, Loader2, Radio, Zap, Sparkles,
@@ -291,30 +292,20 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="cart" />
-          <div className="p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">•••• 4242</p><p className="text-xs text-muted-foreground">Visa · Crédito · Apple Pay</p></div>
-              <Check className="w-4 h-4 text-success" />
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Subtotal</span><span>R$ {cartTotal}</span></div>
-            <div className="flex justify-between text-sm mb-1 text-success"><span>Pontos NOOWE</span><span>-R$ 5,00</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
-              <span>Total</span><span className="text-primary">R$ {cartTotal - 5}</span>
-            </div>
-          </div>
-          <div className="p-3 rounded-xl bg-success/10 border border-success/20 mb-4 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-success" />
-            <span className="text-xs text-success font-medium">Pré-pagamento = retirada express (sem parar no caixa)</span>
-          </div>
-          <button onClick={() => { setDistance(5.2); setGeoTriggered(false); onNavigate('gps-tracking'); }} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Confirmar R$ {cartTotal - 5}
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="NOOWE Drive · Drive-Thru"
+          total={`R$ ${cartTotal - 5}`}
+          items={[
+            { label: 'Subtotal', value: `R$ ${cartTotal}` },
+            { label: 'Pontos NOOWE', value: '-R$ 5,00', highlight: 'success' },
+          ]}
+          infoBanner={{ icon: Zap, text: 'Pré-pagamento = retirada express (sem parar no caixa)', variant: 'success' }}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('cart')}
+          onConfirm={() => { setDistance(5.2); setGeoTriggered(false); onNavigate('gps-tracking'); }}
+          ctaLabel={`Confirmar R$ ${cartTotal - 5}`}
+        />
       );
 
     case 'gps-tracking':

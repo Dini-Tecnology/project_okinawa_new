@@ -8,6 +8,9 @@
  */
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
+import DemoSplitBill from '../DemoSplitBill';
+import DemoPayment from '../DemoPayment';
+import DemoPaymentSuccess from '../DemoPaymentSuccess';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
@@ -690,94 +693,71 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     /* ═══ STAGE 8 & 9: SPLIT & PAYMENT ═══ */
     case 'split':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Dividir Conta" back="min-spend" />
-          <div className="p-4 rounded-xl bg-card border border-border mb-4">
-            <div className="space-y-1 mb-3">
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Consumido total</span><span>R$ {consumed.toLocaleString()}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-success">Créditos (ingresso + depósito)</span><span className="text-success">-R$ {totalCredits.toLocaleString()}</span></div>
-              <div className="border-t-2 border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>A dividir</span><span className="text-primary">R$ {Math.max(0, consumed - totalCredits).toLocaleString()}</span></div>
-            </div>
-          </div>
-          <p className="text-xs font-semibold mb-2">Como dividir?</p>
-          <div className="grid grid-cols-2 gap-2 mb-4">
-            <button onClick={() => setSplitMode('consumption')} className={`p-3 rounded-xl border-2 text-center ${splitMode === 'consumption' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-              <DollarSign className={`w-4 h-4 mx-auto mb-1 ${splitMode === 'consumption' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <p className="text-[10px] font-semibold">Por Consumo</p>
-              <p className="text-[8px] text-muted-foreground">Cada um paga o seu</p>
-            </button>
-            <button onClick={() => setSplitMode('equal')} className={`p-3 rounded-xl border-2 text-center ${splitMode === 'equal' ? 'border-primary bg-primary/10' : 'border-border'}`}>
-              <Users className={`w-4 h-4 mx-auto mb-1 ${splitMode === 'equal' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <p className="text-[10px] font-semibold">Igual</p>
-              <p className="text-[8px] text-muted-foreground">R$ {Math.ceil(Math.max(0, consumed - totalCredits) / 3)} cada</p>
-            </button>
-          </div>
-          <div className="p-3 rounded-xl bg-muted/30 mb-4 text-xs text-muted-foreground">
-            <p className="flex items-center gap-1.5"><AlertTriangle className="w-3 h-3 text-warning" /> Se o grupo não atingir o mínimo, o host é responsável pelo restante (regra CL-010)</p>
-          </div>
-          <button onClick={() => onNavigate('payment')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" /> Pagar Minha Parte
-          </button>
-        </div>
+        <DemoSplitBill
+          title="Dividir Conta"
+          subtitle="NOOWE Club · Tech House Night"
+          total={`R$ ${Math.max(0, consumed - totalCredits).toLocaleString()}`}
+          people={guests.filter(g => g.status === 'confirmed').map(g => ({
+            id: g.name,
+            name: g.name,
+            color: 'bg-primary',
+            initial: g.name[0],
+          }))}
+          modes={[
+            { id: 'individual', name: 'Por Consumo', desc: 'Cada um paga o seu', icon: DollarSign },
+            { id: 'equal', name: 'Igual', desc: `R$ ${Math.ceil(Math.max(0, consumed - totalCredits) / 3)} cada`, icon: Users },
+          ]}
+          summaryLines={[
+            { label: 'Consumido total', value: `R$ ${consumed.toLocaleString()}` },
+            { label: 'Créditos (ingresso + depósito)', value: `-R$ ${totalCredits.toLocaleString()}`, highlight: 'success' },
+          ]}
+          onBack={() => onNavigate('min-spend')}
+          onProceed={() => onNavigate('payment')}
+          ctaLabel="Pagar Minha Parte"
+        />
       );
 
     case 'payment':
+      const clubPayAmount = splitMode === 'equal' ? Math.ceil(Math.max(0, consumed - totalCredits) / 3) : Math.ceil(Math.max(0, consumed - totalCredits) * 0.4);
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="split" />
-          <div className="text-center mb-5">
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
-              <CreditCard className="w-8 h-8 text-primary" />
-            </div>
-            <h2 className="font-display text-lg font-bold">Confirmar pagamento</h2>
-            <p className="font-display text-2xl font-bold text-primary mt-1">R$ {splitMode === 'equal' ? Math.ceil(Math.max(0, consumed - totalCredits) / 3) : Math.ceil(Math.max(0, consumed - totalCredits) * 0.4)}</p>
-          </div>
-          <div className="space-y-2 mb-4">
-            {[
-              { method: 'Cartão vinculado', detail: '•••• 4242 · Visa', selected: true },
-              { method: 'PIX', detail: 'Pagamento instantâneo', selected: false },
-            ].map((m, i) => (
-              <div key={i} className={`flex items-center gap-3 p-4 rounded-xl border-2 ${m.selected ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
-                <CreditCard className="w-5 h-5 text-muted-foreground" />
-                <div className="flex-1"><p className="text-sm font-semibold">{m.method}</p><p className="text-[10px] text-muted-foreground">{m.detail}</p></div>
-                {m.selected && <Check className="w-4 h-4 text-primary" />}
-              </div>
-            ))}
-          </div>
-          <button onClick={() => onNavigate('post')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
-            <Check className="w-5 h-5" /> Confirmar Pagamento
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="NOOWE Club · Tech House Night"
+          total={`R$ ${clubPayAmount}`}
+          items={[
+            { label: 'Sua parte', value: `R$ ${clubPayAmount}` },
+          ]}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('split')}
+          onConfirm={() => onNavigate('post')}
+          ctaLabel="Confirmar Pagamento"
+        />
       );
 
     /* ═══ STAGE 10: POST-EXPERIENCE ═══ */
     case 'post':
       return (
-        <div className="flex flex-col items-center justify-center h-full px-5 text-center">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-5 shadow-xl shadow-purple-500/30">
-            <Music className="w-12 h-12 text-primary-foreground" />
-          </div>
-          <h2 className="font-display text-2xl font-bold mb-1">Noite Incrível!</h2>
-          <p className="text-sm text-muted-foreground mb-4">NOOWE Club · Tech House Night</p>
-          <div className="w-full p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Consumido total</span><span>R$ {consumed.toLocaleString()}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-success">Créditos aplicados</span><span className="text-success">-R$ {totalCredits.toLocaleString()}</span></div>
-            <div className="border-t-2 border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total pago</span><span className="text-primary">R$ {Math.max(0, consumed - totalCredits).toLocaleString()}</span></div>
-          </div>
-          <div className="w-full p-3 rounded-xl bg-primary/5 border border-primary/20 mb-3 flex items-center gap-3">
-            <Gift className="w-5 h-5 text-primary" />
-            <div className="text-left"><p className="text-sm font-semibold">+200 pontos ganhos!</p><p className="text-[10px] text-muted-foreground">Acesso VIP no próximo evento</p></div>
-          </div>
-          <div className="w-full grid grid-cols-3 gap-2 mb-4">
-            {[{ label: 'Tempo', value: '5h 30min' }, { label: 'Drinks', value: '12' }, { label: 'Garrafas', value: '2' }].map(s => (
-              <div key={s.label} className="p-2 rounded-xl bg-muted/30 text-center"><p className="text-xs font-bold">{s.value}</p><p className="text-[8px] text-muted-foreground">{s.label}</p></div>
-            ))}
-          </div>
-          <div className="w-full flex gap-2 mb-3">
-            <button onClick={() => onNavigate('rate')} className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><Star className="w-4 h-4" /> Avaliar</button>
-            <button className="flex-1 py-3 border border-border rounded-xl font-semibold text-sm flex items-center justify-center gap-1"><Car className="w-4 h-4" /> Uber</button>
-          </div>
-        </div>
+        <DemoPaymentSuccess
+          heading="Noite Incrível!"
+          subtitle="NOOWE Club · Tech House Night"
+          icon={Music}
+          gradientFrom="from-primary"
+          gradientTo="to-accent"
+          shadowColor="shadow-primary/30"
+          summaryItems={[
+            { label: 'Consumido total', value: `R$ ${consumed.toLocaleString()}` },
+            { label: 'Créditos aplicados', value: `-R$ ${totalCredits.toLocaleString()}`, highlight: 'success' },
+            { label: 'Total pago', value: `R$ ${Math.max(0, consumed - totalCredits).toLocaleString()}`, highlight: 'primary' },
+          ]}
+          loyaltyReward={{ points: '+200 pontos ganhos!', description: 'Acesso VIP no próximo evento' }}
+          stats={[
+            { label: 'Tempo', value: '5h 30min' },
+            { label: 'Drinks', value: '12' },
+            { label: 'Garrafas', value: '2' },
+          ]}
+          primaryAction={{ label: 'Avaliar', onClick: () => onNavigate('rate'), icon: Star }}
+          secondaryAction={{ label: 'Uber', onClick: () => {}, icon: Car }}
+        />
       );
 
     case 'rate':

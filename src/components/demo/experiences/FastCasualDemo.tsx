@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
+import DemoPayment from '../DemoPayment';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
@@ -519,48 +520,21 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="builder-summary" />
-          {/* Loyalty points */}
-          <div className="p-3 rounded-xl bg-primary/5 border border-primary/20 mb-4 flex items-center gap-3">
-            <Award className="w-5 h-5 text-primary" />
-            <div className="flex-1">
-              <p className="text-xs font-semibold">320 pontos disponíveis</p>
-              <p className="text-[10px] text-muted-foreground">Equivale a R$ 3,20 de desconto</p>
-            </div>
-            <button className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-[10px] font-bold">Usar</button>
-          </div>
-          {/* Payment method */}
-          <div className="p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">•••• 4242</p><p className="text-xs text-muted-foreground">Visa Crédito</p></div>
-              <Check className="w-4 h-4 text-success" />
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-card border border-border mb-4">
-            <div className="flex items-center gap-3">
-              <Zap className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">PIX</p><p className="text-xs text-muted-foreground">Pagamento instantâneo</p></div>
-            </div>
-          </div>
-          {/* Summary */}
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Bowl Personalizado</span><span>R$ {totalPrice}</span></div>
-            <div className="flex justify-between text-sm mb-1 text-success"><span>Pontos aplicados</span><span>-R$ 3,20</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg">
-              <span>Total</span><span className="text-primary">R$ {(totalPrice - 3.2).toFixed(2)}</span>
-            </div>
-          </div>
-          {/* Estimated time */}
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-muted/30 mb-4">
-            <Clock className="w-4 h-4 text-primary" />
-            <span className="text-xs font-medium">Preparo estimado: <strong>8-10 min</strong></span>
-          </div>
-          <button onClick={() => onNavigate('prep-tracking')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Confirmar Pagamento
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="NOOWE Fresh · Fast Casual"
+          total={`R$ ${(totalPrice - 3.2).toFixed(2)}`}
+          items={[
+            { label: 'Bowl Personalizado', value: `R$ ${totalPrice}` },
+            { label: 'Pontos aplicados', value: '-R$ 3,20', highlight: 'success' },
+          ]}
+          loyalty={{ title: '320 pontos disponíveis', subtitle: 'Equivale a R$ 3,20 de desconto', actionLabel: 'Usar' }}
+          estimatedTime="8-10 min"
+          fullMethodGrid={false}
+          onBack={() => onNavigate('builder-summary')}
+          onConfirm={() => onNavigate('prep-tracking')}
+          ctaLabel="Confirmar Pagamento"
+        />
       );
 
     case 'prep-tracking':

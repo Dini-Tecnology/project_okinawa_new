@@ -5,6 +5,7 @@
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
+import DemoPayment from '../DemoPayment';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
@@ -496,52 +497,20 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <div className="flex items-center justify-between py-4">
-            <button onClick={() => onNavigate('cart')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-            <h1 className="font-display font-bold">Pagamento</h1>
-            <div className="w-8" />
-          </div>
-
-          {/* Loyalty points */}
-          <div className="p-3 rounded-xl bg-accent/10 border border-accent/20 mb-4 flex items-center gap-3">
-            <Award className="w-5 h-5 text-accent" />
-            <div className="flex-1">
-              <p className="text-xs font-semibold">Você tem 340 pontos</p>
-              <p className="text-[10px] text-muted-foreground">Use 200 pts = R$ 10 de desconto</p>
-            </div>
-            <button className="px-3 py-1.5 rounded-lg bg-accent/20 text-accent text-xs font-semibold">Usar</button>
-          </div>
-
-          {/* Payment methods */}
-          <h2 className="font-semibold text-sm mb-3">Forma de pagamento</h2>
-          <div className="grid grid-cols-3 gap-2 mb-5">
-            {[
-              { id: 'pix', name: 'PIX', icon: QrCode },
-              { id: 'credit', name: 'Crédito', icon: CreditCard },
-              { id: 'apple', name: 'Apple Pay', icon: Smartphone },
-              { id: 'google', name: 'Google Pay', icon: Smartphone },
-              { id: 'tap', name: 'TAP to Pay', icon: Nfc },
-              { id: 'wallet', name: 'Carteira', icon: Wallet },
-            ].map((method) => (
-              <button key={method.id} onClick={() => setSelectedPayment(method.id)} className={`p-3 rounded-xl border-2 text-center transition-all ${selectedPayment === method.id ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                <method.icon className={`w-5 h-5 mx-auto mb-1 ${selectedPayment === method.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                <span className={`text-xs font-medium ${selectedPayment === method.id ? 'text-primary' : 'text-muted-foreground'}`}>{method.name}</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Summary */}
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Subtotal</span><span>R$ {cartTotal}</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Desconto pontos</span><span className="text-success">- R$ 0</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total</span><span className="text-primary">R$ {cartTotal}</span></div>
-          </div>
-
-          <button onClick={() => onNavigate('preparing')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Confirmar Pagamento
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="NOOWE Express · Quick Service"
+          total={`R$ ${cartTotal}`}
+          items={[
+            { label: `Subtotal (${cart.length} itens)`, value: `R$ ${cartTotal}` },
+            { label: 'Desconto pontos', value: '- R$ 0', highlight: 'success' },
+          ]}
+          loyalty={{ title: 'Você tem 340 pontos', subtitle: 'Use 200 pts = R$ 10 de desconto', actionLabel: 'Usar' }}
+          fullMethodGrid={true}
+          onBack={() => onNavigate('cart')}
+          onConfirm={() => onNavigate('preparing')}
+          ctaLabel="Confirmar Pagamento"
+        />
       );
 
     case 'preparing': {

@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
+import DemoPayment from '../DemoPayment';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map, Sparkles,
@@ -345,28 +346,20 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
 
     case 'payment':
       return (
-        <div className="px-5 pb-4">
-          <Header title="Pagamento" back="cart" />
-          <div className="p-4 rounded-xl bg-card border border-border mb-3">
-            <div className="flex items-center gap-3">
-              <CreditCard className="w-5 h-5 text-muted-foreground" />
-              <div className="flex-1"><p className="text-sm font-medium">PIX</p><p className="text-xs text-muted-foreground">Pagamento instantâneo</p></div>
-              <Check className="w-4 h-4 text-success" />
-            </div>
-          </div>
-          <div className="p-4 rounded-xl bg-muted/30 mb-4">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Taco al Pastor (3un)</span><span>R$ 35</span></div>
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Agua Fresca Hibisco</span><span>R$ 12</span></div>
-            <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total</span><span className="text-primary">R$ 47</span></div>
-          </div>
-          <div className="p-3 rounded-xl bg-success/10 border border-success/20 mb-4 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-success" />
-            <span className="text-xs text-success font-medium">Fila #{queuePos} · Pedido começa quando for sua vez</span>
-          </div>
-          <button onClick={() => onNavigate('waiting')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
-            <CreditCard className="w-5 h-5" />Confirmar Pagamento
-          </button>
-        </div>
+        <DemoPayment
+          title="Pagamento"
+          subtitle="Taco Noowe · Food Truck"
+          total="R$ 47"
+          items={[
+            { label: 'Taco al Pastor (3un)', value: 'R$ 35' },
+            { label: 'Agua Fresca Hibisco', value: 'R$ 12' },
+          ]}
+          infoBanner={{ icon: Zap, text: `Fila #${queuePos} · Pedido começa quando for sua vez`, variant: 'success' }}
+          fullMethodGrid={false}
+          onBack={() => onNavigate('cart')}
+          onConfirm={() => onNavigate('waiting')}
+          ctaLabel="Confirmar Pagamento"
+        />
       );
 
     case 'waiting':
