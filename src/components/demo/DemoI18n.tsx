@@ -964,7 +964,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Pague sem fila no caixa.': 'Pay without queuing at the register.',
     // Café
     'QR da Mesa': 'Table QR',
-    'Modo Trabalho': 'Work Mode',
+    
     'Dashboard com Wi-Fi (senha copiável), velocidade, nível de ruído em tempo real, tomadas e timer de sessão.': 'Dashboard with Wi-Fi (copyable password), speed, real-time noise level, outlets and session timer.',
     'Personalizar Bebida': 'Customize Drink',
     'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.': 'Open tab: add items, order refills and track the total without leaving your table.',
