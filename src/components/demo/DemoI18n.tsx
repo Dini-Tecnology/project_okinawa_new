@@ -1275,7 +1275,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Escolha data, convidados e garanta sua vaga': 'Choose date, guests and secure your spot',
     'Sem sabor': 'No flavor',
     'Mais intensidade': 'More intensity',
-    'Cada um paga o que pediu': 'Each pays for what they ordered',
   },
   es: {
     // ── Common UI ──
