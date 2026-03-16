@@ -186,6 +186,7 @@ const DemoOrderStatus: React.FC<OrderStatusConfig> = ({
   tableInfo,
   helpOptions = ['Dúvidas sobre o pedido', 'Solicitar algo especial', 'Reportar problema'],
 }) => {
+  const { translateText } = useDemoI18n();
   const [showHelp, setShowHelp] = useState(false);
 
   return (
