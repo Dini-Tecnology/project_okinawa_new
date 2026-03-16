@@ -132,6 +132,9 @@ export const SCREEN_INFO: Record<RestaurantScreen, { title: string; desc: string
   stock: { title: 'Controle de Estoque', desc: 'Insumos, alertas de nível baixo e reposição' },
   'waiter-calls': { title: 'Chamados de Clientes', desc: 'Chamados pendentes das suas mesas' },
   'waiter-tips': { title: 'Minhas Gorjetas', desc: 'Gorjetas recebidas hoje e histórico' },
+  'waiter-table-detail': { title: 'Detalhe da Mesa', desc: 'Detalhes completos da mesa, pedidos e status dos clientes' },
+  'waiter-payment': { title: 'Cobrar na Mesa', desc: 'TAP to Pay, PIX QR e cartão — transforme o celular em maquininha' },
+  'waiter-actions': { title: 'Ações na Mesa', desc: 'Executar ações pelo cliente: adicionar itens, solicitar conta, chamar gerente' },
   'floor-flow': { title: 'Fluxo do Salão', desc: 'Fila virtual, tempos de espera e rotação' },
   'daily-report': { title: 'Relatório do Dia', desc: 'Fechamento, métricas e comparativos' },
 };
