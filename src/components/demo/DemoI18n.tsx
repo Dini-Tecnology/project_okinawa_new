@@ -516,7 +516,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Sua parte': 'Your share',
 
     // ── Payment ──
-    'Pagamento': 'Payment',
+    
     'Forma de pagamento': 'Payment method',
     'Crédito': 'Credit',
     'Carteira': 'Wallet',
