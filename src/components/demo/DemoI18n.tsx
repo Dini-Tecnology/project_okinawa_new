@@ -1280,7 +1280,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Entradas': 'Starters',
     'Pratos Principais': 'Main Courses',
     'Sobremesas': 'Desserts',
-    'Bebidas': 'Drinks',
     'Burgers': 'Burgers',
     'Combos': 'Combos',
     'Acompanhamentos': 'Sides',
@@ -1301,8 +1300,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
 
     // ── Menu Tags ──
     'Sem Glúten': 'Gluten-Free',
-    'Vegetariano': 'Vegetarian',
-    'Vegano': 'Vegan',
     'Orgânico': 'Organic',
     'Sem Lactose': 'Lactose-Free',
     'Picante': 'Spicy',
@@ -1343,14 +1340,10 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
 
     // ── Restaurant features ──
     'Wi-Fi': 'Wi-Fi',
-    'Estacionamento': 'Parking',
-    'Acessível': 'Accessible',
     'Pet Friendly': 'Pet Friendly',
-    'Terraço': 'Terrace',
     'Ao Ar Livre': 'Outdoor',
     'Wi-Fi Rápido': 'Fast Wi-Fi',
     'Kids Friendly': 'Kids Friendly',
-    'Opções veganas': 'Vegan options',
     'Gastronomia contemporânea com ingredientes locais e sazonais': 'Contemporary gastronomy with local and seasonal ingredients',
 
     // ── Quick Service Menu Items ──
@@ -1417,7 +1410,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Coco': 'Coconut',
     'Integral': 'Whole',
     'Desnatado': 'Skim',
-    'Leite': 'Milk',
 
     // ── Buffet Items ──
     'Fraldinha': 'Flank Steak',
@@ -1496,7 +1488,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Batata rústica com trio de molhos': 'Rustic potatoes with trio of sauces',
     'Tábua de Frios': 'Charcuterie Board',
     'Porção de Fritas': 'Fries Portion',
-    'Torneiras': 'Taps',
 
     // ── Club Items ──
     'Absolut Vodka': 'Absolut Vodka',
@@ -1525,15 +1516,12 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     // ── Restaurant description & misc ──
     'Ter-Dom · 12h–15h, 19h–00h': 'Tue-Sun · 12pm–3pm, 7pm–12am',
     'Rua Oscar Freire, 432 - Jardins, São Paulo': 'Rua Oscar Freire, 432 - Jardins, São Paulo',
-    'Ver cardápio e favoritar': 'View menu and bookmark',
     'Sem cebola, molho extra...': 'No onion, extra sauce...',
-    'Ex: sem cebola, bem passado, extra queijo...': 'E.g.: no onion, well done, extra cheese...',
     'Combos em destaque, menu categorizado por tipo, tempo de preparo por item e montagem de carrinho.': 'Featured combos, menu categorized by type, prep time per item and cart building.',
     'Customize: extras pagos (bacon, cheddar), remoção de ingredientes, tamanho e observações.': 'Customize: paid extras (bacon, cheddar), ingredient removal, size and notes.',
     'Código de retirada, tempo total, balcão express designado e registro de velocidade.': 'Pickup code, total time, designated express counter and speed record.',
     'Avaliação por categorias (velocidade, sabor, atendimento), pontos de fidelidade ganhos e stamp card.': 'Rating by categories (speed, taste, service), loyalty points earned and stamp card.',
     'Avaliar Experiência': 'Rate Experience',
-    'Confirmar Pagamento': 'Confirm Payment',
     'Alface': 'Lettuce',
     'Cebola': 'Onion',
     'Tomate': 'Tomato',
