@@ -3422,6 +3422,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Ovo': 'Huevo',
     'Pago por outros': 'Pagado por otros',
     'Pague': 'Paga',
+    'Pague pelo app — sem fila no caixa!': '¡Paga por la app — sin cola en caja!',
     'Pague antecipado — sem cartão na janela': 'Paga anticipado — sin tarjeta en la ventanilla',
     'Pague na hora — sem fila no caixa': 'Paga al momento — sin fila en caja',
     'Para harmonização personalizada': 'Para maridaje personalizado',
