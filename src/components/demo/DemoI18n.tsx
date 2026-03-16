@@ -3019,11 +3019,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Comida (por peso)': 'Comida (por peso)',
     'Pesagem': 'Pesada',
     'Pagar': 'Pagar',
-    'Sabores Noowe · Buffet': 'Sabores Noowe · Buffet',
-    'Pague pelo app — sem fila no caixa!': '¡Paga por la app — sin cola en caja!',
-    'Pagamento confirmado — sem fila no caixa!': '¡Pago confirmado — sin cola en caja!',
-    'Peso médio: 520g · Estação favorita: Grelhados': 'Peso promedio: 520g · Estación favorita: Parrilla',
-    'Ocupação': 'Ocupación',
 
     // ── Café & Bakery Missing Items ──
     'Espresso': 'Espresso',
