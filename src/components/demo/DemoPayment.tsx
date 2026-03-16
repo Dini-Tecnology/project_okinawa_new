@@ -151,7 +151,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
         {/* Tip Selector */}
         {showTip && (
           <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-            <h2 className="font-semibold text-foreground text-sm mb-3">Gorjeta</h2>
+            <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Gorjeta')}</h2>
             <div className="flex gap-2">
               {[0, 10, 15, 20].map((p) => (
                 <button
@@ -164,7 +164,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
                   }`}
                 >
                   <p className={`text-sm font-bold ${tipPercent === p ? 'text-primary' : 'text-foreground'}`}>
-                    {p === 0 ? 'Sem' : `${p}%`}
+                    {p === 0 ? translateText('Sem') : `${p}%`}
                   </p>
                   {p > 0 && tipBase > 0 && (
                     <p className="text-[9px] text-muted-foreground">
@@ -179,7 +179,7 @@ const DemoPayment: React.FC<PaymentConfig> = ({
 
         {/* Payment Methods */}
         <div className="bg-card rounded-2xl p-4 shadow-md border border-border">
-          <h2 className="font-semibold text-foreground text-sm mb-3">Forma de pagamento</h2>
+          <h2 className="font-semibold text-foreground text-sm mb-3">{translateText('Forma de pagamento')}</h2>
           {fullMethodGrid ? (
             <div className="grid grid-cols-3 gap-2">
               {FULL_METHODS.map((method) => (
