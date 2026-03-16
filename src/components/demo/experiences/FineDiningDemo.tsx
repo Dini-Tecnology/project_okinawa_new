@@ -1031,29 +1031,18 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
 // ============ PAYMENT SUCCESS ============
 
 const PaymentSuccessScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => (
-  <div className="flex flex-col h-full bg-background">
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
-      <div className="w-24 h-24 rounded-full bg-gradient-to-br from-success to-success/80 flex items-center justify-center mb-6 shadow-xl shadow-success/30 animate-bounce">
-        <Check className="w-12 h-12 text-primary-foreground" />
-      </div>
-      <h2 className="text-2xl font-bold text-foreground mb-2">Pagamento Confirmado!</h2>
-      <p className="text-muted-foreground mb-4">Seu pagamento de <strong className="text-primary">R$ 193,60</strong> foi processado</p>
-      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6"><Heart className="w-4 h-4 fill-primary" /><span className="text-sm font-medium">+10% gorjeta para a equipe</span></div>
-      <div className="w-full p-4 rounded-2xl bg-card border border-border mb-4">
-        <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Pontos ganhos</span><span className="font-bold text-foreground">+19 pts</span></div>
-        <div className="flex justify-between text-sm mb-2"><span className="text-muted-foreground">Valor restante da mesa</span><span className="font-bold text-foreground">R$ 97,40</span></div>
-        <div className="flex justify-between text-sm"><span className="text-muted-foreground">João (pendente)</span><span className="font-bold text-warning">Aguardando</span></div>
-      </div>
-      <div className="w-full p-3 rounded-xl bg-muted/30 mb-4 flex items-center gap-3">
-        <Award className="w-5 h-5 text-accent" />
-        <div className="flex-1 text-left"><p className="text-sm font-semibold">Nível Gold · 1.269 pts</p><p className="text-xs text-muted-foreground">Faltam 731 pts para Platinum</p></div>
-      </div>
-      <div className="w-full space-y-3">
-        <button onClick={() => onNavigate('loyalty')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold rounded-2xl shadow-xl shadow-primary/25 flex items-center justify-center gap-2"><Gift className="w-4 h-4" />Ver Programa de Fidelidade</button>
-        <button onClick={() => onNavigate('home')} className="w-full py-3 border border-border rounded-xl font-semibold text-sm">Voltar ao Início</button>
-      </div>
-    </div>
-  </div>
+  <DemoPaymentSuccess
+    heading="Pagamento Confirmado!"
+    subtitle="Bistrô Noowe agradece sua visita"
+    summaryItems={[
+      { label: 'Pontos ganhos', value: '+19 pts' },
+      { label: 'Valor restante da mesa', value: 'R$ 97,40' },
+      { label: 'João (pendente)', value: 'Aguardando', highlight: 'warning' },
+    ]}
+    loyaltyReward={{ points: 'Nível Gold · 1.269 pts', description: 'Faltam 731 pts para Platinum' }}
+    primaryAction={{ label: 'Ver Programa de Fidelidade', onClick: () => onNavigate('loyalty'), icon: Gift }}
+    secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
+  />
 );
 
 // ============ RESERVATIONS ============
