@@ -3557,7 +3557,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Empanado e dourado': 'Empanizado y dorado',
     'Encontre Quick Services com Skip the Line: peça antes de chegar e retire sem fila.': 'Encuentra Quick Service con Skip the Line: pide antes de llegar y retira sin fila.',
     'Endereço': 'Dirección',
-    'Entrada premium': 'Entrada premium',
+    // 'Entrada premium' — moved to Fine Dining section
     'Entregues': 'Entregados',
     'Equivale a R$ 3,20 de desconto': 'Equivale a R$ 3,20 de descuento',
     'Escaneie o QR da mesa — tab abre automaticamente.': 'Escanea el QR de la mesa — la cuenta se abre automáticamente.',
