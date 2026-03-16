@@ -356,7 +356,7 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { label: 'Agua Fresca Hibisco', value: 'R$ 12' },
           ]}
           infoBanner={{ icon: Zap, text: `Fila #${queuePos} · Pedido começa quando for sua vez`, variant: 'success' }}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('cart')}
           onConfirm={() => onNavigate('waiting')}
           ctaLabel="Confirmar Pagamento"

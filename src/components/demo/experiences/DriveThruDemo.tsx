@@ -302,7 +302,7 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { label: 'Pontos NOOWE', value: '-R$ 5,00', highlight: 'success' },
           ]}
           infoBanner={{ icon: Zap, text: 'Pré-pagamento = retirada express (sem parar no caixa)', variant: 'success' }}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('cart')}
           onConfirm={() => { setDistance(5.2); setGeoTriggered(false); onNavigate('gps-tracking'); }}
           ctaLabel={`Confirmar R$ ${cartTotal - 5}`}

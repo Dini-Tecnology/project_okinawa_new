@@ -727,7 +727,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           items={[
             { label: 'Sua parte', value: `R$ ${clubPayAmount}` },
           ]}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('split')}
           onConfirm={() => onNavigate('post')}
           ctaLabel="Confirmar Pagamento"

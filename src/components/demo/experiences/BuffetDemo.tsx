@@ -382,7 +382,7 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { label: 'Serviço (10%)', value: `R$ ${serviceCharge.toFixed(2)}` },
           ]}
           infoBanner={{ icon: Zap, text: 'Pague pelo app — sem fila no caixa!', variant: 'primary' }}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('comanda')}
           onConfirm={() => onNavigate('payment-success')}
         />

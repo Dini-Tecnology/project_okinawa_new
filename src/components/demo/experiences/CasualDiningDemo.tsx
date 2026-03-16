@@ -711,7 +711,7 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           showTip={true}
           defaultTip={tipPct}
           tipBase={myTotal}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('split')}
           onConfirm={() => onNavigate('payment-success')}
           ctaLabel={`Pagar R$ ${myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}`}

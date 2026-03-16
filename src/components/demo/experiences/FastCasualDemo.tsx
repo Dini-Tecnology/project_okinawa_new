@@ -531,7 +531,7 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           ]}
           loyalty={{ title: '320 pontos disponíveis', subtitle: 'Equivale a R$ 3,20 de desconto', actionLabel: 'Usar' }}
           estimatedTime="8-10 min"
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('builder-summary')}
           onConfirm={() => onNavigate('prep-tracking')}
           ctaLabel="Confirmar Pagamento"

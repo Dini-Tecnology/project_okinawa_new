@@ -766,7 +766,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             ...(coverCredit > 0 ? [{ label: 'Crédito cover aplicado', value: `-R$ ${coverCredit}`, highlight: 'success' as const }] : []),
           ]}
           infoBanner={{ icon: Check, text: 'Pré-autorização será liquidada', variant: 'success' }}
-          fullMethodGrid={false}
+          fullMethodGrid={true}
           onBack={() => onNavigate('split')}
           onConfirm={() => onNavigate('post')}
           ctaLabel={`Confirmar · R$ ${getPersonTotal('Você')}`}
