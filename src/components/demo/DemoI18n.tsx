@@ -1929,7 +1929,7 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Seletivo': 'Selective',
     'Seu Bowl': 'Your Bowl',
     'Silver': 'Silver',
-    'Sobremesa grátis': 'Free dessert',
+    // 'Sobremesa grátis' — moved to Fine Dining section
     'Sofia': 'Sofia',
     'Subtotal (${cart.length} itens)': 'Subtotal (${cart.length} items)',
     'Superfood proteico': 'Protein superfood',
