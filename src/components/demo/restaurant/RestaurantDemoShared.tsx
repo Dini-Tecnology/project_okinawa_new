@@ -1,11 +1,13 @@
 /**
- * Restaurant Demo — Shared Types, Journey Config, Role System
+ * Restaurant Demo — Shared Types, Journey Config, 7-Role System
  */
 import React from 'react';
 import {
   Sparkles, Settings, BarChart3, LayoutGrid, UtensilsCrossed,
   ChefHat, Wine, CalendarDays, Smartphone, BookOpen, Users, TrendingUp,
-  Crown, HandPlatter,
+  Crown, HandPlatter, Briefcase, Beer, CookingPot, Shield,
+  Bell, Package, ClipboardList, Timer, DollarSign, Flame,
+  CheckCircle2, AlertCircle, Star,
 } from 'lucide-react';
 
 // ============ TYPES ============
@@ -13,50 +15,13 @@ import {
 export type RestaurantScreen =
   | 'welcome' | 'setup' | 'dashboard' | 'table-map'
   | 'orders' | 'kds-kitchen' | 'kds-bar'
-  | 'maitre' | 'waiter' | 'menu-editor' | 'team' | 'analytics';
+  | 'maitre' | 'waiter' | 'menu-editor' | 'team' | 'analytics'
+  // New role-specific screens
+  | 'manager-ops' | 'approvals' | 'barman-station' | 'drink-recipes'
+  | 'cook-station' | 'stock' | 'waiter-calls' | 'waiter-tips'
+  | 'floor-flow' | 'daily-report';
 
-export type StaffRole = 'owner' | 'chef' | 'waiter' | 'maitre';
-
-// ============ JOURNEY STAGES ============
-
-export interface RestaurantJourneyStage {
-  step: number;
-  label: string;
-  screen: RestaurantScreen;
-  icon: React.FC<{ className?: string }>;
-  group: 'onboarding' | 'operations' | 'service' | 'management';
-  roleHighlight: StaffRole[];
-}
-
-export const JOURNEY_STAGES: RestaurantJourneyStage[] = [
-  { step: 1, label: 'Bem-vindo', screen: 'welcome', icon: Sparkles, group: 'onboarding', roleHighlight: ['owner', 'chef', 'waiter', 'maitre'] },
-  { step: 2, label: 'Configuração', screen: 'setup', icon: Settings, group: 'onboarding', roleHighlight: ['owner'] },
-  { step: 3, label: 'Dashboard', screen: 'dashboard', icon: BarChart3, group: 'operations', roleHighlight: ['owner'] },
-  { step: 4, label: 'Mapa de Mesas', screen: 'table-map', icon: LayoutGrid, group: 'operations', roleHighlight: ['owner', 'maitre'] },
-  { step: 5, label: 'Pedidos', screen: 'orders', icon: UtensilsCrossed, group: 'operations', roleHighlight: ['owner', 'waiter'] },
-  { step: 6, label: 'KDS Cozinha', screen: 'kds-kitchen', icon: ChefHat, group: 'operations', roleHighlight: ['chef'] },
-  { step: 7, label: 'KDS Bar', screen: 'kds-bar', icon: Wine, group: 'operations', roleHighlight: ['chef'] },
-  { step: 8, label: 'Maitre', screen: 'maitre', icon: CalendarDays, group: 'service', roleHighlight: ['maitre'] },
-  { step: 9, label: 'Garçom', screen: 'waiter', icon: Smartphone, group: 'service', roleHighlight: ['waiter'] },
-  { step: 10, label: 'Cardápio', screen: 'menu-editor', icon: BookOpen, group: 'management', roleHighlight: ['owner', 'chef'] },
-  { step: 11, label: 'Equipe', screen: 'team', icon: Users, group: 'management', roleHighlight: ['owner'] },
-  { step: 12, label: 'Analytics', screen: 'analytics', icon: TrendingUp, group: 'management', roleHighlight: ['owner'] },
-];
-
-export const SCREEN_INFO: Record<RestaurantScreen, { title: string; desc: string }> = {
-  welcome: { title: 'Bem-vindo ao NOOWE', desc: 'Conheça o painel que transforma a operação do seu restaurante' },
-  setup: { title: 'Configuração', desc: 'Configure o perfil, tipo de serviço e funcionalidades do seu estabelecimento' },
-  dashboard: { title: 'Dashboard Operacional', desc: 'Visão em tempo real de toda a operação — KPIs, pedidos e ocupação' },
-  'table-map': { title: 'Mapa de Mesas', desc: 'Planta interativa do salão com status de cada mesa em tempo real' },
-  orders: { title: 'Gestão de Pedidos', desc: 'Acompanhe e gerencie todos os pedidos ativos do restaurante' },
-  'kds-kitchen': { title: 'KDS — Cozinha', desc: 'Display profissional para a equipe de cozinha com tickets e timers' },
-  'kds-bar': { title: 'KDS — Bar', desc: 'Display dedicado para o barman com fila de bebidas e cocktails' },
-  maitre: { title: 'Painel do Maitre', desc: 'Gestão de reservas, fila virtual e controle de fluxo do salão' },
-  waiter: { title: 'App do Garçom', desc: 'Visão mobile do garçom: mesas, pedidos, chamados e gorjetas' },
-  'menu-editor': { title: 'Editor de Cardápio', desc: 'Gerencie categorias, itens, preços, fotos e disponibilidade' },
-  team: { title: 'Gestão de Equipe', desc: 'Equipe, escalas, funções, permissões e desempenho individual' },
-  analytics: { title: 'Analytics & Relatórios', desc: 'Receita, tendências, itens mais vendidos e insights operacionais' },
-};
+export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
 // ============ ROLE CONFIG ============
 
@@ -68,14 +33,104 @@ export interface RoleConfig {
   icon: React.FC<{ className?: string }>;
   colorClass: string;
   bgClass: string;
+  gradient: string;
+  defaultScreen: RestaurantScreen;
 }
 
 export const ROLE_CONFIG: RoleConfig[] = [
-  { id: 'owner', label: 'Dono / Gerente', desc: 'Acesso total ao sistema', emoji: '👑', icon: Crown, colorClass: 'text-primary', bgClass: 'bg-primary/10' },
-  { id: 'chef', label: 'Chef / Cozinha', desc: 'KDS e gestão de cardápio', emoji: '👨‍🍳', icon: ChefHat, colorClass: 'text-warning', bgClass: 'bg-warning/10' },
-  { id: 'waiter', label: 'Garçom', desc: 'Pedidos e atendimento', emoji: '🤵', icon: HandPlatter, colorClass: 'text-info', bgClass: 'bg-info/10' },
-  { id: 'maitre', label: 'Maitre / Hostess', desc: 'Reservas e recepção', emoji: '💁‍♀️', icon: CalendarDays, colorClass: 'text-secondary', bgClass: 'bg-secondary/10' },
+  { id: 'owner', label: 'Dono', desc: 'Visão executiva completa', emoji: '👑', icon: Crown, colorClass: 'text-primary', bgClass: 'bg-primary/10', gradient: 'from-primary/20 to-primary/5', defaultScreen: 'dashboard' },
+  { id: 'manager', label: 'Gerente', desc: 'Operação e aprovações', emoji: '📊', icon: Briefcase, colorClass: 'text-secondary', bgClass: 'bg-secondary/10', gradient: 'from-secondary/20 to-secondary/5', defaultScreen: 'manager-ops' },
+  { id: 'maitre', label: 'Maitre', desc: 'Reservas e fluxo do salão', emoji: '💁‍♀️', icon: CalendarDays, colorClass: 'text-info', bgClass: 'bg-info/10', gradient: 'from-info/20 to-info/5', defaultScreen: 'maitre' },
+  { id: 'chef', label: 'Chef', desc: 'KDS e gestão de cardápio', emoji: '👨‍🍳', icon: ChefHat, colorClass: 'text-warning', bgClass: 'bg-warning/10', gradient: 'from-warning/20 to-warning/5', defaultScreen: 'kds-kitchen' },
+  { id: 'barman', label: 'Barman', desc: 'Bar, drinks e estoque', emoji: '🍸', icon: Beer, colorClass: 'text-accent-foreground', bgClass: 'bg-accent/10', gradient: 'from-accent/20 to-accent/5', defaultScreen: 'barman-station' },
+  { id: 'cook', label: 'Cozinheiro', desc: 'Estação de preparo', emoji: '🧑‍🍳', icon: CookingPot, colorClass: 'text-destructive', bgClass: 'bg-destructive/10', gradient: 'from-destructive/20 to-destructive/5', defaultScreen: 'cook-station' },
+  { id: 'waiter', label: 'Garçom', desc: 'Mesas, pedidos e gorjetas', emoji: '🤵', icon: HandPlatter, colorClass: 'text-success', bgClass: 'bg-success/10', gradient: 'from-success/20 to-success/5', defaultScreen: 'waiter' },
 ];
+
+// ============ PER-ROLE JOURNEY STAGES ============
+
+export interface RoleJourneyStage {
+  screen: RestaurantScreen;
+  label: string;
+  icon: React.FC<{ className?: string }>;
+  desc: string;
+}
+
+export const ROLE_JOURNEYS: Record<StaffRole, RoleJourneyStage[]> = {
+  owner: [
+    { screen: 'dashboard', label: 'Dashboard', icon: BarChart3, desc: 'Visão executiva com KPIs em tempo real' },
+    { screen: 'table-map', label: 'Mapa de Mesas', icon: LayoutGrid, desc: 'Planta interativa do salão' },
+    { screen: 'orders', label: 'Pedidos', icon: UtensilsCrossed, desc: 'Todos os pedidos ativos' },
+    { screen: 'kds-kitchen', label: 'KDS Cozinha', icon: ChefHat, desc: 'Monitor da cozinha' },
+    { screen: 'kds-bar', label: 'KDS Bar', icon: Wine, desc: 'Monitor do bar' },
+    { screen: 'analytics', label: 'Analytics', icon: TrendingUp, desc: 'Relatórios e tendências' },
+    { screen: 'team', label: 'Equipe', icon: Users, desc: 'Gestão de colaboradores' },
+    { screen: 'menu-editor', label: 'Cardápio', icon: BookOpen, desc: 'Editor de cardápio' },
+    { screen: 'setup', label: 'Configuração', icon: Settings, desc: 'Perfil e configurações' },
+  ],
+  manager: [
+    { screen: 'manager-ops', label: 'Painel Operacional', icon: BarChart3, desc: 'Visão operacional em tempo real' },
+    { screen: 'orders', label: 'Pedidos', icon: UtensilsCrossed, desc: 'Gestão de pedidos ativos' },
+    { screen: 'approvals', label: 'Aprovações', icon: Shield, desc: 'Cancelamentos, cortesias e estornos' },
+    { screen: 'table-map', label: 'Mapa de Mesas', icon: LayoutGrid, desc: 'Status do salão' },
+    { screen: 'team', label: 'Equipe Hoje', icon: Users, desc: 'Quem está em serviço' },
+    { screen: 'daily-report', label: 'Relatório do Dia', icon: ClipboardList, desc: 'Fechamento e métricas do dia' },
+    { screen: 'stock', label: 'Estoque', icon: Package, desc: 'Alertas de estoque baixo' },
+  ],
+  maitre: [
+    { screen: 'maitre', label: 'Reservas', icon: CalendarDays, desc: 'Reservas e check-in do dia' },
+    { screen: 'floor-flow', label: 'Fluxo do Salão', icon: Users, desc: 'Fila virtual e tempos de espera' },
+    { screen: 'table-map', label: 'Mapa de Mesas', icon: LayoutGrid, desc: 'Alocação e disponibilidade' },
+  ],
+  chef: [
+    { screen: 'kds-kitchen', label: 'KDS Cozinha', icon: ChefHat, desc: 'Tickets e fila de preparo' },
+    { screen: 'menu-editor', label: 'Cardápio', icon: BookOpen, desc: 'Itens, fichas técnicas e preparo' },
+    { screen: 'stock', label: 'Estoque Cozinha', icon: Package, desc: 'Insumos e alertas' },
+  ],
+  barman: [
+    { screen: 'barman-station', label: 'Minha Estação', icon: Beer, desc: 'Fila de drinks e pedidos do bar' },
+    { screen: 'kds-bar', label: 'KDS Bar', icon: Wine, desc: 'Display completo de bebidas' },
+    { screen: 'drink-recipes', label: 'Receitas', icon: BookOpen, desc: 'Fichas técnicas de drinks' },
+    { screen: 'stock', label: 'Estoque Bar', icon: Package, desc: 'Bebidas e insumos' },
+  ],
+  cook: [
+    { screen: 'cook-station', label: 'Minha Estação', icon: Flame, desc: 'Tickets da sua estação de preparo' },
+    { screen: 'kds-kitchen', label: 'KDS Geral', icon: ChefHat, desc: 'Visão geral da cozinha' },
+  ],
+  waiter: [
+    { screen: 'waiter', label: 'Minhas Mesas', icon: LayoutGrid, desc: 'Mesas atribuídas e pedidos' },
+    { screen: 'orders', label: 'Pedidos Ativos', icon: UtensilsCrossed, desc: 'Pedidos das suas mesas' },
+    { screen: 'waiter-calls', label: 'Chamados', icon: Bell, desc: 'Chamados de clientes' },
+    { screen: 'waiter-tips', label: 'Gorjetas', icon: DollarSign, desc: 'Suas gorjetas do dia' },
+  ],
+};
+
+// ============ SCREEN INFO (full superset) ============
+
+export const SCREEN_INFO: Record<RestaurantScreen, { title: string; desc: string }> = {
+  welcome: { title: 'Bem-vindo ao NOOWE', desc: 'Escolha um perfil para explorar o painel' },
+  setup: { title: 'Configuração', desc: 'Perfil, tipo de serviço e funcionalidades' },
+  dashboard: { title: 'Dashboard Executivo', desc: 'Visão completa com KPIs, receita e operação em tempo real' },
+  'table-map': { title: 'Mapa de Mesas', desc: 'Planta interativa com status de cada mesa' },
+  orders: { title: 'Gestão de Pedidos', desc: 'Pedidos ativos, confirmações e acompanhamento' },
+  'kds-kitchen': { title: 'KDS — Cozinha', desc: 'Display de tickets com timers e prioridades' },
+  'kds-bar': { title: 'KDS — Bar', desc: 'Fila de bebidas e cocktails' },
+  maitre: { title: 'Painel do Maitre', desc: 'Reservas, fila virtual e check-in' },
+  waiter: { title: 'Visão do Garçom', desc: 'Mesas, pedidos, chamados e gorjetas' },
+  'menu-editor': { title: 'Editor de Cardápio', desc: 'Categorias, itens, preços e fichas técnicas' },
+  team: { title: 'Gestão de Equipe', desc: 'Colaboradores, escalas e desempenho' },
+  analytics: { title: 'Analytics & Relatórios', desc: 'Receita, tendências e insights operacionais' },
+  'manager-ops': { title: 'Painel Operacional', desc: 'Visão gerencial com alertas e status em tempo real' },
+  approvals: { title: 'Aprovações Pendentes', desc: 'Cancelamentos, cortesias, estornos e ajustes' },
+  'barman-station': { title: 'Estação do Barman', desc: 'Drinks na fila, preparo e expedição' },
+  'drink-recipes': { title: 'Receitas de Drinks', desc: 'Fichas técnicas, ingredientes e porções' },
+  'cook-station': { title: 'Estação de Preparo', desc: 'Tickets da sua estação com timers' },
+  stock: { title: 'Controle de Estoque', desc: 'Insumos, alertas de nível baixo e reposição' },
+  'waiter-calls': { title: 'Chamados de Clientes', desc: 'Chamados pendentes das suas mesas' },
+  'waiter-tips': { title: 'Minhas Gorjetas', desc: 'Gorjetas recebidas hoje e histórico' },
+  'floor-flow': { title: 'Fluxo do Salão', desc: 'Fila virtual, tempos de espera e rotação' },
+  'daily-report': { title: 'Relatório do Dia', desc: 'Fechamento, métricas e comparativos' },
+};
 
 // ============ MOCK TEAM DATA ============
 
@@ -88,6 +143,8 @@ export const TEAM_MEMBERS = [
   { id: 'tm6', name: 'Carla Lima', role: 'Garçom', status: 'online' as const, shift: '12h–18h', since: 'Jan 2024', sales: 2100, tips: 280, avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' },
   { id: 'tm7', name: 'Diego Martins', role: 'Barman', status: 'offline' as const, shift: 'Folga', since: 'Feb 2024', sales: 0, tips: 0, avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100' },
   { id: 'tm8', name: 'Juliana Ferraz', role: 'Hostess', status: 'online' as const, shift: '18h–00h', since: 'Apr 2024', sales: 0, tips: 0, avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100' },
+  { id: 'tm9', name: 'Thiago Nunes', role: 'Cozinheiro', status: 'online' as const, shift: '15h–23h', since: 'May 2024', sales: 0, tips: 0, avatar: 'https://images.unsplash.com/photo-1519345182560-3f2917c472ef?w=100' },
+  { id: 'tm10', name: 'Priscila Gomes', role: 'Cozinheiro', status: 'online' as const, shift: '11h–19h', since: 'Jul 2024', sales: 0, tips: 0, avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=100' },
 ];
 
 // ============ TABLE FLOOR PLAN POSITIONS ============
@@ -105,6 +162,34 @@ export const TABLE_POSITIONS: { id: string; x: number; y: number; shape: 'round'
   { id: 't10', x: 38, y: 70, shape: 'round' },
   { id: 't11', x: 58, y: 68, shape: 'long' },
   { id: 't12', x: 80, y: 70, shape: 'round' },
+];
+
+// ============ MOCK DATA ============
+
+export const DRINK_RECIPES = [
+  { id: 'dr1', name: 'Gin Tônica Aurora', ingredients: ['Gin Artesanal 60ml', 'Tônica Premium 120ml', 'Pepino 2 fatias', 'Cardamomo 3 sementes'], glass: 'Taça Balloon', garnish: 'Pepino + Cardamomo', prepTime: 3, price: 38, image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=200' },
+  { id: 'dr2', name: 'Negroni Clássico', ingredients: ['Gin 30ml', 'Campari 30ml', 'Vermute Rosso 30ml'], glass: 'Copo Old Fashioned', garnish: 'Twist de laranja', prepTime: 3, price: 42, image: 'https://images.unsplash.com/photo-1551751299-1b51cab2694c?w=200' },
+  { id: 'dr3', name: 'Espresso Martini', ingredients: ['Vodka 45ml', 'Licor de Café 30ml', 'Espresso 30ml'], glass: 'Taça Martini', garnish: '3 grãos de café', prepTime: 4, price: 40, image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=200' },
+  { id: 'dr4', name: 'Caipirinha Premium', ingredients: ['Cachaça Envelhecida 60ml', 'Limão 1 unidade', 'Açúcar demerara 2 colheres'], glass: 'Copo Old Fashioned', garnish: 'Limão', prepTime: 2, price: 32, image: 'https://images.unsplash.com/photo-1536935338788-846bb9981813?w=200' },
+  { id: 'dr5', name: 'Moscow Mule', ingredients: ['Vodka 45ml', 'Ginger Beer 120ml', 'Suco de limão 15ml'], glass: 'Caneca de cobre', garnish: 'Fatia de limão + Hortelã', prepTime: 2, price: 36, image: 'https://images.unsplash.com/photo-1556855810-ac404aa91e85?w=200' },
+];
+
+export const STOCK_ITEMS = [
+  { id: 's1', name: 'Gin Tanqueray', category: 'Destilados', current: 3, min: 5, unit: 'garrafas', status: 'low' as const },
+  { id: 's2', name: 'Tônica Fever Tree', category: 'Mixers', current: 12, min: 10, unit: 'unidades', status: 'ok' as const },
+  { id: 's3', name: 'Limão Tahiti', category: 'Frutas', current: 8, min: 20, unit: 'unidades', status: 'critical' as const },
+  { id: 's4', name: 'Campari', category: 'Licores', current: 4, min: 3, unit: 'garrafas', status: 'ok' as const },
+  { id: 's5', name: 'Filé Mignon', category: 'Carnes', current: 6, min: 10, unit: 'kg', status: 'low' as const },
+  { id: 's6', name: 'Salmão Norueguês', category: 'Peixes', current: 4, min: 5, unit: 'kg', status: 'low' as const },
+  { id: 's7', name: 'Arroz Arbóreo', category: 'Grãos', current: 15, min: 5, unit: 'kg', status: 'ok' as const },
+  { id: 's8', name: 'Azeite Trufado', category: 'Condimentos', current: 2, min: 3, unit: 'garrafas', status: 'low' as const },
+];
+
+export const PENDING_APPROVALS = [
+  { id: 'ap1', type: 'cancel' as const, table: 5, item: 'Filé ao Molho de Vinho', reason: 'Cliente mudou de ideia', requestedBy: 'Bruno Oliveira', time: '3min atrás', amount: 118 },
+  { id: 'ap2', type: 'courtesy' as const, table: 8, item: 'Sobremesa (Petit Gâteau)', reason: 'Aniversariante na mesa', requestedBy: 'Carla Lima', time: '8min atrás', amount: 42 },
+  { id: 'ap3', type: 'refund' as const, table: 1, item: 'Ceviche Peruano', reason: 'Prato devolvido — não atendeu expectativa', requestedBy: 'Bruno Oliveira', time: '15min atrás', amount: 48 },
+  { id: 'ap4', type: 'discount' as const, table: 3, item: 'Conta Mesa 3', reason: '10% desconto fidelidade', requestedBy: 'Marina Costa', time: '20min atrás', amount: 31 },
 ];
 
 // ============ HELPERS ============
