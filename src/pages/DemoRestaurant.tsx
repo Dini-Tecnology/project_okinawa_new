@@ -345,7 +345,6 @@ const DemoRestaurantInner = () => {
                         screen={activeScreen}
                         onNavigate={handleNavigate}
                         onSelectRole={handleRoleChange}
-                        viewMode="mobile"
                       />
                     </div>
                     <MobileBottomNav
