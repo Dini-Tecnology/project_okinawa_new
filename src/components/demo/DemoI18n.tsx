@@ -2798,6 +2798,20 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Onde ir hoje?': '¿A dónde ir hoy?',
     'Onde sair hoje?': '¿A dónde salir hoy?',
 
+    // ── Barman role: journey & screen info ──
+    'Bar, drinks e estoque': 'Bar, drinks and stock',
+    'Display completo de bebidas': 'Full beverages display',
+    'Bebidas e insumos': 'Beverages and supplies',
+    'Estação do Barman': 'Barman Station',
+    'Drinks na fila, preparo e expedição': 'Drinks in queue, prep and dispatch',
+    'Fichas técnicas, ingredientes e porções': 'Tech sheets, ingredients and portions',
+    'KDS — Bar': 'KDS — Bar',
+    'Fila de bebidas e cocktails': 'Beverages and cocktails queue',
+    'Minha Estação': 'My Station',
+    'itens com alerta': 'items with alert',
+    'Fichas técnicas padronizadas — ingredientes, medidas e apresentação': 'Standardized tech sheets — ingredients, measures and presentation',
+    'Fila de drinks e pedidos do bar': 'Drinks queue and bar orders',
+
     // ── Search placeholders ──
     'Buscar restaurantes, pratos...': 'Buscar restaurantes, platos...',
     'Buscar restaurantes rápidos...': 'Buscar restaurantes rápidos...',
@@ -5335,6 +5349,20 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Tickets da sua estação de preparo': 'Tickets de tu estación de preparación',
     'Visão geral da cozinha': 'Vista general de la cocina',
     'Insumos e alertas': 'Insumos y alertas',
+
+    // ── Barman role: journey & screen info ──
+    'Bar, drinks e estoque': 'Bar, drinks y stock',
+    'Display completo de bebidas': 'Display completo de bebidas',
+    'Bebidas e insumos': 'Bebidas e insumos',
+    'Estação do Barman': 'Estación del Barman',
+    'Drinks na fila, preparo e expedição': 'Drinks en cola, preparación y despacho',
+    'Fichas técnicas, ingredientes e porções': 'Fichas técnicas, ingredientes y porciones',
+    'KDS — Bar': 'KDS — Bar',
+    'Fila de bebidas e cocktails': 'Cola de bebidas y cócteles',
+    'Minha Estação': 'Mi Estación',
+    'itens com alerta': 'ítems con alerta',
+    'Fichas técnicas padronizadas — ingredientes, medidas e apresentação': 'Fichas técnicas estandarizadas — ingredientes, medidas y presentación',
+    'Fila de drinks e pedidos do bar': 'Cola de drinks y pedidos del bar',
 
 
   },
