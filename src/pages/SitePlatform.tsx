@@ -43,6 +43,30 @@ const rolesData = [
   { icon: UserCheck, name: { en: 'Waiter', pt: 'Garçom', es: 'Mesero' }, desc: { en: 'The frontline. Tables, orders, payments.', pt: 'A linha de frente. Mesas, pedidos, pagamentos.', es: 'La primera línea.' } },
 ];
 
+const featureItems = {
+  pt: [
+    'Pedidos fluem automaticamente entre áreas',
+    'Cozinha trabalha com clareza e prioridade',
+    'Contas fecham sem erro',
+    'Dados aparecem em tempo real',
+    'Decisões deixam de ser reativas',
+  ],
+  en: [
+    'Orders flow automatically between areas',
+    'Kitchen works with clarity and priority',
+    'Bills close without errors',
+    'Data appears in real time',
+    'Decisions stop being reactive',
+  ],
+  es: [
+    'Pedidos fluyen automáticamente entre áreas',
+    'Cocina trabaja con claridad y prioridad',
+    'Cuentas cierran sin error',
+    'Datos aparecen en tiempo real',
+    'Decisiones dejan de ser reactivas',
+  ],
+};
+
 const SitePlatform: React.FC = () => {
   const { lang, t } = useLang();
   const [activeService, setActiveService] = useState<number | null>(null);
@@ -60,7 +84,7 @@ const SitePlatform: React.FC = () => {
             </div>
           </Reveal>
           <Reveal delay={80}>
-            <h1 className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(34px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
+            <h1 className="font-display font-bold text-foreground whitespace-pre-line" style={{ fontSize: 'clamp(34px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
               {t('platform.title')}
             </h1>
           </Reveal>
@@ -72,8 +96,8 @@ const SitePlatform: React.FC = () => {
         </div>
       </section>
 
-      {/* 11 Service Types */}
-      <section className="py-20 bg-muted/30" id="services">
+      {/* Client Experience */}
+      <section className="py-20 bg-muted/30" id="client">
         <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
             <div className="flex items-center gap-3 mb-3">
@@ -82,6 +106,19 @@ const SitePlatform: React.FC = () => {
             </div>
           </Reveal>
           <Reveal delay={80}>
+            <div className="max-w-xl mt-6">
+              <p className="text-foreground text-lg leading-relaxed whitespace-pre-line">
+                {t('platform.client_body')}
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* 11 Service Types */}
+      <section className="py-20" id="services">
+        <div className="max-w-[960px] mx-auto px-6">
+          <Reveal>
             <h2 className="font-display font-bold text-foreground mb-10" style={{ fontSize: 'clamp(26px, 3vw, 38px)', letterSpacing: '-0.03em' }}>
               {t('services.title')}
             </h2>
@@ -136,8 +173,8 @@ const SitePlatform: React.FC = () => {
         </div>
       </section>
 
-      {/* 7 Roles */}
-      <section className="py-20" id="roles">
+      {/* 7 Roles — Team Experience */}
+      <section className="py-20 bg-muted/30" id="roles">
         <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
             <div className="flex items-center gap-3 mb-3">
@@ -145,8 +182,13 @@ const SitePlatform: React.FC = () => {
               <p className="text-primary font-semibold text-sm tracking-wide uppercase">{t('platform.ops_title')}</p>
             </div>
           </Reveal>
-          <Reveal delay={80}>
-            <p className="text-muted-foreground mb-10 max-w-lg text-lg leading-relaxed">
+          <Reveal delay={60}>
+            <h3 className="font-display font-bold text-foreground mt-2" style={{ fontSize: 'clamp(22px, 2.5vw, 32px)', letterSpacing: '-0.02em' }}>
+              {t('platform.ops_sub_title')}
+            </h3>
+          </Reveal>
+          <Reveal delay={120}>
+            <p className="text-muted-foreground mb-10 max-w-lg text-lg leading-relaxed mt-4">
               {t('platform.ops_sub')}
             </p>
           </Reveal>
@@ -167,33 +209,54 @@ const SitePlatform: React.FC = () => {
         </div>
       </section>
 
-      {/* Capabilities */}
-      <section className="py-20 bg-muted/30" id="features">
+      {/* Feature Section — Na Prática */}
+      <section className="py-20" id="features">
         <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
-            <div className="flex items-center gap-3 mb-8">
+            <div className="flex items-center gap-3 mb-3">
               <span className="w-8 h-0.5 bg-secondary rounded-full" />
-              <p className="text-secondary font-semibold text-sm tracking-wide uppercase">{t('platform.cross_title')}</p>
+              <p className="text-secondary font-semibold text-sm tracking-wide uppercase">{t('platform.cross_overline')}</p>
             </div>
           </Reveal>
+          <Reveal delay={80}>
+            <h2 className="font-display font-bold text-foreground mb-10" style={{ fontSize: 'clamp(26px, 3vw, 38px)', letterSpacing: '-0.03em' }}>
+              {t('platform.cross_title')}
+            </h2>
+          </Reveal>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[
-              { title: lang === 'pt' ? 'Sistema de Pagamento' : 'Payment System', desc: lang === 'pt' ? 'PIX, Crédito, Apple Pay, Google Pay, TAP to Pay e Wallet.' : 'PIX, Credit, Apple Pay, Google Pay, TAP to Pay & Wallet.' },
-              { title: 'Split Bill', desc: lang === 'pt' ? '4 modos: por item, igual, seletivo e valor customizado.' : '4 modes: by item, equal, selective, and custom amount.' },
-              { title: lang === 'pt' ? 'Rastreamento de Pedidos' : 'Order Tracking', desc: lang === 'pt' ? 'Pipeline em tempo real com atribuição do chef por prato.' : 'Real-time pipeline with chef attribution per dish.' },
-              { title: lang === 'pt' ? 'Programa de Fidelidade' : 'Loyalty Program', desc: lang === 'pt' ? 'Progressão por tiers: Silver, Gold, Platinum e Black.' : 'Tier progression: Silver, Gold, Platinum & Black.' },
-              { title: lang === 'pt' ? 'Simulação em Tempo Real' : 'Real-Time Simulation', desc: lang === 'pt' ? 'Pedidos avançam, notificações chegam, métricas atualizam — tudo ao vivo.' : 'Orders advance, notifications arrive, metrics update — all live.' },
-              { title: lang === 'pt' ? 'Multilíngue' : 'Multilingual', desc: lang === 'pt' ? 'Suporte completo em Português, Inglês e Espanhol.' : 'Full support in Portuguese, English and Spanish.' },
-            ].map((f, i) => (
-              <Reveal key={i} delay={i * 50}>
-                <div className="bg-background p-6 rounded-2xl border border-border hover:border-primary/20 transition-all hover:shadow-sm h-full">
-                  <h4 className="text-foreground font-semibold">{f.title}</h4>
-                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{f.desc}</p>
+          <div className="space-y-4 max-w-xl">
+            {featureItems[lang].map((item, i) => (
+              <Reveal key={i} delay={i * 60}>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check size={16} />
+                  </div>
+                  <p className="text-foreground text-lg leading-relaxed">{item}</p>
                 </div>
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* System Thinking */}
+      <section className="py-24 bg-muted/30">
+        <div className="max-w-[700px] mx-auto px-6 text-center">
+          <Reveal>
+            <h2 className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.035em', lineHeight: 1.15 }}>
+              {t('platform.system_title_1')}
+            </h2>
+          </Reveal>
+          <Reveal delay={80}>
+            <h2 className="font-display font-bold text-primary mt-2" style={{ fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.035em', lineHeight: 1.15 }}>
+              {t('platform.system_title_2')}
+            </h2>
+          </Reveal>
+          <Reveal delay={160}>
+            <p className="text-muted-foreground mt-8 text-lg leading-relaxed whitespace-pre-line max-w-lg mx-auto">
+              {t('platform.system_body')}
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -215,7 +278,7 @@ const SitePlatform: React.FC = () => {
               to="/request-demo"
               className="group inline-flex items-center gap-2.5 mt-10 bg-primary text-primary-foreground font-semibold px-10 py-4 rounded-xl hover:bg-primary-dark transition-all shadow-glow"
             >
-              {t('nav.request_demo')}
+              {t('platform.cta_button')}
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </Reveal>
