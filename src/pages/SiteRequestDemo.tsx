@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useLang } from '@/lib/i18n';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
@@ -15,6 +16,7 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
 };
 
 const SiteRequestDemo: React.FC = () => {
+  const navigate = useNavigate();
   const { lang, t } = useLang();
   const [form, setForm] = useState({ name: '', restaurant: '', email: '', phone: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -121,6 +123,13 @@ const SiteRequestDemo: React.FC = () => {
                     </div>
                     <h2 className="font-display font-bold text-xl mb-3 text-foreground">{t('rdemo.success_title')}</h2>
                     <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{t('rdemo.success_body')}</p>
+                    <button
+                      onClick={() => navigate('/access')}
+                      className="group w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-glow mb-4"
+                    >
+                      {lang === 'pt' ? 'Inserir código de acesso' : lang === 'es' ? 'Ingresar código de acceso' : 'Enter access code'}
+                      <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                     <button className="text-primary text-sm font-semibold hover:underline">{t('rdemo.resend')}</button>
                   </div>
                 </Reveal>
