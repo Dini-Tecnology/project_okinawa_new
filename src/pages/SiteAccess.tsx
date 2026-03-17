@@ -63,7 +63,8 @@ const SiteAccess: React.FC = () => {
           <NooweLogo size="lg" className="justify-center mb-14" />
 
           <h1 className="font-display font-bold text-3xl mb-3 text-foreground">{t('access.title')}</h1>
-          <p className="text-muted-foreground text-base mb-12">{t('access.sub')}</p>
+          <p className="text-muted-foreground text-base mb-4">{t('access.sub')}</p>
+          <p className="text-muted-foreground/70 text-sm mb-12 max-w-xs mx-auto">{t('access.sim_note')}</p>
 
           <div className="flex justify-center gap-3 mb-10">
             {code.map((digit, i) => (

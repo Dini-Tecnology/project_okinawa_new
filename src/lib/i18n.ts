@@ -139,10 +139,46 @@ const translations: Record<string, Record<Lang, string>> = {
     es: 'Pega o escribe el código de 6 dígitos que enviamos a tu correo.',
   },
   'access.request_new': { pt: 'Não tenho um código', en: 'I don\'t have a code', es: 'No tengo un código' },
+  'access.sim_note': {
+    pt: 'Este acesso é uma simulação real da plataforma. Explore como se fosse o seu restaurante.',
+    en: 'This is a real simulation of the platform. Explore it as if it were your restaurant.',
+    es: 'Este acceso es una simulación real de la plataforma. Explóralo como si fuera tu restaurante.',
+  },
+
+  // Intent capture
+  'intent.title': { pt: 'Como funciona seu restaurante?', en: 'How does your restaurant work?', es: '¿Cómo funciona tu restaurante?' },
+  'intent.sub': {
+    pt: 'Isso nos ajuda a personalizar sua experiência.',
+    en: 'This helps us personalize your experience.',
+    es: 'Esto nos ayuda a personalizar tu experiencia.',
+  },
+  'intent.table': { pt: 'Serviço à mesa', en: 'Table service', es: 'Servicio a la mesa' },
+  'intent.table_desc': { pt: 'Restaurantes, bistrôs, bares', en: 'Restaurants, bistros, bars', es: 'Restaurantes, bistrós, bares' },
+  'intent.quick': { pt: 'Atendimento rápido', en: 'Quick service', es: 'Servicio rápido' },
+  'intent.quick_desc': { pt: 'Fast food, fast casual, food courts', en: 'Fast food, fast casual, food courts', es: 'Fast food, fast casual, food courts' },
+  'intent.delivery': { pt: 'Delivery / retirada', en: 'Delivery / takeout', es: 'Delivery / retiro' },
+  'intent.delivery_desc': { pt: 'Dark kitchens, delivery-first', en: 'Dark kitchens, delivery-first', es: 'Dark kitchens, delivery-first' },
+  'intent.bar': { pt: 'Bar / noturno', en: 'Bar / nightlife', es: 'Bar / nocturno' },
+  'intent.bar_desc': { pt: 'Pubs, clubs, lounges', en: 'Pubs, clubs, lounges', es: 'Pubs, clubs, lounges' },
+  'intent.continue': { pt: 'Continuar', en: 'Continue', es: 'Continuar' },
 
   // Demo hub
   'hub.title': { pt: 'Você está dentro.', en: 'You\'re in.', es: 'Ya estás dentro.' },
   'hub.sub': { pt: 'Escolha como quer explorar o NOOWE.', en: 'Choose how you want to explore NOOWE.', es: 'Elige cómo quieres explorar NOOWE.' },
+  'hub.guided_title': { pt: 'Ver simulação guiada', en: 'See guided simulation', es: 'Ver simulación guiada' },
+  'hub.guided_tag': { pt: 'recomendado', en: 'recommended', es: 'recomendado' },
+  'hub.guided_desc': {
+    pt: 'Veja uma operação real acontecendo em poucos passos.',
+    en: 'See a real operation happening in just a few steps.',
+    es: 'Mira una operación real sucediendo en pocos pasos.',
+  },
+  'hub.guided_time': { pt: 'Leva menos de 2 minutos', en: 'Takes less than 2 minutes', es: 'Toma menos de 2 minutos' },
+  'hub.free_title': { pt: 'Explorar livremente', en: 'Explore freely', es: 'Explorar libremente' },
+  'hub.free_desc': {
+    pt: 'Acesse todas as telas e navegue no seu ritmo.',
+    en: 'Access all screens and browse at your own pace.',
+    es: 'Accede a todas las pantallas y navega a tu ritmo.',
+  },
   'hub.client_title': { pt: 'Visão do Cliente', en: 'Guest View', es: 'Visión del Cliente' },
   'hub.client_desc': {
     pt: 'Veja como seus clientes vão viver a experiência: pedir, acompanhar, pagar — tudo pelo celular, sem atrito.',
@@ -156,6 +192,76 @@ const translations: Record<string, Record<Lang, string>> = {
     es: 'Mira cómo tu equipo va a operar: de la caja a la cocina, del mesero al gerente. Cada rol con la pantalla correcta.',
   },
   'hub.launch': { pt: 'Explorar', en: 'Explore', es: 'Explorar' },
+  'hub.or': { pt: 'ou', en: 'or', es: 'o' },
+
+  // Guided simulation
+  'guided.exit': { pt: 'Sair da simulação', en: 'Exit simulation', es: 'Salir de la simulación' },
+  'guided.back': { pt: 'Voltar', en: 'Back', es: 'Volver' },
+  'guided.next': { pt: 'Avançar', en: 'Next', es: 'Avanzar' },
+  'guided.finish': { pt: 'Ver resultado', en: 'See result', es: 'Ver resultado' },
+  'guided.experience': { pt: 'Experiência', en: 'Experience', es: 'Experiencia' },
+  'guided.step1_title': { pt: 'O cliente abre o cardápio', en: 'The guest opens the menu', es: 'El cliente abre el menú' },
+  'guided.step1_tooltip': {
+    pt: 'Imagine um cliente sentando na mesa e escaneando o QR code. O cardápio digital aparece instantaneamente.',
+    en: 'Imagine a guest sitting down and scanning the QR code. The digital menu appears instantly.',
+    es: 'Imagina un cliente sentándose y escaneando el código QR. El menú digital aparece al instante.',
+  },
+  'guided.step2_title': { pt: 'Pedido enviado', en: 'Order sent', es: 'Pedido enviado' },
+  'guided.step2_tooltip': {
+    pt: 'O pedido foi enviado automaticamente para a cozinha. Sem garçom anotando, sem erro de comunicação.',
+    en: 'The order was sent automatically to the kitchen. No waiter writing it down, no miscommunication.',
+    es: 'El pedido se envió automáticamente a la cocina. Sin mesero anotando, sin error de comunicación.',
+  },
+  'guided.step3_title': { pt: 'Cozinha recebe em tempo real', en: 'Kitchen receives in real time', es: 'Cocina recibe en tiempo real' },
+  'guided.step3_tooltip': {
+    pt: 'O pedido chegou aqui automaticamente, já organizado por prioridade. O cozinheiro sabe exatamente o que fazer.',
+    en: 'The order arrived here automatically, already organized by priority. The cook knows exactly what to do.',
+    es: 'El pedido llegó aquí automáticamente, ya organizado por prioridad. El cocinero sabe exactamente qué hacer.',
+  },
+  'guided.step4_title': { pt: 'Acompanhamento em tempo real', en: 'Real-time tracking', es: 'Seguimiento en tiempo real' },
+  'guided.step4_tooltip': {
+    pt: 'O cliente acompanha cada etapa do pedido no celular. Sem precisar chamar o garçom pra perguntar.',
+    en: 'The guest tracks every step of the order on their phone. No need to call the waiter to ask.',
+    es: 'El cliente sigue cada etapa del pedido en su celular. Sin necesidad de llamar al mesero.',
+  },
+  'guided.step5_title': { pt: 'Pagamento sem fricção', en: 'Frictionless payment', es: 'Pago sin fricción' },
+  'guided.step5_tooltip': {
+    pt: 'O cliente paga direto pelo celular. Divide a conta, deixa gorjeta — tudo sem esperar.',
+    en: 'The guest pays directly from their phone. Splits the bill, leaves a tip — all without waiting.',
+    es: 'El cliente paga directo desde su celular. Divide la cuenta, deja propina — todo sin esperar.',
+  },
+  'guided.step6_title': { pt: 'Operação completa', en: 'Operation complete', es: 'Operación completa' },
+  'guided.step6_tooltip': {
+    pt: 'Pedido concluído. Tudo sincronizado. Do cliente à cozinha, do pagamento ao relatório.',
+    en: 'Order completed. Everything synced. From guest to kitchen, from payment to report.',
+    es: 'Pedido completado. Todo sincronizado. Del cliente a la cocina, del pago al informe.',
+  },
+
+  // Impact screen
+  'impact.title': { pt: 'Isso foi uma simulação.', en: 'That was a simulation.', es: 'Eso fue una simulación.' },
+  'impact.subtitle': {
+    pt: 'No seu restaurante, isso acontece o tempo todo.',
+    en: 'In your restaurant, this happens all the time.',
+    es: 'En tu restaurante, esto pasa todo el tiempo.',
+  },
+  'impact.bullet1': { pt: 'Sem retrabalho', en: 'No rework', es: 'Sin retrabajo' },
+  'impact.bullet2': { pt: 'Sem erro de comunicação', en: 'No miscommunication', es: 'Sin errores de comunicación' },
+  'impact.bullet3': { pt: 'Sem atrasos', en: 'No delays', es: 'Sin atrasos' },
+  'impact.cta': { pt: 'Quero isso no meu restaurante', en: 'I want this for my restaurant', es: 'Quiero esto en mi restaurante' },
+  'impact.explore': { pt: 'Explorar a plataforma completa', en: 'Explore the full platform', es: 'Explorar la plataforma completa' },
+  'impact.tagline': {
+    pt: 'Isso não é uma demo. É o seu restaurante funcionando.',
+    en: 'This is not a demo. This is your restaurant running.',
+    es: 'Esto no es una demo. Es tu restaurante funcionando.',
+  },
+
+  // Free mode banner
+  'free.banner': {
+    pt: 'Quer ver um fluxo guiado?',
+    en: 'Want to see a guided flow?',
+    es: '¿Quieres ver un flujo guiado?',
+  },
+  'free.banner_cta': { pt: 'Iniciar simulação', en: 'Start simulation', es: 'Iniciar simulación' },
 
   // Platform
   'platform.overline': { pt: 'COMO FUNCIONA', en: 'HOW IT WORKS', es: 'CÓMO FUNCIONA' },
