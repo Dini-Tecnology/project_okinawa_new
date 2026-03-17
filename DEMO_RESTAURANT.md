@@ -1,750 +1,1741 @@
-# NOOWE Restaurant Demo — Complete Technical Documentation
+# NOOWE Restaurant Demo — Complete Technical & Product Documentation
 
-> **Version**: 3.1 · **Last Updated**: 2026-03-17  
-> **Route**: `/demo/restaurant` · **Context**: Bistrô Noowe (simulated establishment)
+> **Version**: 4.0 · **Last Updated**: 2026-03-17 · **Classification**: Internal Engineering & Product  
+> **Route**: `/demo/restaurant` · **Context**: Bistrô Noowe (simulated Fine Dining establishment)  
+> **Total Codebase**: ~5,538 lines of TypeScript/React + ~6,000 lines of i18n translations
 
 ---
 
 ## Table of Contents
 
 1. [Executive Summary](#1-executive-summary)
-2. [Architecture Overview](#2-architecture-overview)
-3. [Role-Based Access Control (RBAC)](#3-role-based-access-control-rbac)
-4. [Screen Inventory (22 Screens)](#4-screen-inventory-22-screens)
-5. [Role Journeys](#5-role-journeys)
-6. [Feature Deep-Dives](#6-feature-deep-dives)
-7. [Data Model & Mock Data](#7-data-model--mock-data)
-8. [Internationalization (i18n)](#8-internationalization-i18n)
-9. [Mobile-First Rendering](#9-mobile-first-rendering)
-10. [Component Architecture](#10-component-architecture)
-11. [Interactive Actions Catalog](#11-interactive-actions-catalog)
-12. [Service Type Differentiation](#12-service-type-differentiation)
-13. [Design System Integration](#13-design-system-integration)
-14. [File Map](#14-file-map)
+2. [Architecture & System Design](#2-architecture--system-design)
+3. [Role-Based Access Control (RBAC) — 7 Roles](#3-role-based-access-control-rbac--7-roles)
+4. [Complete Screen Inventory — 22 Screens](#4-complete-screen-inventory--22-screens)
+5. [Role Journeys — Step-by-Step Walkthroughs](#5-role-journeys--step-by-step-walkthroughs)
+6. [Critical User Flows — Sequence Diagrams](#6-critical-user-flows--sequence-diagrams)
+7. [Waiter Command Center — Deep Dive](#7-waiter-command-center--deep-dive)
+8. [Data Model & Mock Data Catalog](#8-data-model--mock-data-catalog)
+9. [Internationalization (i18n) — 3 Languages](#9-internationalization-i18n--3-languages)
+10. [Mobile-First Rendering Architecture](#10-mobile-first-rendering-architecture)
+11. [Component Architecture & File Map](#11-component-architecture--file-map)
+12. [Interactive Actions — Complete Catalog](#12-interactive-actions--complete-catalog)
+13. [Service Type Differentiation — 11 Types](#13-service-type-differentiation--11-types)
+14. [Design System & Visual Language](#14-design-system--visual-language)
+15. [State Management & Simulation Engine](#15-state-management--simulation-engine)
 
 ---
 
 ## 1. Executive Summary
 
-The Restaurant Demo is a **high-fidelity interactive prototype** embedded within the NOOWE platform, designed to showcase the full operational management capabilities of a restaurant SaaS. It operates under the simulated context of **Bistrô Noowe**, a Fine Dining establishment, and allows stakeholders to explore the platform through 7 distinct staff perspectives across 22 dedicated screens.
+The Restaurant Demo (`/demo/restaurant`) is a **production-grade interactive prototype** embedded within the NOOWE platform. It simulates the complete operational management of a Fine Dining restaurant — **Bistrô Noowe** — allowing stakeholders to experience every aspect of the platform through 7 distinct staff perspectives across 22 dedicated screens with 50+ interactive actions.
 
-### Key Numbers
+### 1.1 — Purpose & Strategic Goals
 
-| Metric | Value |
-|--------|-------|
-| Staff Roles | 7 (Owner → Cook) |
-| Dedicated Screens | 22 |
-| Service Types Supported | 11 (Fine Dining → Club & Balada) |
-| Interactive Actions | 50+ |
-| Languages | 3 (PT-BR, EN, ES) |
-| Mock Data Points | Tables (12), Orders (dynamic), Reservations (dynamic), Team (10), Stock (8), Drinks (5) |
+| Goal | Description |
+|------|-------------|
+| **Sales Enablement** | Prospective restaurant owners experience the full platform before purchase — every role, every workflow, every screen |
+| **Stakeholder Validation** | Each team member (chef, waiter, owner, manager) sees exactly what their daily interface looks like |
+| **Product Demonstration** | Showcases NOOWE's SaaS + Take Rate business model with real operational depth |
+| **Technical Proof** | Validates that complex restaurant workflows (KDS, approvals, multi-party payments, floor management) work seamlessly |
 
-### Purpose
+### 1.2 — Key Metrics
 
-- **Sales**: Allow prospective restaurant owners to experience the full platform before purchasing
-- **Validation**: Demonstrate real operational workflows (KDS, approvals, payments, floor management)
-- **Stakeholder Alignment**: Let each team member (chef, waiter, owner) see their exact view
-
----
-
-## 2. Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    /demo/restaurant                         │
-│  ┌──────────┐   ┌─────────────────┐   ┌──────────────────┐ │
-│  │  Journey  │   │  PhoneShell /   │   │   Context        │ │
-│  │  Sidebar  │   │  Desktop View   │   │   Sidebar        │ │
-│  │  (left)   │   │  (center)       │   │   (right)        │ │
-│  └──────────┘   └─────────────────┘   └──────────────────┘ │
-│                          │                                  │
-│                    DemoContext                               │
-│               (orders, tables, menus,                       │
-│                reservations, analytics,                     │
-│                notifications, simulation)                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Layout Pattern
-
-Three-column centered layout:
-1. **Journey Sidebar** (left, ≥768px) — Progress tracker with role-specific stages
-2. **PhoneShell / Desktop View** (center) — Primary content rendered inside a responsive phone emulator (mobile) or full-width cards (desktop)
-3. **Context Sidebar** (right) — Screen metadata (title, description) from `SCREEN_INFO`
-
-### State Management
-
-All demo state flows through `DemoContext` (React Context), providing:
-- `orders` — Live order objects with status pipeline
-- `tables` — 12 table objects with status, customer, timing
-- `reservations` — Reservation list with status tracking
-- `analytics` — Revenue, occupancy, hourly data, satisfaction
-- `notifications` — Real-time notification feed
-- `menu` — Menu items with categories and images
-- Mutation helpers: `updateOrderStatus()`, `updateTableStatus()`
-
-### Real-Time Simulation Engine
-
-`DemoContext` runs an interval-based simulation that:
-- Advances order statuses through the pipeline
-- Generates new notifications (waiter calls, kitchen alerts)
-- Updates occupancy and revenue metrics
-- Creates a sense of a "living" restaurant during the demo
+| Metric | Value | Detail |
+|--------|-------|--------|
+| Staff Roles | 7 | Owner, Manager, Maitre, Chef, Barman, Cook, Waiter |
+| Dedicated Screens | 22 | Role-specific views with unique functionality |
+| Service Types | 11 | Fine Dining through Club & Balada |
+| Interactive Actions | 50+ | Stateful interactions with visual feedback |
+| Languages | 3 | Portuguese (PT-BR), English (EN), Spanish (ES) |
+| Mock Tables | 12 | Positioned on interactive floor plan |
+| Mock Team Members | 10 | With avatars, roles, shifts, sales data |
+| Mock Orders | Dynamic | Generated and advanced by simulation engine |
+| Mock Reservations | Dynamic | With status lifecycle tracking |
+| Mock Stock Items | 8 | With critical/low/ok status levels |
+| Mock Drink Recipes | 5 | With full ingredient technical sheets |
+| Mock Approvals | 4 | Cancel, courtesy, refund, discount types |
+| Mock Guest Data | 13 guests | Across 5 tables with 18 individual orders |
+| Mock Live Feed | 7 events | With 4 urgency levels |
+| Mock Kitchen Pipeline | 5 dishes | With SLA tracking and chef attribution |
 
 ---
 
-## 3. Role-Based Access Control (RBAC)
+## 2. Architecture & System Design
 
-The demo implements a **6-tier RBAC hierarchy** with 7 roles:
+### 2.1 — Layout Architecture
 
-| # | Role | ID | Default Screen | Icon | Access Level |
-|---|------|----|---------------|------|-------------|
-| 1 | **Dono** (Owner) | `owner` | `dashboard` | 👑 Crown | Full Control — all 9 screens |
-| 2 | **Gerente** (Manager) | `manager` | `manager-ops` | 📊 Briefcase | Operations & Approvals — 7 screens |
-| 3 | **Maitre** | `maitre` | `maitre` | 💁‍♀️ CalendarDays | Reservations & Floor — 3 screens |
-| 4 | **Chef** | `chef` | `kds-kitchen` | 👨‍🍳 ChefHat | Kitchen KDS & Menu — 3 screens |
-| 5 | **Barman** | `barman` | `barman-station` | 🍸 Beer | Bar KDS & Drinks — 4 screens |
-| 6 | **Cozinheiro** (Cook) | `cook` | `cook-station` | 🧑‍🍳 CookingPot | Station-specific KDS — 2 screens |
-| 7 | **Garçom** (Waiter) | `waiter` | `waiter` | 🤵 HandPlatter | Table Service — 6 screens |
+```
+┌────────────────────────────────────────────────────────────────────┐
+│                      /demo/restaurant                              │
+│  ┌──────────────┐   ┌─────────────────────┐   ┌────────────────┐  │
+│  │   Journey     │   │   PhoneShell /       │   │   Context      │  │
+│  │   Sidebar     │   │   Desktop View       │   │   Sidebar      │  │
+│  │   (left)      │   │   (center)           │   │   (right)      │  │
+│  │              │   │                     │   │                │  │
+│  │  ┌─────────┐ │   │  Screen content     │   │  Screen title  │  │
+│  │  │ Stage 1 │ │   │  rendered here      │   │  Description   │  │
+│  │  │ Stage 2 │ │   │  (role-specific)    │   │  from          │  │
+│  │  │ Stage 3 │ │   │                     │   │  SCREEN_INFO   │  │
+│  │  │   ...   │ │   │                     │   │                │  │
+│  │  └─────────┘ │   │                     │   │                │  │
+│  └──────────────┘   └─────────────────────┘   └────────────────┘  │
+│                                                                    │
+│                         DemoContext                                 │
+│                  (Global Simulation State)                          │
+└────────────────────────────────────────────────────────────────────┘
+```
 
-### Permission Matrix
+**Three-Column Centered Layout:**
+1. **Journey Sidebar** (left, visible ≥768px) — Progress tracker showing role-specific stages; click any stage to navigate directly to that screen. Mandatory from `md` breakpoint upwards to preserve presentation context.
+2. **PhoneShell / Desktop View** (center) — Primary content area. Mobile-specific screens (Waiter, Dashboard) render inside a `PhoneShell` or `ResponsivePhoneShell` component simulating a smartphone. Desktop screens render full-width with cards and grids.
+3. **Context Sidebar** (right) — Displays screen metadata (title, description) pulled from the `SCREEN_INFO` constant map, providing contextual orientation for the viewer.
+
+### 2.2 — State Management
+
+All demo state flows through `DemoContext` (React Context API), providing:
+
+| State | Type | Description |
+|-------|------|-------------|
+| `orders` | `DemoOrder[]` | Live order objects with full status pipeline (pending → confirmed → preparing → ready → delivered → paid) |
+| `tables` | `DemoTable[]` | 12 table objects with status (available/occupied/reserved/billing), customer name, seat count, occupied timestamp, order total |
+| `reservations` | `DemoReservation[]` | Reservation list with customer, time, party size, status (confirmed/seated/waiting/cancelled), notes |
+| `analytics` | `DemoAnalytics` | Revenue (today, hourly, weekly), orders count, avg ticket, occupancy rate, satisfaction score, top items, returning customers rate |
+| `notifications` | `DemoNotification[]` | Real-time notification feed with type (waiter_call, kitchen, payment, etc.), read status, timestamp |
+| `menu` | `DemoMenuItem[]` | Full menu catalog with name, price, category, description, image URL, prep time |
+| `unreadNotifications` | `number` | Count of unread notifications for badge rendering |
+
+**Mutation Helpers:**
+- `updateOrderStatus(orderId, newStatus)` — Advances order through pipeline
+- `updateTableStatus(tableId, newStatus)` — Transitions table between states
+
+### 2.3 — Real-Time Simulation Engine
+
+`DemoContext` runs an **interval-based simulation** that creates the feeling of a living, active restaurant:
+
+- **Order Advancement**: Automatically progresses orders through status pipeline at realistic intervals
+- **Notification Generation**: Creates waiter calls, kitchen ready alerts, payment notifications
+- **Metric Updates**: Recalculates revenue, occupancy, and counts in real-time
+- **Timestamp Tracking**: All orders and notifications carry real `Date` objects for elapsed time calculations
+
+This simulation ensures the demo feels dynamic regardless of user interaction, with orders appearing to move through the kitchen, notifications arriving organically, and metrics shifting naturally.
+
+---
+
+## 3. Role-Based Access Control (RBAC) — 7 Roles
+
+### 3.1 — Role Hierarchy
+
+```
+                     ┌─────────┐
+                     │  OWNER  │  Full Control
+                     │  (Dono) │  9 screens
+                     └────┬────┘
+                          │
+                ┌─────────┴─────────┐
+                │                   │
+          ┌─────┴─────┐      ┌─────┴─────┐
+          │  MANAGER  │      │  MAITRE   │
+          │ (Gerente) │      │           │
+          │ 7 screens │      │ 3 screens │
+          └─────┬─────┘      └───────────┘
+                │
+     ┌──────────┼──────────┐
+     │          │          │
+┌────┴────┐ ┌──┴───┐ ┌────┴────┐
+│  CHEF   │ │BARMAN│ │ WAITER  │
+│         │ │      │ │(Garçom) │
+│3 screens│ │4 scr.│ │6 screens│
+└────┬────┘ └──────┘ └─────────┘
+     │
+┌────┴────┐
+│  COOK   │
+│(Cozinh.)│
+│2 screens│
+└─────────┘
+```
+
+### 3.2 — Role Configuration Detail
+
+| # | Role | ID | Emoji | Default Screen | Color Token | Gradient | Description |
+|---|------|----|-------|---------------|-------------|----------|-------------|
+| 1 | **Dono** | `owner` | 👑 | `dashboard` | `primary` | `from-primary/20 to-primary/5` | Full executive control — revenue, analytics, all operations |
+| 2 | **Gerente** | `manager` | 📊 | `manager-ops` | `secondary` | `from-secondary/20 to-secondary/5` | Operations management, approvals, staff oversight |
+| 3 | **Maitre** | `maitre` | 💁‍♀️ | `maitre` | `info` | `from-info/20 to-info/5` | Reservation flow, virtual queue, floor management |
+| 4 | **Chef** | `chef` | 👨‍🍳 | `kds-kitchen` | `warning` | `from-warning/20 to-warning/5` | Kitchen KDS, menu management, stock control |
+| 5 | **Barman** | `barman` | 🍸 | `barman-station` | `accent-foreground` | `from-accent/20 to-accent/5` | Bar KDS, drink recipes, bar stock |
+| 6 | **Cozinheiro** | `cook` | 🧑‍🍳 | `cook-station` | `destructive` | `from-destructive/20 to-destructive/5` | Station-specific prep, simplified KDS |
+| 7 | **Garçom** | `waiter` | 🤵 | `waiter` | `success` | `from-success/20 to-success/5` | Complete table service command center |
+
+### 3.3 — Complete Permission Matrix
 
 | Screen | Owner | Manager | Maitre | Chef | Barman | Cook | Waiter |
 |--------|:-----:|:-------:|:------:|:----:|:------:|:----:|:------:|
-| Dashboard | ✅ | — | — | — | — | — | — |
-| Table Map | ✅ | ✅ | ✅ | — | — | — | — |
-| Orders | ✅ | ✅ | — | — | — | — | ✅ |
-| KDS Kitchen | ✅ | — | — | ✅ | — | ✅ | — |
+| Dashboard Executivo | ✅ | — | — | — | — | — | — |
+| Mapa de Mesas | ✅ | ✅ | ✅ | — | — | — | — |
+| Gestão de Pedidos | ✅ | ✅ | — | — | — | — | ✅ |
+| KDS Cozinha | ✅ | — | — | ✅ | — | ✅ | — |
 | KDS Bar | ✅ | — | — | — | ✅ | — | — |
-| Analytics | ✅ | — | — | — | — | — | — |
-| Team | ✅ | ✅ | — | — | — | — | — |
-| Menu Editor | ✅ | — | — | ✅ | — | — | — |
-| Setup | ✅ | — | — | — | — | — | — |
-| Manager Ops | — | ✅ | — | — | — | — | — |
-| Approvals | — | ✅ | — | — | — | — | — |
-| Daily Report | — | ✅ | — | — | — | — | — |
-| Maitre Panel | — | — | ✅ | — | — | — | — |
-| Floor Flow | — | — | ✅ | — | — | — | — |
-| Barman Station | — | — | — | — | ✅ | — | — |
-| Drink Recipes | — | — | — | — | ✅ | — | — |
-| Cook Station | — | — | — | — | — | ✅ | — |
-| Stock | — | ✅ | — | ✅ | ✅ | — | — |
-| Waiter (Command Center) | — | — | — | — | — | — | ✅ |
-| Waiter Calls | — | — | — | — | — | — | ✅ |
-| Waiter Tips | — | — | — | — | — | — | ✅ |
-| Waiter Payment | — | — | — | — | — | — | ✅ |
+| Analytics & Relatórios | ✅ | — | — | — | — | — | — |
+| Gestão de Equipe | ✅ | ✅ | — | — | — | — | — |
+| Editor de Cardápio | ✅ | — | — | ✅ | — | — | — |
+| Configuração (Setup) | ✅ | — | — | — | — | — | — |
+| Painel Operacional | — | ✅ | — | — | — | — | — |
+| Aprovações | — | ✅ | — | — | — | — | — |
+| Relatório do Dia | — | ✅ | — | — | — | — | — |
+| Painel do Maitre | — | — | ✅ | — | — | — | — |
+| Fluxo do Salão | — | — | ✅ | — | — | — | — |
+| Estação do Barman | — | — | — | — | ✅ | — | — |
+| Receitas de Drinks | — | — | — | — | ✅ | — | — |
+| Estação de Preparo | — | — | — | — | — | ✅ | — |
+| Controle de Estoque | — | ✅ | — | ✅ | ✅ | — | — |
+| Garçom (Command Center) | — | — | — | — | — | — | ✅ |
+| Chamados de Clientes | — | — | — | — | — | — | ✅ |
+| Gorjetas | — | — | — | — | — | — | ✅ |
+| Cobrar na Mesa | — | — | — | — | — | — | ✅ |
+| Ações na Mesa | — | — | — | — | — | — | ✅ |
 
 ---
 
-## 4. Screen Inventory (22 Screens)
+## 4. Complete Screen Inventory — 22 Screens
 
-### 4.1 — Welcome (`welcome`)
-**Purpose**: Entry point for the restaurant demo  
-**Components**: Hero banner, 7-role selector grid, 6 feature highlight cards, stats summary (7 roles, 22 screens, 11 service types)  
-**Actions**: Select a staff role → navigates to their default screen  
-**File**: `SetupScreens.tsx` → `WelcomeScreen`
+### 4.1 — Welcome Screen (`welcome`)
+
+**Purpose**: Entry point and role selection hub for the entire restaurant demo.
+
+**Visual Structure**:
+- **Hero Banner**: Gradient background with "Bistrô Noowe" logo (N icon), "DEMO INTERATIVA" badge, and description inviting exploration
+- **Role Selection Grid**: 2×4 grid (responsive) with 7 role cards. Each card shows emoji, role name, description, feature count, and "Explorar →" CTA. Cards have gradient backgrounds matching role color tokens and scale on hover (`hover:scale-[1.02]`)
+- **Feature Highlights**: 3-column grid showcasing 6 platform capabilities (Real-time Dashboard, Professional KDS, Interactive Map, Reservations & Queue, Waiter App, Approvals & RBAC)
+- **Stats Summary**: 3-column centered stats — "7 Perfis de Acesso", "22 Telas Dedicadas", "11 Tipos de Serviço"
+
+**Interactive Actions**:
+| Action | Trigger | Result |
+|--------|---------|--------|
+| Select Role | Click role card | Sets `activeRole` in parent, navigates to role's `defaultScreen`, updates journey sidebar stages |
+
+**File**: `SetupScreens.tsx` → `WelcomeScreen` · **Lines**: 17-99
+
+---
 
 ### 4.2 — Setup Wizard (`setup`)
-**Purpose**: 4-step restaurant configuration wizard  
-**Steps**:
-1. **Profile** — Name, description, address, phone, hours, photo upload
-2. **Service Type** — 11 options (Fine Dining → Club & Balada), each with feature count
-3. **Features** — Toggle amenities (Wi-Fi, Parking, Pet Friendly, Terrace, Wine List, Online Reservations, QR Code)
-4. **Payments** — Service charge (10%), tip (optional), split payment (4 modes), methods (Card, PIX, Apple/Google Pay, NFC)
 
-**Actions**: Navigate steps, select service type, toggle features, proceed to dashboard  
-**File**: `SetupScreens.tsx` → `SetupScreen`
+**Purpose**: Simulates the 4-step restaurant onboarding configuration.
 
-### 4.3 — Dashboard (`dashboard`)
-**Purpose**: Executive real-time overview  
-**KPIs**: Revenue today, Total orders, Average ticket, Occupancy rate  
-**Widgets**: Revenue-by-hour bar chart, Occupancy gauge (SVG ring), Active orders list, Notifications feed, Top sellers ranking  
-**Actions**: Click KPI alerts → navigate to orders, click "See all" → orders/notifications  
-**File**: `DashboardScreens.tsx` → `DashboardScreen`
+**Step 1 — Profile (Perfil do Restaurante)**:
+- Restaurant photo with camera hover overlay
+- Pre-filled fields: Name ("Bistrô Noowe"), Description ("Gastronomia contemporânea com ingredientes locais e sazonais")
+- Contact info grid: Address (Rua Oscar Freire, 432 - Jardins, SP), Phone ((11) 3042-8900), Hours (Ter-Dom · 12h-15h, 19h-00h), Website
+- "Próximo →" CTA with shadow-glow
 
-### 4.4 — Analytics (`analytics`)
-**Purpose**: Deep reporting & insights  
-**Sections**: Period selector (Today/Week/Month), Revenue summary cards, Weekly revenue bar chart, Customer satisfaction (5-star breakdown), Returning customers gauge, Peak hours heatmap (7×6 grid), Staff performance leaderboard  
-**File**: `DashboardScreens.tsx` → `AnalyticsScreen`
+**Step 2 — Service Type (Tipo de Serviço)**:
+- 4-column grid (responsive) with 11 service type cards
+- Each card: label, short description, feature count with ⚡ icon
+- Selected card: primary border, glow shadow, ring effect, checkmark
+- Available types: Fine Dining (26 features), Casual Dining (22), Fast Casual (18), Café/Padaria (16), Pub & Bar (20), Buffet (14), Drive-Thru (12), Food Truck (14), Chef's Table (24), Quick Service (15), Club & Balada (22)
 
-### 4.5 — Table Map (`table-map`)
-**Purpose**: Interactive floor plan  
-**Features**: 12 tables positioned on a visual grid (round/rect/long shapes), color-coded status (Available/Occupied/Reserved/Billing), click-to-select detail panel, status transition buttons  
-**Actions**: Click table → view details, "Seat Customer" / "Close Bill" / "Release Table" / "Check-in Reservation"  
-**File**: `OperationsScreens.tsx` → `TableMapScreen`
+**Step 3 — Features (Características)**:
+- 4-column toggle grid for amenities
+- All enabled by default: Wi-Fi, Estacionamento, Acessível, Pet Friendly, Terraço, Carta de Vinhos, Reservas Online, QR Code nas Mesas
+- Each toggle shows icon + label + checkmark when active
 
-### 4.6 — Orders (`orders`)
-**Purpose**: Complete order lifecycle management  
-**Features**: Filter bar by status (All/Pending/Confirmed/Preparing/Ready/Delivered), expandable order cards with item images, elapsed time tracking, late order highlighting (>15min)  
-**Actions**: Confirm → Prepare → Ready → Deliver status transitions per order  
-**File**: `OperationsScreens.tsx` → `OrdersScreen`
+**Step 4 — Payments (Pagamentos)**:
+- 4 configuration rows: Taxa de serviço (10%), Gorjeta (Opcional 5/10/15%), Split de pagamento (4 modos), Métodos (Cartão, PIX, Apple/Google Pay, NFC)
+- Completion banner: Success gradient, checkmark icon, "Configuração Completa!" message
+- "Ir para o Dashboard →" CTA
 
-### 4.7 — KDS Kitchen (`kds-kitchen`)
-**Purpose**: Kitchen Display System  
-**Features**: Stats (Queue/Preparing/Ready), ticket cards with table number, item list, prep time, elapsed timer, urgency indicators (flame, bounce, pulse animations), ticket actions  
-**Actions**: "Start Preparation" / "Mark as Ready" per ticket  
-**File**: `OperationsScreens.tsx` → `KDSScreen` (view='kitchen')
+**Interactive Actions**:
+| Action | Trigger | Result |
+|--------|---------|--------|
+| Navigate Steps | Click step pill or "Próximo"/"Voltar" | Advances/retreats through 4-step wizard |
+| Select Service Type | Click type card | Highlights with glow + ring, shows checkmark |
+| Toggle Feature | Click feature toggle | Visual on/off state change |
+| Complete Setup | Click "Ir para o Dashboard" | Navigates to dashboard screen |
 
-### 4.8 — KDS Bar (`kds-bar`)
-**Purpose**: Bar Display System (same component as Kitchen KDS, filtered for drinks)  
-**Actions**: Same as KDS Kitchen but filtered to `Bebidas` category  
-**File**: `OperationsScreens.tsx` → `KDSScreen` (view='bar')
-
-### 4.9 — Maitre Panel (`maitre`)
-**Purpose**: Reservation management & guest flow  
-**Sections**: Quick stats (Reservations/Confirmed/Queue/Free Tables), Reservations timeline with expandable cards (Check-in, Edit, Cancel), Virtual Queue (3 mock guests with position, party size, wait time), Available Tables for assignment  
-**Actions**: Check-in guest, call queue member, assign table  
-**File**: `ServiceScreens.tsx` → `MaitreScreen`
-
-### 4.10 — Floor Flow (`floor-flow`)
-**Purpose**: Virtual queue management & table rotation  
-**Accessible by**: Maitre  
-**File**: `ServiceScreens.tsx` (referenced in journey)
-
-### 4.11 — Waiter Command Center (`waiter`)
-**Purpose**: Complete table service hub — the most complex screen in the demo  
-**Rendered in**: PhoneShell (mobile-first emulator)  
-**Sub-tabs**:
-
-#### 4.11a — Ao Vivo (Live Feed)
-- Real-time event feed with 7 event types: `kitchen_ready`, `call`, `payment`, `payment_needed`, `approval`, `order`
-- Urgency levels: `critical` (pulsing), `high`, `medium`, `info`
-- Actionable: "Retirar" (pick up dish), "Atender" (answer call), "Cobrar" (charge), "Solicitar" (request approval)
-- Kitchen alert banner when dishes are waiting
-
-#### 4.11b — Mesas (Tables Overview → Table Detail)
-- **Overview**: List of assigned tables with guest count, order count, payment progress bar, badges (PRATO=dish ready, S/APP=guest without app)
-- **Table Detail** (click on table):
-  - Header: Table number, customer name, guest count, time elapsed, total amount, payment progress
-  - **Sub-tab: Pessoas (Guests)** — Individual guest cards with app/no-app status, order count, total, "+ Pedir" and "Cobrar" buttons, "Add guest without app" form
-  - **Sub-tab: Pedidos (Orders)** — All orders from all guests, status badges (ENVIADO/PREPARANDO/PRONTO/✓ SERVIDO), edit quantity and cancel actions
-  - **Sub-tab: Cardápio (Menu)** — Full menu catalog (Entradas, Principais, Sobremesas, Bebidas), ordering flow per guest, quantity selector, "🔥 Enviar para Cozinha" button
-  - **Sub-tab: Cobrar (Charge)** — Per-guest billing, multi-method payment (TAP to Pay/NFC, PIX QR, Card, Cash), 3-step flow (select guest → choose method → processing → confirmation)
-
-#### 4.11c — Cozinha (Kitchen Pipeline)
-- Visual pipeline of dishes in preparation
-- Status: Preparando (yellow) / Pronto (green pulsing) / Servido (muted)
-- SLA timers with elapsed vs expected time
-- "Retirar" action for ready dishes
-- Chef attribution
-
-#### 4.11d — Cobrar (Quick Charge)
-- Guest selector from occupied tables
-- Payment method selection: TAP to Pay (NFC), PIX QR Code, Cartão, Dinheiro
-- 3-step flow: Select guest → Method → Processing animation → Confirmation
-- NFC simulation with "Aproxime o cartão" animation
-
-**File**: `ServiceScreens.tsx` → `WaiterScreen`
-
-### 4.12 — Waiter Calls (`waiter-calls`)
-**Purpose**: Pending customer calls  
-**Features**: Call notifications with table number, timestamp, read/unread status  
-**File**: `RoleScreens.tsx` → `WaiterCallsScreen`
-
-### 4.13 — Waiter Tips (`waiter-tips`)
-**Purpose**: Daily tip tracking  
-**Features**: Today's total, tip history, per-table breakdown  
-**File**: `RoleScreens.tsx` → `WaiterTipsScreen`
-
-### 4.14 — Waiter Payment (`waiter-payment`)
-**Purpose**: Redirected to Waiter Command Center "Cobrar" tab  
-**File**: Routes to `waiter` screen with charge tab active
-
-### 4.15 — Manager Ops (`manager-ops`)
-**Purpose**: Operational dashboard for managers  
-**Features**: Alert banners (late orders >15min, pending approvals), 4 KPIs (Active Orders, Revenue, Active Staff, Occupancy), Staff on duty list with avatars and roles, Approval preview cards, Real-time order feed with elapsed timers  
-**Actions**: Navigate to approvals, view order details  
-**File**: `RoleScreens.tsx` → `ManagerOpsScreen`
-
-### 4.16 — Approvals (`approvals`)
-**Purpose**: Authorization workflow for sensitive operations  
-**Stats**: Pending, Approved Today, Rejected Today, Total Impact (R$)  
-**Types**:
-- 🔴 **Cancelamento** — Order cancellation (e.g., "Cliente mudou de ideia")
-- 🔵 **Cortesia** — Complimentary item (e.g., "Aniversariante na mesa")
-- 🟡 **Estorno** — Refund (e.g., "Prato devolvido — não atendeu expectativa")
-- 🟣 **Desconto** — Discount (e.g., "10% desconto fidelidade")
-
-**Actions**: Approve ✅ or Reject ❌ each request with visual feedback  
-**Mock Data**: 4 pending approvals totaling R$ 239  
-**File**: `RoleScreens.tsx` → `ApprovalsScreen`
-
-### 4.17 — Barman Station (`barman-station`)
-**Purpose**: Bar-specific KDS  
-**Features**: 3 stats (Queue, Ready, Today's Total), Drink ticket cards with images, prep timers, urgency markers, quick links to Recipes and Stock  
-**Actions**: "Prepare" → "Ready to serve" per drink order  
-**File**: `RoleScreens.tsx` → `BarmanStationScreen`
-
-### 4.18 — Drink Recipes (`drink-recipes`)
-**Purpose**: Standardized cocktail technical sheets  
-**Cocktails**: Gin Tônica Aurora, Negroni Clássico, Espresso Martini, Caipirinha Premium, Moscow Mule  
-**Detail**: Image, prep time, price, glass type, garnish, numbered ingredients, step-by-step preparation  
-**File**: `RoleScreens.tsx` → `DrinkRecipesScreen`
-
-### 4.19 — Cook Station (`cook-station`)
-**Purpose**: Simplified station-specific KDS  
-**Stations**: 🔥 Grelhados, ❄️ Frios, 🍝 Massas (tab selector)  
-**Features**: Large ticket cards with item quantity, name, prep time, urgency highlighting, station keyword filtering  
-**Actions**: "INICIAR PREPARO" / "PRONTO" per ticket  
-**File**: `RoleScreens.tsx` → `CookStationScreen`
-
-### 4.20 — Stock (`stock`)
-**Purpose**: Inventory control  
-**Stats**: OK / Low / Critical counts  
-**Filters**: All, Low Stock, Critical  
-**Items**: 8 mock items (Gin Tanqueray, Tônica, Limão, Campari, Filé Mignon, Salmão, Arroz, Azeite) with current level, minimum, visual progress bar  
-**File**: `RoleScreens.tsx` → `StockScreen`
-
-### 4.21 — Menu Editor (`menu-editor`)
-**Purpose**: Menu management with categories, items, and pricing  
-**File**: `ServiceScreens.tsx` → `MenuEditorScreen`
-
-### 4.22 — Team (`team`)
-**Purpose**: Staff management  
-**Members**: 10 mock team members with avatars, roles, shifts, sales, tips  
-**File**: `ServiceScreens.tsx` → `TeamScreen`
-
-### 4.23 — Daily Report (`daily-report`)
-**Purpose**: End-of-day metrics and closure  
-**File**: `RoleScreens.tsx` → `DailyReportScreen`
+**File**: `SetupScreens.tsx` → `SetupScreen` · **Lines**: 101-286
 
 ---
 
-## 5. Role Journeys
+### 4.3 — Dashboard Executivo (`dashboard`)
 
-Each role has a predefined journey (sequence of screens) displayed in the sidebar:
+**Purpose**: Real-time executive overview of all restaurant operations.
 
-### 5.1 — Owner Journey (9 stages)
-```
-Dashboard → Table Map → Orders → KDS Kitchen → KDS Bar → Analytics → Team → Menu → Setup
-```
+**Visual Structure**:
 
-### 5.2 — Manager Journey (7 stages)
-```
-Ops Panel → Orders → Approvals → Table Map → Team → Daily Report → Stock
-```
+**KPI Grid (4 cards)**:
+| KPI | Example Value | Icon | Color | Detail |
+|-----|--------------|------|-------|--------|
+| Receita Hoje | R$ 12.840 | DollarSign | success | +12.4% |
+| Pedidos | 47 | UtensilsCrossed | primary | X ativos |
+| Ticket Médio | R$ 273 | TrendingUp | info | +5.2% |
+| Ocupação | 83% | Users | warning | X/12 mesas |
 
-### 5.3 — Maitre Journey (3 stages)
-```
-Reservations → Floor Flow → Table Map
-```
+**Quick Action Alerts**: Contextual banners that appear when:
+- Ready orders exist → green banner "X pedido(s) pronto(s) para entregar" → click navigates to Orders
+- Pending orders exist → warning banner "X pedido(s) aguardando confirmação" → click navigates to Orders
 
-### 5.4 — Chef Journey (3 stages)
-```
-KDS Kitchen → Menu → Stock
-```
+**Revenue by Hour Chart**: Bar chart with 12 hourly columns (11h-22h), gradient fill, hover-to-reveal values (R$X.Xk), responsive height
 
-### 5.5 — Barman Journey (4 stages)
-```
-My Station → KDS Bar → Recipes → Stock
-```
+**Occupancy Gauge**: SVG circular gauge with animated stroke-dasharray, center text showing percentage, 2×2 grid below (Livres/Ocupadas/Reservadas/Pagamento)
 
-### 5.6 — Cook Journey (2 stages)
-```
-My Station → General KDS
-```
+**Active Orders List**: Scrollable list (max 6 items) with table number badge, customer name, item count, total, status badge, elapsed time
 
-### 5.7 — Waiter Journey (6 stages)
-```
-My Tables → Calls → Charge/TAP → Actions → Active Orders → Tips
-```
+**Notifications Feed**: Scrollable list with read/unread styling (unread: primary border + background), dot indicator, message text, timestamp
+
+**Top Sellers**: 5-column horizontal ranking with position number (#1 in primary, #2 in secondary), item name, quantity sold
+
+**Interactive Actions**:
+| Action | Trigger | Result |
+|--------|---------|--------|
+| Click ready alert | Banner click | Navigate to orders (filtered to ready) |
+| Click pending alert | Banner click | Navigate to orders (filtered to pending) |
+| Click "Ver todos →" | Link click | Navigate to orders or notifications screen |
+| Hover revenue bar | Mouse hover | Shows revenue value tooltip |
+
+**File**: `DashboardScreens.tsx` → `DashboardScreen` · **Lines**: 31-210
 
 ---
 
-## 6. Feature Deep-Dives
+### 4.4 — Analytics & Relatórios (`analytics`)
 
-### 6.1 — Real-Time KDS (Kitchen Display System)
+**Purpose**: Deep reporting with multi-period analysis.
 
-The KDS is the operational heartbeat of the kitchen and bar. It implements:
+**Period Selector**: 3 pill buttons — Hoje / Semana / Mês. Values dynamically change:
+- Today: R$ 12.840 / 47 orders / R$ 273 avg / 4.7★
+- Week: R$ 77.500 / 312 orders / R$ 248 avg
+- Month: R$ 312.000 / 1.248 orders / R$ 250 avg
 
-- **Ticket lifecycle**: `confirmed` → `preparing` → `ready`
-- **SLA timers**: Elapsed time vs expected prep time, with visual urgency escalation
-- **Color-coded urgency**:
-  - Normal (0–10min): Default border
-  - Urgent (10–15min): Warning border + flame icon
-  - Late (>15min): Destructive border + pulsing animation + bouncing alert icon
-- **Dual views**: Kitchen (food items) and Bar (drink items) from the same component
-- **Station filtering** (Cook): Keywords filter tickets to specific stations (grelhados, frios, massas)
+**Summary Cards (4)**: Revenue Total, Total Orders, Average Ticket, Customer Satisfaction — each with icon, percentage change, arrow indicator
 
-### 6.2 — Waiter Command Center
+**Weekly Revenue Chart**: 7 bars (Seg-Dom), current day highlighted in primary gradient, others in secondary gradient, hover-to-reveal values
 
-The most sophisticated screen, operating as a 4-tab mobile-first command center:
+**Customer Satisfaction Panel**: Giant score display (4.7), 5-star visual, distribution bars (5★=72%, 4★=18%, 3★=7%, 2★=2%, 1★=1%), "342 avaliações"
 
-**State Management (local)**:
-- `waiterTab`: live | tables | kitchen | charge
-- `selectedTable`: Current table being managed
-- `tableDetailTab`: guests | orders | menu | charge
-- `addedGuests`: Guests added without app
-- `pendingOrder`: Items staged for kitchen submission
-- `sentOrders`: Orders sent to kitchen (tracked locally)
-- `cancelledOrders`: Cancelled order IDs
-- `handledItems`: Dismissed live feed items
-- `pickedUp`: Kitchen items marked as picked up
-- `paymentStep`: guests | method | processing | done
+**Returning Customers**: Large percentage (e.g., 68%), horizontal progress bar with secondary gradient
 
-**Key Flows**:
+**Peak Hours Heatmap**: 7×6 grid (days × time slots), color-coded intensity (4 levels of primary opacity), hover for hour tooltip, legend bar
+
+**Staff Performance**: 3-row leaderboard with rank, name, role, order count, revenue, tips, rating star
+
+**File**: `DashboardScreens.tsx` → `AnalyticsScreen` · **Lines**: 212-392
+
+---
+
+### 4.5 — Mapa de Mesas (`table-map`)
+
+**Purpose**: Interactive visual floor plan of the restaurant dining room.
+
+**Layout**: 2-column (desktop) — floor plan (2/3) + detail panel (1/3)
+
+**Floor Plan**:
+- 12 tables positioned on a relative coordinate system within a bordered container
+- Decorative labels: "Salão Principal" (top-left), "Terraço →" (top-right), "← Entrada" (bottom-left), "Bar ↑" (bottom-center)
+- Dashed inner border for visual depth
+- Tables rendered as positioned buttons with `translate(-50%, -50%)` centering
+
+**Table Shapes**:
+| Shape | CSS | Usage |
+|-------|-----|-------|
+| Round | `w-16 h-16 rounded-full` | Intimate 2-person tables |
+| Rect | `w-20 h-16 rounded-2xl` | Standard 4-person tables |
+| Long | `w-24 h-14 rounded-2xl` | Group 6-8 person tables |
+
+**Status Color Coding**:
+| Status | Background | Border | Text | Label |
+|--------|-----------|--------|------|-------|
+| Available | `bg-success/20` | `border-success/50` | `text-success` | Disponível |
+| Occupied | `bg-primary/20` | `border-primary/50` | `text-primary` | Ocupada |
+| Reserved | `bg-warning/20` | `border-warning/50` | `text-warning` | Reservada |
+| Billing | `bg-info/20` | `border-info/50` | `text-info` | Pagamento |
+
+**Table Decorations**:
+- Customer name label below table (when occupied)
+- Animated pulse dot on occupied tables (top-right corner)
+- Selected table: foreground border, shadow, scale(1.1), z-index elevation
+
+**Detail Panel** (when table selected):
+- Table number (large display), status badge
+- Stats grid: Seats, Time elapsed (if occupied)
+- Customer info card (if occupied): name, order total
+- **Status Transition Buttons**:
 
 ```
-Guest without app arrives
-  → Waiter opens table detail
-  → "Pessoas" tab → "Adicionar convidado sem app"
-  → Types name → Confirms
-  → Guest appears in list with "!" badge
-  → "+ Pedir" button → Cardápio tab
-  → Browse categories → Add items with qty
-  → "🔥 Enviar para Cozinha"
-  → Toast confirmation → Order appears in "Pedidos" tab
-  → Kitchen prepares → "Cozinha" tab shows status
-  → Dish ready → "Retirar" → Serve
-  → "Cobrar" tab → Select guest → Choose payment method
-  → NFC/PIX/Card/Cash → Processing → Done ✓
+Available  ──[Sentar Cliente]──→  Occupied
+Occupied   ──[Fechar Conta]────→  Billing
+Billing    ──[Liberar Mesa]────→  Available
+Reserved   ──[Check-in Reserva]→  Occupied
+```
+
+**Empty State**: Eye icon + "Clique em uma mesa para ver os detalhes"
+
+**Interactive Actions**:
+| Action | Trigger | Result |
+|--------|---------|--------|
+| Select table | Click table on floor plan | Highlights table, opens detail panel |
+| Deselect table | Click selected table again | Closes detail panel |
+| Seat Customer | Button click (available) | Status → occupied |
+| Close Bill | Button click (occupied) | Status → billing |
+| Release Table | Button click (billing) | Status → available |
+| Check-in Reservation | Button click (reserved) | Status → occupied |
+| Hover table | Mouse hover | `scale-110` animation |
+
+**File**: `OperationsScreens.tsx` → `TableMapScreen` · **Lines**: 14-162
+
+---
+
+### 4.6 — Gestão de Pedidos (`orders`)
+
+**Purpose**: Complete order lifecycle management with filtering and status transitions.
+
+**Filter Bar**: Horizontal scrollable pill buttons:
+- Todos (X) · Pendentes (X) · Confirmados (X) · Preparando (X) · Prontos (X) · Entregues (X)
+- Active filter: `bg-primary text-primary-foreground shadow-glow`
+- Count badges in each pill
+
+**Order Cards** (expandable):
+- **Header**: Table number badge (large, primary), customer name, elapsed time with clock icon, item count, status badge
+- **Item Preview**: First 3 items as small pills (`2x Filé...`), +N indicator
+- **Expanded Detail** (click "..." menu): Full item list with images (w-10 h-10 rounded-lg), notes (italic), individual prices
+- **Action Bar**: Total price (large display) + status transition button
+
+**Late Order Highlighting**: Orders >15 minutes get `bg-destructive/5 border border-destructive/20` styling
+
+**Order Status Pipeline & Actions**:
+```
+Pending ──[✓ Confirmar]──→ Confirmed ──[🔥 Preparar]──→ Preparing ──[✓ Pronto]──→ Ready ──[🍽️ Entregar]──→ Delivered
+```
+
+**File**: `OperationsScreens.tsx` → `OrdersScreen` · **Lines**: 164-297
+
+---
+
+### 4.7 — KDS Cozinha (`kds-kitchen`) & 4.8 — KDS Bar (`kds-bar`)
+
+**Purpose**: Professional Kitchen/Bar Display System with ticket-based workflow.
+
+**Same component** (`KDSScreen`) with `view` prop ('kitchen' | 'bar'). Kitchen filters non-beverage items; bar filters beverages.
+
+**Stats Row (3)**:
+- Na Fila (Queue): warning color, count of confirmed orders
+- Preparando: primary color, count of preparing orders
+- Prontos: success color, count of ready orders
+
+**Empty State**: Large icon (ChefHat/Wine) + "Nenhum pedido na fila" + "Os tickets aparecerão aqui automaticamente"
+
+**Ticket Cards** (grid layout: 2-3 columns):
+- **Header Bar**: "Mesa X" (large display), flame icon (if urgent), timer badge showing elapsed minutes
+- **Urgency Styling**:
+
+| Elapsed Time | Border | Background | Animation |
+|-------------|--------|------------|-----------|
+| 0-10 min | `border-border` | `bg-card` | None |
+| 10-15 min | `border-warning` | `bg-warning/5` | Flame icon |
+| >15 min | `border-destructive` | `bg-destructive/5` | `animate-pulse` + bouncing AlertCircle |
+
+- **Item List**: Quantity badge, item name, prep time in minutes
+- **Action Button**: Full-width, contextual:
+  - Confirmed: "▶ Iniciar Preparo" (warning color)
+  - Preparing: "✓ Marcar como Pronto" (success color)
+
+**File**: `OperationsScreens.tsx` → `KDSScreen` · **Lines**: 299-423
+
+---
+
+### 4.9 — Painel do Maitre (`maitre`)
+
+**Purpose**: Reservation management, virtual queue, and guest flow control.
+
+**Quick Stats (4)**: Reservas Hoje, Confirmadas, Na Fila, Mesas Livres
+
+**2-Column Layout**:
+
+**Left — Reservations Timeline**:
+- "Nova" button (primary) to add reservation
+- Expandable reservation cards with:
+  - Calendar icon, customer name, phone
+  - Status badge (Confirmada/Sentado/Aguardando/Cancelada) with color coding
+  - Time, party size, notes (italic with 📝)
+  - **Expanded actions**: Check-in (success), Editar (muted), Cancelar (destructive)
+
+**Right — Virtual Queue**:
+- Queue count badge ("3 na fila", warning)
+- Guest cards with position number (#1, #2, #3), name, party size, estimated wait
+- Action buttons per guest: ✓ Check (seat) and 📱 Phone (call)
+
+**Available Tables Grid**: 4-column grid showing free tables with number and seat count, `bg-success/10 border-success/20`
+
+**Mock Queue Data**:
+| Position | Name | Party | Wait |
+|----------|------|-------|------|
+| #1 | Marcos Pereira | 3 | ~15min |
+| #2 | Sandra Alves | 2 | ~25min |
+| #3 | Roberto Lima | 5 | ~35min |
+
+**File**: `ServiceScreens.tsx` → `MaitreScreen` · **Lines**: 18-157
+
+---
+
+### 4.10 — Fluxo do Salão (`floor-flow`)
+
+**Purpose**: Extended Maitre view for table rotation monitoring and virtual queue management.
+
+**Stats Row (4)**:
+| Metric | Value | Color |
+|--------|-------|-------|
+| Mesas Ativas | (occupied count) | primary |
+| Tempo Médio | 42min | warning |
+| Na Fila | 3 | success |
+| Espera Estimada | ~15min | info |
+
+**Table Rotation Monitor**:
+- Lists all occupied tables with:
+  - Table number badge, customer name, seat count, order total
+  - Elapsed time (highlighted in warning if >60min, "Acima da média")
+  - Progress bar (fills to 90min, warning color if >60min)
+
+**Virtual Queue** (same as Maitre):
+- 3 queued guests with position, name, party size, estimated wait
+- "Chamar" (Call) action button per guest
+
+**File**: `RoleScreens.tsx` → `FloorFlowScreen` · **Lines**: 1016-1098
+
+---
+
+### 4.11 — Painel Operacional do Gerente (`manager-ops`)
+
+**Purpose**: Manager's operational command center with alerts, staff oversight, and approval preview.
+
+**Alert Banners** (conditional):
+- Late orders (>15min): Destructive pulsing banner with count
+- Pending approvals: Warning banner with shield icon, clickable → navigates to approvals
+
+**KPI Grid (4)**:
+| KPI | Icon | Color | Sub-detail |
+|-----|------|-------|-----------|
+| Pedidos Ativos | UtensilsCrossed | primary | "X prontos" |
+| Receita Hoje | DollarSign | success | "+12% vs ontem" |
+| Equipe Ativa | Users | info | "X em folga" |
+| Ocupação | BarChart3 | warning | "X mesas livres" |
+
+**2-Column Layout**:
+
+**Left — Staff on Duty**:
+- Scrollable list (max height 72) of online team members
+- Each: avatar (rounded-full), name, role + shift, "● Ativo" green status
+
+**Right — Pending Approvals Preview**:
+- "Ver todas →" link to full approvals screen
+- First 3 approvals with type badge, item name, table number, requester, amount (destructive red)
+
+**Live Orders Feed**:
+- Max 6 active orders with elapsed time, late highlighting (>15min → destructive background)
+- Status pills (Pendente/Confirmado/Preparando/Pronto/Entregue)
+
+**File**: `RoleScreens.tsx` → `ManagerOpsScreen` · **Lines**: 20-154
+
+---
+
+### 4.12 — Aprovações Pendentes (`approvals`)
+
+**Purpose**: Authorization workflow for financially sensitive operations.
+
+**Stats Row (4)**:
+| Metric | Value | Color |
+|--------|-------|-------|
+| Pendentes | (active count) | warning |
+| Aprovadas Hoje | 7 | success |
+| Recusadas Hoje | 2 | destructive |
+| Total Impacto | R$ 239 | primary |
+
+**Approval Types**:
+| Type | Icon | Color | Description |
+|------|------|-------|-------------|
+| Cancelamento | XCircle | destructive | Order cancellation by customer or waiter |
+| Cortesia | Star | info | Complimentary item (e.g., birthday dessert) |
+| Estorno | ArrowDown | warning | Refund for returned/unsatisfactory dish |
+| Desconto | DollarSign | secondary | Loyalty or promotional discount |
+
+**Approval Cards** (full-detail):
+- Type badge, time ago, item name, table number, requester name (bold), quoted reason (italic)
+- Amount displayed in large destructive font
+- **Action row** (border-top): "✅ Aprovar" (success) | "❌ Recusar" (destructive)
+- **Post-action state**: Card fades to 50% opacity, "✅ Processado" message
+
+**Mock Data**:
+| # | Type | Table | Item | Reason | Amount | Requester |
+|---|------|-------|------|--------|--------|-----------|
+| 1 | Cancel | 5 | Filé ao Molho de Vinho | Cliente mudou de ideia | R$ 118 | Bruno Oliveira |
+| 2 | Courtesy | 8 | Petit Gâteau | Aniversariante na mesa | R$ 42 | Carla Lima |
+| 3 | Refund | 1 | Ceviche Peruano | Prato devolvido — não atendeu expectativa | R$ 48 | Bruno Oliveira |
+| 4 | Discount | 3 | Conta Mesa 3 | 10% desconto fidelidade | R$ 31 | Marina Costa |
+
+**File**: `RoleScreens.tsx` → `ApprovalsScreen` · **Lines**: 156-232
+
+---
+
+### 4.13 — Estação do Barman (`barman-station`)
+
+**Purpose**: Bar-specific workstation with drink queue, recipes access, and stock alerts.
+
+**Stats (3)**: Drinks na Fila (warning), Prontos (success), Drinks Hoje (primary, hardcoded 47)
+
+**Drink Queue**: Grid (2-3 columns) of order cards:
+- Header with "Mesa X", flame icon if >5min, timer badge
+- Drink items with images (w-10 h-10 rounded-lg), quantity, name, notes
+- Action button: "▶ Preparar" (warning) or "✓ Pronto para servir" (success)
+
+**Empty State**: Beer icon + "Nenhum drink na fila"
+
+**Quick Access Cards (2-column)**:
+- "Receitas de Drinks" → navigates to drink-recipes
+- "Estoque do Bar" → navigates to stock (with alert count badge)
+
+**File**: `RoleScreens.tsx` → `BarmanStationScreen` · **Lines**: 234-343
+
+---
+
+### 4.14 — Receitas de Drinks (`drink-recipes`)
+
+**Purpose**: Standardized cocktail technical sheets with full preparation instructions.
+
+**Layout**: 3-column — recipe list (1/3) + detail panel (2/3)
+
+**Recipe List**: 5 clickable cards with thumbnail (w-12 h-12 rounded-xl), name, prep time, price
+
+**Recipe Detail**:
+- Large image (w-32 h-32 rounded-2xl), drink name (display font, 2xl), prep time + price
+- Tags: glass type pill, garnish pill (primary)
+- **Ingredients**: Numbered list (1-4 items) with circular step indicators
+- **Preparation Steps**: 5 standardized steps in muted panel
+
+**Cocktail Catalog**:
+| Drink | Ingredients | Glass | Garnish | Time | Price |
+|-------|------------|-------|---------|------|-------|
+| Gin Tônica Aurora | Gin 60ml, Tônica 120ml, Pepino 2 slices, Cardamomo 3 seeds | Taça Balloon | Pepino + Cardamomo | 3min | R$ 38 |
+| Negroni Clássico | Gin 30ml, Campari 30ml, Vermute Rosso 30ml | Old Fashioned | Twist de laranja | 3min | R$ 42 |
+| Espresso Martini | Vodka 45ml, Licor de Café 30ml, Espresso 30ml | Taça Martini | 3 grãos de café | 4min | R$ 40 |
+| Caipirinha Premium | Cachaça Envelhecida 60ml, Limão 1 unit, Açúcar demerara 2 colheres | Old Fashioned | Limão | 2min | R$ 32 |
+| Moscow Mule | Vodka 45ml, Ginger Beer 120ml, Suco de limão 15ml | Caneca de cobre | Limão + Hortelã | 2min | R$ 36 |
+
+**File**: `RoleScreens.tsx` → `DrinkRecipesScreen` · **Lines**: 345-414
+
+---
+
+### 4.15 — Estação de Preparo (`cook-station`)
+
+**Purpose**: Simplified, station-specific KDS designed for line cooks.
+
+**Station Selector** (3 tabs):
+| Station | Label | Count |
+|---------|-------|-------|
+| Grelhados | 🔥 Grelhados | 4 |
+| Frios | ❄️ Frios | 2 |
+| Massas | 🍝 Massas | 1 |
+
+**Station Keyword Filtering**:
+- Grelhados: Filé, Salmão, Polvo, Carpaccio
+- Frios: Tartare, Ceviche, Burrata, Carpaccio
+- Massas: Risoto, Ravioli
+
+**Ticket Cards** (large format, designed for kitchen displays):
+- "Mesa X" in 2xl font, elapsed time badge
+- Large quantity badges (w-12 h-12), item name in lg font, prep time
+- Late highlighting: destructive border + background + bouncing alert icon
+- Action: "▶ INICIAR PREPARO" (warning) or "✓ PRONTO" (success) — full-width py-4 buttons
+
+**File**: `RoleScreens.tsx` → `CookStationScreen` · **Lines**: 416-519
+
+---
+
+### 4.16 — Controle de Estoque (`stock`)
+
+**Purpose**: Inventory monitoring with automatic low-stock alerts.
+
+**Stats (3)**: OK count (success), Low count (warning), Critical count (destructive)
+
+**Filters (3)**: Todos / Baixo Estoque / Crítico
+
+**Item List**: Table-style rows with:
+- Status icon (Package) with color coding
+- Item name, category
+- Current level + unit, minimum level
+- Visual progress bar (fills based on current/min ratio)
+
+**Status Styling**:
+| Status | Background | Bar Color | Icon Color |
+|--------|-----------|-----------|-----------|
+| OK | Default | success | success |
+| Low | `bg-warning/5` | warning | warning |
+| Critical | `bg-destructive/5` | destructive | destructive |
+
+**File**: `RoleScreens.tsx` → `StockScreen` · **Lines**: 521-594
+
+---
+
+### 4.17 — Chamados de Clientes (`waiter-calls`)
+
+**Purpose**: Real-time customer call management for waiters.
+
+**Urgent Banner**: Pulsing destructive banner when urgent calls exist — "X chamado(s) urgente(s)! Prioridade máxima"
+
+**Stats (4)**: Pendentes (warning), Urgentes (destructive), Atendidos (success), Tempo Médio ~2min (primary)
+
+**Call Cards** (sorted by urgency):
+- Table number badge (large), message, urgency/category badges
+- Detailed reason text
+- Timestamp ("Mesa X · Xmin atrás")
+- "Atender" button (primary, shadow-glow) → transitions to "✅ Atendido"
+- Urgent cards: destructive border + background + animate-pulse
+
+**Mock Call Data**:
+| ID | Table | Type | Message | Reason | Category | Urgent |
+|----|-------|------|---------|--------|----------|--------|
+| wc1 | 3 | garcom | Solicitou garçom | Dúvida sobre harmonização | Atendimento | No |
+| wc2 | 8 | gerente | Falar com gerente | Reclamação sobre tempo de espera | Escalação | Yes |
+| wc3 | 1 | garcom | Pedido de sobremesa | Ver cardápio de sobremesas | Pedido | No |
+| wc4 | 5 | ajuda | Assistência especial | Acessibilidade — cadeira especial | Acessibilidade | Yes |
+| wc5 | 10 | garcom | Questão sobre alérgenos | Intolerância a glúten | Segurança | No |
+
+**File**: `RoleScreens.tsx` → `WaiterCallsScreen` · **Lines**: 596-685
+
+---
+
+### 4.18 — Gorjetas (`waiter-tips`)
+
+**Purpose**: Daily tip tracking with weekly performance chart.
+
+**Stats (3)**:
+| Metric | Value | Detail |
+|--------|-------|--------|
+| Hoje | R$ 410 | +18% vs ontem (success gradient) |
+| Semana | R$ 1.840 | 23 mesas |
+| Média/Mesa | R$ 51 | 8 mesas hoje |
+
+**Today's Tips List** (5 entries):
+| Table | Customer | Amount | Time | % of Bill |
+|-------|----------|--------|------|-----------|
+| 8 | Grupo Aniversário | R$ 120 | 30min atrás | 15% |
+| 5 | Grupo Pedro | R$ 85 | 1h atrás | 12% |
+| 10 | Carlos M. | R$ 98 | 1h30 atrás | 10% |
+| 3 | João & Ana | R$ 62 | 2h atrás | 10% |
+| 1 | Maria S. | R$ 45 | 2h30 atrás | 15% |
+
+**Weekly Performance Chart**: 7 bars (Seg-Dom), current day in success gradient, values on top, folga days show "-"
+
+**File**: `RoleScreens.tsx` → `WaiterTipsScreen` · **Lines**: 933-1014
+
+---
+
+### 4.19 — Waiter Payment (`waiter-payment`)
+
+**Purpose**: Payment tracking across all tables with per-guest status visibility.
+
+**Stats (4)**: Mesas abertas, Pagos via app, Pendentes, Sem app
+
+**Alert Banner**: "X cliente(s) sem app precisam do garçom — Use TAP to Pay, PIX ou dinheiro"
+
+**Per-Table Payment Cards**:
+- Table header: number badge, customer name, seat count, total, progress ring (SVG circle)
+- Guest rows: avatar badge (✓ paid / 📱 app / ! no app), name, payment status text, amount
+- Paid guests: faded (opacity-60), success styling
+- No-app guests: warning background, "Cobrar" button
+- App guests: info badge "No app"
+- Summary bar: progress bar + "X/Y pagos" + "Mesa quitada" when 100%
+
+**File**: `RoleScreens.tsx` → `WaiterPaymentScreen` · **Lines**: 687-805
+
+---
+
+### 4.20 — Ações na Mesa (`waiter-actions`)
+
+**Purpose**: Situational action feed prioritized by urgency with contextual sub-actions.
+
+**Urgent Banner**: Pulsing destructive — "X prato(s) pronto(s) para retirar! A cozinha está esperando"
+
+**Stats (4)**: Cozinha (destructive), Clientes (warning), Outros (info), Resolvidos (success)
+
+**Action Cards** (6 mock situations):
+| Urgency | Table | Title | Detail | Primary Action |
+|---------|-------|-------|--------|---------------|
+| 🔴 Critical | 5 | Prato pronto — retirar agora | 2x Filé · Chef Felipe · 2min | Confirmar retirada |
+| 🔴 Critical | 10 | Sobremesa pronta — servir | 1x Petit Gâteau · Thiago · 1min | Confirmar retirada |
+| 🟡 High | 3 | Cliente sem app quer pedir | Convidado 3 não tem app | Abrir cardápio |
+| 🟡 High | 1 | Conta solicitada | 1 convidado sem app | Ir para cobrança |
+| 🔵 Medium | 8 | Cortesia — aniversário | Solicitar Petit Gâteau ao gerente | Solicitar aprovação |
+| ⚪ Low | 5 | Transferir mesa | Grupo quer mesa maior | Solicitar ao Maitre |
+
+**Expandable Detail**: Click card → reveals sub-action buttons (e.g., "Retirei da cozinha", "Servi na mesa")
+
+**Collapsed Action**: Full-width bottom button with urgency-colored styling
+
+**Completed State**: "Tudo em dia!" with success checkmark when all resolved
+
+**File**: `RoleScreens.tsx` → `WaiterActionsScreen` · **Lines**: 807-930
+
+---
+
+### 4.21 — Editor de Cardápio (`menu-editor`)
+
+**Purpose**: Complete menu management with categories, pricing, and item editing.
+
+**Header**: Item count, category count, "Categorias" button, "+ Novo Item" CTA
+
+**Category Filter**: Horizontal scrollable pills from menu categories
+
+**Item Grid**: Cards with:
+- Item image (w-16 h-16 rounded-xl), name, description (truncated), price, prep time, category badge
+- Availability toggle
+- Edit (pencil) and Delete (trash) icon buttons
+
+**Quick Edit Panel** (expandable):
+- 2-column form: Name, Price, Prep Time, Category
+- Description textarea
+- "Salvar" (primary) + "Cancelar" buttons
+- Panel highlighted with `border-2 border-primary/30`
+
+**Stats (3)**: Items count (primary), Categories count (secondary), Average Price (accent)
+
+**File**: `ServiceScreens.tsx` → `MenuEditorScreen` · **Lines**: 1235-1371
+
+---
+
+### 4.22 — Gestão de Equipe (`team`)
+
+**Purpose**: Staff management with roles, schedules, and permission overview.
+
+**Header**: Total members, online count, "+ Adicionar" CTA
+
+**Stats (3)**: Em serviço (success), Folga (warning), Gorjetas hoje R$847 (info)
+
+**Team List** (table-style rows):
+- Avatar with online/offline dot indicator
+- Name, join date ("Desde X"), shift hours
+- Role badge with color coding per role
+- Status text ("● Ativo" / "○ Folga")
+- "..." menu button
+
+**Roles & Permissions Section**:
+- 6 role cards showing role name, permission description, "Editar" link
+- Roles: Dono (acesso total), Gerente (gestão operacional), Chef (KDS, cardápio, estoque), Garçom (pedidos, mesas), Barman (KDS bar, bebidas), Hostess/Maitre (reservas, fila, mapa)
+
+**File**: `ServiceScreens.tsx` → `TeamScreen` · **Lines**: 1373-1479
+
+---
+
+### 4.23 — Relatório do Dia (`daily-report`)
+
+**Purpose**: End-of-day closure report with metrics, rankings, and hourly breakdown.
+
+**Hero Card**: Gradient background with:
+- "Fechamento do Dia" title, date ("Domingo, 16 de Março 2026")
+- "+12% vs semana passada" badge
+- 4 KPIs: Receita Total, Pedidos, Ticket Médio, Satisfação (★)
+
+**2-Column Layout**:
+- **Left — Top Sellers**: Ranked list (#1-#5) with item name and quantity
+- **Right — Staff Performance**: Sorted by sales with avatar, name, role, revenue, tip amount
+
+**Hourly Revenue Chart**: Same bar chart as Dashboard but standalone with full-width rendering
+
+**File**: `RoleScreens.tsx` → `DailyReportScreen` · **Lines**: 1100-1188
+
+---
+
+## 5. Role Journeys — Step-by-Step Walkthroughs
+
+### 5.1 — Owner Journey (9 Stages)
+
+The owner sees the full operational picture from executive metrics to individual configuration.
+
+```
+Stage 1: Dashboard         → Real-time KPIs, revenue chart, occupancy gauge, alerts
+Stage 2: Mapa de Mesas     → Visual floor plan, table status management
+Stage 3: Pedidos            → Full order lifecycle management with filtering
+Stage 4: KDS Cozinha        → Kitchen ticket monitoring with SLA timers
+Stage 5: KDS Bar            → Bar ticket monitoring (drink-filtered)
+Stage 6: Analytics          → Period-based reporting, heatmaps, satisfaction
+Stage 7: Equipe             → Staff roster, schedules, permission matrix
+Stage 8: Cardápio           → Menu editor with categories and pricing
+Stage 9: Configuração       → 4-step setup wizard (Profile → Service Type → Features → Payments)
+```
+
+**Narrative**: The owner starts their day checking the executive dashboard for revenue and occupancy. They glance at the floor plan to see table status, then review active orders. They monitor both kitchen and bar KDS for production flow. For strategic analysis, they dive into Analytics for weekly trends and peak hour patterns. They manage their team roster and update the menu as needed. Finally, they review the restaurant configuration.
+
+---
+
+### 5.2 — Manager Journey (7 Stages)
+
+The manager focuses on operational execution, staff coordination, and sensitive approvals.
+
+```
+Stage 1: Painel Operacional → Alerts, KPIs, staff status, approval preview, live feed
+Stage 2: Pedidos             → Active order management and status transitions
+Stage 3: Aprovações          → Cancel/courtesy/refund/discount authorization
+Stage 4: Mapa de Mesas       → Floor status overview
+Stage 5: Equipe Hoje         → Current shift roster
+Stage 6: Relatório do Dia    → End-of-day closure metrics
+Stage 7: Estoque             → Low stock alerts and inventory levels
+```
+
+**Narrative**: The manager opens their operational panel and immediately sees alerts — 2 late orders and 3 pending approvals. They handle the approvals first (approving a birthday courtesy, rejecting an unjustified cancellation). They check the order flow, ensuring nothing is stuck. They verify the floor plan, confirm staff assignments, and at end of shift, review the daily report. Before leaving, they check stock alerts to prepare tomorrow's purchase orders.
+
+---
+
+### 5.3 — Maitre Journey (3 Stages)
+
+The maitre manages the front-of-house guest experience flow.
+
+```
+Stage 1: Reservas           → Today's reservations, check-in, virtual queue
+Stage 2: Fluxo do Salão     → Table rotation monitoring, wait time management
+Stage 3: Mapa de Mesas      → Table allocation and availability
+```
+
+**Narrative**: The maitre begins by reviewing today's reservations — 5 confirmed, 2 waiting. As guests arrive, they perform check-ins, expanding reservation cards and clicking "Check-in". Walk-in guests are added to the virtual queue with estimated wait times. The maitre monitors the Floor Flow screen to track table rotation — any table exceeding 60 minutes gets a warning flag. They use the table map to identify which tables will be available next for queue guests.
+
+---
+
+### 5.4 — Chef Journey (3 Stages)
+
+The chef commands the kitchen production line and menu quality.
+
+```
+Stage 1: KDS Cozinha        → Active ticket queue with SLA tracking
+Stage 2: Cardápio           → Menu item management, prep times, descriptions
+Stage 3: Estoque Cozinha    → Kitchen ingredient stock levels
+```
+
+**Narrative**: The chef's primary screen is the KDS — ticket cards arrive as orders are confirmed. They click "Iniciar Preparo" when starting a dish, and "Marcar como Pronto" when it's ready for service. Urgent tickets (>10min) show flame icons; late tickets (>15min) pulse red. Between rushes, the chef reviews the menu editor for seasonal updates and checks kitchen stock for any critical-level ingredients that need immediate attention.
+
+---
+
+### 5.5 — Barman Journey (4 Stages)
+
+The barman manages the bar's drink production workflow.
+
+```
+Stage 1: Minha Estação      → Drink queue, prep timers, recipe/stock shortcuts
+Stage 2: KDS Bar            → Full bar display system
+Stage 3: Receitas           → Cocktail technical sheets with ingredients and steps
+Stage 4: Estoque Bar        → Bar-specific inventory (spirits, mixers, garnishes)
+```
+
+**Narrative**: The barman opens their station to see the drink queue. New drink orders appear as ticket cards with images and specifications. They progress each drink through "Preparar" → "Pronto para servir". For unfamiliar drinks, they quickly access the Recipe screen for standardized measurements and garnish instructions. Between orders, they check bar stock — seeing that Gin Tanqueray is low (3/5 bottles) and Limão Tahiti is critical (8/20 units).
+
+---
+
+### 5.6 — Cook Journey (2 Stages)
+
+The cook has a minimal, focused interface for their specific station.
+
+```
+Stage 1: Minha Estação      → Station-filtered tickets (Grelhados/Frios/Massas)
+Stage 2: KDS Geral          → Full kitchen view for coordination
+```
+
+**Narrative**: The cook selects their station (e.g., Grelhados) and sees only relevant tickets — Filé, Salmão, Polvo items are shown while pasta and cold dishes are hidden. Large, touch-friendly ticket cards show quantity, item name, and prep time. They tap "INICIAR PREPARO" when they start and "PRONTO" when finished. They can switch to the general KDS view to coordinate with other stations.
+
+---
+
+### 5.7 — Waiter Journey (6 Stages)
+
+The waiter's journey covers the complete table service lifecycle — the most complex role.
+
+```
+Stage 1: Minhas Mesas       → 4-tab Command Center (Live/Tables/Kitchen/Charge)
+Stage 2: Chamados           → Real-time customer call management
+Stage 3: Cobrar / TAP       → Payment processing (NFC/PIX/Card/Cash)
+Stage 4: Ações na Mesa      → Situational action feed with prioritized tasks
+Stage 5: Pedidos Ativos     → Active order management for assigned tables
+Stage 6: Gorjetas           → Daily tip tracking and weekly performance
+```
+
+**Narrative**: The waiter starts their shift checking the Live Feed for urgent items — 2 dishes ready for pickup, a customer calling at Table 3. They attend to pickups first (Kitchen tab), then check their Tables tab for an overview. When a guest without the app needs to order, they open the table detail, navigate to the Menu tab, select the guest, browse categories, add items, and send to kitchen. For payment, they use the Charge tab — selecting the guest, choosing TAP to Pay, and processing the NFC payment. Throughout the shift, they monitor their tips screen to track daily earnings.
+
+---
+
+## 6. Critical User Flows — Sequence Diagrams
+
+### 6.1 — Order Lifecycle (End-to-End)
+
+```
+Customer (App)          Waiter              KDS (Kitchen/Bar)       Manager
+     │                    │                       │                    │
+     │──[Place Order]────→│                       │                    │
+     │                    │──[Order Created]──────→│                    │
+     │                    │   status: pending      │                    │
+     │                    │                       │                    │
+     │                    │                       │──[Confirm]─────────│
+     │                    │                       │   → confirmed      │
+     │                    │                       │                    │
+     │                    │                       │──[Start Prep]──────│
+     │                    │                       │   → preparing      │
+     │                    │                       │                    │
+     │                    │                       │──[Mark Ready]──────│
+     │                    │  ←──[Ready Alert]──── │   → ready          │
+     │                    │                       │                    │
+     │                    │──[Pick Up]────────────→│                    │
+     │                    │──[Deliver]────────────→│   → delivered      │
+     │                    │                       │                    │
+     │──[Pay via App]────→│                       │                    │
+     │                    │   → paid              │                    │
+```
+
+### 6.2 — Guest Without App (Waiter Proxy Flow)
+
+```
+Walk-in Guest           Waiter (Command Center)              Kitchen
+     │                         │                                │
+     │──[Sits at table]───────→│                                │
+     │                         │                                │
+     │                         │──[Tables tab → Select table]   │
+     │                         │──[Guests tab → "+Add guest"]   │
+     │                         │──[Enter name → Confirm]        │
+     │                         │   Guest added with "!" badge   │
+     │                         │                                │
+     │──[Wants to order]──────→│                                │
+     │                         │──[Click "+ Pedir" on guest]    │
+     │                         │──[Menu tab opens]              │
+     │                         │──[Select category → Add items] │
+     │                         │──[Adjust quantities (+/−)]     │
+     │                         │──[🔥 Enviar para Cozinha]      │
+     │                         │──────────────────────────────→ │
+     │                         │   Toast: "Pedido enviado!"     │
+     │                         │   Tab switches to Orders       │
+     │                         │                                │
+     │                         │  ←──[Status updates]───────────│
+     │                         │   pending → preparing → ready  │
+     │                         │                                │
+     │                         │──[Kitchen tab → "Retirar ✓"]   │
+     │                         │──[Serves dish to guest]        │
+     │                         │                                │
+     │──[Ready to pay]────────→│                                │
+     │                         │──[Charge tab → Select guest]   │
+     │                         │──[Choose method: TAP to Pay]   │
+     │                         │──[Processing: "Aproxime cartão"]│
+     │──[Taps card]───────────→│                                │
+     │                         │──[Confirm Payment]             │
+     │                         │   "Pagamento confirmado! ✓"    │
+     │                         │   [Imprimir recibo] [Próximo]  │
 ```
 
 ### 6.3 — Approval Workflow
 
-Sensitive financial operations require manager/owner authorization:
+```
+Waiter                 System                Manager               Owner
+  │                      │                      │                    │
+  │──[Request Cancel]───→│                      │                    │
+  │                      │──[Create Approval]──→│                    │
+  │                      │   type: cancel       │                    │
+  │                      │   amount: R$118      │                    │
+  │                      │                      │                    │
+  │                      │   Manager sees:      │                    │
+  │                      │   - Alert banner     │                    │
+  │                      │   - Ops dashboard    │                    │
+  │                      │   - Full detail card │                    │
+  │                      │                      │                    │
+  │                      │                      │──[Review]          │
+  │                      │                      │  Item, reason,     │
+  │                      │                      │  requester, amount │
+  │                      │                      │                    │
+  │                      │                      │──[Approve ✅]      │
+  │                      │  ←──[Processed]──────│                    │
+  │                      │   Card fades, shows  │                    │
+  │  ←──[Notification]───│   "Processado" badge │                    │
+```
+
+### 6.4 — Table Lifecycle
 
 ```
-Waiter requests cancellation
-  → Approval card created (type: cancel)
-  → Manager sees alert banner in Ops Dashboard
-  → Navigates to Approvals screen
-  → Reviews: item, table, reason, requester, amount
-  → Approves ✅ or Rejects ❌
-  → Card transitions to "Processado" state
+Table Status Flow:
+
+  ┌───────────┐    Seat Customer    ┌───────────┐
+  │ AVAILABLE │ ──────────────────→ │ OCCUPIED  │
+  │  (green)  │                     │  (blue)   │
+  └───────────┘                     └─────┬─────┘
+       ↑                                  │
+       │         Close Bill               │
+       │                                  ▼
+  ┌────┴──────┐                     ┌───────────┐
+  │  Release  │ ←────────────────── │  BILLING  │
+  │   Table   │                     │  (cyan)   │
+  └───────────┘                     └───────────┘
+
+  ┌───────────┐    Check-in         ┌───────────┐
+  │ RESERVED  │ ──────────────────→ │ OCCUPIED  │
+  │ (yellow)  │                     │  (blue)   │
+  └───────────┘                     └───────────┘
 ```
 
-4 approval types: Cancel, Courtesy, Refund, Discount — each with distinct color coding and icons.
+### 6.5 — NFC/TAP Payment Flow
 
-### 6.4 — Interactive Table Map
-
-Visual floor plan with 12 tables in a grid layout:
-
-| Table | Position | Shape | Seats |
-|-------|----------|-------|-------|
-| T1 | (12%, 15%) | Round | 2 |
-| T2 | (32%, 12%) | Round | 2 |
-| T3 | (52%, 15%) | Rect | 4 |
-| T4 | (75%, 12%) | Rect | 4 |
-| T5 | (10%, 42%) | Long | 6 |
-| T6 | (35%, 40%) | Round | 2 |
-| T7 | (55%, 42%) | Rect | 4 |
-| T8 | (78%, 38%) | Long | 6 |
-| T9 | (15%, 68%) | Round | 2 |
-| T10 | (38%, 70%) | Round | 2 |
-| T11 | (58%, 68%) | Long | 8 |
-| T12 | (80%, 70%) | Round | 2 |
-
-**Status transitions**: Available → Occupied → Billing → Available (cycle), Reserved → Occupied (check-in)
-
----
-
-## 7. Data Model & Mock Data
-
-### 7.1 — Team Members (10)
-
-| ID | Name | Role | Status | Shift |
-|----|------|------|--------|-------|
-| tm1 | Ricardo Alves | Dono | Online | Integral |
-| tm2 | Marina Costa | Gerente | Online | 14h–23h |
-| tm3 | Felipe Santos | Chef | Online | 15h–23h |
-| tm4 | Ana Rodrigues | Sommelier | Online | 18h–00h |
-| tm5 | Bruno Oliveira | Garçom | Online | 18h–00h |
-| tm6 | Carla Lima | Garçom | Online | 12h–18h |
-| tm7 | Diego Martins | Barman | Offline | Folga |
-| tm8 | Juliana Ferraz | Hostess | Online | 18h–00h |
-| tm9 | Thiago Nunes | Cozinheiro | Online | 15h–23h |
-| tm10 | Priscila Gomes | Cozinheiro | Online | 11h–19h |
-
-### 7.2 — Stock Items (8)
-
-| Item | Category | Current | Min | Status |
-|------|----------|---------|-----|--------|
-| Gin Tanqueray | Destilados | 3 bottles | 5 | 🟡 Low |
-| Tônica Fever Tree | Mixers | 12 units | 10 | 🟢 OK |
-| Limão Tahiti | Frutas | 8 units | 20 | 🔴 Critical |
-| Campari | Licores | 4 bottles | 3 | 🟢 OK |
-| Filé Mignon | Carnes | 6 kg | 10 | 🟡 Low |
-| Salmão Norueguês | Peixes | 4 kg | 5 | 🟡 Low |
-| Arroz Arbóreo | Grãos | 15 kg | 5 | 🟢 OK |
-| Azeite Trufado | Condimentos | 2 bottles | 3 | 🟡 Low |
-
-### 7.3 — Drink Recipes (5)
-
-| Drink | Glass | Prep Time | Price |
-|-------|-------|-----------|-------|
-| Gin Tônica Aurora | Taça Balloon | 3min | R$ 38 |
-| Negroni Clássico | Old Fashioned | 3min | R$ 42 |
-| Espresso Martini | Taça Martini | 4min | R$ 40 |
-| Caipirinha Premium | Old Fashioned | 2min | R$ 32 |
-| Moscow Mule | Caneca de cobre | 2min | R$ 36 |
-
-### 7.4 — Pending Approvals (4)
-
-| Type | Table | Item | Amount | Requester |
-|------|-------|------|--------|-----------|
-| Cancel | 5 | Filé ao Molho de Vinho | R$ 118 | Bruno Oliveira |
-| Courtesy | 8 | Petit Gâteau | R$ 42 | Carla Lima |
-| Refund | 1 | Ceviche Peruano | R$ 48 | Bruno Oliveira |
-| Discount | 3 | Conta Mesa 3 | R$ 31 | Marina Costa |
-
-### 7.5 — Waiter Menu (15 items across 4 categories)
-
-**Entradas**: Tartare de Atum (R$58), Burrata com Presunto (R$52), Polvo Grelhado (R$68), Carpaccio de Wagyu (R$72)  
-**Principais**: Filé ao Molho de Vinho (R$89), Risotto de Cogumelos (R$62), Salmão Grelhado (R$72), Costela Braseada (R$78)  
-**Sobremesas**: Petit Gâteau (R$38), Tiramisu (R$32), Crème Brûlée (R$34)  
-**Bebidas**: Café Espresso (R$12), Vinho Tinto taça (R$45), Cerveja Artesanal (R$24), Suco Natural (R$16)
-
-### 7.6 — Kitchen Pipeline (5 dishes)
-
-| Dish | Table | Chef | Status | SLA | Elapsed |
-|------|-------|------|--------|-----|---------|
-| Filé ao Molho de Vinho (2x) | 5 | Chef Felipe | Ready | 20min | 22min |
-| Petit Gâteau | 10 | Cozinheiro Thiago | Ready | 12min | 11min |
-| Risotto de Cogumelos | 3 | Chef Felipe | Preparing | 25min | 18min |
-| Salmão Grelhado | 8 | Cozinheiro Ana | Preparing | 22min | 8min |
-| Tiramisu (2x) | 1 | Cozinheiro Thiago | Preparing | 15min | 5min |
-
-### 7.7 — Table Guests (5 tables, 13 guests, 18 orders)
-
-Tables 1, 3, 5, 8, 10 have pre-populated guest data with individual orders, app status, and payment status. This data powers the Waiter Command Center's deep-dive functionality.
-
-### 7.8 — Live Feed (7 events)
-
-| Time | Table | Event | Type | Urgency |
-|------|-------|-------|------|---------|
-| now | 5 | Dish ready for pickup | kitchen_ready | 🔴 Critical |
-| 1min | 10 | Dessert ready | kitchen_ready | 🔴 Critical |
-| 2min | 3 | Customer called waiter | call | 🟡 High |
-| 3min | 8 | Payment received via app | payment | 🔵 Info |
-| 5min | 1 | Bill requested | payment_needed | 🟡 High |
-| 8min | 10 | Courtesy requested | approval | 🟠 Medium |
-| 12min | 5 | New order registered | order | 🔵 Info |
+```
+Waiter                    Phone (Simulated)         Guest Card
+  │                            │                        │
+  │──[Select guest]            │                        │
+  │──[Choose TAP to Pay]──────→│                        │
+  │                            │                        │
+  │                            │ ┌────────────────────┐ │
+  │                            │ │ Animated circles   │ │
+  │                            │ │ (ping + pulse)     │ │
+  │                            │ │                    │ │
+  │                            │ │  📱 Phone icon     │ │
+  │                            │ │                    │ │
+  │                            │ │ "Aproxime o cartão"│ │
+  │                            │ │ ● Aguardando...    │ │
+  │                            │ └────────────────────┘ │
+  │                            │                        │
+  │                            │  ←─[Card tap]──────── │
+  │                            │                        │
+  │──[Confirmar Pagamento]────→│                        │
+  │                            │                        │
+  │                            │ ┌────────────────────┐ │
+  │                            │ │    ✓ Green circle  │ │
+  │                            │ │                    │ │
+  │                            │ │ "Pagamento         │ │
+  │                            │ │  confirmado!"      │ │
+  │                            │ │                    │ │
+  │                            │ │ [Imprimir recibo]  │ │
+  │                            │ │ [Próximo →]        │ │
+  │                            │ └────────────────────┘ │
+```
 
 ---
 
-## 8. Internationalization (i18n)
+## 7. Waiter Command Center — Deep Dive
 
-The demo supports **3 languages**: Portuguese (PT-BR), English (EN), and Spanish (ES).
+The Waiter Command Center (`waiter` screen) is the most sophisticated component in the demo, rendered inside a `PhoneShell` emulator with 4 tabs and deep-nested sub-navigation.
 
-- Translation engine: `useDemoI18n()` hook from `DemoI18n.tsx`
-- All user-facing strings are translation keys (PT-BR as source, mapped to EN/ES)
-- Technical comments and code remain in English
-- ~300+ translation keys covering all 22 screens
+### 7.1 — Component State (16 state variables)
 
-### Coverage Areas
+```typescript
+// Tab navigation
+waiterTab: 'live' | 'tables' | 'kitchen' | 'charge'
 
-- Navigation labels (Dashboard, Mesas, Pedidos, etc.)
-- KPI labels and descriptions
-- Action buttons (Confirmar, Preparar, Pronto, Entregar)
-- Status badges (Pendente, Confirmado, Preparando, Pronto, Entregue, Pago)
-- Waiter Command Center (Ao Vivo, Pessoas, Cobrar, Enviar para Cozinha)
-- Payment flows (TAP to Pay, Aproxime o cartão, Pagamento confirmado)
-- Approval types (Cancelamento, Cortesia, Estorno, Desconto)
-- Alert messages and live feed events
+// Table selection & detail
+selectedTable: number | null
+tableDetailTab: 'guests' | 'orders' | 'menu' | 'charge'
+
+// Guest management
+addingGuest: boolean
+newGuestName: string
+addedGuests: TableGuest[]
+
+// Order management
+menuCategory: string
+orderingForGuest: string | null
+pendingOrder: Array<{ item, qty, price }>
+sentOrders: Array<{ id, guest, item, qty, price, status, sentAt }>
+cancelledOrders: string[]
+editingOrder: string | null
+orderSentToast: boolean
+
+// Feed & kitchen
+handledItems: string[]
+pickedUp: string[]
+
+// Payment
+paymentStep: 'guests' | 'method' | 'processing' | 'done'
+selectedGuest: string | null
+```
+
+### 7.2 — Header Bar
+
+Gradient header (`from-primary via-primary/90 to-accent`) with:
+- Shift label ("Turno das 18h"), Waiter name ("Bruno — Garçom")
+- Kitchen alert badge (pulsing, shows ready dish count)
+- Bell icon with unread call count
+- 4 mini-stat cards: Mesas, Retirar (urgent if >0), Chamados (urgent if >0), Gorjetas (R$410)
+
+### 7.3 — Tab: Ao Vivo (Live Feed)
+
+**Purpose**: Situational awareness — everything happening now that requires attention.
+
+**Urgent Kitchen Banner**: Appears when dishes are waiting — "X prato(s) esperando retirada! A cozinha está aguardando" with "Ver" button → switches to Kitchen tab
+
+**Event Types** (7 in mock data):
+
+| Type | Icon | Color | Action Button | Behavior on Click |
+|------|------|-------|--------------|-------------------|
+| `kitchen_ready` | ChefHat | destructive | "Retirar →" | Switches to Kitchen tab |
+| `call` | Bell | warning | "Atender →" | Switches to Tables tab, selects table |
+| `payment` | Check | success | None (info only) | — |
+| `payment_needed` | Smartphone | primary | "Cobrar →" | Switches to Charge tab, selects table |
+| `approval` | Shield | info | "Solicitar →" | — |
+| `order` | BookOpen | muted | None (info only) | — |
+
+**Urgency Levels**:
+| Level | Visual Treatment |
+|-------|-----------------|
+| Critical | Ring border, pulsing icon, "AGORA" badge |
+| High | Standard urgent styling |
+| Medium | Default styling |
+| Info | Muted background, no action button |
+
+**Dismissed Items**: Clicking an action removes the event from the feed via `handledItems` state
+
+**Empty State**: Green checkmark + "Tudo tranquilo! Nenhuma ação pendente"
+
+### 7.4 — Tab: Mesas (Tables)
+
+**Two-Level Navigation**: Overview → Table Detail
+
+**Level 1 — Table Overview**:
+For each occupied table:
+- Table number badge (pulsing red if dish ready), customer name
+- Guest count, order count, total amount
+- Guest avatar dots: ✓ (paid, green) / 📱 (has app, blue) / ! (no app, yellow)
+- Payment progress bar with percentage
+- Badges: "PRATO" (dish ready), "X S/APP" (guests without app)
+- Click → opens Table Detail
+
+**Level 2 — Table Detail**:
+- "← Todas as mesas" back button
+- Header card with gradient: table number, customer name, guest count, elapsed time, total, payment progress
+
+**4 Sub-tabs**:
+
+#### Sub-tab: Pessoas (Guests)
+- Individual guest cards with:
+  - Avatar badge (paid/app/no-app status)
+  - Name, "APP" or "SEM APP" badge
+  - Order count, active order count, payment status
+  - Total amount
+  - Action buttons: "+ Pedir" → opens Menu tab for that guest, "Cobrar" → opens Charge tab
+- **Add Guest Form**: Dashed border card, text input for name, Confirmar/Cancelar buttons
+- "+ Adicionar convidado sem app" floating button
+
+#### Sub-tab: Pedidos (Orders)
+- Orders grouped by status: ENVIADO → CONFIRMADO → PREPARANDO → 🔔 PRONTO → ✓ SERVIDO
+- Each status group has colored dot indicator and uppercase label
+- Order items show: qty × name, guest avatar (📱 or 👤), guest name, sent time, price
+- **Actions per item**:
+  - Ready: "Servir" button (destructive)
+  - Pending/Confirmed: Edit (pencil) → expand to "Alterar qtd" / "Trocar item" / "Cancelar", Delete (X)
+- Empty state: "Nenhum pedido ainda" + "Abrir Cardápio" button
+- "+ Adicionar mais itens" dashed button at bottom
+
+#### Sub-tab: Cardápio (Menu)
+- **Guest selector**: Shows which guest the order is for. If none selected, shows guest pills. "trocar" link to switch.
+- **Category pills**: Horizontal scrollable (Entradas, Principais, Sobremesas, Bebidas)
+- **Item cards**: Name, price (bold primary), prep time. "Adicionar" button or quantity controls (−/qty/+)
+- **Cart/Send bar** (sticky bottom, appears when items added):
+  - Item count, guest name, total price
+  - "🔥 Enviar para Cozinha" full-width success button
+  - Triggers: creates sent order records, shows toast, switches to Orders tab
+
+#### Sub-tab: Cobrar (Charge)
+- Instruction card: "Quem pagou pelo app aparece automaticamente. Cobre apenas quem precisa."
+- Guest list with payment status:
+  - Paid (✓): faded, "Pago via [method] ✓"
+  - Has app (📱): info badge "No app"
+  - No app (!): warning background, "Cobrar" button
+- Payment progress bar with count "X/Y pagos"
+
+### 7.5 — Tab: Cozinha (Kitchen Pipeline)
+
+**Sections** (in order of priority):
+
+**1. Ready Dishes (Destructive pulsing banner)**:
+- Alert: "X prato(s) para retirar agora! Tempo é qualidade"
+- Individual dish cards with:
+  - Table number badge (destructive), qty × dish name
+  - Chef attribution, "pronto há Xmin"
+  - "Retirar ✓" button (destructive, shadow-lg)
+
+**2. Preparing Dishes (Warning section)**:
+- Cards with: table number (warning), qty × dish name, chef name
+- SLA progress bar: fills based on elapsed/expected time
+- Remaining time or overage time indicator
+
+**3. Served Dishes (Success section, only if items picked up)**:
+- Faded cards (opacity-60) with success border
+- Checkmark icon
+
+### 7.6 — Tab: Cobrar (Quick Charge — Global View)
+
+**Two views depending on context**:
+
+**From Tab (Global)**: Shows all tables with per-guest payment status
+- Instruction card: "Cobrança inteligente — Quem pagou pelo app aparece automaticamente"
+- Per-table cards with:
+  - Table header: number badge, customer name, paid/waiting/needsWaiter counts
+  - SVG progress ring (paid/total ratio)
+  - Guest rows (same as table detail Charge sub-tab)
+  - "Cobrar" button only for no-app unpaid guests
+
+**From Table Detail**: Same as sub-tab charge (see 7.4 above)
+
+**Payment Method Flow** (4 steps):
+
+**Step 1 — Guest Selection**: Pick which guest to charge
+
+**Step 2 — Method Selection**:
+| Method | Icon | Description | Highlight |
+|--------|------|-------------|-----------|
+| TAP to Pay (NFC) | 📱 | Encoste o cartão no celular | ✅ RECOMENDADO |
+| PIX QR Code | ⚡ | Gere o QR e mostre ao cliente | |
+| Cartão (Chip/Senha) | 💳 | Maquininha vinculada | |
+| Dinheiro | 💵 | Confirme valor recebido | |
+
+**Step 3 — Processing**:
+- Concentric animated circles (ping + pulse) with phone icon
+- "Aproxime o cartão" instruction
+- "● Aguardando..." with pulsing dot
+- "Confirmar Pagamento" (success) + "Trocar método" (muted)
+
+**Step 4 — Confirmation**:
+- Green checkmark circle
+- "Pagamento confirmado!" (success bold)
+- Table/guest info, "Recibo enviado automaticamente"
+- "Imprimir recibo" + "Próximo →" buttons
 
 ---
 
-## 9. Mobile-First Rendering
+## 8. Data Model & Mock Data Catalog
 
-### PhoneShell Emulator
+### 8.1 — Team Members (10 records)
 
-Desktop screens like the Waiter Command Center render inside a `PhoneShell` component that simulates a smartphone interface:
-- Fixed width/height resembling a mobile device
-- Status bar (time, battery, signal)
-- Notch or dynamic island
-- Rounded corners and bezels
-- Internal scrolling
+| ID | Name | Role | Status | Shift | Since | Sales (R$) | Tips (R$) | Avatar Source |
+|----|------|------|--------|-------|-------|-----------|----------|---------------|
+| tm1 | Ricardo Alves | Dono | 🟢 Online | Integral | Jan 2023 | 0 | 0 | Unsplash 507003 |
+| tm2 | Marina Costa | Gerente | 🟢 Online | 14h–23h | Mar 2023 | 4,200 | 320 | Unsplash 494790 |
+| tm3 | Felipe Santos | Chef | 🟢 Online | 15h–23h | Jun 2023 | 0 | 0 | Unsplash 472099 |
+| tm4 | Ana Rodrigues | Sommelier | 🟢 Online | 18h–00h | Set 2023 | 1,800 | 240 | Unsplash 438761 |
+| tm5 | Bruno Oliveira | Garçom | 🟢 Online | 18h–00h | Nov 2023 | 3,200 | 410 | Unsplash 500648 |
+| tm6 | Carla Lima | Garçom | 🟢 Online | 12h–18h | Jan 2024 | 2,100 | 280 | Unsplash 534528 |
+| tm7 | Diego Martins | Barman | 🔴 Offline | Folga | Feb 2024 | 0 | 0 | Unsplash 506794 |
+| tm8 | Juliana Ferraz | Hostess | 🟢 Online | 18h–00h | Apr 2024 | 0 | 0 | Unsplash 544005 |
+| tm9 | Thiago Nunes | Cozinheiro | 🟢 Online | 15h–23h | May 2024 | 0 | 0 | Unsplash 519345 |
+| tm10 | Priscila Gomes | Cozinheiro | 🟢 Online | 11h–19h | Jul 2024 | 0 | 0 | Unsplash 580489 |
 
-### ResponsivePhoneShell
+### 8.2 — Table Floor Plan (12 tables)
 
-The `ResponsivePhoneShell` variant adapts rendering:
-- **Mobile devices** (<768px): Full-screen rendering without shell chrome
-- **Tablets/Desktop** (≥768px): PhoneShell emulator centered in viewport
+| ID | Position (x%, y%) | Shape | Seats |
+|----|-------------------|-------|-------|
+| t1 | (12, 15) | Round | 2 |
+| t2 | (32, 12) | Round | 2 |
+| t3 | (52, 15) | Rect | 4 |
+| t4 | (75, 12) | Rect | 4 |
+| t5 | (10, 42) | Long | 6 |
+| t6 | (35, 40) | Round | 2 |
+| t7 | (55, 42) | Rect | 4 |
+| t8 | (78, 38) | Long | 6 |
+| t9 | (15, 68) | Round | 2 |
+| t10 | (38, 70) | Round | 2 |
+| t11 | (58, 68) | Long | 8 |
+| t12 | (80, 70) | Round | 2 |
 
-### Mobile-Optimized Screens (`MobileRestaurantScreens.tsx`)
+### 8.3 — Guest Data (13 guests across 5 tables, 18 orders)
 
-Dedicated mobile versions of key screens:
-- `MobileDashboard` — Compact KPIs, quick action grid
-- `MobileOwner` — Revenue, ticket, top items, executive summary
-- `MobileManager` — Alerts, pending approvals, staff status
-- `MobileMaitre` — Reservation cards, queue
-- `MobileChef` — Kitchen ticket cards
-- `MobileBarman` — Drink queue
-- `MobileCook` — Station tickets
-- `MobileWaiter` — Full Command Center (4 tabs, same as desktop `WaiterScreen`)
+**Table 1** (2 guests):
+| Guest | App | Paid | Orders |
+|-------|-----|------|--------|
+| Maria S. | ✅ | ❌ | Tartare de Atum (served, R$58), Risotto (preparing, R$62) |
+| Paulo R. | ❌ | ❌ | Salmão Grelhado (preparing, R$72) |
+
+**Table 3** (3 guests):
+| Guest | App | Paid | Orders |
+|-------|-----|------|--------|
+| João | ✅ | ❌ | Costela Braseada (confirmed, R$78), Vinho Tinto (served, R$45) |
+| Ana | ✅ | ✅ Apple Pay | Polvo Grelhado (served, R$68), Tiramisu (preparing, R$32) |
+| Convidado 3 | ❌ | ❌ | (none — needs waiter to order) |
+
+**Table 5** (3 guests):
+| Guest | App | Paid | Orders |
+|-------|-----|------|--------|
+| Pedro M. | ✅ | ✅ PIX | Filé ao Molho (ready, R$89), Café Espresso (served, R$12) |
+| Lucas C. | ✅ | ❌ | Filé ao Molho (ready, R$89), Tiramisu (pending, R$32) |
+| Mariana | ❌ | ❌ | Salmão Grelhado (preparing, R$72) |
+
+**Table 8** (4 guests):
+| Guest | App | Paid | Orders |
+|-------|-----|------|--------|
+| Rafael C. | ✅ | ✅ Apple Pay | Polvo Grelhado (served, R$68) |
+| Fernanda A. | ✅ | ❌ | Costela Braseada (preparing, R$78) |
+| Thiago S. | ❌ | ❌ | Tartare (confirmed, R$58), Cerveja ×2 (served, R$24) |
+| Juliana | ❌ | ❌ | (none — needs waiter) |
+
+**Table 10** (1 guest):
+| Guest | App | Paid | Orders |
+|-------|-----|------|--------|
+| Carlos M. | ✅ | ❌ | Petit Gâteau (ready, R$38), Café Espresso (served, R$12) |
+
+### 8.4 — Kitchen Pipeline (5 dishes)
+
+| Dish | Qty | Table | Chef | Status | SLA | Elapsed | Over SLA? |
+|------|-----|-------|------|--------|-----|---------|-----------|
+| Filé ao Molho de Vinho | 2 | 5 | Chef Felipe | 🟢 Ready (3min ago) | 20min | 22min | ⚠️ +2min |
+| Petit Gâteau | 1 | 10 | Cozinheiro Thiago | 🟢 Ready (1min ago) | 12min | 11min | ✅ |
+| Risotto de Cogumelos | 1 | 3 | Chef Felipe | 🟡 Preparing | 25min | 18min | ✅ 7min left |
+| Salmão Grelhado | 1 | 8 | Cozinheiro Ana | 🟡 Preparing | 22min | 8min | ✅ 14min left |
+| Tiramisu | 2 | 1 | Cozinheiro Thiago | 🟡 Preparing | 15min | 5min | ✅ 10min left |
+
+### 8.5 — Live Feed Events (7 entries)
+
+| Time | Table | Event | Detail | Type | Urgency |
+|------|-------|-------|--------|------|---------|
+| agora | 5 | Prato pronto para retirar | 2x Filé ao Molho — Chef Felipe | kitchen_ready | 🔴 critical |
+| 1min | 10 | Sobremesa pronta | 1x Petit Gâteau — Cozinheiro Thiago | kitchen_ready | 🔴 critical |
+| 2min | 3 | Cliente chamou o garçom | Convidado 3 sem app quer fazer pedido | call | 🟡 high |
+| 3min | 8 | Pagamento recebido pelo app | Rafael C. pagou R$ 85 via Apple Pay | payment | 🔵 info |
+| 5min | 1 | Conta solicitada | 1 convidado sem app precisa de cobrança | payment_needed | 🟡 high |
+| 8min | 10 | Cortesia solicitada | Aniversário — solicitar Petit Gâteau ao gerente | approval | 🟠 medium |
+| 12min | 5 | Novo pedido registrado | 1x Tiramisu + 1x Café Espresso via app | order | 🔵 info |
+
+### 8.6 — Waiter Menu (15 items, 4 categories)
+
+| Category | Items |
+|----------|-------|
+| **Entradas** | Tartare de Atum (R$58, 8min) · Burrata com Presunto (R$52, 5min) · Polvo Grelhado (R$68, 12min) · Carpaccio de Wagyu (R$72, 6min) |
+| **Principais** | Filé ao Molho de Vinho (R$89, 20min) · Risotto de Cogumelos (R$62, 25min) · Salmão Grelhado (R$72, 18min) · Costela Braseada (R$78, 15min) |
+| **Sobremesas** | Petit Gâteau (R$38, 12min) · Tiramisu (R$32, 5min) · Crème Brûlée (R$34, 8min) |
+| **Bebidas** | Café Espresso (R$12, 3min) · Vinho Tinto taça (R$45, 1min) · Cerveja Artesanal (R$24, 1min) · Suco Natural (R$16, 5min) |
 
 ---
 
-## 10. Component Architecture
+## 9. Internationalization (i18n) — 3 Languages
 
-### File Structure
+**Engine**: `useDemoI18n()` hook from `DemoI18n.tsx` (~6,000+ lines)
+
+**Languages**: Portuguese (PT-BR, source), English (EN), Spanish (ES)
+
+**Translation Approach**: PT-BR strings serve as keys; the `t()` function maps them to the selected language. If no translation found, falls back to the original PT-BR string.
+
+**Coverage** (~300+ keys):
+- Navigation: Dashboard, Mesas, Pedidos, KDS, Analytics
+- KPIs: Receita, Ticket Médio, Ocupação, Satisfação
+- Order statuses: Pendente, Confirmado, Preparando, Pronto, Entregue, Pago
+- Waiter actions: Ao Vivo, Pessoas, Cobrar, Enviar para Cozinha, Retirar
+- Payment: TAP to Pay, Aproxime o cartão, Pagamento confirmado, PIX QR Code
+- Approval types: Cancelamento, Cortesia, Estorno, Desconto
+- Alerts: Prato pronto, Cliente chamou, Conta solicitada
+- Setup: Perfil, Tipo de Serviço, Recursos, Pagamentos
+- Stock: OK, Baixo, Crítico, Estoque
+- Tips: Gorjetas, Hoje, Semana, Média por mesa
+
+---
+
+## 10. Mobile-First Rendering Architecture
+
+### 10.1 — PhoneShell Emulator
+
+Desktop screens like the Waiter Command Center render inside a `PhoneShell` component:
+- Fixed dimensions simulating a smartphone viewport
+- Status bar with time, battery, signal indicators
+- Notch/dynamic island simulation
+- Rounded corners with device bezel styling
+- Internal scrolling independent of page scroll
+
+### 10.2 — ResponsivePhoneShell
+
+Adapts rendering strategy by viewport:
+- **< 768px (Mobile)**: Full-screen rendering, no shell chrome
+- **≥ 768px (Tablet/Desktop)**: PhoneShell emulator centered in viewport
+
+### 10.3 — Mobile-Optimized Screens
+
+`MobileRestaurantScreens.tsx` (1,557 lines) provides optimized variants:
+
+| Component | Screens | Specialization |
+|-----------|---------|---------------|
+| `MobileDashboard` | Owner mobile | Compact KPIs, quick action grid, recent orders, alerts |
+| `MobileTableMap` | All roles | 3-column grid (not positioned plan), detail card below |
+| `MobileOrders` | Owner/Manager | Compact order cards with inline status transition |
+| `MobileKDS` | Chef/Barman/Cook | Compact ticket cards with stats bar |
+| `MobileMaitre` | Maitre | Reservation cards, available tables count |
+| `MobileWaiter` | Waiter | Full 4-tab Command Center (identical logic to desktop) |
+| `MobileOwner` | Owner | Revenue, ticket médio, top items, executive summary |
+| `MobileManager` | Manager | Alerts, approvals, staff, quick KPIs |
+
+---
+
+## 11. Component Architecture & File Map
+
+### 11.1 — File Structure
 
 ```
 src/components/demo/restaurant/
-├── RestaurantDemoShared.tsx   — Types, RBAC config, journey stages, mock data, helpers
-├── SetupScreens.tsx           — Welcome + 4-step Setup Wizard (286 lines)
-├── DashboardScreens.tsx       — Dashboard + Analytics (392 lines)
-├── OperationsScreens.tsx      — Table Map + Orders + KDS (423 lines)
-├── ServiceScreens.tsx         — Maitre + Waiter Command Center + Menu + Team (1,479 lines)
-├── RoleScreens.tsx            — Manager + Approvals + Barman + Cook + Stock + Calls + Tips (1,188 lines)
-└── MobileRestaurantScreens.tsx — Mobile-optimized variants of all screens (1,557 lines)
+├── RestaurantDemoShared.tsx    213 lines  Types, RBAC, journeys, mock data, helpers
+├── SetupScreens.tsx            286 lines  Welcome + 4-step Setup Wizard
+├── DashboardScreens.tsx        392 lines  Dashboard + Analytics
+├── OperationsScreens.tsx       423 lines  Table Map + Orders + KDS
+├── ServiceScreens.tsx        1,479 lines  Maitre + Waiter Command Center + Menu + Team
+├── RoleScreens.tsx           1,188 lines  Manager + Approvals + Barman + Cook + Stock + Calls + Tips + Floor + Report
+└── MobileRestaurantScreens.tsx 1,557 lines  Mobile-optimized variants of all screens
+                              ─────────
+                              5,538 lines total (+ ~6,000 lines i18n)
 ```
 
-### Shared Components
+### 11.2 — Shared Components
 
-| Component | Purpose |
-|-----------|---------|
-| `GuidedHint` | Contextual hint bar at top of each screen |
-| `PhoneShell` | Mobile device emulator frame |
-| `MobileSection` | Standardized section with title/subtitle/action |
-| `CompactStat` | Small KPI card with tone coloring |
-| `MobileHint` | Compact hint for mobile screens |
-| `StatusBadge` | Order status pill component |
+| Component | File | Purpose |
+|-----------|------|---------|
+| `GuidedHint` | `DemoShared.tsx` | Contextual hint bar at top of each screen (primary/5 bg, primary text) |
+| `PhoneShell` | `DemoShared.tsx` | Mobile device emulator frame for phone-view screens |
+| `MobileSection` | `MobileRestaurantScreens.tsx` | Standardized section with title, subtitle, optional action |
+| `CompactStat` | `MobileRestaurantScreens.tsx` | Small KPI card with tone-based coloring |
+| `MobileHint` | `MobileRestaurantScreens.tsx` | Compact hint for mobile (primary/5 bg, rounded-2xl) |
+| `StatusBadge` | `DashboardScreens.tsx` | Order status pill with color coding |
 
-### Exported Types
+### 11.3 — Exported Types
 
 ```typescript
-type RestaurantScreen = 'welcome' | 'setup' | 'dashboard' | ... (24 values)
+// Screen navigation
+type RestaurantScreen = 'welcome' | 'setup' | 'dashboard' | 'table-map' | 'orders' |
+  'kds-kitchen' | 'kds-bar' | 'maitre' | 'waiter' | 'menu-editor' | 'team' |
+  'analytics' | 'manager-ops' | 'approvals' | 'barman-station' | 'drink-recipes' |
+  'cook-station' | 'stock' | 'waiter-calls' | 'waiter-tips' |
+  'waiter-table-detail' | 'waiter-payment' | 'waiter-actions' | 'floor-flow' | 'daily-report'
+
+// Staff roles
 type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter'
+
+// Guest orders (waiter module)
 type GuestOrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'cancelled'
-type TableGuest = { id, name, hasApp, paid, method?, orders[] }
-type GuestOrder = { id, item, qty, price, status, sentAt }
+type GuestOrder = { id: string; item: string; qty: number; price: number; status: GuestOrderStatus; sentAt: string }
+type TableGuest = { id: string; name: string; hasApp: boolean; paid: boolean; method?: string; orders: GuestOrder[] }
 ```
 
 ---
 
-## 11. Interactive Actions Catalog
+## 12. Interactive Actions — Complete Catalog
 
-### Global Actions
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Select Role | Welcome | Sets active role, navigates to default screen, updates journey sidebar |
-| Switch Language | Header | Applies i18n translations across all screens |
+### 12.1 — Global Actions (2)
+| # | Action | Screen | Trigger | Effect |
+|---|--------|--------|---------|--------|
+| 1 | Select Role | Welcome | Click role card | Sets active role, loads journey, navigates to default screen |
+| 2 | Switch Language | Header | Language selector | Applies i18n translations across all screens |
 
-### Order Management
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Confirm Order | Orders / KDS | Status: `pending` → `confirmed` |
-| Start Preparation | Orders / KDS | Status: `confirmed` → `preparing` |
-| Mark Ready | Orders / KDS | Status: `preparing` → `ready` |
-| Deliver | Orders | Status: `ready` → `delivered` |
-| Expand Order | Orders | Shows item details with images |
-| Filter by Status | Orders | Filters visible orders |
+### 12.2 — Setup Actions (4)
+| # | Action | Step | Effect |
+|---|--------|------|--------|
+| 3 | Navigate Steps | All | Wizard step progression/regression |
+| 4 | Select Service Type | Step 2 | Highlights card with glow + ring + checkmark |
+| 5 | Toggle Feature | Step 3 | Visual on/off toggle for amenities |
+| 6 | Complete Setup | Step 4 | Shows completion banner, navigates to dashboard |
 
-### Table Management
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Select Table | Table Map | Opens detail panel |
-| Seat Customer | Table Map | Status: `available` → `occupied` |
-| Close Bill | Table Map | Status: `occupied` → `billing` |
-| Release Table | Table Map | Status: `billing` → `available` |
-| Check-in Reservation | Table Map | Status: `reserved` → `occupied` |
+### 12.3 — Table Management (5)
+| # | Action | Screen | Trigger | State Change |
+|---|--------|--------|---------|-------------|
+| 7 | Select Table | Table Map | Click table node | Opens detail panel |
+| 8 | Seat Customer | Table Map (available) | Button click | available → occupied |
+| 9 | Close Bill | Table Map (occupied) | Button click | occupied → billing |
+| 10 | Release Table | Table Map (billing) | Button click | billing → available |
+| 11 | Check-in Reservation | Table Map (reserved) | Button click | reserved → occupied |
 
-### Waiter Actions
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Dismiss Live Feed Item | Waiter/Live | Removes from feed, navigates to relevant tab |
-| Select Table | Waiter/Tables | Opens table detail with 4 sub-tabs |
-| Add Guest Without App | Waiter/Guests | Creates new guest entry |
-| Place Order for Guest | Waiter/Menu | Adds items to pending order → sends to kitchen |
-| Send to Kitchen | Waiter/Menu | Creates sent order records, shows toast, switches to Orders tab |
-| Cancel Order | Waiter/Orders | Moves order to cancelled list |
-| Edit Quantity | Waiter/Orders | Opens edit modal for order item |
-| Pick Up Dish | Waiter/Kitchen | Marks kitchen item as picked up |
-| Charge Guest (TAP/NFC) | Waiter/Charge | Simulates NFC payment flow |
-| Charge Guest (PIX) | Waiter/Charge | Shows QR code simulation |
-| Charge Guest (Card/Cash) | Waiter/Charge | Simulates payment processing |
+### 12.4 — Order Management (7)
+| # | Action | Screen | Trigger | State Change |
+|---|--------|--------|---------|-------------|
+| 12 | Filter Orders | Orders | Click filter pill | Filters visible orders by status |
+| 13 | Expand Order | Orders | Click "..." | Reveals full item list with images |
+| 14 | Confirm Order | Orders/KDS | Click button | pending → confirmed |
+| 15 | Start Preparation | Orders/KDS | Click button | confirmed → preparing |
+| 16 | Mark Ready | Orders/KDS | Click button | preparing → ready |
+| 17 | Deliver Order | Orders | Click button | ready → delivered |
+| 18 | Collapse Order | Orders | Click "..." again | Hides expanded detail |
 
-### Approval Actions
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Approve Request | Approvals | Marks as processed with ✅ |
-| Reject Request | Approvals | Marks as processed with ❌ |
+### 12.5 — KDS Actions (2)
+| # | Action | Screen | Effect |
+|---|--------|--------|--------|
+| 19 | Start Prep (KDS) | KDS Kitchen/Bar | confirmed → preparing, button changes |
+| 20 | Mark Ready (KDS) | KDS Kitchen/Bar | preparing → ready, ticket moves to "Prontos" |
 
-### Setup Actions
-| Action | Screen | Effect |
-|--------|--------|--------|
-| Navigate Steps (1-4) | Setup | Advances/retreats through wizard |
-| Select Service Type | Setup | Highlights selected type with feature count |
-| Toggle Features | Setup | Enables/disables restaurant amenities |
-| Complete Setup | Setup | Shows success state, navigates to dashboard |
+### 12.6 — Approval Actions (2)
+| # | Action | Screen | Effect |
+|---|--------|--------|--------|
+| 21 | Approve Request | Approvals | Card fades, "✅ Processado" shown |
+| 22 | Reject Request | Approvals | Card fades, "✅ Processado" shown |
+
+### 12.7 — Waiter Command Center Actions (28)
+| # | Action | Tab/Sub | Trigger | Effect |
+|---|--------|---------|---------|--------|
+| 23 | Switch Tab | — | Click tab pill | Resets sub-navigation state |
+| 24 | Dismiss Feed Item | Live | Click action button | Removes from feed, navigates to relevant tab |
+| 25 | View Kitchen | Live | Click "Ver" on banner | Switches to Kitchen tab |
+| 26 | Select Table | Tables | Click table card | Opens table detail view |
+| 27 | Back to Tables | Tables/Detail | Click "← Todas as mesas" | Returns to table list |
+| 28 | Switch Sub-tab | Tables/Detail | Click Pessoas/Pedidos/Cardápio/Cobrar | Changes detail view |
+| 29 | Add Guest | Tables/Guests | Click "+" button | Opens name input form |
+| 30 | Confirm Guest | Tables/Guests | Click "Confirmar" | Creates guest entry with "!" badge |
+| 31 | Cancel Add Guest | Tables/Guests | Click "Cancelar" | Closes input form |
+| 32 | Open Menu for Guest | Tables/Guests | Click "+ Pedir" | Switches to Menu tab with guest pre-selected |
+| 33 | Open Charge for Guest | Tables/Guests | Click "Cobrar" | Switches to Charge tab for that guest |
+| 34 | Switch Menu Category | Tables/Menu | Click category pill | Filters menu items |
+| 35 | Add Item to Cart | Tables/Menu | Click "+ Adicionar" | Adds to pending order |
+| 36 | Increment Item | Tables/Menu | Click "+" button | Increases quantity |
+| 37 | Decrement Item | Tables/Menu | Click "−" button | Decreases qty or removes |
+| 38 | Send to Kitchen | Tables/Menu | Click "🔥 Enviar para Cozinha" | Creates sent orders, toast, switches to Orders |
+| 39 | Serve Dish | Tables/Orders | Click "Servir" (ready) | Marks as served |
+| 40 | Edit Order | Tables/Orders | Click pencil icon | Expands edit options |
+| 41 | Cancel Order | Tables/Orders | Click X icon | Adds to cancelled list |
+| 42 | Pick Up Dish | Kitchen | Click "Retirar ✓" | Moves to served section |
+| 43 | Select Payment Guest | Charge | Click "Cobrar" on guest | Opens method selection |
+| 44 | Select Payment Method | Charge/Method | Click method card | Starts processing animation |
+| 45 | Confirm Payment | Charge/Processing | Click "Confirmar Pagamento" | Shows success screen |
+| 46 | Print Receipt | Charge/Done | Click "Imprimir recibo" | (UI-only action) |
+| 47 | Next Payment | Charge/Done | Click "Próximo →" | Resets to guest selection |
+| 48 | Change Method | Charge/Processing | Click "Trocar método" | Returns to method selection |
+| 49 | Back from Method | Charge/Method | Click "← Voltar" | Returns to guest list |
+| 50 | Switch Guest Order | Tables/Menu | Click "trocar" | Clears guest selection |
+
+### 12.8 — Other Waiter Screens (3)
+| # | Action | Screen | Effect |
+|---|--------|--------|--------|
+| 51 | Attend Call | Waiter Calls | Marks call as attended, shows "✅ Atendido" |
+| 52 | Expand Situation | Waiter Actions | Reveals sub-action buttons |
+| 53 | Resolve Situation | Waiter Actions | Removes from active list, increments resolved count |
+
+### 12.9 — Maitre/Floor Actions (3)
+| # | Action | Screen | Effect |
+|---|--------|--------|--------|
+| 54 | Expand Reservation | Maitre | Shows Check-in/Edit/Cancel buttons |
+| 55 | Check-in Guest | Maitre | Status transition (UI-only) |
+| 56 | Call Queue Guest | Floor Flow | "Chamar" button (UI-only) |
+
+### 12.10 — Menu & Team Actions (4)
+| # | Action | Screen | Effect |
+|---|--------|--------|--------|
+| 57 | Filter Menu Category | Menu Editor | Filters visible items |
+| 58 | Edit Menu Item | Menu Editor | Opens inline edit panel with fields |
+| 59 | Select Drink Recipe | Drink Recipes | Shows detailed recipe view |
+| 60 | Filter Stock | Stock | Filters by OK/Low/Critical |
 
 ---
 
-## 12. Service Type Differentiation
+## 13. Service Type Differentiation — 11 Types
 
-The Setup Wizard offers 11 service types, each unlocking a distinct feature set:
-
-| # | Service Type | Key Feature | Feature Count |
-|---|-------------|-------------|:------------:|
-| 1 | Fine Dining | AI Harmonization + Unified Bill | 26 |
-| 2 | Casual Dining | Smart Waitlist + Family Mode | 22 |
-| 3 | Fast Casual | Dish Builder + Allergen Tracking | 18 |
-| 4 | Café / Bakery | Work Mode (Wi-Fi/outlets) + Refill Logic | 16 |
-| 5 | Pub & Bar | Digital Tab Pre-auth + Round Builder | 20 |
-| 6 | Buffet | Smart Scale (NFC) | 14 |
-| 7 | Drive-Thru | Geofencing GPS (500m triggers) | 12 |
-| 8 | Food Truck | Real-time Map + Virtual Queue | 14 |
-| 9 | Chef's Table | Course-by-course Tasting Menu + Sommelier Notes | 24 |
-| 10 | Quick Service | Skip the Line + 4-stage Tracking | 15 |
-| 11 | Club & Balada | Animated QR Tickets + VIP Map + Minimum Spend Tracker | 22 |
+| # | Service Type | Key Differentiator | Feature Count | Anchor Features |
+|---|-------------|-------------------|:------------:|-----------------|
+| 1 | **Fine Dining** | AI-powered wine/food harmonization | 26 | Harmonização IA, Split por Item, Menu Degustação |
+| 2 | **Casual Dining** | Smart waitlist with pre-ordering | 22 | Smart Waitlist, Modo Família, Kids Priority |
+| 3 | **Fast Casual** | Build-your-own dish builder | 18 | Montador de Pratos, Acompanhamento Nutricional, Alérgenos |
+| 4 | **Café / Bakery** | Work Mode (Wi-Fi/outlet management) | 16 | Work Mode, Lógica de Refill, Timer de Permanência |
+| 5 | **Pub & Bar** | Digital tab pre-authorization | 20 | Pré-auth Comanda, Comandas de Grupo, Round Builder |
+| 6 | **Buffet** | Smart scale integration via NFC | 14 | Balança Inteligente NFC, Peso → Preço Automático |
+| 7 | **Drive-Thru** | Geofencing GPS triggers at 500m | 12 | GPS Geofencing, Pedido Antecipado, ETA Tracking |
+| 8 | **Food Truck** | Real-time location map | 14 | Mapa em Tempo Real, Fila Virtual, Push Notifications |
+| 9 | **Chef's Table** | Course-by-course tasting menu | 24 | Menu Degustação Step-by-Step, Notas do Sommelier |
+| 10 | **Quick Service** | Skip the Line fast checkout | 15 | Skip the Line, Acompanhamento 4 Estágios |
+| 11 | **Club & Balada** | Animated QR tickets + VIP mapping | 22 | QR Animado, Mapa VIP, Consumo Mínimo Tracker |
 
 ---
 
-## 13. Design System Integration
+## 14. Design System & Visual Language
 
-### Color Tokens (Semantic)
+### 14.1 — Semantic Color Tokens
 
-All components use Tailwind semantic tokens from `index.css`:
+All components use Tailwind semantic tokens defined in `index.css`:
 
-| Token | Usage |
+| Token | Usage Examples |
+|-------|---------------|
+| `primary` | CTAs, selected states, main accent, table badges, revenue |
+| `secondary` | Alternate accent, weekly charts, discount badges |
+| `destructive` | Errors, late orders (>15min), critical alerts, cancellations |
+| `success` | Available tables, payments confirmed, completed actions, tips |
+| `warning` | Urgency indicators, low stock, queue, preparing status |
+| `info` | Reservations, confirmed status, billing, app-user badges |
+| `muted` | Backgrounds, disabled states, inactive elements |
+| `accent` | Barman color, header gradients, decorative elements |
+
+### 14.2 — Typography Scale
+
+| Class | Usage |
 |-------|-------|
-| `primary` | CTAs, selected states, main accent |
-| `secondary` | Alternate accent, charts |
-| `destructive` | Errors, late orders, critical alerts |
-| `success` | Available tables, completed actions, payments |
-| `warning` | Urgency, low stock, queue |
-| `info` | Reservations, confirmed status, billing |
-| `muted` | Backgrounds, disabled states |
+| `text-[7px]` | Micro badges (PRATO, S/APP, IMEDIATO) |
+| `text-[8px]` | Sub-labels, timestamps in compact views |
+| `text-[9px]` | Secondary info in mobile views |
+| `text-[10px]` | Status labels, small descriptions |
+| `text-[11px]` | Compact card text, mobile item names |
+| `text-xs` | Standard small text, descriptions |
+| `text-sm` | Body text, names, prices |
+| `text-base` | Waiter header name |
+| `text-lg` | Table numbers, section titles |
+| `text-xl` / `text-2xl` | KPI values, approval amounts |
+| `text-3xl` | Large stat displays |
+| `text-5xl` | Hero KPIs (satisfaction, returning customers) |
 
-### Typography
+### 14.3 — Animation Patterns
 
-- `font-display` — Headings, numbers, KPIs
-- `font-semibold` / `font-bold` — Labels, emphasis
-- Size scale: `text-[7px]` (micro badges) → `text-5xl` (hero KPIs)
+| Pattern | CSS Class | Usage |
+|---------|-----------|-------|
+| Pulse | `animate-pulse` | Urgent alerts, ready dishes, critical badges, NFC waiting |
+| Bounce | `animate-bounce` | Late order alert icon (AlertCircle) |
+| Ping | `animate-ping` | NFC processing circles, notification dots |
+| Slide In | `animate-in slide-in-from-top-2` | Toast notifications |
+| Scale Hover | `hover:scale-[1.02]` | Role selection cards |
+| Scale 110 | `hover:scale-110` | Table map nodes |
+| Shadow Glow | `shadow-glow` | Primary CTAs, active filter pills |
+| Transition All | `transition-all` | Tab switches, card selections, button hovers |
 
-### Animation Patterns
+### 14.4 — Card & Container Patterns
 
 | Pattern | Usage |
 |---------|-------|
-| `animate-pulse` | Urgent alerts, ready dishes, critical badges |
-| `animate-bounce` | Late order alert icon |
-| `animate-in slide-in-from-top-2` | Toast notifications |
-| `transition-all` | Tab switches, button hovers, card selections |
-| `hover:scale-[1.02]` | Role selection cards |
-| `hover:scale-110` | Table map nodes |
-| `shadow-glow` | Primary CTAs, active filters |
+| `rounded-2xl border border-border bg-card` | Standard content card |
+| `rounded-xl border-2 border-primary/30 bg-primary/5` | Selected/highlighted card |
+| `rounded-xl border-2 border-destructive/30 bg-destructive/5 animate-pulse` | Critical alert card |
+| `rounded-xl border-2 border-dashed border-primary/20` | Add/create action card |
+| `bg-gradient-to-br from-primary/10 via-secondary/5 to-accent/10` | Hero/summary cards |
+| `bg-gradient-to-r from-primary via-primary/90 to-accent` | Waiter header bar |
 
 ---
 
-## 14. File Map
+## 15. State Management & Simulation Engine
 
-| File | Lines | Purpose | Key Exports |
-|------|------:|---------|-------------|
-| `RestaurantDemoShared.tsx` | 213 | Types, RBAC, journeys, mock data | `ROLE_CONFIG`, `ROLE_JOURNEYS`, `SCREEN_INFO`, `TEAM_MEMBERS`, `STOCK_ITEMS`, `DRINK_RECIPES`, `PENDING_APPROVALS`, `TABLE_POSITIONS` |
-| `SetupScreens.tsx` | 286 | Welcome + Setup Wizard | `WelcomeScreen`, `SetupScreen` |
-| `DashboardScreens.tsx` | 392 | Dashboard + Analytics | `DashboardScreen`, `AnalyticsScreen` |
-| `OperationsScreens.tsx` | 423 | Table Map + Orders + KDS | `TableMapScreen`, `OrdersScreen`, `KDSScreen` |
-| `ServiceScreens.tsx` | 1,479 | Maitre + Waiter + Menu + Team | `MaitreScreen`, `WaiterScreen`, `MenuEditorScreen`, `TeamScreen`, `TABLE_GUESTS_DATA`, `KITCHEN_PIPELINE`, `LIVE_FEED`, `WAITER_MENU` |
-| `RoleScreens.tsx` | 1,188 | Manager + Barman + Cook + Stock | `ManagerOpsScreen`, `ApprovalsScreen`, `BarmanStationScreen`, `DrinkRecipesScreen`, `CookStationScreen`, `StockScreen`, `WaiterCallsScreen`, `WaiterTipsScreen` |
-| `MobileRestaurantScreens.tsx` | 1,557 | Mobile-optimized variants | `MobileDashboard`, `MobileOwner`, `MobileManager`, `MobileWaiter`, etc. |
-| `DemoI18n.tsx` | ~6,000+ | Translation engine (PT/EN/ES) | `useDemoI18n()` |
+### 15.1 — DemoContext Provider
 
-**Total**: ~5,538 lines of restaurant demo code + ~6,000 lines of translations
+The `DemoContext` (from `@/contexts/DemoContext`) wraps all demo pages and provides:
+
+```typescript
+interface DemoContextValue {
+  // Data
+  orders: DemoOrder[]
+  tables: DemoTable[]
+  reservations: DemoReservation[]
+  analytics: DemoAnalytics
+  notifications: DemoNotification[]
+  menu: DemoMenuItem[]
+  unreadNotifications: number
+
+  // Mutations
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void
+  updateTableStatus: (tableId: string, status: TableStatus) => void
+}
+```
+
+### 15.2 — Order Status Pipeline
+
+```
+pending → confirmed → preparing → ready → delivered → paid
+```
+
+Each transition can be triggered by:
+- Manual action (button click in Orders, KDS, or Waiter screens)
+- Simulation engine (automatic advancement at intervals)
+
+### 15.3 — Table Status Machine
+
+```
+available ⇄ occupied → billing → available
+reserved → occupied
+```
+
+### 15.4 — Local State (Waiter Module)
+
+The Waiter Command Center maintains extensive local state that is **not** persisted to DemoContext:
+- Added guests (via "Add guest without app")
+- Sent orders (via "Send to Kitchen")
+- Cancelled orders
+- Live feed dismissals
+- Kitchen pickup tracking
+- Payment flow progression
+
+This design allows the waiter module to demonstrate complex workflows without side effects on the global simulation state.
 
 ---
 
-> **NOOWE Platform** — Built with React, TypeScript, Tailwind CSS, Vite  
-> **Documentation Standard**: v3.1 · International bilingual (EN/PT) · Big Tech-level  
+> **NOOWE Platform** — Built with React 18, TypeScript, Tailwind CSS, Vite  
+> **Documentation Standard**: v4.0 · International · Big Tech-level  
+> **Total Lines of Code**: ~11,538 (demo + i18n)  
 > **Maintainer**: NOOWE Engineering Team
