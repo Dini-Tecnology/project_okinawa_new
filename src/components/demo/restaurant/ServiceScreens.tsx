@@ -239,7 +239,7 @@ export const TABLE_GUESTS_DATA: Record<number, TableGuest[]> = {
 export const getTableGuests = (tableNum: number): TableGuest[] => TABLE_GUESTS_DATA[tableNum] || [];
 
 // Simple menu categories for ordering flow
-const WAITER_MENU = [
+export const WAITER_MENU = [
   { cat: 'Entradas', items: [
     { id: 'm1', name: 'Tartare de Atum', price: 58, time: '8min' },
     { id: 'm2', name: 'Burrata com Presunto', price: 52, time: '5min' },
