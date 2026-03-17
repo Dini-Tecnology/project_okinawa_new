@@ -16,12 +16,14 @@ export type RestaurantScreen =
   | 'welcome' | 'setup' | 'dashboard' | 'table-map'
   | 'orders' | 'kds-kitchen' | 'kds-bar'
   | 'maitre' | 'waiter' | 'menu-editor' | 'team' | 'analytics'
-  // New role-specific screens
   | 'manager-ops' | 'approvals' | 'barman-station' | 'drink-recipes'
   | 'cook-station' | 'stock' | 'waiter-calls' | 'waiter-tips'
   | 'floor-flow' | 'daily-report'
-  // Enhanced waiter screens
-  | 'waiter-table-detail' | 'waiter-payment' | 'waiter-actions';
+  | 'waiter-table-detail' | 'waiter-payment' | 'waiter-actions'
+  // Configuration Hub screens
+  | 'config-hub' | 'config-profile' | 'config-service-types' | 'config-experience'
+  | 'config-floor' | 'config-menu' | 'config-team' | 'config-kitchen'
+  | 'config-payments' | 'config-features';
 
 export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
