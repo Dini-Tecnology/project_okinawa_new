@@ -170,7 +170,7 @@ export const KITCHEN_PIPELINE = [
   { id: 'k5', dish: 'Tiramisu', qty: 2, table: 1, chef: 'Cozinheiro Thiago', status: 'preparing' as const, readyAgo: 0, sla: 15, elapsed: 5 },
 ];
 
-const LIVE_FEED = [
+export const LIVE_FEED = [
   { id: 'lf1', time: 'agora', table: 5, event: 'Prato pronto para retirar', detail: '2x Filé ao Molho de Vinho — Chef Felipe', type: 'kitchen_ready' as const, urgency: 'critical' as const },
   { id: 'lf2', time: '1min', table: 10, event: 'Sobremesa pronta', detail: '1x Petit Gâteau — Cozinheiro Thiago', type: 'kitchen_ready' as const, urgency: 'critical' as const },
   { id: 'lf3', time: '2min', table: 3, event: 'Cliente chamou o garçom', detail: 'Convidado 3 sem app quer fazer pedido', type: 'call' as const, urgency: 'high' as const },
