@@ -70,7 +70,7 @@ export const ROLE_JOURNEYS: Record<StaffRole, RoleJourneyStage[]> = {
     { screen: 'analytics', label: 'Analytics', icon: TrendingUp, desc: 'Relatórios e tendências' },
     { screen: 'team', label: 'Equipe', icon: Users, desc: 'Gestão de colaboradores' },
     { screen: 'menu-editor', label: 'Cardápio', icon: BookOpen, desc: 'Editor de cardápio' },
-    { screen: 'setup', label: 'Configuração', icon: Settings, desc: 'Perfil e configurações' },
+    { screen: 'config-hub', label: 'Central de Config', icon: Settings, desc: 'Hub de configuração completo' },
   ],
   manager: [
     { screen: 'manager-ops', label: 'Painel Operacional', icon: BarChart3, desc: 'Visão operacional em tempo real' },
