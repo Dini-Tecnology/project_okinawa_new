@@ -1,24 +1,27 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface NooweLogoProps {
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  variant?: 'dark' | 'light';
 }
 
 const sizes = {
-  sm: { h: 28, font: 16 },
-  md: { h: 36, font: 22 },
-  lg: { h: 48, font: 30 },
+  sm: { font: 18, markH: 15 },
+  md: { font: 24, markH: 20 },
+  lg: { font: 34, markH: 28 },
 };
 
-const NooweLogo: React.FC<NooweLogoProps> = ({ size = 'md', className = '' }) => {
-  const { font } = sizes[size];
-  const markH = font * 0.85;
+const NooweLogo = forwardRef<HTMLSpanElement, NooweLogoProps>(({ size = 'md', className = '', variant = 'dark' }, ref) => {
+  const { font, markH } = sizes[size];
   const cx = markH / 2;
-  const r = markH * 0.42;
+  const r = markH * 0.40;
+  const offset = r * 0.38;
+  const sw = r * 0.24;
+  const textColor = variant === 'light' ? 'text-white' : 'text-foreground';
 
   return (
-    <span className={`inline-flex items-center gap-0.5 ${className}`}>
+    <span ref={ref} className={`inline-flex items-center select-none ${className}`} style={{ gap: 1 }}>
       <span
         style={{
           fontFamily: "'Space Grotesk', sans-serif",
@@ -27,40 +30,42 @@ const NooweLogo: React.FC<NooweLogoProps> = ({ size = 'md', className = '' }) =>
           letterSpacing: '-0.03em',
           lineHeight: 1,
         }}
-        className="text-noowe-t1"
+        className={textColor}
       >
         n
       </span>
       <svg
-        width={markH}
+        width={markH * 1.1}
         height={markH}
-        viewBox={`0 0 ${markH} ${markH}`}
+        viewBox={`0 0 ${markH * 1.1} ${markH}`}
         className="flex-shrink-0"
-        style={{ margin: '0 -1px' }}
+        style={{ margin: '0 -1px', position: 'relative', top: 1 }}
+        aria-hidden="true"
       >
         <defs>
-          <linearGradient id="noowe-oo-grad" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id={`noowe-grad-${size}`} x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stopColor="#FF5E3A" />
             <stop offset="100%" stopColor="#0D4F4F" />
           </linearGradient>
         </defs>
-        <circle cx={cx - r * 0.35} cy={cx} r={r} fill="none" stroke="url(#noowe-oo-grad)" strokeWidth={r * 0.22} />
-        <circle cx={cx + r * 0.35} cy={cx} r={r} fill="none" stroke="url(#noowe-oo-grad)" strokeWidth={r * 0.22} />
+        <circle cx={cx - offset + markH * 0.05} cy={cx} r={r} fill="none" stroke={`url(#noowe-grad-${size})`} strokeWidth={sw} />
+        <circle cx={cx + offset + markH * 0.05} cy={cx} r={r} fill="none" stroke={`url(#noowe-grad-${size})`} strokeWidth={sw} />
       </svg>
       <span
         style={{
           fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: font * 1.0,
+          fontSize: font,
           fontWeight: 500,
           letterSpacing: '-0.03em',
           lineHeight: 1,
         }}
-        className="text-noowe-t1"
+        className={textColor}
       >
         we
       </span>
     </span>
   );
-};
+});
 
+NooweLogo.displayName = 'NooweLogo';
 export default NooweLogo;
