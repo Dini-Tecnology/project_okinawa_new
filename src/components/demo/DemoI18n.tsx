@@ -5826,19 +5826,12 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Cozinheiro Thiago': 'Cocinero Thiago',
     'Cozinheiro Ana': 'Cocinera Ana',
     'Principais': 'Principales',
-    'Pedidos Ativos': 'Pedidos Activos',
-    'Ticket Médio': 'Ticket Promedio',
-    'Atalhos para o que importa agora': 'Atajos a lo que importa ahora',
     'Top itens e pico': 'Top ítems y pico',
-    'Pedidos recentes': 'Pedidos recientes',
     'Resumo executivo otimizado para leitura rápida no celular.': 'Resumen ejecutivo optimizado para lectura rápida en el celular.',
     'No mobile, o mapa vira uma grade operacional rápida para seleção e ação.': 'En el móvil, el mapa se convierte en una grilla operativa rápida para selección y acción.',
     'Sem cliente no momento': 'Sin cliente en este momento',
     'Sentar cliente': 'Sentar cliente',
-    'Iniciar preparo': 'Iniciar preparación',
     'Top vendidos': 'Más vendidos',
-    'Reservas confirmadas': 'Reservas confirmadas',
-    'Recorrência': 'Recurrencia',
 
 
 
