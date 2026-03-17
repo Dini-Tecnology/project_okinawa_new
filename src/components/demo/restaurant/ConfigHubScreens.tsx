@@ -807,7 +807,7 @@ export const ConfigFloor: React.FC<{ onNavigate: (screen: string) => void }> = (
   const [showAddZone, setShowAddZone] = useState(false);
   const [editingTable, setEditingTable] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; type: 'table' | 'zone' } | null>(null);
-  const [newTable, setNewTable] = useState({ seats: '4', zone: 'z1', shape: 'rect' as const });
+  const [newTable, setNewTable] = useState<{ seats: string; zone: string; shape: 'round' | 'rect' | 'long' }>({ seats: '4', zone: 'z1', shape: 'rect' });
   const [newZone, setNewZone] = useState({ name: '' });
   const [editTableData, setEditTableData] = useState({ seats: '', zone: '', shape: '' });
 
