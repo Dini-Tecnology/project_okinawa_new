@@ -54,9 +54,9 @@ const translations: Record<string, Record<Lang, string>> = {
     es: 'Tu restaurante usa 5 sistemas que no se hablan. Y tú pagas el precio.',
   },
   'problem.body': {
-    pt: 'Um app pro pedido, outro pra cozinha, planilha pro estoque, WhatsApp pra escala, caderno pro caixa. Cada um faz o seu — mas ninguém faz o todo. NOOWE nasceu pra resolver isso: uma plataforma, uma verdade, um ritmo.',
-    en: 'One app for orders, another for kitchen, spreadsheet for inventory, WhatsApp for scheduling, notebook for the register. Each does its part — but nobody does the whole. NOOWE was born to fix this: one platform, one truth, one rhythm.',
-    es: 'Una app para pedidos, otra para cocina, planilla para inventario, WhatsApp para turnos, cuaderno para la caja. Cada uno hace lo suyo — pero nadie hace el todo. NOOWE nació para resolver esto: una plataforma, una verdad, un ritmo.',
+    pt: 'Um sistema pro pedido. Outro pra cozinha. Planilha pro estoque. WhatsApp pra escala. Caderno pro caixa. Cada ferramenta resolve uma parte — nenhuma resolve o todo. A NOOWE nasceu pra isso: uma plataforma única, uma só verdade operacional, um ritmo só.',
+    en: 'One system for orders. Another for the kitchen. A spreadsheet for inventory. WhatsApp for scheduling. A notebook for the register. Each tool solves a piece — none solves the whole. NOOWE was born for this: one platform, one operational truth, one rhythm.',
+    es: 'Un sistema para pedidos. Otro para cocina. Planilla para inventario. WhatsApp para turnos. Cuaderno para la caja. Cada herramienta resuelve una parte — ninguna resuelve el todo. NOOWE nació para eso: una plataforma única, una sola verdad operacional, un solo ritmo.',
   },
 
   // Services
