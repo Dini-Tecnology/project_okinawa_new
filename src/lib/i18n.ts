@@ -92,9 +92,9 @@ const translations: Record<string, Record<Lang, string>> = {
     es: 'Mira NOOWE funcionando con tu tipo de restaurante. Rápido, sin compromiso y sin tarjeta.',
   },
   'cta.note': {
-    pt: 'Acesso gratuito. Sem cartão de crédito. Sem vendedor.',
-    en: 'Free access. No credit card. No salesperson.',
-    es: 'Acceso gratuito. Sin tarjeta. Sin vendedor.',
+    pt: 'Acesso gratuito, instantâneo e rápido — como seu negócio.',
+    en: 'Free, instant and fast access — just like your business.',
+    es: 'Acceso gratuito, instantáneo y rápido — como tu negocio.',
   },
 
   // Footer
