@@ -159,8 +159,8 @@ export const MaitreScreen: React.FC<{ onNavigate: (screen: string) => void }> = 
 // ============ WAITER VIEW (Phone Shell) — Command Center Redesign ============
 
 export type GuestOrderStatus = 'pending' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'cancelled';
-type GuestOrder = { id: string; item: string; qty: number; price: number; status: GuestOrderStatus; sentAt: string };
-type TableGuest = { id: string; name: string; hasApp: boolean; paid: boolean; method?: string; orders: GuestOrder[] };
+export type GuestOrder = { id: string; item: string; qty: number; price: number; status: GuestOrderStatus; sentAt: string };
+export type TableGuest = { id: string; name: string; hasApp: boolean; paid: boolean; method?: string; orders: GuestOrder[] };
 
 const KITCHEN_PIPELINE = [
   { id: 'k1', dish: 'Filé ao Molho de Vinho', qty: 2, table: 5, chef: 'Chef Felipe', status: 'ready' as const, readyAgo: 3, sla: 20, elapsed: 22 },
