@@ -14,7 +14,6 @@ const SiteAccess: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  // Prefill from URL param
   useEffect(() => {
     const urlCode = searchParams.get('code');
     if (urlCode && urlCode.length === 6) {
@@ -24,9 +23,7 @@ const SiteAccess: React.FC = () => {
   }, []);
 
   const validateCode = (digits: string[]) => {
-    const joined = digits.join('');
-    if (joined.length === 6) {
-      // For demo: accept any 6 digits
+    if (digits.join('').length === 6) {
       setSuccess(true);
       setTimeout(() => navigate('/demo'), 800);
     }
@@ -35,8 +32,6 @@ const SiteAccess: React.FC = () => {
   const handleInput = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
     const newCode = [...code];
-    
-    // Handle paste
     if (value.length > 1) {
       const digits = value.replace(/\D/g, '').slice(0, 6).split('');
       digits.forEach((d, i) => { if (i < 6) newCode[i] = d; });
@@ -47,18 +42,11 @@ const SiteAccess: React.FC = () => {
       if (digits.length === 6) validateCode(newCode);
       return;
     }
-
     newCode[index] = value;
     setCode(newCode);
     setError(false);
-
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-
-    if (newCode.every((d) => d !== '')) {
-      validateCode(newCode);
-    }
+    if (value && index < 5) inputRefs.current[index + 1]?.focus();
+    if (newCode.every((d) => d !== '')) validateCode(newCode);
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
@@ -68,15 +56,15 @@ const SiteAccess: React.FC = () => {
   };
 
   return (
-    <div className="bg-noowe-bg text-noowe-t1 font-noowe min-h-screen flex flex-col">
+    <div className="bg-background text-foreground min-h-screen flex flex-col">
       <SiteNavbar />
 
       <div className="flex-1 flex items-center justify-center px-5">
         <div className={`text-center max-w-md ${shake ? 'animate-[shake_0.5s_ease-in-out]' : ''}`}>
           <NooweLogo size="md" className="justify-center mb-10" />
-          
-          <h1 className="font-bold text-2xl mb-2">{t('access.title')}</h1>
-          <p className="text-noowe-t2 text-sm mb-10">{t('access.sub')}</p>
+
+          <h1 className="font-bold text-2xl mb-2 text-foreground">{t('access.title')}</h1>
+          <p className="text-muted-foreground text-sm mb-10">{t('access.sub')}</p>
 
           <div className="flex justify-center gap-3 mb-8">
             {code.map((digit, i) => (
@@ -89,14 +77,14 @@ const SiteAccess: React.FC = () => {
                 value={digit}
                 onChange={(e) => handleInput(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className={`w-12 h-14 text-center text-xl font-bold rounded-xl border bg-noowe-bg3 text-noowe-t1 focus:outline-none transition-all ${
-                  success ? 'border-noowe-green' : error ? 'border-noowe-red' : 'border-white/[0.06] focus:border-noowe-blue'
+                className={`w-12 h-14 text-center text-xl font-bold rounded-xl border bg-card text-foreground focus:outline-none transition-all ${
+                  success ? 'border-success' : error ? 'border-destructive' : 'border-border focus:border-primary'
                 }`}
               />
             ))}
           </div>
 
-          <a href="/request-demo" className="text-noowe-blue text-sm hover:underline">
+          <a href="/request-demo" className="text-primary text-sm hover:underline">
             {t('access.request_new')}
           </a>
         </div>

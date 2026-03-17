@@ -13,23 +13,13 @@ const SiteFooter: React.FC = () => {
         { label: t('footer.overview'), to: '/platform' },
         { label: t('footer.service_types'), to: '/platform#services' },
         { label: t('footer.roles'), to: '/platform#roles' },
-        { label: t('footer.features'), to: '/platform#features' },
       ],
     },
     {
       title: t('footer.company'),
       links: [
-        { label: t('footer.about'), to: '/about' },
+        { label: t('footer.about'), to: '#' },
         { label: t('footer.careers'), to: '#' },
-        { label: t('footer.press'), to: '#' },
-      ],
-    },
-    {
-      title: t('footer.resources'),
-      links: [
-        { label: t('footer.blog'), to: '#' },
-        { label: t('footer.docs'), to: '#' },
-        { label: t('footer.help'), to: '#' },
       ],
     },
     {
@@ -42,29 +32,25 @@ const SiteFooter: React.FC = () => {
   ];
 
   return (
-    <footer className="bg-noowe-bg2 border-t border-noowe-border py-16">
-      <div className="max-w-[980px] mx-auto px-5">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
-          {/* Logo column */}
+    <footer className="border-t border-border py-16 bg-card/50">
+      <div className="max-w-[1080px] mx-auto px-5">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <NooweLogo size="sm" />
-            <p className="text-noowe-t4 text-[12px] mt-4 leading-relaxed">
+            <p className="text-muted-foreground text-xs mt-3 leading-relaxed max-w-[200px]">
               The Operating System for Restaurants
             </p>
           </div>
 
           {cols.map((col) => (
             <div key={col.title}>
-              <h4 className="text-noowe-t2 text-[12px] font-semibold uppercase tracking-wider mb-4">
+              <h4 className="text-foreground text-xs font-semibold uppercase tracking-wider mb-4">
                 {col.title}
               </h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link
-                      to={link.to}
-                      className="text-noowe-t3 text-[12px] hover:text-noowe-t2 transition-colors"
-                    >
+                    <Link to={link.to} className="text-muted-foreground text-sm hover:text-foreground transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -74,8 +60,8 @@ const SiteFooter: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-12 pt-6 border-t border-noowe-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-noowe-t4 text-[11px]">
+        <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
+          <p className="text-muted-foreground text-xs">
             © {new Date().getFullYear()} NOOWE. {t('footer.rights')}
           </p>
         </div>
