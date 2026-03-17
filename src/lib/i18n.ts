@@ -23,40 +23,40 @@ const translations: Record<string, Record<Lang, string>> = {
   // Value Props
   'value.ops.title': { pt: 'Operação sem retrabalho', en: 'Operations without rework', es: 'Operación sin retrabajo' },
   'value.ops.desc': {
-    pt: 'Pedido saiu errado? Comanda perdida? Conta que não fecha? Isso não existe mais. Tudo flui do salão pra cozinha e volta sem ruído.',
-    en: 'Wrong order? Lost ticket? Bill that doesn\'t add up? That\'s over. Everything flows from floor to kitchen and back without friction.',
-    es: '¿Pedido equivocado? ¿Comanda perdida? ¿Cuenta que no cuadra? Eso ya no existe. Todo fluye del salón a la cocina y vuelve sin fricción.',
+    pt: 'Nada se perde. Nada se repete. Do pedido ao fechamento da conta, tudo acontece no fluxo certo — automaticamente.',
+    en: 'Nothing is lost. Nothing repeats. From order to bill closure, everything flows in the right sequence — automatically.',
+    es: 'Nada se pierde. Nada se repite. Del pedido al cierre de cuenta, todo ocurre en el flujo correcto — automáticamente.',
   },
   'value.kitchen.title': { pt: 'Cozinha no controle', en: 'Kitchen in control', es: 'Cocina bajo control' },
   'value.kitchen.desc': {
-    pt: 'Seu cozinheiro sabe exatamente o que preparar, em que ordem, pra qual mesa. Sem gritos, sem confusão, sem atraso.',
-    en: 'Your cook knows exactly what to prepare, in what order, for which table. No shouting, no confusion, no delays.',
-    es: 'Tu cocinero sabe exactamente qué preparar, en qué orden, para cuál mesa. Sin gritos, sin confusión, sin atrasos.',
+    pt: 'Cada pedido chega no tempo certo, na ordem certa, para a pessoa certa. Sem ruído. Sem pressão desnecessária. Só execução.',
+    en: 'Each order arrives at the right time, in the right sequence, to the right person. No noise. No unnecessary pressure. Just execution.',
+    es: 'Cada pedido llega en el momento justo, en el orden correcto, a la persona indicada. Sin ruido. Sin presión innecesaria. Solo ejecución.',
   },
-  'value.guest.title': { pt: 'Cliente que volta', en: 'Guests that return', es: 'Clientes que vuelven' },
+  'value.guest.title': { pt: 'Experiência que fideliza', en: 'Experience that builds loyalty', es: 'Experiencia que fideliza' },
   'value.guest.desc': {
-    pt: 'Quando a experiência é fluida, o cliente percebe. Pedir é fácil. Pagar é rápido. E a vontade de voltar é natural.',
-    en: 'When the experience is seamless, guests notice. Ordering is easy. Paying is fast. And wanting to come back is natural.',
-    es: 'Cuando la experiencia es fluida, el cliente lo nota. Pedir es fácil. Pagar es rápido. Y las ganas de volver son naturales.',
+    pt: 'Quando tudo flui, o cliente percebe. Pedir é natural. Pagar é rápido. Voltar vira consequência.',
+    en: 'When everything flows, guests notice. Ordering feels natural. Paying is fast. Coming back becomes the consequence.',
+    es: 'Cuando todo fluye, el cliente lo nota. Pedir es natural. Pagar es rápido. Volver se vuelve consecuencia.',
   },
-  'value.bi.title': { pt: 'Decisões com dados reais', en: 'Decisions with real data', es: 'Decisiones con datos reales' },
+  'value.bi.title': { pt: 'Decisões com clareza', en: 'Decisions with clarity', es: 'Decisiones con claridad' },
   'value.bi.desc': {
-    pt: 'Chega de achismo. Saiba o que vende, o que dá margem, onde está o gargalo — e aja antes que vire problema.',
-    en: 'No more guessing. Know what sells, what gives margin, where the bottleneck is — and act before it becomes a problem.',
-    es: 'Basta de adivinar. Sabe qué vende, qué da margen, dónde está el cuello de botella — y actúa antes de que sea un problema.',
+    pt: 'Você não precisa adivinhar. Saiba o que vende, o que gera margem e onde ajustar — antes de virar problema.',
+    en: 'You don\'t need to guess. Know what sells, what drives margin and where to adjust — before it becomes a problem.',
+    es: 'No necesitas adivinar. Sabe qué vende, qué genera margen y dónde ajustar — antes de que sea un problema.',
   },
 
   // Problem
-  'problem.overline': { pt: 'O PROBLEMA QUE VOCÊ CONHECE BEM', en: 'THE PROBLEM YOU KNOW TOO WELL', es: 'EL PROBLEMA QUE CONOCES BIEN' },
+  'problem.overline': { pt: 'O PROBLEMA NÃO É NOVO', en: 'THE PROBLEM ISN\'T NEW', es: 'EL PROBLEMA NO ES NUEVO' },
   'problem.title': {
-    pt: 'Seu restaurante usa 5 sistemas que não se falam. E você paga a conta.',
-    en: 'Your restaurant runs on 5 systems that don\'t talk to each other. And you pay the price.',
-    es: 'Tu restaurante usa 5 sistemas que no se hablan. Y tú pagas el precio.',
+    pt: 'Seu restaurante opera com várias ferramentas. Mas nenhuma opera junto.',
+    en: 'Your restaurant runs on multiple tools. But none of them run together.',
+    es: 'Tu restaurante opera con varias herramientas. Pero ninguna opera en conjunto.',
   },
   'problem.body': {
-    pt: 'Um sistema pro pedido. Outro pra cozinha. Planilha pro estoque. WhatsApp pra escala. Caderno pro caixa. Cada ferramenta resolve uma parte — nenhuma resolve o todo. A NOOWE nasceu pra isso: uma plataforma única, uma só verdade operacional, um ritmo só.',
-    en: 'One system for orders. Another for the kitchen. A spreadsheet for inventory. WhatsApp for scheduling. A notebook for the register. Each tool solves a piece — none solves the whole. NOOWE was born for this: one platform, one operational truth, one rhythm.',
-    es: 'Un sistema para pedidos. Otro para cocina. Planilla para inventario. WhatsApp para turnos. Cuaderno para la caja. Cada herramienta resuelve una parte — ninguna resuelve el todo. NOOWE nació para eso: una plataforma única, una sola verdad operacional, un solo ritmo.',
+    pt: 'Um sistema para pedidos. Outro para a cozinha. Planilhas para controle. Mensagens para organizar equipe. Tudo funciona — isoladamente.\n\nMas o seu restaurante não funciona em partes.\n\nO NOOWE conecta tudo em um único sistema, com uma única lógica, em um único fluxo.',
+    en: 'One system for orders. Another for the kitchen. Spreadsheets for control. Messages to organize the team. Everything works — in isolation.\n\nBut your restaurant doesn\'t work in parts.\n\nNOOWE connects everything into one system, with one logic, in one flow.',
+    es: 'Un sistema para pedidos. Otro para cocina. Planillas para control. Mensajes para organizar el equipo. Todo funciona — de forma aislada.\n\nPero tu restaurante no funciona por partes.\n\nNOOWE conecta todo en un único sistema, con una única lógica, en un único flujo.',
   },
 
   // Services
