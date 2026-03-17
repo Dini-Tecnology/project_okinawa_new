@@ -25,7 +25,7 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
 };
 
 type ServiceItem = {
-  icon: React.FC<{ size?: number }>;
+  icon: any;
   name: string;
   tagline: Record<Lang, string>;
   features: string[];
