@@ -24,7 +24,7 @@ const SiteAccess: React.FC = () => {
   const validateCode = (digits: string[]) => {
     if (digits.join('').length === 6) {
       setSuccess(true);
-      setTimeout(() => navigate('/demo'), 800);
+      setTimeout(() => navigate('/demo/intent'), 800);
     }
   };
 
