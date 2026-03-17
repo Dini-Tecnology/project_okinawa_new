@@ -27,12 +27,12 @@ const SiteNavbar: React.FC = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-background/95 backdrop-blur-md border-b border-border'
+          ? 'bg-background/98 backdrop-blur-xl shadow-sm border-b border-border/50'
           : 'bg-transparent'
       }`}
-      style={{ height: 64 }}
+      style={{ height: 72 }}
     >
-      <div className="max-w-[1120px] mx-auto px-6 h-full flex items-center justify-between">
+      <div className="max-w-[1200px] mx-auto px-6 h-full flex items-center justify-between">
         <Link to="/" className="flex-shrink-0">
           <NooweLogo size="sm" />
         </Link>
@@ -52,14 +52,14 @@ const SiteNavbar: React.FC = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-5">
-          <div className="flex items-center gap-1.5 text-xs font-medium">
+          <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
             {(['pt', 'en', 'es'] as const).map((l, i) => (
               <React.Fragment key={l}>
                 {i > 0 && <span className="text-border">|</span>}
                 <button
                   onClick={() => setLang(l)}
-                  className={`transition-colors px-0.5 ${
-                    lang === l ? 'text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground'
+                  className={`transition-colors px-1 py-0.5 rounded ${
+                    lang === l ? 'text-foreground font-semibold' : 'hover:text-foreground'
                   }`}
                 >
                   {l.toUpperCase()}
@@ -70,7 +70,7 @@ const SiteNavbar: React.FC = () => {
 
           <Link
             to="/request-demo"
-            className="group text-sm font-semibold bg-foreground text-background px-5 py-2.5 rounded-lg hover:opacity-90 transition-all duration-200 inline-flex items-center gap-2"
+            className="group text-sm font-semibold bg-primary text-primary-foreground px-6 py-2.5 rounded-lg hover:bg-primary-dark transition-all duration-200 inline-flex items-center gap-2"
           >
             {t('nav.request_demo')}
             <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
@@ -105,7 +105,7 @@ const SiteNavbar: React.FC = () => {
             </div>
             <Link
               to="/request-demo"
-              className="mt-2 text-center text-sm font-semibold bg-foreground text-background px-5 py-3 rounded-lg"
+              className="mt-2 text-center text-sm font-semibold bg-primary text-primary-foreground px-5 py-3 rounded-lg"
             >
               {t('nav.request_demo')}
             </Link>
