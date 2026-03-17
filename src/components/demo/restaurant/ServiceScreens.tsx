@@ -236,7 +236,7 @@ export const TABLE_GUESTS_DATA: Record<number, TableGuest[]> = {
   ],
 };
 
-const getTableGuests = (tableNum: number): TableGuest[] => TABLE_GUESTS_DATA[tableNum] || [];
+export const getTableGuests = (tableNum: number): TableGuest[] => TABLE_GUESTS_DATA[tableNum] || [];
 
 // Simple menu categories for ordering flow
 const WAITER_MENU = [
