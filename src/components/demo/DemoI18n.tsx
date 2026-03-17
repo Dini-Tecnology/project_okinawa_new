@@ -5824,10 +5824,6 @@ const EXACT_TEXT_TRANSLATIONS: Record<Exclude<DemoLang, 'pt'>, Record<string, st
     'Cozinheiro Ana': 'Cocinera Ana',
     'Principais': 'Principales',
     'Top itens e pico': 'Top ítems y pico',
-    'Resumo executivo otimizado para leitura rápida no celular.': 'Resumen ejecutivo optimizado para lectura rápida en el celular.',
-    'No mobile, o mapa vira uma grade operacional rápida para seleção e ação.': 'En el móvil, el mapa se convierte en una grilla operativa rápida para selección y acción.',
-    'Sem cliente no momento': 'Sin cliente en este momento',
-    'Sentar cliente': 'Sentar cliente',
     'Top vendidos': 'Más vendidos',
 
 
