@@ -32,12 +32,12 @@ const SiteFooter: React.FC = () => {
   ];
 
   return (
-    <footer className="border-t border-border py-16 bg-background">
-      <div className="max-w-[1120px] mx-auto px-6">
+    <footer className="border-t border-border bg-muted/30">
+      <div className="max-w-[1200px] mx-auto px-6 py-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <NooweLogo size="sm" />
-            <p className="text-muted-foreground text-xs mt-4 leading-relaxed max-w-[220px]">
+            <p className="text-muted-foreground text-sm mt-4 leading-relaxed max-w-[240px]">
               The Operating System
               <br />for Restaurants.
             </p>
@@ -45,13 +45,13 @@ const SiteFooter: React.FC = () => {
 
           {cols.map((col) => (
             <div key={col.title}>
-              <h4 className="text-foreground text-xs font-semibold uppercase tracking-wider mb-4">
+              <h4 className="text-foreground text-xs font-semibold uppercase tracking-wider mb-5">
                 {col.title}
               </h4>
               <ul className="space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.to} className="text-muted-foreground text-sm hover:text-foreground transition-colors">
+                    <Link to={link.to} className="text-muted-foreground text-sm hover:text-primary transition-colors">
                       {link.label}
                     </Link>
                   </li>
@@ -61,10 +61,14 @@ const SiteFooter: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-14 pt-6 border-t border-border flex items-center justify-between">
+        <div className="mt-14 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-muted-foreground text-xs">
             © {new Date().getFullYear()} NOOWE. {t('footer.rights')}
           </p>
+          <div className="flex items-center gap-1">
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#FF5E3A' }} />
+            <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#0D4F4F' }} />
+          </div>
         </div>
       </div>
     </footer>

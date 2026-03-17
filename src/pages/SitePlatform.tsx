@@ -55,15 +55,17 @@ const SitePlatform: React.FC = () => {
       <section className="pt-32 pb-20">
         <div className="max-w-[800px] mx-auto px-6 text-center">
           <Reveal>
-            <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-4">{t('platform.overline')}</p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-6">
+              <span className="text-primary font-medium text-sm">{t('platform.overline')}</span>
+            </div>
           </Reveal>
           <Reveal delay={80}>
-            <h1 className="font-bold text-foreground" style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
+            <h1 className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(34px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
               {t('platform.title')}
             </h1>
           </Reveal>
           <Reveal delay={160}>
-            <p className="text-muted-foreground mt-5 max-w-lg mx-auto" style={{ fontSize: 'clamp(16px, 1.3vw, 20px)', lineHeight: 1.6 }}>
+            <p className="text-muted-foreground mt-6 max-w-lg mx-auto text-lg leading-relaxed">
               {t('platform.sub')}
             </p>
           </Reveal>
@@ -71,49 +73,54 @@ const SitePlatform: React.FC = () => {
       </section>
 
       {/* 11 Service Types */}
-      <section className="py-20" style={{ backgroundColor: 'hsl(var(--section-alt))' }} id="services">
-        <div className="max-w-[900px] mx-auto px-6">
+      <section className="py-20 bg-muted/30" id="services">
+        <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
-            <p className="text-secondary font-semibold text-sm tracking-wide uppercase mb-3">{t('platform.client_title')}</p>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="w-8 h-0.5 bg-secondary rounded-full" />
+              <p className="text-secondary font-semibold text-sm tracking-wide uppercase">{t('platform.client_title')}</p>
+            </div>
           </Reveal>
           <Reveal delay={80}>
-            <h2 className="font-bold text-foreground mb-10" style={{ fontSize: 'clamp(24px, 3vw, 36px)', letterSpacing: '-0.03em' }}>
+            <h2 className="font-display font-bold text-foreground mb-10" style={{ fontSize: 'clamp(26px, 3vw, 38px)', letterSpacing: '-0.03em' }}>
               {t('services.title')}
             </h2>
           </Reveal>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             {serviceTypes.map((s, i) => {
               const isOpen = activeService === i;
               return (
                 <Reveal key={i} delay={i * 25}>
                   <div
-                    className={`bg-background rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden ${isOpen ? 'border-primary/30 shadow-md' : 'border-border hover:border-primary/15'}`}
+                    className={`bg-background rounded-2xl border transition-all duration-300 cursor-pointer overflow-hidden ${isOpen ? 'border-primary/30 shadow-lg' : 'border-border hover:border-primary/15 hover:shadow-sm'}`}
                     onClick={() => setActiveService(isOpen ? null : i)}
                   >
-                    <div className="flex items-center gap-4 px-5 py-4">
-                      <s.icon size={20} className={`flex-shrink-0 transition-colors ${isOpen ? 'text-primary' : 'text-muted-foreground'}`} />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-foreground font-semibold text-sm">{s.name}</span>
-                        <span className="text-muted-foreground text-sm ml-2 hidden sm:inline">— {s.tagline[lang]}</span>
+                    <div className="flex items-center gap-4 px-6 py-5">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${isOpen ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                        <s.icon size={20} />
                       </div>
-                      <ChevronDown size={16} className={`text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                      <div className="flex-1 min-w-0">
+                        <span className="text-foreground font-semibold">{s.name}</span>
+                        <span className="text-muted-foreground text-sm ml-3 hidden sm:inline">{s.tagline[lang]}</span>
+                      </div>
+                      <ChevronDown size={18} className={`text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
                     </div>
 
                     {isOpen && (
-                      <div className="px-5 pb-5 border-t border-border pt-4 animate-fade-up">
-                        <p className="text-muted-foreground text-sm mb-4 sm:hidden">{s.tagline[lang]}</p>
-                        <div className="grid md:grid-cols-2 gap-5">
-                          <ul className="space-y-2">
+                      <div className="px-6 pb-6 border-t border-border/50 pt-5 animate-fade-up">
+                        <p className="text-muted-foreground text-sm mb-5 sm:hidden">{s.tagline[lang]}</p>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <ul className="space-y-2.5">
                             {s.features.map((f) => (
-                              <li key={f} className="text-muted-foreground text-sm flex items-start gap-2">
-                                <Check size={14} className="text-primary flex-shrink-0 mt-0.5" />
+                              <li key={f} className="text-muted-foreground text-sm flex items-start gap-2.5">
+                                <Check size={15} className="text-primary flex-shrink-0 mt-0.5" />
                                 {f}
                               </li>
                             ))}
                           </ul>
-                          <div className="bg-muted rounded-xl p-5">
-                            <p className="text-xs uppercase tracking-wider mb-2 font-semibold text-muted-foreground">
+                          <div className="bg-primary/5 border border-primary/10 rounded-xl p-5">
+                            <p className="text-xs uppercase tracking-wider mb-2 font-semibold text-primary">
                               {lang === 'pt' ? 'Diferencial' : lang === 'es' ? 'Diferencial' : 'Differentiator'}
                             </p>
                             <p className="text-foreground text-sm leading-relaxed">{s.diff[lang]}</p>
@@ -131,12 +138,15 @@ const SitePlatform: React.FC = () => {
 
       {/* 7 Roles */}
       <section className="py-20" id="roles">
-        <div className="max-w-[900px] mx-auto px-6">
+        <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
-            <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-3">{t('platform.ops_title')}</p>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="w-8 h-0.5 bg-primary rounded-full" />
+              <p className="text-primary font-semibold text-sm tracking-wide uppercase">{t('platform.ops_title')}</p>
+            </div>
           </Reveal>
           <Reveal delay={80}>
-            <p className="text-muted-foreground mb-10 max-w-lg" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)', lineHeight: 1.6 }}>
+            <p className="text-muted-foreground mb-10 max-w-lg text-lg leading-relaxed">
               {t('platform.ops_sub')}
             </p>
           </Reveal>
@@ -144,10 +154,12 @@ const SitePlatform: React.FC = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {rolesData.map((r, i) => (
               <Reveal key={i} delay={i * 50}>
-                <div className="p-5 rounded-xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-sm h-full">
-                  <r.icon size={20} className="text-primary mb-3" />
-                  <h4 className="text-foreground font-semibold text-sm">{r.name[lang]}</h4>
-                  <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed">{r.desc[lang]}</p>
+                <div className="p-6 rounded-2xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-md h-full bg-background">
+                  <div className="w-10 h-10 rounded-xl bg-primary/8 text-primary flex items-center justify-center mb-4">
+                    <r.icon size={20} />
+                  </div>
+                  <h4 className="text-foreground font-semibold">{r.name[lang]}</h4>
+                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{r.desc[lang]}</p>
                 </div>
               </Reveal>
             ))}
@@ -156,10 +168,13 @@ const SitePlatform: React.FC = () => {
       </section>
 
       {/* Capabilities */}
-      <section className="py-20" style={{ backgroundColor: 'hsl(var(--section-alt))' }} id="features">
-        <div className="max-w-[900px] mx-auto px-6">
+      <section className="py-20 bg-muted/30" id="features">
+        <div className="max-w-[960px] mx-auto px-6">
           <Reveal>
-            <p className="text-secondary font-semibold text-sm tracking-wide uppercase mb-8">{t('platform.cross_title')}</p>
+            <div className="flex items-center gap-3 mb-8">
+              <span className="w-8 h-0.5 bg-secondary rounded-full" />
+              <p className="text-secondary font-semibold text-sm tracking-wide uppercase">{t('platform.cross_title')}</p>
+            </div>
           </Reveal>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -172,9 +187,9 @@ const SitePlatform: React.FC = () => {
               { title: lang === 'pt' ? 'Multilíngue' : 'Multilingual', desc: lang === 'pt' ? 'Suporte completo em Português, Inglês e Espanhol.' : 'Full support in Portuguese, English and Spanish.' },
             ].map((f, i) => (
               <Reveal key={i} delay={i * 50}>
-                <div className="bg-background p-5 rounded-xl border border-border hover:border-primary/20 transition-all h-full">
-                  <h4 className="text-foreground font-semibold text-sm">{f.title}</h4>
-                  <p className="text-muted-foreground text-sm mt-1.5 leading-relaxed">{f.desc}</p>
+                <div className="bg-background p-6 rounded-2xl border border-border hover:border-primary/20 transition-all hover:shadow-sm h-full">
+                  <h4 className="text-foreground font-semibold">{f.title}</h4>
+                  <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{f.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -186,22 +201,22 @@ const SitePlatform: React.FC = () => {
       <section className="py-28">
         <div className="max-w-[600px] mx-auto px-6 text-center">
           <Reveal>
-            <h2 className="font-bold text-foreground" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em' }}>
+            <h2 className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(30px, 3.5vw, 48px)', letterSpacing: '-0.03em' }}>
               {t('platform.cta_title')}
             </h2>
           </Reveal>
           <Reveal delay={80}>
-            <p className="text-muted-foreground mt-4 max-w-lg mx-auto" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
+            <p className="text-muted-foreground mt-5 text-lg max-w-lg mx-auto">
               {t('platform.cta_body')}
             </p>
           </Reveal>
           <Reveal delay={160}>
             <Link
               to="/request-demo"
-              className="inline-flex items-center gap-2 mt-8 bg-foreground text-background font-semibold px-8 py-3.5 rounded-lg hover:opacity-90 transition-all"
+              className="group inline-flex items-center gap-2.5 mt-10 bg-primary text-primary-foreground font-semibold px-10 py-4 rounded-xl hover:bg-primary-dark transition-all shadow-glow"
             >
               {t('nav.request_demo')}
-              <ArrowRight size={16} />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </Reveal>
         </div>

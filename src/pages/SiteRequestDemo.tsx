@@ -3,7 +3,7 @@ import { useLang } from '@/lib/i18n';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
-import { Check, Loader2 } from 'lucide-react';
+import { Check, Loader2, ArrowRight, Shield, Clock, Users } from 'lucide-react';
 
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = '' }) => {
   const [ref, visible] = useScrollReveal<HTMLDivElement>();
@@ -15,7 +15,7 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
 };
 
 const SiteRequestDemo: React.FC = () => {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const [form, setForm] = useState({ name: '', restaurant: '', email: '', phone: '' });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -40,65 +40,88 @@ const SiteRequestDemo: React.FC = () => {
   };
 
   const inputClass = (field: string) =>
-    `w-full px-4 py-3.5 rounded-lg border bg-background text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
+    `w-full px-4 py-4 rounded-xl border bg-background text-foreground text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
       errors[field] ? 'border-destructive' : 'border-border'
     }`;
+
+  const benefits = [
+    { icon: Clock, text: lang === 'pt' ? 'Acesso em menos de 24h' : lang === 'es' ? 'Acceso en menos de 24h' : 'Access in less than 24h' },
+    { icon: Shield, text: lang === 'pt' ? 'Sem cartão de crédito' : lang === 'es' ? 'Sin tarjeta de crédito' : 'No credit card required' },
+    { icon: Users, text: lang === 'pt' ? 'Plataforma completa' : lang === 'es' ? 'Plataforma completa' : 'Full platform access' },
+  ];
 
   return (
     <div className="bg-background text-foreground min-h-screen">
       <SiteNavbar />
 
-      <section className="pt-28 pb-20 min-h-screen flex items-center">
-        <div className="max-w-[960px] mx-auto px-6 w-full">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
+      <section className="pt-32 pb-20 min-h-screen flex items-center">
+        <div className="max-w-[1100px] mx-auto px-6 w-full">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
             <div>
               <Reveal>
-                <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-4">{t('rdemo.overline')}</p>
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/20 bg-primary/5 mb-6">
+                  <span className="text-primary font-medium text-sm">{t('rdemo.overline')}</span>
+                </div>
               </Reveal>
               <Reveal delay={80}>
-                <h1 className="font-bold text-foreground" style={{ fontSize: 'clamp(32px, 5vw, 52px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
+                <h1 className="font-display font-bold text-foreground" style={{ fontSize: 'clamp(34px, 5vw, 52px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
                   {t('rdemo.title')}
                 </h1>
               </Reveal>
               <Reveal delay={160}>
-                <p className="text-muted-foreground mt-5 max-w-md" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)', lineHeight: 1.6 }}>
+                <p className="text-muted-foreground mt-6 max-w-md text-lg leading-relaxed">
                   {t('rdemo.sub')}
                 </p>
+              </Reveal>
+              <Reveal delay={240}>
+                <div className="mt-10 space-y-4">
+                  {benefits.map((b, i) => (
+                    <div key={i} className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-lg bg-primary/8 text-primary flex items-center justify-center flex-shrink-0">
+                        <b.icon size={18} />
+                      </div>
+                      <span className="text-foreground text-sm font-medium">{b.text}</span>
+                    </div>
+                  ))}
+                </div>
               </Reveal>
             </div>
 
             <div>
               {!submitted ? (
-                <Reveal delay={240}>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <input autoFocus type="text" placeholder={t('rdemo.name')} value={form.name}
-                      onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors({ ...errors, name: false }); }}
-                      className={inputClass('name')} />
-                    <input type="text" placeholder={t('rdemo.restaurant')} value={form.restaurant}
-                      onChange={(e) => { setForm({ ...form, restaurant: e.target.value }); setErrors({ ...errors, restaurant: false }); }}
-                      className={inputClass('restaurant')} />
-                    <input type="email" placeholder={t('rdemo.email')} value={form.email}
-                      onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: false }); }}
-                      className={inputClass('email')} />
-                    <input type="tel" placeholder={t('rdemo.phone')} value={form.phone}
-                      onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                      className={inputClass('phone')} />
-                    <button type="submit" disabled={loading}
-                      className="w-full py-3.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
-                      {loading ? <Loader2 size={18} className="animate-spin" /> : null}
-                      {t('rdemo.submit')}
-                    </button>
-                  </form>
+                <Reveal delay={200}>
+                  <div className="bg-background rounded-2xl border border-border p-8 shadow-lg">
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <input autoFocus type="text" placeholder={t('rdemo.name')} value={form.name}
+                        onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors({ ...errors, name: false }); }}
+                        className={inputClass('name')} />
+                      <input type="text" placeholder={t('rdemo.restaurant')} value={form.restaurant}
+                        onChange={(e) => { setForm({ ...form, restaurant: e.target.value }); setErrors({ ...errors, restaurant: false }); }}
+                        className={inputClass('restaurant')} />
+                      <input type="email" placeholder={t('rdemo.email')} value={form.email}
+                        onChange={(e) => { setForm({ ...form, email: e.target.value }); setErrors({ ...errors, email: false }); }}
+                        className={inputClass('email')} />
+                      <input type="tel" placeholder={t('rdemo.phone')} value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                        className={inputClass('phone')} />
+                      <button type="submit" disabled={loading}
+                        className="group w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary-dark transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-glow">
+                        {loading ? <Loader2 size={18} className="animate-spin" /> : null}
+                        {t('rdemo.submit')}
+                        {!loading && <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />}
+                      </button>
+                    </form>
+                  </div>
                 </Reveal>
               ) : (
                 <Reveal>
-                  <div className="text-center md:text-left">
-                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-success/10 mb-6">
-                      <Check size={28} className="text-success" />
+                  <div className="bg-background rounded-2xl border border-border p-10 text-center shadow-lg">
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-success/10 mb-6">
+                      <Check size={32} className="text-success" />
                     </div>
-                    <h2 className="font-bold text-xl mb-2 text-foreground">{t('rdemo.success_title')}</h2>
-                    <p className="text-muted-foreground text-sm mb-6">{t('rdemo.success_body')}</p>
-                    <button className="text-primary text-sm font-medium hover:underline">{t('rdemo.resend')}</button>
+                    <h2 className="font-display font-bold text-xl mb-3 text-foreground">{t('rdemo.success_title')}</h2>
+                    <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{t('rdemo.success_body')}</p>
+                    <button className="text-primary text-sm font-semibold hover:underline">{t('rdemo.resend')}</button>
                   </div>
                 </Reveal>
               )}

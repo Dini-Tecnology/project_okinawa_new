@@ -60,12 +60,12 @@ const SiteAccess: React.FC = () => {
 
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <NooweLogo size="md" className="justify-center mb-12" />
+          <NooweLogo size="lg" className="justify-center mb-14" />
 
-          <h1 className="font-bold text-2xl mb-2 text-foreground">{t('access.title')}</h1>
-          <p className="text-muted-foreground text-sm mb-10">{t('access.sub')}</p>
+          <h1 className="font-display font-bold text-3xl mb-3 text-foreground">{t('access.title')}</h1>
+          <p className="text-muted-foreground text-base mb-12">{t('access.sub')}</p>
 
-          <div className="flex justify-center gap-3 mb-8">
+          <div className="flex justify-center gap-3 mb-10">
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -76,14 +76,14 @@ const SiteAccess: React.FC = () => {
                 value={digit}
                 onChange={(e) => handleInput(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
-                className={`w-12 h-14 text-center text-xl font-bold rounded-lg border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all ${
-                  success ? 'border-success' : error ? 'border-destructive' : 'border-border focus:border-primary'
+                className={`w-14 h-16 text-center text-2xl font-bold rounded-xl border-2 bg-background text-foreground focus:outline-none transition-all duration-200 ${
+                  success ? 'border-success bg-success/5' : error ? 'border-destructive' : 'border-border focus:border-primary focus:ring-4 focus:ring-primary/10'
                 }`}
               />
             ))}
           </div>
 
-          <a href="/request-demo" className="text-primary text-sm font-medium hover:underline">
+          <a href="/request-demo" className="text-primary text-sm font-semibold hover:underline">
             {t('access.request_new')}
           </a>
         </div>
