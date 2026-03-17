@@ -40,7 +40,7 @@ const SiteRequestDemo: React.FC = () => {
   };
 
   const inputClass = (field: string) =>
-    `w-full px-4 py-3.5 rounded-xl border bg-background text-foreground text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:border-primary transition-colors ${
+    `w-full px-4 py-3.5 rounded-lg border bg-background text-foreground text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all ${
       errors[field] ? 'border-destructive' : 'border-border'
     }`;
 
@@ -49,19 +49,19 @@ const SiteRequestDemo: React.FC = () => {
       <SiteNavbar />
 
       <section className="pt-28 pb-20 min-h-screen flex items-center">
-        <div className="max-w-[980px] mx-auto px-5 w-full">
+        <div className="max-w-[960px] mx-auto px-6 w-full">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <Reveal>
-                <span className="text-primary text-xs font-semibold tracking-[0.08em] uppercase">{t('rdemo.overline')}</span>
+                <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-4">{t('rdemo.overline')}</p>
               </Reveal>
-              <Reveal delay={100}>
-                <h1 className="font-bold mt-4 text-foreground" style={{ fontSize: 'clamp(32px, 5vw, 56px)', letterSpacing: '-0.035em', lineHeight: 1.08 }}>
+              <Reveal delay={80}>
+                <h1 className="font-bold text-foreground" style={{ fontSize: 'clamp(32px, 5vw, 52px)', letterSpacing: '-0.035em', lineHeight: 1.1 }}>
                   {t('rdemo.title')}
                 </h1>
               </Reveal>
-              <Reveal delay={200}>
-                <p className="text-muted-foreground mt-4 max-w-md" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)', lineHeight: 1.55 }}>
+              <Reveal delay={160}>
+                <p className="text-muted-foreground mt-5 max-w-md" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)', lineHeight: 1.6 }}>
                   {t('rdemo.sub')}
                 </p>
               </Reveal>
@@ -69,7 +69,7 @@ const SiteRequestDemo: React.FC = () => {
 
             <div>
               {!submitted ? (
-                <Reveal delay={300}>
+                <Reveal delay={240}>
                   <form onSubmit={handleSubmit} className="space-y-4">
                     <input autoFocus type="text" placeholder={t('rdemo.name')} value={form.name}
                       onChange={(e) => { setForm({ ...form, name: e.target.value }); setErrors({ ...errors, name: false }); }}
@@ -84,7 +84,7 @@ const SiteRequestDemo: React.FC = () => {
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       className={inputClass('phone')} />
                     <button type="submit" disabled={loading}
-                      className="w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary-dark transition-all disabled:opacity-60 flex items-center justify-center gap-2 shadow-md">
+                      className="w-full py-3.5 rounded-lg bg-foreground text-background font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 flex items-center justify-center gap-2">
                       {loading ? <Loader2 size={18} className="animate-spin" /> : null}
                       {t('rdemo.submit')}
                     </button>
@@ -93,12 +93,12 @@ const SiteRequestDemo: React.FC = () => {
               ) : (
                 <Reveal>
                   <div className="text-center md:text-left">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-success/15 mb-6">
-                      <Check size={32} className="text-success" />
+                    <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-success/10 mb-6">
+                      <Check size={28} className="text-success" />
                     </div>
-                    <h2 className="font-bold text-2xl mb-2 text-foreground">{t('rdemo.success_title')}</h2>
+                    <h2 className="font-bold text-xl mb-2 text-foreground">{t('rdemo.success_title')}</h2>
                     <p className="text-muted-foreground text-sm mb-6">{t('rdemo.success_body')}</p>
-                    <button className="text-primary text-sm hover:underline">{t('rdemo.resend')}</button>
+                    <button className="text-primary text-sm font-medium hover:underline">{t('rdemo.resend')}</button>
                   </div>
                 </Reveal>
               )}

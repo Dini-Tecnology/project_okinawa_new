@@ -7,65 +7,75 @@ interface NooweLogoProps {
 }
 
 const sizes = {
-  sm: { font: 18, markH: 15 },
-  md: { font: 24, markH: 20 },
-  lg: { font: 34, markH: 28 },
+  sm: { font: 20, gap: 2 },
+  md: { font: 26, gap: 3 },
+  lg: { font: 38, gap: 4 },
 };
 
-const NooweLogo = forwardRef<HTMLSpanElement, NooweLogoProps>(({ size = 'md', className = '', variant = 'dark' }, ref) => {
-  const { font, markH } = sizes[size];
-  const cx = markH / 2;
-  const r = markH * 0.40;
-  const offset = r * 0.38;
-  const sw = r * 0.24;
-  const textColor = variant === 'light' ? 'text-white' : 'text-foreground';
+const NooweLogo = forwardRef<HTMLSpanElement, NooweLogoProps>(
+  ({ size = 'md', className = '', variant = 'dark' }, ref) => {
+    const { font, gap } = sizes[size];
+    const dotSize = font * 0.18;
+    const textColor = variant === 'light' ? 'text-white' : 'text-foreground';
 
-  return (
-    <span ref={ref} className={`inline-flex items-center select-none ${className}`} style={{ gap: 1 }}>
+    return (
       <span
-        style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: font,
-          fontWeight: 500,
-          letterSpacing: '-0.03em',
-          lineHeight: 1,
-        }}
-        className={textColor}
+        ref={ref}
+        className={`inline-flex items-center select-none ${className}`}
+        style={{ gap }}
       >
-        n
+        <span
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: font,
+            fontWeight: 700,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+          }}
+          className={textColor}
+        >
+          n
+        </span>
+        <span className="relative flex items-center" style={{ width: dotSize * 3.2, height: font * 0.7 }}>
+          <span
+            className="absolute rounded-full"
+            style={{
+              width: dotSize,
+              height: dotSize,
+              backgroundColor: '#FF5E3A',
+              left: dotSize * 0.4,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }}
+          />
+          <span
+            className="absolute rounded-full"
+            style={{
+              width: dotSize,
+              height: dotSize,
+              backgroundColor: '#0D4F4F',
+              right: dotSize * 0.4,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }}
+          />
+        </span>
+        <span
+          style={{
+            fontFamily: "'Space Grotesk', sans-serif",
+            fontSize: font,
+            fontWeight: 700,
+            letterSpacing: '-0.04em',
+            lineHeight: 1,
+          }}
+          className={textColor}
+        >
+          we
+        </span>
       </span>
-      <svg
-        width={markH * 1.1}
-        height={markH}
-        viewBox={`0 0 ${markH * 1.1} ${markH}`}
-        className="flex-shrink-0"
-        style={{ margin: '0 -1px', position: 'relative', top: 1 }}
-        aria-hidden="true"
-      >
-        <defs>
-          <linearGradient id={`noowe-grad-${size}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#FF5E3A" />
-            <stop offset="100%" stopColor="#0D4F4F" />
-          </linearGradient>
-        </defs>
-        <circle cx={cx - offset + markH * 0.05} cy={cx} r={r} fill="none" stroke={`url(#noowe-grad-${size})`} strokeWidth={sw} />
-        <circle cx={cx + offset + markH * 0.05} cy={cx} r={r} fill="none" stroke={`url(#noowe-grad-${size})`} strokeWidth={sw} />
-      </svg>
-      <span
-        style={{
-          fontFamily: "'Space Grotesk', sans-serif",
-          fontSize: font,
-          fontWeight: 500,
-          letterSpacing: '-0.03em',
-          lineHeight: 1,
-        }}
-        className={textColor}
-      >
-        we
-      </span>
-    </span>
-  );
-});
+    );
+  }
+);
 
 NooweLogo.displayName = 'NooweLogo';
 export default NooweLogo;

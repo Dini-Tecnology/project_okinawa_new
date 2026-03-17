@@ -7,13 +7,15 @@ import NooweLogo from '@/components/site/NooweLogo';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import {
   ArrowRight, ChefHat, Utensils, Coffee, UtensilsCrossed, Truck,
-  Wine, Zap, Star, Music, Salad, BarChart3, Users, Workflow, Sparkles,
-  Crown, ConciergeBell, GlassWater, Flame, UserCheck,
+  Wine, Zap, Star, Music, Salad, BarChart3, Users, Workflow,
+  Crown, ConciergeBell, GlassWater, Flame, UserCheck, Check,
 } from 'lucide-react';
 
-const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string; variant?: 'up' | 'scale' | 'blur' }> = ({
-  children, delay = 0, className = '', variant = 'up',
-}) => {
+/* ─── Reveal Wrapper ─── */
+const Reveal: React.FC<{
+  children: React.ReactNode; delay?: number; className?: string;
+  variant?: 'up' | 'scale' | 'blur';
+}> = ({ children, delay = 0, className = '', variant = 'up' }) => {
   const [ref, visible] = useScrollReveal<HTMLDivElement>();
   const cls = variant === 'scale' ? 'noowe-scale-in' : variant === 'blur' ? 'noowe-blur-in' : 'noowe-reveal';
   return (
@@ -23,52 +25,45 @@ const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: 
   );
 };
 
-const Counter: React.FC<{ target: number; suffix?: string }> = ({ target, suffix = '' }) => {
-  const [ref, visible] = useScrollReveal<HTMLSpanElement>();
-  const [count, setCount] = useState(0);
-  const started = useRef(false);
-  useEffect(() => {
-    if (!visible || started.current) return;
-    started.current = true;
-    const start = performance.now();
-    const step = (now: number) => {
-      const p = Math.min((now - start) / 1800, 1);
-      setCount(Math.floor((1 - Math.pow(1 - p, 3)) * target));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [visible, target]);
-  return <span ref={ref}>{count}{suffix}</span>;
-};
-
+/* ─── Data ─── */
 const serviceTypes = [
-  { icon: Star, name: 'Fine Dining', tagline: 'pt:Gastronomia premium|en:Premium gastronomy|es:Gastronomía premium', color: 'bg-rose-100 text-rose-700' },
-  { icon: Zap, name: 'Quick Service', tagline: 'pt:Velocidade sem compromisso|en:Speed without compromise|es:Velocidad sin compromisos', color: 'bg-amber-100 text-amber-700' },
-  { icon: Salad, name: 'Fast Casual', tagline: 'pt:Monte sua refeição|en:Build your meal|es:Arma tu comida', color: 'bg-green-100 text-green-700' },
-  { icon: Coffee, name: 'Café & Bakery', tagline: 'pt:Fique, trabalhe, repita|en:Stay, work, refill|es:Quédate y trabaja', color: 'bg-orange-100 text-orange-700' },
-  { icon: UtensilsCrossed, name: 'Buffet', tagline: 'pt:Balança inteligente|en:Smart scale pricing|es:Balanza inteligente', color: 'bg-red-100 text-red-700' },
-  { icon: Truck, name: 'Drive-Thru', tagline: 'pt:Pedido antes de chegar|en:Order before you arrive|es:Pide antes de llegar', color: 'bg-sky-100 text-sky-700' },
-  { icon: Truck, name: 'Food Truck', tagline: 'pt:Encontre, peça, receba|en:Find us, order ahead|es:Encuéntranos', color: 'bg-lime-100 text-lime-700' },
-  { icon: ChefHat, name: "Chef's Table", tagline: 'pt:Jornada degustativa|en:Tasting journey|es:Viaje de degustación', color: 'bg-stone-100 text-stone-700' },
-  { icon: Utensils, name: 'Casual Dining', tagline: 'pt:Famílias bem-vindas|en:Families welcome|es:Familias bienvenidas', color: 'bg-pink-100 text-pink-700' },
-  { icon: Wine, name: 'Pub & Bar', tagline: 'pt:Comandas sem confusão|en:Tabs without confusion|es:Cuentas sin confusión', color: 'bg-yellow-100 text-yellow-700' },
-  { icon: Music, name: 'Club & Nightlife', tagline: 'pt:Ingressos ao bottle service|en:Tickets to bottle service|es:Boletos al bottle service', color: 'bg-purple-100 text-purple-700' },
+  { icon: Star, name: 'Fine Dining', key: 'fine' },
+  { icon: Zap, name: 'Quick Service', key: 'quick' },
+  { icon: Salad, name: 'Fast Casual', key: 'fast' },
+  { icon: Coffee, name: 'Café & Bakery', key: 'cafe' },
+  { icon: UtensilsCrossed, name: 'Buffet', key: 'buffet' },
+  { icon: Truck, name: 'Drive-Thru', key: 'drive' },
+  { icon: Truck, name: 'Food Truck', key: 'truck' },
+  { icon: ChefHat, name: "Chef's Table", key: 'chef' },
+  { icon: Utensils, name: 'Casual Dining', key: 'casual' },
+  { icon: Wine, name: 'Pub & Bar', key: 'pub' },
+  { icon: Music, name: 'Club & Nightlife', key: 'club' },
 ];
 
 const roles = [
-  { icon: Crown, name: { pt: 'Dono', en: 'Owner', es: 'Dueño' }, desc: { pt: 'Controle executivo total', en: 'Full executive control', es: 'Control ejecutivo total' } },
-  { icon: BarChart3, name: { pt: 'Gerente', en: 'Manager', es: 'Gerente' }, desc: { pt: 'Operações do dia a dia', en: 'Day-to-day operations', es: 'Operaciones diarias' } },
-  { icon: ConciergeBell, name: { pt: 'Maitre', en: 'Maitre', es: 'Maitre' }, desc: { pt: 'Fluxo de clientes', en: 'Guest flow mastery', es: 'Flujo de clientes' } },
-  { icon: ChefHat, name: { pt: 'Chef', en: 'Chef', es: 'Chef' }, desc: { pt: 'Comando da cozinha', en: 'Kitchen command', es: 'Comando de cocina' } },
-  { icon: GlassWater, name: { pt: 'Barman', en: 'Barman', es: 'Barman' }, desc: { pt: 'Operações do bar', en: 'Bar operations', es: 'Operaciones del bar' } },
-  { icon: Flame, name: { pt: 'Cozinheiro', en: 'Cook', es: 'Cocinero' }, desc: { pt: 'Foco na estação', en: 'Station focused', es: 'Enfoque en estación' } },
-  { icon: UserCheck, name: { pt: 'Garçom', en: 'Waiter', es: 'Mesero' }, desc: { pt: 'Linha de frente', en: 'Frontline interface', es: 'Interfaz de primera línea' } },
+  { icon: Crown, nameKey: 'owner' },
+  { icon: BarChart3, nameKey: 'manager' },
+  { icon: ConciergeBell, nameKey: 'maitre' },
+  { icon: ChefHat, nameKey: 'chef' },
+  { icon: GlassWater, nameKey: 'barman' },
+  { icon: Flame, nameKey: 'cook' },
+  { icon: UserCheck, nameKey: 'waiter' },
 ];
+
+const roleNames: Record<string, Record<string, string>> = {
+  owner: { pt: 'Dono', en: 'Owner', es: 'Dueño' },
+  manager: { pt: 'Gerente', en: 'Manager', es: 'Gerente' },
+  maitre: { pt: 'Maitre', en: 'Maitre', es: 'Maitre' },
+  chef: { pt: 'Chef', en: 'Chef', es: 'Chef' },
+  barman: { pt: 'Barman', en: 'Barman', es: 'Barman' },
+  cook: { pt: 'Cozinheiro', en: 'Cook', es: 'Cocinero' },
+  waiter: { pt: 'Garçom', en: 'Waiter', es: 'Mesero' },
+};
 
 const SiteHome: React.FC = () => {
   const { lang, t } = useLang();
 
-  /* Text reveal */
+  /* ── Text Reveal ── */
   const revealRef = useRef<HTMLDivElement>(null);
   const [revealProgress, setRevealProgress] = useState(0);
   useEffect(() => {
@@ -89,94 +84,110 @@ const SiteHome: React.FC = () => {
   };
   const words = (revealTexts[lang] || revealTexts.en).split(' ');
 
-  const getTagline = (taglineStr: string) => {
-    const parts = taglineStr.split('|');
-    const match = parts.find(p => p.startsWith(lang + ':'));
-    return match ? match.slice(3) : parts[1]?.slice(3) || '';
-  };
-
   return (
-    <div className="bg-background text-foreground min-h-screen overflow-hidden">
+    <div className="bg-background text-foreground min-h-screen">
       <SiteNavbar />
 
       {/* ═══ HERO ═══ */}
-      <section className="relative min-h-[90vh] flex items-center justify-center pt-14">
-        {/* Warm ambient blobs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div
-            className="absolute top-[20%] left-[15%] w-[500px] h-[500px] rounded-full blur-[140px] opacity-30"
-            style={{ background: 'hsl(14 100% 57%)' }}
-          />
-          <div
-            className="absolute top-[40%] right-[10%] w-[400px] h-[400px] rounded-full blur-[140px] opacity-20"
-            style={{ background: 'hsl(168 84% 29%)' }}
-          />
-        </div>
-
-        <div className="relative max-w-[980px] mx-auto px-5 text-center">
-          <div className="noowe-blur-in visible mb-5">
-            <span className="inline-block text-primary font-semibold tracking-[0.08em] uppercase text-xs">
+      <section className="min-h-[92vh] flex items-center justify-center pt-16">
+        <div className="max-w-[800px] mx-auto px-6 text-center">
+          <Reveal variant="blur">
+            <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-6">
               {t('hero.overline')}
-            </span>
-          </div>
+            </p>
+          </Reveal>
 
-          <h1
-            className="noowe-blur-in visible font-bold text-foreground"
-            style={{
-              fontSize: 'clamp(44px, 8vw, 88px)',
-              letterSpacing: '-0.04em',
-              lineHeight: 1.05,
-              transitionDelay: '100ms',
-            }}
-          >
-            {t('hero.h1_1')}
-            <br />
-            <span className="text-gradient-brand">{t('hero.h1_2')}</span>
-          </h1>
-
-          <p
-            className="noowe-blur-in visible text-muted-foreground mx-auto mt-6 max-w-xl"
-            style={{ fontSize: 'clamp(16px, 1.4vw, 21px)', lineHeight: 1.5, transitionDelay: '200ms' }}
-          >
-            {t('hero.sub')}
-          </p>
-
-          <div className="noowe-blur-in visible flex flex-col sm:flex-row items-center justify-center gap-4 mt-10" style={{ transitionDelay: '300ms' }}>
-            <Link
-              to="/request-demo"
-              className="group flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-full hover:bg-primary-dark transition-all duration-200 hover:scale-[1.03] shadow-md"
-              style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}
+          <Reveal variant="blur" delay={80}>
+            <h1
+              className="font-bold text-foreground"
+              style={{
+                fontSize: 'clamp(40px, 7vw, 80px)',
+                letterSpacing: '-0.04em',
+                lineHeight: 1.05,
+              }}
             >
-              {t('hero.cta1')}
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              to="/platform"
-              className="flex items-center gap-2 px-8 py-3.5 rounded-full font-medium text-foreground hover:text-primary border border-border hover:border-primary/30 bg-card transition-all"
-              style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}
+              {t('hero.h1_1')}
+              <br />
+              <span className="text-primary">{t('hero.h1_2')}</span>
+            </h1>
+          </Reveal>
+
+          <Reveal variant="blur" delay={160}>
+            <p
+              className="text-muted-foreground mx-auto mt-6 max-w-lg"
+              style={{ fontSize: 'clamp(16px, 1.3vw, 20px)', lineHeight: 1.6 }}
             >
-              {t('hero.cta2')}
-            </Link>
-          </div>
+              {t('hero.sub')}
+            </p>
+          </Reveal>
+
+          <Reveal variant="blur" delay={240}>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+              <Link
+                to="/request-demo"
+                className="group flex items-center gap-2 bg-foreground text-background font-semibold px-8 py-3.5 rounded-lg hover:opacity-90 transition-all"
+                style={{ fontSize: 'clamp(14px, 1vw, 16px)' }}
+              >
+                {t('hero.cta1')}
+                <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/platform"
+                className="flex items-center gap-2 px-8 py-3.5 rounded-lg font-medium text-foreground border border-border hover:border-foreground/20 transition-all"
+                style={{ fontSize: 'clamp(14px, 1vw, 16px)' }}
+              >
+                {t('hero.cta2')}
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ═══ VALUE PROPS ═══ */}
+      {/* ═══ TRUST STRIP ═══ */}
+      <section className="py-16 border-y border-border">
+        <div className="max-w-[1120px] mx-auto px-6">
+          <Reveal>
+            <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
+              {['Fine Dining', 'Quick Service', 'Café', 'Buffet', 'Bar', 'Club'].map((name) => (
+                <span key={name} className="text-muted-foreground/40 text-sm font-semibold tracking-wider uppercase">
+                  {name}
+                </span>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ VALUE PROPOSITIONS ═══ */}
       <section className="py-24">
-        <div className="max-w-[1080px] mx-auto px-5">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="max-w-[1120px] mx-auto px-6">
+          <div className="max-w-xl mb-16">
+            <Reveal>
+              <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-4">{t('problem.overline')}</p>
+            </Reveal>
+            <Reveal delay={80}>
+              <h2 className="font-bold text-foreground" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+                {t('problem.title')}
+              </h2>
+            </Reveal>
+            <Reveal delay={160}>
+              <p className="text-muted-foreground mt-5 leading-relaxed" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
+                {t('problem.body')}
+              </p>
+            </Reveal>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { icon: Workflow, key: 'ops', accent: 'text-primary bg-primary/10' },
-              { icon: ChefHat, key: 'kitchen', accent: 'text-secondary bg-secondary/10' },
-              { icon: Users, key: 'guest', accent: 'text-accent bg-accent/10' },
-              { icon: BarChart3, key: 'bi', accent: 'text-info bg-info/10' },
+              { icon: Workflow, key: 'ops' },
+              { icon: ChefHat, key: 'kitchen' },
+              { icon: Users, key: 'guest' },
+              { icon: BarChart3, key: 'bi' },
             ].map((v, i) => (
-              <Reveal key={v.key} delay={i * 80}>
-                <div className="site-card p-7 h-full">
-                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${v.accent}`}>
-                    <v.icon size={22} />
-                  </div>
-                  <h3 className="text-foreground font-bold text-base mb-2">{t(`value.${v.key}.title`)}</h3>
+              <Reveal key={v.key} delay={i * 70}>
+                <div className="p-6 rounded-xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-md h-full">
+                  <v.icon size={24} className="text-primary mb-4" />
+                  <h3 className="text-foreground font-semibold text-base mb-2">{t(`value.${v.key}.title`)}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{t(`value.${v.key}.desc`)}</p>
                 </div>
               </Reveal>
@@ -185,39 +196,20 @@ const SiteHome: React.FC = () => {
         </div>
       </section>
 
-      {/* ═══ PROBLEM / WHY ═══ */}
-      <section className="py-24 bg-card">
-        <div className="max-w-[720px] mx-auto px-5 text-center">
-          <Reveal>
-            <span className="text-primary text-xs font-semibold tracking-[0.08em] uppercase">{t('problem.overline')}</span>
-          </Reveal>
-          <Reveal delay={100}>
-            <h2 className="font-bold mt-4 text-foreground" style={{ fontSize: 'clamp(26px, 3vw, 42px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
-              {t('problem.title')}
-            </h2>
-          </Reveal>
-          <Reveal delay={200}>
-            <p className="text-muted-foreground mt-5 leading-relaxed" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
-              {t('problem.body')}
-            </p>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ═══ SERVICE TYPES ═══ */}
-      <section className="py-24">
-        <div className="max-w-[1080px] mx-auto px-5">
-          <div className="text-center max-w-xl mx-auto mb-14">
+      <section className="py-24" style={{ backgroundColor: 'hsl(var(--section-alt))' }}>
+        <div className="max-w-[1120px] mx-auto px-6">
+          <div className="max-w-xl mb-14">
             <Reveal>
-              <span className="text-secondary text-xs font-semibold tracking-[0.08em] uppercase">{t('services.overline')}</span>
+              <p className="text-secondary font-semibold text-sm tracking-wide uppercase mb-4">{t('services.overline')}</p>
             </Reveal>
-            <Reveal delay={100}>
-              <h2 className="font-bold mt-3 text-foreground" style={{ fontSize: 'clamp(26px, 3vw, 42px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+            <Reveal delay={80}>
+              <h2 className="font-bold text-foreground" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
                 {t('services.title')}
               </h2>
             </Reveal>
-            <Reveal delay={200}>
-              <p className="text-muted-foreground mt-3" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
+            <Reveal delay={160}>
+              <p className="text-muted-foreground mt-4" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
                 {t('services.sub')}
               </p>
             </Reveal>
@@ -225,23 +217,20 @@ const SiteHome: React.FC = () => {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {serviceTypes.map((s, i) => (
-              <Reveal key={i} delay={i * 50}>
-                <div className="site-card p-5 h-full text-center group">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 ${s.color} transition-transform group-hover:scale-110`}>
-                    <s.icon size={22} />
-                  </div>
-                  <h4 className="text-foreground font-bold text-sm mb-1">{s.name}</h4>
-                  <p className="text-muted-foreground text-xs leading-relaxed">{getTagline(s.tagline)}</p>
+              <Reveal key={s.key} delay={i * 40}>
+                <div className="bg-background rounded-xl border border-border p-5 hover:border-primary/20 hover:shadow-md transition-all duration-300 group h-full">
+                  <s.icon size={22} className="text-muted-foreground group-hover:text-primary transition-colors mb-3" />
+                  <h4 className="text-foreground font-semibold text-sm">{s.name}</h4>
                 </div>
               </Reveal>
             ))}
           </div>
 
-          <Reveal delay={600}>
-            <div className="text-center mt-8">
+          <Reveal delay={500}>
+            <div className="mt-10">
               <Link to="/platform" className="inline-flex items-center gap-1.5 text-primary font-medium text-sm hover:gap-3 transition-all">
-                {lang === 'pt' ? 'Ver detalhes de cada tipo' : lang === 'es' ? 'Ver detalles de cada tipo' : 'See details for each type'}
-                <ArrowRight size={16} />
+                {lang === 'pt' ? 'Conheça cada tipo em detalhe' : lang === 'es' ? 'Conoce cada tipo en detalle' : 'Explore each type in detail'}
+                <ArrowRight size={15} />
               </Link>
             </div>
           </Reveal>
@@ -249,28 +238,25 @@ const SiteHome: React.FC = () => {
       </section>
 
       {/* ═══ ROLES ═══ */}
-      <section className="py-24 bg-card">
-        <div className="max-w-[1080px] mx-auto px-5">
-          <div className="text-center max-w-xl mx-auto mb-14">
+      <section className="py-24">
+        <div className="max-w-[1120px] mx-auto px-6">
+          <div className="max-w-xl mb-14">
             <Reveal>
-              <span className="text-primary text-xs font-semibold tracking-[0.08em] uppercase">{t('roles.overline')}</span>
+              <p className="text-primary font-semibold text-sm tracking-wide uppercase mb-4">{t('roles.overline')}</p>
             </Reveal>
-            <Reveal delay={100}>
-              <h2 className="font-bold mt-3 text-foreground" style={{ fontSize: 'clamp(26px, 3vw, 42px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+            <Reveal delay={80}>
+              <h2 className="font-bold text-foreground" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
                 {t('roles.title')}
               </h2>
             </Reveal>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="flex flex-wrap gap-3">
             {roles.map((r, i) => (
-              <Reveal key={i} delay={i * 60}>
-                <div className="site-card p-5 text-center h-full">
-                  <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mx-auto mb-3">
-                    <r.icon size={20} />
-                  </div>
-                  <h4 className="text-foreground font-bold text-sm">{r.name[lang]}</h4>
-                  <p className="text-muted-foreground text-xs mt-1">{r.desc[lang]}</p>
+              <Reveal key={r.nameKey} delay={i * 50}>
+                <div className="flex items-center gap-3 px-5 py-3 rounded-lg border border-border bg-background hover:border-primary/20 hover:shadow-sm transition-all">
+                  <r.icon size={18} className="text-muted-foreground" />
+                  <span className="text-foreground font-medium text-sm">{roleNames[r.nameKey]?.[lang]}</span>
                 </div>
               </Reveal>
             ))}
@@ -280,13 +266,13 @@ const SiteHome: React.FC = () => {
 
       {/* ═══ TEXT REVEAL ═══ */}
       <section ref={revealRef} className="relative" style={{ height: '200vh' }}>
-        <div className="sticky top-0 h-screen flex items-center justify-center bg-background">
-          <div className="max-w-[720px] mx-auto px-5">
-            <p style={{ fontSize: 'clamp(22px, 2.2vw, 30px)', lineHeight: 1.6, letterSpacing: '-0.015em' }}>
+        <div className="sticky top-0 h-screen flex items-center justify-center" style={{ backgroundColor: 'hsl(var(--section-alt))' }}>
+          <div className="max-w-[680px] mx-auto px-6">
+            <p style={{ fontSize: 'clamp(20px, 2.2vw, 28px)', lineHeight: 1.65, letterSpacing: '-0.01em' }}>
               {words.map((word, i) => {
-                const opacity = revealProgress > i / words.length ? 1 : 0.12;
+                const opacity = revealProgress > i / words.length ? 1 : 0.1;
                 return (
-                  <span key={i} className="transition-opacity duration-200 text-foreground" style={{ opacity }}>
+                  <span key={i} className="transition-opacity duration-200 text-foreground font-medium" style={{ opacity }}>
                     {word}{' '}
                   </span>
                 );
@@ -297,77 +283,73 @@ const SiteHome: React.FC = () => {
       </section>
 
       {/* ═══ DEMO PREVIEW ═══ */}
-      <section className="py-24 bg-card">
-        <div className="max-w-[980px] mx-auto px-5 text-center">
+      <section className="py-28">
+        <div className="max-w-[900px] mx-auto px-6 text-center">
           <Reveal>
-            <span className="text-secondary text-xs font-semibold tracking-[0.08em] uppercase">
+            <p className="text-secondary font-semibold text-sm tracking-wide uppercase mb-4">
               {lang === 'pt' ? 'VEJA EM AÇÃO' : lang === 'es' ? 'VÉALO EN ACCIÓN' : 'SEE IT IN ACTION'}
-            </span>
+            </p>
           </Reveal>
-          <Reveal delay={100}>
-            <h2 className="text-foreground font-bold mt-4" style={{ fontSize: 'clamp(26px, 3vw, 42px)', letterSpacing: '-0.03em' }}>
+          <Reveal delay={80}>
+            <h2 className="text-foreground font-bold" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em' }}>
               {lang === 'pt' ? 'Feito para ser experimentado.' : lang === 'es' ? 'Hecho para ser experimentado.' : 'Built to be experienced.'}
             </h2>
           </Reveal>
-          <Reveal delay={200}>
-            <p className="text-muted-foreground mt-3 max-w-md mx-auto" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
+          <Reveal delay={160}>
+            <p className="text-muted-foreground mt-4 max-w-md mx-auto" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
               {lang === 'pt' ? 'Solicite acesso e veja NOOWE em ação.' : lang === 'es' ? 'Solicita acceso y ve NOOWE en acción.' : 'Request access and see NOOWE in action.'}
             </p>
           </Reveal>
-          <Reveal delay={300} variant="scale">
-            <div className="mt-12 mx-auto max-w-3xl rounded-3xl border border-border overflow-hidden bg-background aspect-video flex items-center justify-center shadow-lg">
+          <Reveal delay={240} variant="scale">
+            <div className="mt-14 mx-auto max-w-2xl rounded-2xl border border-border overflow-hidden bg-muted aspect-video flex items-center justify-center">
               <div className="text-center">
-                <NooweLogo size="lg" className="justify-center" />
-                <p className="text-muted-foreground text-sm mt-4">Platform Preview</p>
+                <NooweLogo size="lg" className="justify-center opacity-20" />
               </div>
             </div>
           </Reveal>
-          <Reveal delay={400}>
+          <Reveal delay={320}>
             <Link
               to="/request-demo"
-              className="inline-flex items-center gap-2 mt-8 text-primary font-medium hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 mt-10 text-primary font-semibold text-sm hover:gap-3 transition-all"
             >
-              {t('hero.cta1')} <ArrowRight size={16} />
+              {t('hero.cta1')} <ArrowRight size={15} />
             </Link>
           </Reveal>
         </div>
       </section>
 
       {/* ═══ CTA FINAL ═══ */}
-      <section className="py-28 relative">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full blur-[140px] opacity-15" style={{ background: 'hsl(14 100% 57%)' }} />
-        </div>
-        <div className="max-w-[640px] mx-auto px-5 text-center relative">
+      <section className="py-28 border-t border-border" style={{ backgroundColor: 'hsl(var(--section-alt))' }}>
+        <div className="max-w-[600px] mx-auto px-6 text-center">
           <Reveal>
-            <h2 className="text-foreground font-bold" style={{ fontSize: 'clamp(26px, 3vw, 42px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
+            <h2 className="text-foreground font-bold" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1.15 }}>
               {t('cta.title')}
             </h2>
           </Reveal>
-          <Reveal delay={100}>
+          <Reveal delay={80}>
             <p className="text-muted-foreground mt-4" style={{ fontSize: 'clamp(15px, 1.1vw, 18px)' }}>
               {t('cta.sub')}
             </p>
           </Reveal>
-          <Reveal delay={200}>
+          <Reveal delay={160}>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
               <Link
                 to="/request-demo"
-                className="group flex items-center gap-2 bg-primary text-primary-foreground font-semibold px-8 py-3.5 rounded-full hover:bg-primary-dark transition-all hover:scale-[1.03] shadow-md"
+                className="group flex items-center gap-2 bg-foreground text-background font-semibold px-8 py-3.5 rounded-lg hover:opacity-90 transition-all"
               >
                 {t('hero.cta1')}
-                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link
                 to="/platform"
-                className="px-8 py-3.5 rounded-full font-medium text-foreground border border-border hover:border-primary/30 bg-card transition-colors"
+                className="px-8 py-3.5 rounded-lg font-medium text-foreground border border-border hover:border-foreground/20 transition-colors"
               >
                 {t('hero.cta2')}
               </Link>
             </div>
           </Reveal>
-          <Reveal delay={300}>
-            <p className="text-muted-foreground text-xs mt-6">{t('cta.note')}</p>
+          <Reveal delay={240}>
+            <p className="text-muted-foreground text-xs mt-8">{t('cta.note')}</p>
           </Reveal>
         </div>
       </section>

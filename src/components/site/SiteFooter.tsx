@@ -32,13 +32,14 @@ const SiteFooter: React.FC = () => {
   ];
 
   return (
-    <footer className="border-t border-border py-16 bg-card/50">
-      <div className="max-w-[1080px] mx-auto px-5">
+    <footer className="border-t border-border py-16 bg-background">
+      <div className="max-w-[1120px] mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <NooweLogo size="sm" />
-            <p className="text-muted-foreground text-xs mt-3 leading-relaxed max-w-[200px]">
-              The Operating System for Restaurants
+            <p className="text-muted-foreground text-xs mt-4 leading-relaxed max-w-[220px]">
+              The Operating System
+              <br />for Restaurants.
             </p>
           </div>
 
@@ -47,7 +48,7 @@ const SiteFooter: React.FC = () => {
               <h4 className="text-foreground text-xs font-semibold uppercase tracking-wider mb-4">
                 {col.title}
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-3">
                 {col.links.map((link) => (
                   <li key={link.label}>
                     <Link to={link.to} className="text-muted-foreground text-sm hover:text-foreground transition-colors">
@@ -60,7 +61,7 @@ const SiteFooter: React.FC = () => {
           ))}
         </div>
 
-        <div className="mt-12 pt-6 border-t border-border flex items-center justify-between">
+        <div className="mt-14 pt-6 border-t border-border flex items-center justify-between">
           <p className="text-muted-foreground text-xs">
             © {new Date().getFullYear()} NOOWE. {t('footer.rights')}
           </p>

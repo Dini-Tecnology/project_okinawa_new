@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import NooweLogo from './NooweLogo';
 import { useLang } from '@/lib/i18n';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 
 const SiteNavbar: React.FC = () => {
   const { lang, setLang, t } = useLang();
@@ -11,7 +11,7 @@ const SiteNavbar: React.FC = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -27,18 +27,17 @@ const SiteNavbar: React.FC = () => {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-card/90 backdrop-blur-xl border-b border-border/50 shadow-sm'
+          ? 'bg-background/95 backdrop-blur-md border-b border-border'
           : 'bg-transparent'
       }`}
-      style={{ height: 56 }}
+      style={{ height: 64 }}
     >
-      <div className="max-w-[1080px] mx-auto px-5 h-full flex items-center justify-between">
+      <div className="max-w-[1120px] mx-auto px-6 h-full flex items-center justify-between">
         <Link to="/" className="flex-shrink-0">
           <NooweLogo size="sm" />
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {links.map((l) => (
             <Link
               key={l.to}
@@ -52,12 +51,11 @@ const SiteNavbar: React.FC = () => {
           ))}
         </div>
 
-        {/* Right */}
-        <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center gap-1 text-xs">
+        <div className="hidden md:flex items-center gap-5">
+          <div className="flex items-center gap-1.5 text-xs font-medium">
             {(['pt', 'en', 'es'] as const).map((l, i) => (
               <React.Fragment key={l}>
-                {i > 0 && <span className="text-muted-foreground/40">|</span>}
+                {i > 0 && <span className="text-border">|</span>}
                 <button
                   onClick={() => setLang(l)}
                   className={`transition-colors px-0.5 ${
@@ -72,9 +70,10 @@ const SiteNavbar: React.FC = () => {
 
           <Link
             to="/request-demo"
-            className="text-sm font-semibold bg-primary text-primary-foreground px-5 py-2 rounded-full hover:bg-primary-dark transition-all duration-200 hover:scale-[1.03] shadow-sm"
+            className="group text-sm font-semibold bg-foreground text-background px-5 py-2.5 rounded-lg hover:opacity-90 transition-all duration-200 inline-flex items-center gap-2"
           >
             {t('nav.request_demo')}
+            <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>
 
@@ -84,8 +83,8 @@ const SiteNavbar: React.FC = () => {
       </div>
 
       {mobileOpen && (
-        <div className="md:hidden bg-card/95 backdrop-blur-xl border-t border-border">
-          <div className="px-5 py-6 flex flex-col gap-4">
+        <div className="md:hidden bg-background border-t border-border">
+          <div className="px-6 py-6 flex flex-col gap-4">
             {links.map((l) => (
               <Link key={l.to} to={l.to} className="text-base text-muted-foreground hover:text-foreground transition-colors">
                 {l.label}
@@ -94,7 +93,7 @@ const SiteNavbar: React.FC = () => {
             <div className="flex items-center gap-2 pt-2 text-sm">
               {(['pt', 'en', 'es'] as const).map((l, i) => (
                 <React.Fragment key={l}>
-                  {i > 0 && <span className="text-muted-foreground/40">|</span>}
+                  {i > 0 && <span className="text-border">|</span>}
                   <button
                     onClick={() => setLang(l)}
                     className={lang === l ? 'text-foreground font-semibold' : 'text-muted-foreground'}
@@ -106,7 +105,7 @@ const SiteNavbar: React.FC = () => {
             </div>
             <Link
               to="/request-demo"
-              className="mt-2 text-center text-sm font-semibold bg-primary text-primary-foreground px-5 py-2.5 rounded-full"
+              className="mt-2 text-center text-sm font-semibold bg-foreground text-background px-5 py-3 rounded-lg"
             >
               {t('nav.request_demo')}
             </Link>
