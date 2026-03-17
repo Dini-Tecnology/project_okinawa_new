@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useLang } from '@/lib/i18n';
+import { useLang, Lang } from '@/lib/i18n';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import {
   ArrowRight, Star, Zap, Salad, Coffee, UtensilsCrossed, Truck,
   ChefHat, Utensils, Wine, Music, Crown, BarChart3, ConciergeBell,
-  GlassWater, Flame, UserCheck, ChevronDown, Check,
+  GlassWater, Flame, UserCheck, Check,
 } from 'lucide-react';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = '' }) => {
   const [ref, visible] = useScrollReveal<HTMLDivElement>();
