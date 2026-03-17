@@ -16,12 +16,14 @@ export type RestaurantScreen =
   | 'welcome' | 'setup' | 'dashboard' | 'table-map'
   | 'orders' | 'kds-kitchen' | 'kds-bar'
   | 'maitre' | 'waiter' | 'menu-editor' | 'team' | 'analytics'
-  // New role-specific screens
   | 'manager-ops' | 'approvals' | 'barman-station' | 'drink-recipes'
   | 'cook-station' | 'stock' | 'waiter-calls' | 'waiter-tips'
   | 'floor-flow' | 'daily-report'
-  // Enhanced waiter screens
-  | 'waiter-table-detail' | 'waiter-payment' | 'waiter-actions';
+  | 'waiter-table-detail' | 'waiter-payment' | 'waiter-actions'
+  // Configuration Hub screens
+  | 'config-hub' | 'config-profile' | 'config-service-types' | 'config-experience'
+  | 'config-floor' | 'config-menu' | 'config-team' | 'config-kitchen'
+  | 'config-payments' | 'config-features';
 
 export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
@@ -68,7 +70,7 @@ export const ROLE_JOURNEYS: Record<StaffRole, RoleJourneyStage[]> = {
     { screen: 'analytics', label: 'Analytics', icon: TrendingUp, desc: 'Relatórios e tendências' },
     { screen: 'team', label: 'Equipe', icon: Users, desc: 'Gestão de colaboradores' },
     { screen: 'menu-editor', label: 'Cardápio', icon: BookOpen, desc: 'Editor de cardápio' },
-    { screen: 'setup', label: 'Configuração', icon: Settings, desc: 'Perfil e configurações' },
+    { screen: 'config-hub', label: 'Central de Config', icon: Settings, desc: 'Hub de configuração completo' },
   ],
   manager: [
     { screen: 'manager-ops', label: 'Painel Operacional', icon: BarChart3, desc: 'Visão operacional em tempo real' },
@@ -78,6 +80,7 @@ export const ROLE_JOURNEYS: Record<StaffRole, RoleJourneyStage[]> = {
     { screen: 'team', label: 'Equipe Hoje', icon: Users, desc: 'Quem está em serviço' },
     { screen: 'daily-report', label: 'Relatório do Dia', icon: ClipboardList, desc: 'Fechamento e métricas do dia' },
     { screen: 'stock', label: 'Estoque', icon: Package, desc: 'Alertas de estoque baixo' },
+    { screen: 'config-hub', label: 'Central de Config', icon: Settings, desc: 'Hub de configuração completo' },
   ],
   maitre: [
     { screen: 'maitre', label: 'Reservas', icon: CalendarDays, desc: 'Reservas e check-in do dia' },
@@ -137,6 +140,16 @@ export const SCREEN_INFO: Record<RestaurantScreen, { title: string; desc: string
   'waiter-actions': { title: 'Ações na Mesa', desc: 'Executar ações pelo cliente: adicionar itens, solicitar conta, chamar gerente' },
   'floor-flow': { title: 'Fluxo do Salão', desc: 'Fila virtual, tempos de espera e rotação' },
   'daily-report': { title: 'Relatório do Dia', desc: 'Fechamento, métricas e comparativos' },
+  'config-hub': { title: 'Central de Configuração', desc: 'Hub completo para configurar todos os aspectos do seu estabelecimento' },
+  'config-profile': { title: 'Perfil do Restaurante', desc: 'Nome, logo, fotos, endereço e contato' },
+  'config-service-types': { title: 'Tipos de Serviço', desc: 'Selecione os 11 modelos de operação' },
+  'config-experience': { title: 'Experiência do Cliente', desc: 'Reservas, fila, QR Code, atendimento' },
+  'config-floor': { title: 'Mapa do Salão', desc: 'Mesas, zonas, áreas VIP e planta visual' },
+  'config-menu': { title: 'Gestão do Cardápio', desc: 'Categorias, itens, preços e disponibilidade' },
+  'config-team': { title: 'Equipe & Permissões', desc: 'Cargos, escalas, acessos e membros' },
+  'config-kitchen': { title: 'Cozinha & Bar', desc: 'Estações de preparo, KDS e receitas' },
+  'config-payments': { title: 'Pagamentos', desc: 'Taxa de serviço, gorjeta, split e métodos' },
+  'config-features': { title: 'Marketplace de Features', desc: 'Ative módulos avançados: fidelidade, IA, eventos' },
 };
 
 // ============ MOCK TEAM DATA ============

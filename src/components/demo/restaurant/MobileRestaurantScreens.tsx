@@ -27,6 +27,10 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
+import {
+  ConfigHub, ConfigProfile, ConfigServiceTypes, ConfigExperience,
+  ConfigFloor, ConfigMenu, ConfigTeam, ConfigKitchen, ConfigPayments, ConfigFeatures,
+} from './ConfigHubScreens';
 import { useDemoContext, type OrderStatus, type TableStatus } from '@/contexts/DemoContext';
 import { useDemoI18n } from '@/components/demo/DemoI18n';
 import {
@@ -1547,6 +1551,16 @@ export const MobileRestaurantScreen: React.FC<{
       {screen === 'waiter-table-detail' && <MobileWaiter />}
       {screen === 'floor-flow' && <MobileFloorFlow />}
       {screen === 'daily-report' && <MobileDailyReport />}
+      {screen === 'config-hub' && <ConfigHub onNavigate={onNavigate} />}
+      {screen === 'config-profile' && <ConfigProfile onNavigate={onNavigate} />}
+      {screen === 'config-service-types' && <ConfigServiceTypes onNavigate={onNavigate} />}
+      {screen === 'config-experience' && <ConfigExperience onNavigate={onNavigate} />}
+      {screen === 'config-floor' && <ConfigFloor onNavigate={onNavigate} />}
+      {screen === 'config-menu' && <ConfigMenu onNavigate={onNavigate} />}
+      {screen === 'config-team' && <ConfigTeam onNavigate={onNavigate} />}
+      {screen === 'config-kitchen' && <ConfigKitchen onNavigate={onNavigate} />}
+      {screen === 'config-payments' && <ConfigPayments onNavigate={onNavigate} />}
+      {screen === 'config-features' && <ConfigFeatures onNavigate={onNavigate} />}
 
       <div className="rounded-2xl border border-border bg-card p-3">
         <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Perfil ativo')}</p>
