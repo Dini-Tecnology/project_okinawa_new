@@ -121,10 +121,10 @@ const GuidedSimulationInner: React.FC = () => {
               />
             ) : (
               <MobileRestaurantScreen
-                screen={step.restaurantScreen as any || 'kds'}
+                screen={(step.restaurantScreen as any) || 'kds'}
+                activeRole="chef"
                 onNavigate={() => {}}
-                role="chef"
-                serviceType="fine-dining"
+                onSelectRole={() => {}}
               />
             )}
           </PhoneShell>
