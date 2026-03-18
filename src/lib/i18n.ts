@@ -290,7 +290,7 @@ const translations: Record<string, Record<Lang, string>> = {
   'free.banner_cta': { pt: 'Iniciar simulação', en: 'Start simulation', es: 'Iniciar simulación' },
 
   // Platform
-  'platform.overline': { pt: 'A PLATAFORMA', en: 'THE PLATFORM', es: 'LA PLATAFORMA' },
+  'platform.overline': { pt: 'PARA SEU NEGÓCIO', en: 'FOR YOUR BUSINESS', es: 'PARA TU NEGOCIO' },
   'platform.title': { pt: 'Um sistema.\nTodos os fluxos do seu restaurante.', en: 'One system.\nEvery flow in your restaurant.', es: 'Un sistema.\nTodos los flujos de tu restaurante.' },
   'platform.sub': {
     pt: 'Do primeiro pedido ao fechamento do dia, tudo acontece dentro de uma única lógica — contínua, integrada e em tempo real.',
