@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      demo_leads: {
+        Row: {
+          access_code: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          restaurant: string
+          verified: boolean
+        }
+        Insert: {
+          access_code: string
+          created_at?: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          restaurant: string
+          verified?: boolean
+        }
+        Update: {
+          access_code?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          restaurant?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       waitlist: {
         Row: {
           city: string | null

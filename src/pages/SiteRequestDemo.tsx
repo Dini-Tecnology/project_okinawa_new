@@ -5,6 +5,8 @@ import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import { Check, Loader2, ArrowRight, Shield, Clock, Users } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const Reveal: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({ children, delay = 0, className = '' }) => {
   const [ref, visible] = useScrollReveal<HTMLDivElement>();
@@ -36,9 +38,31 @@ const SiteRequestDemo: React.FC = () => {
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setLoading(false);
-    setSubmitted(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-demo-code', {
+        body: {
+          name: form.name.trim(),
+          restaurant: form.restaurant.trim(),
+          email: form.email.trim().toLowerCase(),
+          phone: form.phone.trim() || null,
+        },
+      });
+
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error('Error requesting demo:', err);
+      toast.error(
+        lang === 'pt' ? 'Erro ao enviar. Tente novamente.' :
+        lang === 'es' ? 'Error al enviar. Intente de nuevo.' :
+        'Failed to send. Please try again.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const inputClass = (field: string) =>
@@ -124,7 +148,7 @@ const SiteRequestDemo: React.FC = () => {
                     <h2 className="font-display font-bold text-xl mb-3 text-foreground">{t('rdemo.success_title')}</h2>
                     <p className="text-muted-foreground text-sm mb-6 leading-relaxed">{t('rdemo.success_body')}</p>
                     <button
-                      onClick={() => navigate('/access')}
+                      onClick={() => navigate(`/access?email=${encodeURIComponent(form.email.trim().toLowerCase())}`)}
                       className="group w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary-dark transition-all flex items-center justify-center gap-2 shadow-glow mb-4"
                     >
                       {lang === 'pt' ? 'Inserir código de acesso' : lang === 'es' ? 'Ingresar código de acceso' : 'Enter access code'}
