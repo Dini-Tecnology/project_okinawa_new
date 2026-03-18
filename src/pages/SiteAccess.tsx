@@ -3,28 +3,54 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useLang } from '@/lib/i18n';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import NooweLogo from '@/components/site/NooweLogo';
+import { supabase } from '@/integrations/supabase/client';
+import { Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 const SiteAccess: React.FC = () => {
-  const { t } = useLang();
+  const { lang, t } = useLang();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [code, setCode] = useState<string[]>(Array(6).fill(''));
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState(searchParams.get('email') || '');
+  const [showEmailInput, setShowEmailInput] = useState(!searchParams.get('email'));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
-  useEffect(() => {
-    const urlCode = searchParams.get('code');
-    if (urlCode && urlCode.length === 6) {
-      setCode(urlCode.split(''));
-      validateCode(urlCode.split(''));
-    }
-  }, []);
+  const validateCode = async (digits: string[]) => {
+    const codeStr = digits.join('');
+    if (codeStr.length !== 6 || !email) return;
 
-  const validateCode = (digits: string[]) => {
-    if (digits.join('').length === 6) {
-      setSuccess(true);
-      setTimeout(() => navigate('/demo/intent'), 800);
+    setLoading(true);
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke('verify-demo-code', {
+        body: { email: email.trim().toLowerCase(), code: codeStr },
+      });
+
+      if (fnError) throw fnError;
+
+      if (data?.valid) {
+        setSuccess(true);
+        setTimeout(() => navigate('/demo/intent'), 800);
+      } else {
+        setError(true);
+        toast.error(
+          lang === 'pt' ? 'Código inválido. Verifique e tente novamente.' :
+          lang === 'es' ? 'Código inválido. Verifique e intente de nuevo.' :
+          'Invalid code. Please check and try again.'
+        );
+      }
+    } catch (err) {
+      console.error('Verify error:', err);
+      toast.error(
+        lang === 'pt' ? 'Erro ao verificar. Tente novamente.' :
+        lang === 'es' ? 'Error al verificar. Intente de nuevo.' :
+        'Verification failed. Please try again.'
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,9 +90,27 @@ const SiteAccess: React.FC = () => {
 
           <h1 className="font-display font-bold text-3xl mb-3 text-foreground">{t('access.title')}</h1>
           <p className="text-muted-foreground text-base mb-4">{t('access.sub')}</p>
+
+          {showEmailInput && (
+            <div className="mb-8">
+              <input
+                type="email"
+                placeholder={lang === 'pt' ? 'Seu e-mail' : lang === 'es' ? 'Tu correo' : 'Your email'}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-center"
+              />
+            </div>
+          )}
+
           <p className="text-muted-foreground/70 text-sm mb-12 max-w-xs mx-auto">{t('access.sim_note')}</p>
 
-          <div className="flex justify-center gap-3 mb-10">
+          <div className="flex justify-center gap-3 mb-10 relative">
+            {loading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-background/60 rounded-xl z-10">
+                <Loader2 size={24} className="animate-spin text-primary" />
+              </div>
+            )}
             {code.map((digit, i) => (
               <input
                 key={i}
@@ -77,6 +121,7 @@ const SiteAccess: React.FC = () => {
                 value={digit}
                 onChange={(e) => handleInput(i, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(i, e)}
+                disabled={loading}
                 className={`w-14 h-16 text-center text-2xl font-bold rounded-xl border-2 bg-background text-foreground focus:outline-none transition-all duration-200 ${
                   success ? 'border-success bg-success/5' : error ? 'border-destructive' : 'border-border focus:border-primary focus:ring-4 focus:ring-primary/10'
                 }`}

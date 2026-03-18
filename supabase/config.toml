@@ -1,1 +1,7 @@
 project_id = "micstczoxsvnrkordftk"
+
+[functions.send-demo-code]
+verify_jwt = false
+
+[functions.verify-demo-code]
+verify_jwt = false
