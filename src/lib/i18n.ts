@@ -4,7 +4,7 @@ export type Lang = 'pt' | 'en' | 'es';
 
 const translations: Record<string, Record<Lang, string>> = {
   // Navbar
-  'nav.platform': { pt: 'Plataforma', en: 'Platform', es: 'Plataforma' },
+  'nav.platform': { pt: 'Para seu Negócio', en: 'For Business', es: 'Para tu Negocio' },
   'nav.demo': { pt: 'Demo', en: 'Demo', es: 'Demo' },
   'nav.request_demo': { pt: 'Solicitar Demo', en: 'Request Demo', es: 'Solicitar Demo' },
 
