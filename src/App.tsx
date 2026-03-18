@@ -18,6 +18,7 @@ const SiteRequestDemo = lazy(() => import("./pages/SiteRequestDemo"));
 const SiteAccess = lazy(() => import("./pages/SiteAccess"));
 const SiteIntentCapture = lazy(() => import("./pages/SiteIntentCapture"));
 const SiteDemoHub = lazy(() => import("./pages/SiteDemoHub"));
+const SiteForYou = lazy(() => import("./pages/SiteForYou"));
 const GuidedSimulation = lazy(() => import("./pages/GuidedSimulation"));
 const SiteImpact = lazy(() => import("./pages/SiteImpact"));
 const MobilePreview = lazy(() => import("./pages/MobilePreview"));
