@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { useLang } from '@/lib/i18n';
 import SiteNavbar from '@/components/site/SiteNavbar';
 import SiteFooter from '@/components/site/SiteFooter';
+import WaitlistCard from '@/components/site/WaitlistCard';
 import { useScrollReveal } from '@/hooks/useScrollReveal';
 import {
   ArrowRight, ChefHat, Utensils, Coffee, UtensilsCrossed, Truck,
   Wine, Zap, Star, Music, Salad, BarChart3, Users, Workflow,
   Crown, ConciergeBell, GlassWater, Flame, UserCheck, Check,
-  Shield, Globe, CreditCard, Clock,
+  Shield, Globe, CreditCard, Clock, Building2, Smartphone,
 } from 'lucide-react';
 
 /* ─── Reveal ─── */
@@ -71,7 +72,6 @@ const SiteHome: React.FC = () => {
 
       {/* ═══ HERO ═══ */}
       <section className="relative pt-32 pb-24 overflow-hidden">
-        {/* Subtle background accent */}
         <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-[0.04]" style={{ background: 'radial-gradient(circle, hsl(var(--primary)) 0%, transparent 70%)' }} />
         <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, hsl(var(--secondary)) 0%, transparent 70%)' }} />
         
@@ -87,11 +87,7 @@ const SiteHome: React.FC = () => {
             <Reveal delay={80}>
               <h1
                 className="font-display font-bold text-foreground"
-                style={{
-                  fontSize: 'clamp(42px, 7vw, 76px)',
-                  letterSpacing: '-0.04em',
-                  lineHeight: 1.05,
-                }}
+                style={{ fontSize: 'clamp(42px, 7vw, 76px)', letterSpacing: '-0.04em', lineHeight: 1.05 }}
               >
                 {t('hero.h1_1')}
                 <br />
@@ -100,10 +96,7 @@ const SiteHome: React.FC = () => {
             </Reveal>
 
             <Reveal delay={160}>
-              <p
-                className="text-muted-foreground mt-7 max-w-lg"
-                style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 1.65 }}
-              >
+              <p className="text-muted-foreground mt-7 max-w-lg" style={{ fontSize: 'clamp(17px, 1.4vw, 21px)', lineHeight: 1.65 }}>
                 {t('hero.sub')}
               </p>
             </Reveal>
@@ -143,8 +136,49 @@ const SiteHome: React.FC = () => {
         </div>
       </section>
 
+      {/* ═══ AUDIENCE BIFURCATION ═══ */}
+      <section className="py-20 bg-muted/30">
+        <div className="max-w-[1200px] mx-auto px-6">
+          <Reveal>
+            <h2 className="font-display font-bold text-foreground text-center mb-12" style={{ fontSize: 'clamp(28px, 3vw, 42px)', letterSpacing: '-0.03em' }}>
+              {t('home.audience_title')}
+            </h2>
+          </Reveal>
+
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            {/* B2B Card */}
+            <Reveal delay={80}>
+              <Link to="/platform" className="group block p-8 rounded-2xl border-2 border-border bg-background hover:border-primary/40 transition-all duration-300 hover:shadow-lg h-full">
+                <div className="w-12 h-12 rounded-xl bg-primary/8 text-primary flex items-center justify-center mb-5">
+                  <Building2 size={24} />
+                </div>
+                <h3 className="font-display font-bold text-foreground text-xl mb-3">{t('home.biz_title')}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t('home.biz_desc')}</p>
+                <span className="inline-flex items-center gap-2 text-primary font-semibold text-sm group-hover:gap-3 transition-all">
+                  {t('home.biz_cta')} <ArrowRight size={16} />
+                </span>
+              </Link>
+            </Reveal>
+
+            {/* B2C Card */}
+            <Reveal delay={160}>
+              <Link to="/para-voce" className="group block p-8 rounded-2xl border-2 border-border bg-background hover:border-secondary/40 transition-all duration-300 hover:shadow-lg h-full">
+                <div className="w-12 h-12 rounded-xl bg-secondary/8 text-secondary flex items-center justify-center mb-5">
+                  <Smartphone size={24} />
+                </div>
+                <h3 className="font-display font-bold text-foreground text-xl mb-3">{t('home.you_title')}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed mb-6">{t('home.you_desc')}</p>
+                <span className="inline-flex items-center gap-2 text-secondary font-semibold text-sm group-hover:gap-3 transition-all">
+                  {t('home.you_cta')} <ArrowRight size={16} />
+                </span>
+              </Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ WHY NOOWE ═══ */}
-      <section className="py-24 bg-muted/30">
+      <section className="py-24">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -186,7 +220,7 @@ const SiteHome: React.FC = () => {
       </section>
 
       {/* ═══ SERVICE TYPES ═══ */}
-      <section className="py-24">
+      <section className="py-24 bg-muted/30">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Reveal>
@@ -215,7 +249,6 @@ const SiteHome: React.FC = () => {
                 </div>
               </Reveal>
             ))}
-            {/* CTA card */}
             <Reveal delay={serviceTypes.length * 40}>
               <Link to="/platform" className="group relative p-6 rounded-2xl border-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all duration-300 h-full flex flex-col items-center justify-center text-center">
                 <ArrowRight size={20} className="text-primary mb-2 group-hover:translate-x-1 transition-transform" />
@@ -229,7 +262,7 @@ const SiteHome: React.FC = () => {
       </section>
 
       {/* ═══ ROLES ═══ */}
-      <section className="py-24 bg-muted/30">
+      <section className="py-24">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -269,7 +302,7 @@ const SiteHome: React.FC = () => {
       </section>
 
       {/* ═══ CAPABILITIES ═══ */}
-      <section className="py-24">
+      <section className="py-24 bg-muted/30">
         <div className="max-w-[1200px] mx-auto px-6">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <Reveal>
@@ -282,7 +315,7 @@ const SiteHome: React.FC = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {capabilities.map((c, i) => (
               <Reveal key={i} delay={i * 70}>
-                <div className="p-6 rounded-2xl border border-border hover:border-primary/20 transition-all duration-300 hover:shadow-md h-full">
+                <div className="p-6 rounded-2xl border border-border bg-background hover:border-primary/20 transition-all duration-300 hover:shadow-md h-full">
                   <div className="w-11 h-11 rounded-xl bg-secondary/8 text-secondary flex items-center justify-center mb-5">
                     <c.icon size={22} />
                   </div>
@@ -292,6 +325,21 @@ const SiteHome: React.FC = () => {
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══ B2C WAITLIST STRIP ═══ */}
+      <section className="py-20">
+        <div className="max-w-[600px] mx-auto px-6 text-center">
+          <Reveal>
+            <h2 className="font-display font-bold text-foreground mb-3" style={{ fontSize: 'clamp(26px, 3vw, 38px)', letterSpacing: '-0.03em' }}>
+              {t('foryou.waitlist_title')}
+            </h2>
+            <p className="text-muted-foreground text-lg mb-8">{t('foryou.waitlist_sub')}</p>
+          </Reveal>
+          <Reveal delay={100}>
+            <WaitlistCard />
+          </Reveal>
         </div>
       </section>
 

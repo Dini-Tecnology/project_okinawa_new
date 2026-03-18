@@ -328,6 +328,66 @@ const translations: Record<string, Record<Lang, string>> = {
     es: 'Accede a NOOWE y ve la operación sucediendo de verdad — de principio a fin.',
   },
   'platform.cta_button': { pt: 'Solicitar acesso', en: 'Request access', es: 'Solicitar acceso' },
+
+  // Navbar — For You
+  'nav.foryou': { pt: 'Para Você', en: 'For You', es: 'Para Ti' },
+
+  // Waitlist
+  'waitlist.title': { pt: 'Entre na lista de espera', en: 'Join the waitlist', es: 'Únete a la lista de espera' },
+  'waitlist.sub': { pt: 'Seja um dos primeiros a experimentar o NOOWE quando o app for lançado.', en: 'Be one of the first to experience NOOWE when the app launches.', es: 'Sé de los primeros en experimentar NOOWE cuando la app sea lanzada.' },
+  'waitlist.name_placeholder': { pt: 'Seu nome', en: 'Your name', es: 'Tu nombre' },
+  'waitlist.email_placeholder': { pt: 'Seu email', en: 'Your email', es: 'Tu email' },
+  'waitlist.city_placeholder': { pt: 'Sua cidade (opcional)', en: 'Your city (optional)', es: 'Tu ciudad (opcional)' },
+  'waitlist.cta': { pt: 'Quero fazer parte', en: 'I want in', es: 'Quiero ser parte' },
+  'waitlist.success_title': { pt: 'Você está na lista!', en: "You're on the list!", es: '¡Estás en la lista!' },
+  'waitlist.success_body': { pt: 'Vamos te avisar assim que o NOOWE estiver disponível na sua região.', en: "We'll let you know as soon as NOOWE is available in your area.", es: 'Te avisaremos cuando NOOWE esté disponible en tu región.' },
+  'waitlist.already': { pt: 'Este email já está na lista.', en: 'This email is already on the list.', es: 'Este email ya está en la lista.' },
+  'waitlist.error': { pt: 'Algo deu errado. Tente novamente.', en: 'Something went wrong. Try again.', es: 'Algo salió mal. Inténtalo de nuevo.' },
+
+  // For You (B2C page)
+  'foryou.overline': { pt: 'PARA VOCÊ', en: 'FOR YOU', es: 'PARA TI' },
+  'foryou.h1': { pt: 'A melhor experiência em restaurantes começa no seu celular.', en: 'The best restaurant experience starts on your phone.', es: 'La mejor experiencia en restaurantes empieza en tu celular.' },
+  'foryou.sub': { pt: 'Chega de esperar garçom, disputar atenção ou ficar na dúvida sobre o pedido. Com o NOOWE, tudo flui — do primeiro prato ao pagamento.', en: "No more waiting for the waiter, competing for attention, or wondering about your order. With NOOWE, everything flows — from the first dish to payment.", es: 'Basta de esperar al mesero, competir por atención o quedarse con dudas sobre el pedido. Con NOOWE, todo fluye — del primer plato al pago.' },
+
+  'foryou.features_title': { pt: 'O que muda na sua experiência', en: 'What changes in your experience', es: 'Lo que cambia en tu experiencia' },
+  'foryou.features_sub': { pt: 'Funcionalidades que transformam sua ida ao restaurante.', en: 'Features that transform your restaurant visit.', es: 'Funcionalidades que transforman tu visita al restaurante.' },
+
+  'foryou.feat_order_title': { pt: 'Peça sem esforço', en: 'Order effortlessly', es: 'Pide sin esfuerzo' },
+  'foryou.feat_order_desc': { pt: 'Cardápio digital no seu celular. Escolha, personalize e envie — sem depender de ninguém.', en: 'Digital menu on your phone. Choose, customize and send — without depending on anyone.', es: 'Menú digital en tu celular. Elige, personaliza y envía — sin depender de nadie.' },
+  'foryou.feat_track_title': { pt: 'Acompanhe em tempo real', en: 'Track in real time', es: 'Sigue en tiempo real' },
+  'foryou.feat_track_desc': { pt: 'Saiba exatamente onde está seu pedido. Sem ansiedade, sem chamar o garçom.', en: 'Know exactly where your order is. No anxiety, no calling the waiter.', es: 'Sabe exactamente dónde está tu pedido. Sin ansiedad, sin llamar al mesero.' },
+  'foryou.feat_pay_title': { pt: 'Pague sem fricção', en: 'Pay without friction', es: 'Paga sin fricción' },
+  'foryou.feat_pay_desc': { pt: 'PIX, cartão, Apple Pay, Google Pay. Pague como preferir, direto do celular.', en: 'PIX, card, Apple Pay, Google Pay. Pay however you prefer, right from your phone.', es: 'PIX, tarjeta, Apple Pay, Google Pay. Paga como prefieras, directo del celular.' },
+  'foryou.feat_split_title': { pt: 'Divida a conta fácil', en: 'Split the bill easily', es: 'Divide la cuenta fácil' },
+  'foryou.feat_split_desc': { pt: 'Divida por igual, por item ou por pessoa. Sem calculadora, sem constrangimento.', en: 'Split equally, by item or by person. No calculator, no awkwardness.', es: 'Divide por igual, por item o por persona. Sin calculadora, sin incomodidad.' },
+  'foryou.feat_fast_title': { pt: 'Zero espera', en: 'Zero wait', es: 'Cero espera' },
+  'foryou.feat_fast_desc': { pt: 'Fila virtual, skip the line e pedidos antecipados. Seu tempo vale mais.', en: 'Virtual queue, skip the line and advance orders. Your time is worth more.', es: 'Fila virtual, skip the line y pedidos anticipados. Tu tiempo vale más.' },
+  'foryou.feat_notify_title': { pt: 'Notificações inteligentes', en: 'Smart notifications', es: 'Notificaciones inteligentes' },
+  'foryou.feat_notify_desc': { pt: 'Saiba quando seu pedido está pronto, quando a mesa liberou ou quando é sua vez.', en: "Know when your order is ready, when the table is free or when it's your turn.", es: 'Sabe cuándo tu pedido está listo, cuándo la mesa se liberó o cuándo es tu turno.' },
+
+  'foryou.how_title': { pt: 'Como funciona', en: 'How it works', es: 'Cómo funciona' },
+  'foryou.step1_title': { pt: 'Escaneie o QR code', en: 'Scan the QR code', es: 'Escanea el código QR' },
+  'foryou.step1_desc': { pt: 'Na mesa, no balcão ou na fila. O NOOWE abre instantaneamente.', en: 'At the table, counter or queue. NOOWE opens instantly.', es: 'En la mesa, mostrador o fila. NOOWE se abre al instante.' },
+  'foryou.step2_title': { pt: 'Peça e acompanhe', en: 'Order and track', es: 'Pide y sigue' },
+  'foryou.step2_desc': { pt: 'Navegue pelo cardápio, faça seu pedido e acompanhe tudo em tempo real.', en: 'Browse the menu, place your order and track everything in real time.', es: 'Navega por el menú, haz tu pedido y sigue todo en tiempo real.' },
+  'foryou.step3_title': { pt: 'Pague e vá', en: 'Pay and go', es: 'Paga y vete' },
+  'foryou.step3_desc': { pt: 'Feche a conta no celular. Sem esperar, sem complicação.', en: 'Close your tab on your phone. No waiting, no hassle.', es: 'Cierra la cuenta en tu celular. Sin esperar, sin complicaciones.' },
+
+  'foryou.waitlist_title': { pt: 'Quer ser um dos primeiros?', en: 'Want to be one of the first?', es: '¿Quieres ser de los primeros?' },
+  'foryou.waitlist_sub': { pt: 'O NOOWE está chegando. Entre na lista e descubra antes de todo mundo.', en: "NOOWE is coming. Join the list and discover it before everyone else.", es: 'NOOWE está llegando. Únete a la lista y descúbrelo antes que todos.' },
+
+  // Home — Audience bifurcation
+  'home.audience_title': { pt: 'Como podemos te ajudar?', en: 'How can we help you?', es: '¿Cómo podemos ayudarte?' },
+  'home.biz_title': { pt: 'Para seu negócio', en: 'For your business', es: 'Para tu negocio' },
+  'home.biz_desc': { pt: 'Conheça a plataforma completa que conecta todos os fluxos do seu restaurante.', en: 'Discover the complete platform that connects every flow in your restaurant.', es: 'Conoce la plataforma completa que conecta todos los flujos de tu restaurante.' },
+  'home.biz_cta': { pt: 'Conhecer a plataforma', en: 'Explore the platform', es: 'Conocer la plataforma' },
+  'home.you_title': { pt: 'Para você, cliente', en: 'For you, the guest', es: 'Para ti, cliente' },
+  'home.you_desc': { pt: 'Descubra como o NOOWE transforma sua experiência em restaurantes — e entre na lista de espera.', en: 'Discover how NOOWE transforms your restaurant experience — and join the waitlist.', es: 'Descubre cómo NOOWE transforma tu experiencia en restaurantes — y únete a la lista de espera.' },
+  'home.you_cta': { pt: 'Saiba mais', en: 'Learn more', es: 'Saber más' },
+
+  // Footer waitlist
+  'footer.waitlist_title': { pt: 'Fique por dentro', en: 'Stay in the loop', es: 'Mantente informado' },
+  'footer.foryou': { pt: 'Para Você', en: 'For You', es: 'Para Ti' },
 };
 
 export function t(key: string, lang: Lang): string {

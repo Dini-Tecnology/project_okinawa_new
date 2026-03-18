@@ -18,6 +18,7 @@ const SiteRequestDemo = lazy(() => import("./pages/SiteRequestDemo"));
 const SiteAccess = lazy(() => import("./pages/SiteAccess"));
 const SiteIntentCapture = lazy(() => import("./pages/SiteIntentCapture"));
 const SiteDemoHub = lazy(() => import("./pages/SiteDemoHub"));
+const SiteForYou = lazy(() => import("./pages/SiteForYou"));
 const GuidedSimulation = lazy(() => import("./pages/GuidedSimulation"));
 const SiteImpact = lazy(() => import("./pages/SiteImpact"));
 const MobilePreview = lazy(() => import("./pages/MobilePreview"));
@@ -65,6 +66,7 @@ const App = () => (
                       <Route path="/platform" element={<SitePlatform />} />
                       <Route path="/request-demo" element={<SiteRequestDemo />} />
                       <Route path="/access" element={<SiteAccess />} />
+                      <Route path="/para-voce" element={<SiteForYou />} />
                       <Route path="/demo/intent" element={<SiteIntentCapture />} />
                       <Route path="/demo" element={<SiteDemoHub />} />
                       <Route path="/demo/guided" element={<GuidedSimulation />} />
