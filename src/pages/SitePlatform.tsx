@@ -251,7 +251,7 @@ const SitePlatform: React.FC = () => {
                               <span className="text-foreground font-medium text-sm">{detail.name}</span>
                             </div>
                           </HoverCardTrigger>
-                          <HoverCardContent side="right" align="start" className="w-80 p-0 overflow-hidden" sideOffset={12}>
+                          <HoverCardContent side="top" align="center" className="w-80 p-0 overflow-hidden z-50" sideOffset={8} collisionPadding={16}>
                             <div className="p-4 border-b border-border bg-muted/30">
                               <div className="flex items-center gap-3 mb-1.5">
                                 <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
