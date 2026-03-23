@@ -400,7 +400,7 @@ const translations: Record<string, Record<Lang, string>> = {
   'foryou.step3_desc': { pt: 'Feche a conta no celular. Sem esperar, sem complicação.', en: 'Close your tab on your phone. No waiting, no hassle.', es: 'Cierra la cuenta en tu celular. Sin esperar, sin complicaciones.' },
 
   'foryou.waitlist_title': { pt: 'Quer ser um dos primeiros?', en: 'Want to be one of the first?', es: '¿Quieres ser de los primeros?' },
-  'foryou.waitlist_sub': { pt: 'O NOOWE está chegando. Entre na lista e descubra antes de todo mundo.', en: "NOOWE is coming. Join the list and discover it before everyone else.", es: 'NOOWE está llegando. Únete a la lista y descúbrelo antes que todos.' },
+  'foryou.waitlist_sub': { pt: 'A NOOWE está chegando. Entre na lista e descubra antes de todo mundo.', en: "NOOWE is coming. Join the list and discover it before everyone else.", es: 'NOOWE está llegando. Únete a la lista y descúbrelo antes que todos.' },
 
   // Home — Audience bifurcation
   'home.audience_title': { pt: 'Como podemos te ajudar?', en: 'How can we help you?', es: '¿Cómo podemos ayudarte?' },
@@ -408,12 +408,66 @@ const translations: Record<string, Record<Lang, string>> = {
   'home.biz_desc': { pt: 'Conheça a plataforma completa que conecta todos os fluxos do seu restaurante.', en: 'Discover the complete platform that connects every flow in your restaurant.', es: 'Conoce la plataforma completa que conecta todos los flujos de tu restaurante.' },
   'home.biz_cta': { pt: 'Conhecer a plataforma', en: 'Explore the platform', es: 'Conocer la plataforma' },
   'home.you_title': { pt: 'Para você, cliente', en: 'For you, the guest', es: 'Para ti, cliente' },
-  'home.you_desc': { pt: 'Descubra como o NOOWE transforma sua experiência em restaurantes — e entre na lista de espera.', en: 'Discover how NOOWE transforms your restaurant experience — and join the waitlist.', es: 'Descubre cómo NOOWE transforma tu experiencia en restaurantes — y únete a la lista de espera.' },
+  'home.you_desc': { pt: 'Descubra como a NOOWE transforma sua experiência em restaurantes — e entre na lista de espera.', en: 'Discover how NOOWE transforms your restaurant experience — and join the waitlist.', es: 'Descubre cómo NOOWE transforma tu experiencia en restaurantes — y únete a la lista de espera.' },
   'home.you_cta': { pt: 'Saiba mais', en: 'Learn more', es: 'Saber más' },
 
   // Footer waitlist
   'footer.waitlist_title': { pt: 'Fique por dentro', en: 'Stay in the loop', es: 'Mantente informado' },
   'footer.foryou': { pt: 'Para Você', en: 'For You', es: 'Para Ti' },
+  'footer.tagline': { pt: 'Onde cada experiência\nse encontra.', en: 'Where every experience\ncomes together.', es: 'Donde cada experiencia\nse encuentra.' },
+  'footer.request_demo': { pt: 'Solicitar Demo', en: 'Request Demo', es: 'Solicitar Demo' },
+
+  // Platform WhatsApp CTA
+  'platform.whatsapp_cta': { pt: 'Falar com especialista', en: 'Talk to a specialist', es: 'Hablar con un especialista' },
+
+  // Feedback widget
+  'fb.button_label': { pt: 'Feedback', en: 'Feedback', es: 'Feedback' },
+  'fb.title': { pt: 'Enviar feedback', en: 'Send feedback', es: 'Enviar feedback' },
+  'fb.subtitle': { pt: 'Ajude-nos a melhorar a plataforma.', en: 'Help us improve the platform.', es: 'Ayúdanos a mejorar la plataforma.' },
+  'fb.type': { pt: 'Tipo', en: 'Type', es: 'Tipo' },
+  'fb.type_bug': { pt: 'Bug', en: 'Bug', es: 'Bug' },
+  'fb.type_improvement': { pt: 'Melhoria', en: 'Improvement', es: 'Mejora' },
+  'fb.type_usability': { pt: 'Usabilidade', en: 'Usability', es: 'Usabilidad' },
+  'fb.type_question': { pt: 'Dúvida', en: 'Question', es: 'Duda' },
+  'fb.rating': { pt: 'Avaliação', en: 'Rating', es: 'Calificación' },
+  'fb.description': { pt: 'Descreva o que observou', en: 'Describe what you observed', es: 'Describe lo que observaste' },
+  'fb.description_placeholder': { pt: 'O que aconteceu? O que poderia ser melhor?', en: 'What happened? What could be better?', es: '¿Qué pasó? ¿Qué podría ser mejor?' },
+  'fb.submit': { pt: 'Enviar', en: 'Submit', es: 'Enviar' },
+  'fb.sending': { pt: 'Enviando...', en: 'Sending...', es: 'Enviando...' },
+  'fb.success': { pt: 'Feedback enviado com sucesso!', en: 'Feedback sent successfully!', es: 'Feedback enviado con éxito!' },
+  'fb.error': { pt: 'Erro ao enviar. Tente novamente.', en: 'Error sending. Try again.', es: 'Error al enviar. Inténtalo de nuevo.' },
+  'fb.page': { pt: 'Página', en: 'Page', es: 'Página' },
+
+  // Admin feedback
+  'admin.fb.title': { pt: 'Painel de Feedbacks', en: 'Feedback Dashboard', es: 'Panel de Feedbacks' },
+  'admin.fb.empty': { pt: 'Nenhum feedback registrado ainda.', en: 'No feedback recorded yet.', es: 'Ningún feedback registrado aún.' },
+  'admin.fb.filter_all': { pt: 'Todos', en: 'All', es: 'Todos' },
+  'admin.fb.date': { pt: 'Data', en: 'Date', es: 'Fecha' },
+  'admin.fb.total': { pt: 'Total', en: 'Total', es: 'Total' },
+  'admin.fb.avg_rating': { pt: 'Avaliação média', en: 'Average rating', es: 'Calificación promedio' },
+  'admin.fb.export': { pt: 'Exportar', en: 'Export', es: 'Exportar' },
+  'admin.fb.access_code': { pt: 'Código de acesso', en: 'Access code', es: 'Código de acceso' },
+  'admin.fb.access_placeholder': { pt: 'Digite o código de acesso', en: 'Enter access code', es: 'Ingresa el código de acceso' },
+  'admin.fb.access_submit': { pt: 'Entrar', en: 'Enter', es: 'Entrar' },
+  'admin.fb.access_error': { pt: 'Código incorreto.', en: 'Incorrect code.', es: 'Código incorrecto.' },
+  // Navbar simulation
+  'nav.simulation': { pt: 'Simulação', en: 'Simulation', es: 'Simulación' },
+
+  // Home hero CTA
+  'home.hero_cta_sim': { pt: 'Veja funcionando em 2 min', en: 'See it working in 2 min', es: 'Míralo funcionando en 2 min' },
+  'home.hero_cta_platform': { pt: 'Conhecer a plataforma', en: 'Explore the platform', es: 'Conocer la plataforma' },
+
+  // SEO
+  'seo.home_title': { pt: 'Plataforma Inteligente para Restaurantes', en: 'Intelligent Platform for Restaurants', es: 'Plataforma Inteligente para Restaurantes' },
+  'seo.home_desc': { pt: 'NOOWE conecta restaurantes e clientes numa única plataforma. Pedidos, cozinha, pagamentos e equipe — tudo em tempo real.', en: 'NOOWE connects restaurants and guests in one platform. Orders, kitchen, payments and staff — all in real time.', es: 'NOOWE conecta restaurantes y clientes en una única plataforma. Pedidos, cocina, pagos y equipo — todo en tiempo real.' },
+  'seo.platform_title': { pt: 'Para seu Negócio', en: 'For Your Business', es: 'Para tu Negocio' },
+  'seo.platform_desc': { pt: 'Sistema completo para operação de restaurantes. 11 modelos de negócio, 7 funções, tempo real.', en: 'Complete system for restaurant operations. 11 business models, 7 roles, real-time.', es: 'Sistema completo para operación de restaurantes. 11 modelos de negocio, 7 funciones, tiempo real.' },
+  'seo.foryou_title': { pt: 'Para Você', en: 'For You', es: 'Para Ti' },
+  'seo.foryou_desc': { pt: 'A melhor experiência em restaurantes começa no seu celular. Peça, acompanhe e pague sem fricção.', en: 'The best restaurant experience starts on your phone. Order, track and pay without friction.', es: 'La mejor experiencia en restaurantes empieza en tu celular. Pide, sigue y paga sin fricción.' },
+  'seo.demo_title': { pt: 'Demo Interativa', en: 'Interactive Demo', es: 'Demo Interactiva' },
+  'seo.demo_desc': { pt: 'Explore a plataforma NOOWE com simulação guiada e demos interativas para restaurantes.', en: 'Explore the NOOWE platform with guided simulation and interactive restaurant demos.', es: 'Explora la plataforma NOOWE con simulación guiada y demos interactivas para restaurantes.' },
+  'seo.request_title': { pt: 'Solicitar Demo', en: 'Request Demo', es: 'Solicitar Demo' },
+  'seo.request_desc': { pt: 'Solicite acesso exclusivo à plataforma NOOWE e veja seu restaurante operando de forma integrada.', en: 'Request exclusive access to the NOOWE platform and see your restaurant operating seamlessly.', es: 'Solicita acceso exclusivo a la plataforma NOOWE y ve tu restaurante operando de forma integrada.' },
 };
 
 export function t(key: string, lang: Lang): string {
