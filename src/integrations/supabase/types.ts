@@ -99,6 +99,8 @@ export type Database = {
           email: string
           id: string
           name: string
+          phone: string | null
+          state: string | null
         }
         Insert: {
           city?: string | null
@@ -106,6 +108,8 @@ export type Database = {
           email: string
           id?: string
           name: string
+          phone?: string | null
+          state?: string | null
         }
         Update: {
           city?: string | null
@@ -113,6 +117,8 @@ export type Database = {
           email?: string
           id?: string
           name?: string
+          phone?: string | null
+          state?: string | null
         }
         Relationships: []
       }
