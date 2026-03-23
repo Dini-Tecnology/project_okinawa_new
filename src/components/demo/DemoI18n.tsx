@@ -202,6 +202,27 @@ export const DEMO_TRANSLATIONS = {
     'config-payments': { pt: 'Taxa de serviço, gorjeta, split e métodos', en: 'Service charge, tips, split and methods', es: 'Tasa de servicio, propina, split y métodos' },
     'config-features': { pt: 'Ative módulos avançados: fidelidade, IA, eventos', en: 'Activate advanced modules: loyalty, AI, events', es: 'Active módulos avanzados: fidelidad, IA, eventos' },
   },
+  feedback: {
+    button: { pt: 'Feedback', en: 'Feedback', es: 'Feedback' },
+    title: { pt: 'Enviar Feedback', en: 'Send Feedback', es: 'Enviar Feedback' },
+    subtitle: { pt: 'Sua opinião nos ajuda a melhorar a experiência', en: 'Your opinion helps us improve the experience', es: 'Tu opinión nos ayuda a mejorar la experiencia' },
+    toastSuccess: { pt: 'Feedback enviado com sucesso!', en: 'Feedback sent successfully!', es: '¡Feedback enviado con éxito!' },
+    toastError: { pt: 'Erro ao enviar feedback', en: 'Error sending feedback', es: 'Error al enviar feedback' },
+    successTitle: { pt: 'Obrigado!', en: 'Thank you!', es: '¡Gracias!' },
+    successDesc: { pt: 'Seu feedback foi registrado.', en: 'Your feedback has been recorded.', es: 'Tu feedback ha sido registrado.' },
+    contextLabel: { pt: 'Contexto capturado', en: 'Captured context', es: 'Contexto capturado' },
+    recentActions: { pt: 'Ações recentes', en: 'Recent actions', es: 'Acciones recientes' },
+    typeLabel: { pt: 'Tipo de feedback', en: 'Feedback type', es: 'Tipo de feedback' },
+    typeBug: { pt: 'Bug', en: 'Bug', es: 'Bug' },
+    typeImprovement: { pt: 'Melhoria', en: 'Improvement', es: 'Mejora' },
+    typeUsability: { pt: 'Usabilidade', en: 'Usability', es: 'Usabilidad' },
+    typeQuestion: { pt: 'Dúvida', en: 'Question', es: 'Pregunta' },
+    ratingLabel: { pt: 'Avaliação', en: 'Rating', es: 'Valoración' },
+    descriptionLabel: { pt: 'Descrição', en: 'Description', es: 'Descripción' },
+    descriptionPlaceholder: { pt: 'Descreva sua experiência...', en: 'Describe your experience...', es: 'Describe tu experiencia...' },
+    sending: { pt: 'Enviando...', en: 'Sending...', es: 'Enviando...' },
+    submit: { pt: 'Enviar feedback', en: 'Submit feedback', es: 'Enviar feedback' },
+  },
 } as const;
 
 // ============ EXACT TEXT TRANSLATIONS ============

@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      demo_feedback: {
+        Row: {
+          active_role: string | null
+          created_at: string
+          demo_step: string | null
+          description: string | null
+          email: string | null
+          feedback_type: string
+          id: string
+          journey_step: string | null
+          page_route: string | null
+          rating: number | null
+          recent_actions: Json | null
+          viewport_mode: string | null
+        }
+        Insert: {
+          active_role?: string | null
+          created_at?: string
+          demo_step?: string | null
+          description?: string | null
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          journey_step?: string | null
+          page_route?: string | null
+          rating?: number | null
+          recent_actions?: Json | null
+          viewport_mode?: string | null
+        }
+        Update: {
+          active_role?: string | null
+          created_at?: string
+          demo_step?: string | null
+          description?: string | null
+          email?: string | null
+          feedback_type?: string
+          id?: string
+          journey_step?: string | null
+          page_route?: string | null
+          rating?: number | null
+          recent_actions?: Json | null
+          viewport_mode?: string | null
+        }
+        Relationships: []
+      }
       demo_leads: {
         Row: {
           access_code: string
