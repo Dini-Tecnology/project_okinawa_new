@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '../../../../shared/theme';
 import { typography } from '../../../../shared/theme/typography';
 import { spacing } from '../../../../shared/theme/spacing';
+import logger from '@okinawa/shared/utils/logger';
 
 type RootStackParamList = {
   GeolocationTracking: {
@@ -378,9 +379,9 @@ export const GeolocationTrackingScreen: React.FC = () => {
 
   const sendLocationUpdate = async (location: LocationData, distance: number) => {
     try {
-      console.log('Sending location update:', { restaurantId, orderId, location, distance });
+      logger.log('Sending location update:', { restaurantId, orderId, location, distance });
     } catch (error) {
-      console.error('Failed to send location update:', error);
+      logger.error('Failed to send location update:', error);
     }
   };
 
@@ -394,7 +395,7 @@ export const GeolocationTrackingScreen: React.FC = () => {
         [{ text: 'OK', onPress: () => navigation.goBack() }]
       );
     } catch (error) {
-      console.error('Failed to notify arrival:', error);
+      logger.error('Failed to notify arrival:', error);
     }
   };
 

@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Pressable, Dimensions } from 'react-nativ
 import { Text, Card, Chip, FAB, Portal, Modal, Button, TextInput } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@okinawa/shared/theme';
+import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 
 /**
  * Table interface defines the structure of restaurant tables

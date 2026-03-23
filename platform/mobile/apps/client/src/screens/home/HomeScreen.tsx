@@ -14,6 +14,7 @@ import { t, useTranslations } from '@okinawa/shared/i18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import { useAuth } from '@okinawa/shared/contexts/AuthContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import logger from '@okinawa/shared/utils/logger';
 import type { Restaurant, Order } from '../../types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -95,7 +96,7 @@ export default function HomeScreen() {
       setPopularRestaurants(popularRes.data || []);
       setRecentOrders(ordersRes.data || []);
     } catch (error) {
-      console.error('Error fetching home data:', error);
+      logger.error('Error fetching home data:', error);
     } finally {
       setLoading(false);
       setRefreshing(false);

@@ -37,6 +37,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@/shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -348,7 +349,7 @@ export default function VirtualQueueScreen() {
         setQueueEntries(userQueue);
       }
     } catch (error) {
-      console.error('Failed to load queue data:', error);
+      logger.error('Failed to load queue data:', error);
     } finally {
       setLoading(false);
     }

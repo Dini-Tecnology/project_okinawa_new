@@ -36,6 +36,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@/shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 import type { Restaurant, Location as LocationType, RootStackParamList } from '../../types';
 
 const { width, height } = Dimensions.get('window');
@@ -277,7 +278,7 @@ export default function ExploreScreen() {
         longitude: location.coords.longitude,
       });
     } catch (error) {
-      console.error('Error getting location:', error);
+      logger.error('Error getting location:', error);
       setUserLocation({ latitude: -23.5505, longitude: -46.6333 });
     }
   };
@@ -292,7 +293,7 @@ export default function ExploreScreen() {
       });
       setRestaurants(data);
     } catch (error) {
-      console.error('Error loading restaurants:', error);
+      logger.error('Error loading restaurants:', error);
     } finally {
       setLoading(false);
     }

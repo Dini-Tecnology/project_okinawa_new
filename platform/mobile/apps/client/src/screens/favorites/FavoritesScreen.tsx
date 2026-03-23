@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
 import FavoriteCard from './FavoriteCard';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Restaurant {
   id: string;
@@ -58,7 +59,7 @@ export default function FavoritesScreen() {
       const data = await ApiService.getFavorites();
       setFavorites(data);
     } catch (error) {
-      console.error('Failed to load favorites:', error);
+      logger.error('Failed to load favorites:', error);
       Alert.alert('Erro', 'Não foi possível carregar os favoritos');
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ export default function FavoritesScreen() {
               setFavorites(favorites.filter((f) => f.restaurant_id !== restaurantId));
               Alert.alert('Sucesso', 'Restaurante removido dos favoritos');
             } catch (error) {
-              console.error('Failed to remove favorite:', error);
+              logger.error('Failed to remove favorite:', error);
               Alert.alert('Erro', 'Não foi possível remover dos favoritos');
             }
           },

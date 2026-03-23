@@ -5,6 +5,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 /**
  * Luhn algorithm for card number validation
@@ -150,7 +151,7 @@ export default function PaymentScreen() {
         setPaymentType('new_card');
       }
     } catch (error) {
-      console.error('Failed to load data:', error);
+      logger.error('Failed to load data:', error);
       Alert.alert('Error', 'Failed to load payment information');
       await analytics.logError('Failed to load payment data', 'PAYMENT_DATA_LOAD_ERROR', false);
     } finally {

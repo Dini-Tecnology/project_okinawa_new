@@ -8,6 +8,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useCart } from '@/shared/contexts/CartContext';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import MenuItemCard from './MenuItemCard';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 
@@ -68,7 +69,7 @@ export default function MenuScreen() {
       );
       setCategories([t('common.all'), ...uniqueCategories] as string[]);
     } catch (error) {
-      console.error('Failed to load menu items:', error);
+      logger.error('Failed to load menu items:', error);
       await analytics.logError('Failed to load menu', 'MENU_LOAD_ERROR', false);
     } finally {
       setLoading(false);

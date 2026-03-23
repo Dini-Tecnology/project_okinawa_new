@@ -33,6 +33,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -369,7 +370,7 @@ export default function OrderStatusScreen() {
       const orderData = await ApiService.getOrder(orderId);
       setOrder(orderData);
     } catch (error: any) {
-      console.error('Error loading order:', error);
+      logger.error('Error loading order:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

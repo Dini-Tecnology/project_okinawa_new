@@ -6,6 +6,7 @@ import ApiService from '@/shared/services/api';
 import MapView, { Marker } from 'react-native-maps';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Restaurant {
   id: string;
@@ -58,7 +59,7 @@ export default function RestaurantScreen() {
         await analytics.logRestaurantView(data.id, data.name);
       }
     } catch (error) {
-      console.error('Failed to load restaurant:', error);
+      logger.error('Failed to load restaurant:', error);
       await analytics.logError('Failed to load restaurant', 'RESTAURANT_LOAD_ERROR', false);
     } finally {
       setLoading(false);

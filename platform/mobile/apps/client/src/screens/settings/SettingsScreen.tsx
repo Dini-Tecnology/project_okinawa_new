@@ -14,6 +14,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiService from '@/shared/services/api';
 import { useI18n, SupportedLanguage } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Settings {
   notifications: {
@@ -54,7 +55,7 @@ export default function SettingsScreen() {
         setSettings(JSON.parse(savedSettings));
       }
     } catch (error) {
-      console.error('Error loading settings:', error);
+      logger.error('Error loading settings:', error);
     }
   };
 
@@ -63,7 +64,7 @@ export default function SettingsScreen() {
       await AsyncStorage.setItem('appSettings', JSON.stringify(newSettings));
       setSettings(newSettings);
     } catch (error) {
-      console.error('Error saving settings:', error);
+      logger.error('Error saving settings:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     }
   };

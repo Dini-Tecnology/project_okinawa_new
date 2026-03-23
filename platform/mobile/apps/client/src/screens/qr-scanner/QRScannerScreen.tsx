@@ -8,6 +8,7 @@ import * as Haptics from 'expo-haptics';
 import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface QRCodeData {
   type: 'table' | 'menu' | 'payment' | 'restaurant' | 'invitation';
@@ -72,7 +73,7 @@ export default function QRScannerScreen() {
         );
       }
     } catch (error) {
-      console.error('Error requesting camera permission:', error);
+      logger.error('Error requesting camera permission:', error);
       Alert.alert('Erro', 'Não foi possível solicitar permissão para a câmera');
       await analytics.logError('Camera permission error', 'CAMERA_PERMISSION_ERROR', false);
     }
@@ -156,7 +157,7 @@ export default function QRScannerScreen() {
           qrData = JSON.parse(data);
         }
       } catch (parseError) {
-        console.error('Failed to parse QR data locally:', parseError);
+        logger.error('Failed to parse QR data locally:', parseError);
 
         const validationResult = await ApiService.validateQRCode(data);
 
@@ -174,7 +175,7 @@ export default function QRScannerScreen() {
 
       handleQRData(qrData);
     } catch (error) {
-      console.error('Error processing QR code:', error);
+      logger.error('Error processing QR code:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
         'Erro',
@@ -230,7 +231,7 @@ export default function QRScannerScreen() {
         ]
       );
     } catch (error) {
-      console.error('Error validating secure QR:', error);
+      logger.error('Error validating secure QR:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert('Erro', 'Não foi possível validar o QR code. Tente novamente.');
       resetScanner();
@@ -277,7 +278,7 @@ export default function QRScannerScreen() {
       }, 100);
 
     } catch (error) {
-      console.error('Error starting session:', error);
+      logger.error('Error starting session:', error);
       Alert.alert('Erro', 'Não foi possível iniciar a sessão. Tente novamente.');
       resetScanner();
     } finally {

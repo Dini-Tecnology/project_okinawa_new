@@ -79,8 +79,8 @@ export default function StaffScreen({ navigation }: any) {
 
   const getRoleColor = (role: string) => {
     switch (role) {
-      case 'owner': return '#9C27B0';
-      case 'manager': return '#3F51B5';
+      case 'owner': return colors.accent;
+      case 'manager': return colors.info;
       case 'chef': return colors.error;
       case 'waiter': return colors.success;
       case 'barman': return colors.warning;
@@ -196,13 +196,13 @@ export default function StaffScreen({ navigation }: any) {
           <View style={styles.badges}>
             <Chip
               style={{ backgroundColor: getRoleColor(item.role) }}
-              textStyle={{ color: '#fff', fontSize: 11 }}
+              textStyle={{ color: colors.primaryForeground, fontSize: 11 }}
             >
               {item.role.toUpperCase()}
             </Chip>
             <Chip
               style={{ backgroundColor: getStatusColor(item.status) }}
-              textStyle={{ color: '#fff', fontSize: 11 }}
+              textStyle={{ color: colors.primaryForeground, fontSize: 11 }}
             >
               {item.status.replace('_', ' ').toUpperCase()}
             </Chip>

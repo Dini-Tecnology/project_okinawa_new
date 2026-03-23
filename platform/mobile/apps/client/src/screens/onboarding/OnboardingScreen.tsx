@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 const { width } = Dimensions.get('window');
 
@@ -249,7 +250,7 @@ export default function OnboardingScreen() {
       }));
       navigation.navigate('Auth' as never);
     } catch (error) {
-      console.error('Error saving preferences:', error);
+      logger.error('Error saving preferences:', error);
       navigation.navigate('Auth' as never);
     }
   };

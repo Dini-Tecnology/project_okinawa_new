@@ -10,11 +10,10 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import socketService from '../../../services/socket';
-import {
+import type {
   LiveFeedEvent,
   LiveEventType,
   UrgencyLevel,
-  LIVE_FEED_MOCK,
 } from '../types/waiter.types';
 
 interface UseWaiterLiveFeedOptions {
@@ -35,13 +34,9 @@ export function useWaiterLiveFeed(
   options: UseWaiterLiveFeedOptions = {},
 ): UseWaiterLiveFeedReturn {
   const { restaurantId } = options;
-  const [feedEvents, setFeedEvents] = useState<LiveFeedEvent[]>(() =>
-    LIVE_FEED_MOCK.map((e) => ({
-      ...e,
-      handled: false,
-      timestamp: Date.now() - Math.random() * 600000,
-    })),
-  );
+
+  // Start with an empty array — real events arrive via WebSocket
+  const [feedEvents, setFeedEvents] = useState<LiveFeedEvent[]>([]);
   const [handledIds, setHandledIds] = useState<Set<string>>(new Set());
   const [isConnected, setIsConnected] = useState(false);
   const [reconnecting, setReconnecting] = useState(false);
@@ -67,7 +62,8 @@ export function useWaiterLiveFeed(
         handled: false,
         timestamp: Date.now(),
       };
-      setFeedEvents((prev) => [newEvent, ...prev]);
+      // Keep at most 50 events in memory
+      setFeedEvents((prev) => [newEvent, ...prev].slice(0, 50));
     },
     [],
   );
@@ -78,19 +74,21 @@ export function useWaiterLiveFeed(
       try {
         await socketService.connect();
         setIsConnected(socketService.isConnected);
+        setReconnecting(false);
 
         if (restaurantId) {
           socketService.joinRestaurantRoom(restaurantId);
         }
       } catch (error) {
-        console.warn('WebSocket connection failed, using mock data:', error);
+        console.warn('WebSocket connection failed:', error);
+        setIsConnected(false);
         setReconnecting(true);
       }
     };
 
     setupSocket();
 
-    // Listen for order events
+    // Listen for new order events
     const unsubOrderNew = socketService.on('order:new', (data: any) => {
       addFeedEvent({
         type: 'order',
@@ -101,6 +99,7 @@ export function useWaiterLiveFeed(
       });
     });
 
+    // Listen for order status updates (e.g. ready from kitchen)
     const unsubOrderUpdate = socketService.on('order:update', (data: any) => {
       if (data.status === 'ready') {
         addFeedEvent({
@@ -113,6 +112,7 @@ export function useWaiterLiveFeed(
       }
     });
 
+    // Listen for waiter call notifications
     const unsubNotification = socketService.on('notification', (data: any) => {
       if (data.type === 'waiter_call') {
         addFeedEvent({

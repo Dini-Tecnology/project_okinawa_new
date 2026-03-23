@@ -8,6 +8,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '../../../../shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Restaurant {
   id: string;
@@ -177,7 +178,7 @@ export default function CreateReservationScreen() {
       const data = await ApiService.getRestaurant(restaurantId);
       setRestaurant(data);
     } catch (error) {
-      console.error('Failed to load restaurant:', error);
+      logger.error('Failed to load restaurant:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
       await analytics.logError('Failed to load restaurant', 'RESTAURANT_LOAD_ERROR', false);
     } finally {

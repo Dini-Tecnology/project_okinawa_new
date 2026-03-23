@@ -140,26 +140,8 @@ export type WaiterTab = 'live' | 'tables' | 'kitchen' | 'charge';
 export type TableDetailTab = 'guests' | 'orders' | 'menu' | 'charge';
 
 // ============================================
-// MOCK DATA (for development / demo)
+// DEVELOPMENT / DEMO DATA
 // ============================================
-
-export const KITCHEN_PIPELINE: KitchenDish[] = [
-  { id: 'k1', orderId: 'ord-1', dish: 'File ao Molho de Vinho', qty: 2, table: 5, chef: 'Chef Felipe', status: 'ready', readyAgo: 3, sla: 20, elapsed: 22 },
-  { id: 'k2', orderId: 'ord-2', dish: 'Petit Gateau', qty: 1, table: 10, chef: 'Cozinheiro Thiago', status: 'ready', readyAgo: 1, sla: 12, elapsed: 11 },
-  { id: 'k3', orderId: 'ord-3', dish: 'Risotto de Cogumelos', qty: 1, table: 3, chef: 'Chef Felipe', status: 'preparing', readyAgo: 0, sla: 25, elapsed: 18 },
-  { id: 'k4', orderId: 'ord-4', dish: 'Salmao Grelhado', qty: 1, table: 8, chef: 'Cozinheiro Ana', status: 'preparing', readyAgo: 0, sla: 22, elapsed: 8 },
-  { id: 'k5', orderId: 'ord-5', dish: 'Tiramisu', qty: 2, table: 1, chef: 'Cozinheiro Thiago', status: 'preparing', readyAgo: 0, sla: 15, elapsed: 5 },
-];
-
-export const LIVE_FEED_MOCK: Omit<LiveFeedEvent, 'handled' | 'timestamp'>[] = [
-  { id: 'lf1', time: 'agora', table: 5, event: 'Prato pronto para retirar', detail: '2x File ao Molho de Vinho — Chef Felipe', type: 'kitchen_ready', urgency: 'critical' },
-  { id: 'lf2', time: '1min', table: 10, event: 'Sobremesa pronta', detail: '1x Petit Gateau — Cozinheiro Thiago', type: 'kitchen_ready', urgency: 'critical' },
-  { id: 'lf3', time: '2min', table: 3, event: 'Cliente chamou o garcom', detail: 'Convidado 3 sem app quer fazer pedido', type: 'call', urgency: 'high' },
-  { id: 'lf4', time: '3min', table: 8, event: 'Pagamento recebido pelo app', detail: 'Rafael C. pagou R$ 85 via Apple Pay', type: 'payment', urgency: 'info' },
-  { id: 'lf5', time: '5min', table: 1, event: 'Conta solicitada', detail: '1 convidado sem app precisa de cobranca', type: 'payment_needed', urgency: 'high' },
-  { id: 'lf6', time: '8min', table: 10, event: 'Cortesia solicitada', detail: 'Aniversario — solicitar Petit Gateau ao gerente', type: 'approval', urgency: 'medium' },
-  { id: 'lf7', time: '12min', table: 5, event: 'Novo pedido registrado', detail: '1x Tiramisu + 1x Cafe Espresso via app', type: 'order', urgency: 'info' },
-];
 
 export const TABLE_GUESTS_DATA: Record<number, TableGuest[]> = {
   1: [
@@ -242,33 +224,14 @@ export const WAITER_MENU: MenuCategory[] = [
   ]},
 ];
 
-export const MOCK_WAITER_TABLES: WaiterTable[] = [
-  {
-    id: 'table-1', number: 1, status: 'occupied', customerName: 'Maria S.',
-    occupiedSince: new Date(Date.now() - 55 * 60000).toISOString(), orderTotal: 192,
-    guests: TABLE_GUESTS_DATA[1],
-  },
-  {
-    id: 'table-3', number: 3, status: 'occupied', customerName: 'Joao',
-    occupiedSince: new Date(Date.now() - 40 * 60000).toISOString(), orderTotal: 223,
-    guests: TABLE_GUESTS_DATA[3],
-  },
-  {
-    id: 'table-5', number: 5, status: 'occupied', customerName: 'Pedro M.',
-    occupiedSince: new Date(Date.now() - 65 * 60000).toISOString(), orderTotal: 294,
-    guests: TABLE_GUESTS_DATA[5],
-  },
-  {
-    id: 'table-8', number: 8, status: 'billing', customerName: 'Rafael C.',
-    occupiedSince: new Date(Date.now() - 80 * 60000).toISOString(), orderTotal: 252,
-    guests: TABLE_GUESTS_DATA[8],
-  },
-  {
-    id: 'table-10', number: 10, status: 'occupied', customerName: 'Carlos M.',
-    occupiedSince: new Date(Date.now() - 30 * 60000).toISOString(), orderTotal: 50,
-    guests: TABLE_GUESTS_DATA[10],
-  },
-];
-
 export const getTableGuests = (tableNum: number): TableGuest[] =>
   TABLE_GUESTS_DATA[tableNum] || [];
+
+// Kitchen pipeline — placeholder data for KitchenTab until the kitchen API is wired up
+export const KITCHEN_PIPELINE: KitchenDish[] = [
+  { id: 'k1', orderId: 'ord-1', dish: 'File ao Molho de Vinho', qty: 2, table: 5, chef: 'Chef Felipe', status: 'ready', readyAgo: 3, sla: 20, elapsed: 22 },
+  { id: 'k2', orderId: 'ord-2', dish: 'Petit Gateau', qty: 1, table: 10, chef: 'Cozinheiro Thiago', status: 'ready', readyAgo: 1, sla: 12, elapsed: 11 },
+  { id: 'k3', orderId: 'ord-3', dish: 'Risotto de Cogumelos', qty: 1, table: 3, chef: 'Chef Felipe', status: 'preparing', readyAgo: 0, sla: 25, elapsed: 18 },
+  { id: 'k4', orderId: 'ord-4', dish: 'Salmao Grelhado', qty: 1, table: 8, chef: 'Cozinheiro Ana', status: 'preparing', readyAgo: 0, sla: 22, elapsed: 8 },
+  { id: 'k5', orderId: 'ord-5', dish: 'Tiramisu', qty: 2, table: 1, chef: 'Cozinheiro Thiago', status: 'preparing', readyAgo: 0, sla: 15, elapsed: 5 },
+];

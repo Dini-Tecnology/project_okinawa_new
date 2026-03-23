@@ -19,6 +19,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { Order, RootStackParamList } from '../../types';
 import OrderCard from './OrderCard';
 
@@ -87,7 +88,7 @@ export default function OrdersScreen() {
       const data = await ApiService.getMyOrders();
       setOrders(data);
     } catch (error: any) {
-      console.error('Error loading orders:', error);
+      logger.error('Error loading orders:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

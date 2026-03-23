@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import ApiService from '@/shared/services/api';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Review {
   id: string;
@@ -45,7 +46,7 @@ export default function ReviewsScreen() {
       const data = await ApiService.getMyReviews();
       setReviews(data);
     } catch (error) {
-      console.error('Failed to load reviews:', error);
+      logger.error('Failed to load reviews:', error);
       Alert.alert('Error', 'Failed to load reviews');
     } finally {
       setLoading(false);

@@ -32,6 +32,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -204,7 +205,7 @@ export default function SplitPaymentScreen() {
       setGuests(guestsData);
       setSplits(splitsData);
     } catch (err: any) {
-      console.error('Error loading split data:', err);
+      logger.error('Error loading split data:', err);
       setError(t('split.errorCreate'));
     } finally {
       setLoading(false);

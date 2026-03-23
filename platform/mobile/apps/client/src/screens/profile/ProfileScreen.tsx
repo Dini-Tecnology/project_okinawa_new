@@ -24,6 +24,7 @@ import { useNavigation } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { User } from '../../types';
 
 export default function ProfileScreen() {
@@ -50,7 +51,7 @@ export default function ProfileScreen() {
       const userData = await ApiService.getCurrentUser();
       setUser(userData);
     } catch (error) {
-      console.error('Error loading user:', error);
+      logger.error('Error loading user:', error);
       Alert.alert(t('common.error'), t('errors.loadProfileFailed'));
     } finally {
       setLoading(false);
@@ -70,7 +71,7 @@ export default function ProfileScreen() {
           try {
             await ApiService.logout();
           } catch (error) {
-            console.error('Error logging out:', error);
+            logger.error('Error logging out:', error);
           }
         },
       },
@@ -105,7 +106,7 @@ export default function ProfileScreen() {
       setEditDialogVisible(false);
       Alert.alert(t('common.success'), t('success.profileUpdated'));
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      logger.error('Failed to update profile:', error);
       Alert.alert(t('common.error'), t('errors.updateProfileFailed'));
     } finally {
       setSaving(false);

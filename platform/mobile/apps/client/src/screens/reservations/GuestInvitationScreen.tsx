@@ -6,6 +6,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '../../../../shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Guest {
   id: string;
@@ -252,7 +253,7 @@ export default function GuestInvitationScreen() {
       setGuests(guestsData);
       setContacts(contactsData);
     } catch (error) {
-      console.error('Failed to load data:', error);
+      logger.error('Failed to load data:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);
@@ -371,7 +372,7 @@ export default function GuestInvitationScreen() {
         reservation_id: reservationId,
       });
     } catch (error) {
-      console.error('Failed to share:', error);
+      logger.error('Failed to share:', error);
     }
   };
 

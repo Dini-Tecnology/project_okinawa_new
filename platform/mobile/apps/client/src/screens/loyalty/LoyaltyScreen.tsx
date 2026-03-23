@@ -4,6 +4,7 @@ import { Text, Card, ProgressBar, IconButton, ActivityIndicator, Chip, Button, D
 import ApiService from '@/shared/services/api';
 import { format } from 'date-fns';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 
 interface LoyaltyProgram {
   id: string;
@@ -73,7 +74,7 @@ export default function LoyaltyScreen() {
         setSelectedProgram(data[0]);
       }
     } catch (error) {
-      console.error('Failed to load loyalty programs:', error);
+      logger.error('Failed to load loyalty programs:', error);
       Alert.alert('Error', 'Failed to load loyalty programs');
     } finally {
       setLoading(false);
@@ -95,7 +96,7 @@ export default function LoyaltyScreen() {
         { id: '3', points: -100, transaction_type: 'redeemed', description: 'Redeemed: Free Appetizer', created_at: new Date(Date.now() - 172800000).toISOString() },
       ]);
     } catch (error) {
-      console.error('Failed to load program details:', error);
+      logger.error('Failed to load program details:', error);
     }
   };
 

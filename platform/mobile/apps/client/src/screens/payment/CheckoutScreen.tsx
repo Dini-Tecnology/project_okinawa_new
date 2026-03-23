@@ -23,6 +23,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -183,7 +184,7 @@ export default function CheckoutScreen() {
       const orderData = await ApiService.getOrder(orderId);
       setOrder(orderData);
     } catch (err: any) {
-      console.error('Failed to load order:', err);
+      logger.error('Failed to load order:', err);
       setError(t('checkout.errorLoad'));
       await analytics.logError('Failed to load checkout order', 'CHECKOUT_LOAD_ERROR', false);
     } finally {

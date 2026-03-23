@@ -32,6 +32,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList, PaymentSuccessParams } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -255,7 +256,7 @@ export default function UnifiedPaymentScreen() {
         setSelectedSavedCard(methodsResponse[0].id);
       }
     } catch (err: any) {
-      console.error('Failed to load payment data:', err);
+      logger.error('Failed to load payment data:', err);
       setError(t('payment.errorGeneric'));
       await analytics.logError('Failed to load payment data', 'PAYMENT_DATA_LOAD_ERROR', false);
     } finally {

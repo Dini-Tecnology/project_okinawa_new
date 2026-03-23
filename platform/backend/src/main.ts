@@ -103,10 +103,6 @@ async function bootstrap() {
     ? corsOrigin.split(',').map((origin) => origin.trim()).filter(validateOrigin)
     : defaultOrigins;
 
-  if (nodeEnv === 'production' && corsOrigins.length === 0) {
-    logger.warn('CORS_ORIGIN not set in production. API will reject cross-origin requests.');
-  }
-
   app.enableCors({
     origin: corsOrigins.length > 0 ? corsOrigins : false, // false = reject all cross-origin
     credentials: configService.get<boolean>('CORS_CREDENTIALS') ?? true,

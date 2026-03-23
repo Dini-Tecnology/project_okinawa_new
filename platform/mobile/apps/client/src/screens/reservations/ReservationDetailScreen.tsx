@@ -8,6 +8,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '../../../../shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Guest {
   id: string;
@@ -301,7 +302,7 @@ export default function ReservationDetailScreen() {
       const data = await ApiService.getReservation(reservationId);
       setReservation(data);
     } catch (error) {
-      console.error('Failed to load reservation:', error);
+      logger.error('Failed to load reservation:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

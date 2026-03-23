@@ -7,6 +7,7 @@ import { ptBR as dateFnsPtBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Tip {
   id: string;
@@ -44,7 +45,7 @@ export default function TipsScreen() {
       setTips(data.tips || data);
       setTotalTips(data.total || data.reduce((sum: number, tip: Tip) => sum + Number(tip.amount), 0));
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       setTips([]);
       setTotalTips(0);
     } finally {

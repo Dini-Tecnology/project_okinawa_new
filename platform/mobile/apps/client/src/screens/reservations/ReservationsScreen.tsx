@@ -8,6 +8,7 @@ import { ptBR as dateFnsPtBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 import type { Reservation, ReservationStatus, RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -65,7 +66,7 @@ export default function ReservationsScreen() {
       const data = await ApiService.getMyReservations();
       setReservations(data);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

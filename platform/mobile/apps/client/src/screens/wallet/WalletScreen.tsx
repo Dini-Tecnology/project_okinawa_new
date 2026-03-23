@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/theme';
+import logger from '@okinawa/shared/utils/logger';
 
 interface Wallet {
   id: string;
@@ -58,7 +59,7 @@ export default function WalletScreen() {
       setWallet(walletData);
       setTransactions(transactionsData);
     } catch (error) {
-      console.error('Failed to load wallet data:', error);
+      logger.error('Failed to load wallet data:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

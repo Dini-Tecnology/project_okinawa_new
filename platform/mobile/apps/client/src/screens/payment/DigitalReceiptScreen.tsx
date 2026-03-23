@@ -16,6 +16,7 @@ import * as Sharing from 'expo-sharing';
 import { useColors } from '@okinawa/shared/theme';
 import { typography } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
+import logger from '@okinawa/shared/utils/logger';
 
 interface ReceiptItem {
   id: string;
@@ -99,7 +100,7 @@ export const DigitalReceiptScreen: React.FC<DigitalReceiptScreenProps> = ({
         title: 'Compartilhar Comprovante',
       });
     } catch (error) {
-      console.error('Error sharing:', error);
+      logger.error('Error sharing:', error);
     }
   };
 
@@ -162,7 +163,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
         );
       }
     } catch (error) {
-      console.error('Error downloading receipt:', error);
+      logger.error('Error downloading receipt:', error);
       Alert.alert('Erro', 'Não foi possível baixar o comprovante');
     }
   };

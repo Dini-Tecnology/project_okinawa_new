@@ -9,6 +9,7 @@ import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useAnalyticsContext } from '@/shared/contexts/AnalyticsContext';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import { loginSchema, validateForm, type LoginFormData } from '@/shared/validation/schemas';
 import Haptic from '@/shared/utils/haptics';
 
@@ -48,7 +49,7 @@ export default function LoginScreen({ navigation }: any) {
         handleBiometricLogin();
       }
     } catch (err) {
-      console.error('Error loading biometric preference:', err);
+      logger.error('Error loading biometric preference:', err);
     }
   };
 

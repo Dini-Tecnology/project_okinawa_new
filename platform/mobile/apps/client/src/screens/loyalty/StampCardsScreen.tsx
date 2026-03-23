@@ -13,6 +13,7 @@ import {
 } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
+import logger from '@okinawa/shared/utils/logger';
 import ApiService from '@/shared/services/api';
 
 // Types
@@ -154,7 +155,7 @@ export default function StampCardsScreen() {
       const response = await ApiService.get('/loyalty/stamp-cards/current');
       setStampCards(response.data || []);
     } catch (err) {
-      console.error('Error fetching stamp cards:', err);
+      logger.error('Error fetching stamp cards:', err);
       // Demo data fallback
       setStampCards([
         {

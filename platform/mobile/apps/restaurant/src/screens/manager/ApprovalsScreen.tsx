@@ -225,12 +225,12 @@ export default function ApprovalsScreen() {
           paddingHorizontal: 20,
         },
         headerTitle: {
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
           fontSize: 22,
           fontWeight: '700',
         },
         headerSubtitle: {
-          color: 'rgba(255,255,255,0.8)',
+          color: colors.primaryForeground + 'CC',
           fontSize: 13,
           marginTop: 4,
         },
@@ -363,7 +363,7 @@ export default function ApprovalsScreen() {
           backgroundColor: colors.success,
         },
         approveText: {
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
           fontWeight: '700',
           fontSize: 14,
           marginLeft: 6,
@@ -586,7 +586,7 @@ export default function ApprovalsScreen() {
                     <IconButton
                       icon="check-circle"
                       size={18}
-                      iconColor="#FFFFFF"
+                      iconColor={colors.primaryForeground}
                       style={{ margin: 0, padding: 0, width: 18, height: 18 }}
                     />
                     <Text style={styles.approveText}>{t('approvals.approveButton')}</Text>

@@ -19,7 +19,13 @@ export const validationSchema = Joi.object({
   DATABASE_USER: Joi.string().required().description('Database username'),
   DATABASE_PASSWORD: Joi.string().required().description('Database password'),
   DATABASE_NAME: Joi.string().required().description('Database name'),
-  DATABASE_SSL: Joi.string().valid('true', 'false').default('false'),
+  DATABASE_SSL: Joi.string()
+    .valid('true', 'false')
+    .default('false')
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.valid('true').required().description('DATABASE_SSL must be true in production'),
+    }),
   DATABASE_SSL_REJECT_UNAUTHORIZED: Joi.string().valid('true', 'false').default('true'),
   DATABASE_LOGGING: Joi.string().valid('true', 'false').default('false'),
 
@@ -42,7 +48,12 @@ export const validationSchema = Joi.object({
   THROTTLE_LIMIT: Joi.number().min(1).default(100),
 
   // CORS
-  CORS_ORIGIN: Joi.string().default('http://localhost:3000'),
+  CORS_ORIGIN: Joi.string()
+    .default('http://localhost:3000')
+    .when('NODE_ENV', {
+      is: 'production',
+      then: Joi.string().required().description('CORS_ORIGIN must be set explicitly in production'),
+    }),
   CORS_CREDENTIALS: Joi.string().valid('true', 'false').default('true'),
 
   // Sentry (Optional)

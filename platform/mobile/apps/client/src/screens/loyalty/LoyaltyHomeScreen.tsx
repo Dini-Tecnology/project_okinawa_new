@@ -22,6 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
+import logger from '@okinawa/shared/utils/logger';
 import { t } from '@okinawa/shared/i18n';
 import ApiService from '@/shared/services/api';
 
@@ -170,7 +171,7 @@ export default function LoyaltyHomeScreen() {
         setPromotions([]);
       }
     } catch (err: any) {
-      console.error('Error fetching loyalty data:', err);
+      logger.error('Error fetching loyalty data:', err);
       setError(err?.message || 'Failed to load data');
       // Set default profile for demo
       setProfile({

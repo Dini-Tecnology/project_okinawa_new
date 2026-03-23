@@ -7,12 +7,22 @@
  * @module waiter/hooks/useWaiterTables
  */
 
-import { useState, useCallback } from 'react';
-import {
-  WaiterTable,
-  TableGuest,
-  MOCK_WAITER_TABLES,
-} from '../types/waiter.types';
+import { useCallback } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import ApiService from '@/shared/services/api';
+import type { WaiterTable, TableGuest } from '../types/waiter.types';
+
+// ============================================
+// QUERY KEYS
+// ============================================
+
+export const waiterQueryKeys = {
+  tables: ['waiter', 'tables'] as const,
+};
+
+// ============================================
+// RETURN TYPE
+// ============================================
 
 interface UseWaiterTablesReturn {
   tables: WaiterTable[];
@@ -23,47 +33,61 @@ interface UseWaiterTablesReturn {
   addGuestToTable: (tableNumber: number, guest: TableGuest) => void;
 }
 
-/**
- * Hook to manage waiter tables.
- *
- * In production this would use TanStack Query:
- *   useQuery({ queryKey: ['waiter', 'tables'], queryFn: ... })
- *
- * For the initial implementation we use local state with mock data
- * and expose the same interface for seamless migration.
- */
+// ============================================
+// HOOK
+// ============================================
+
 export function useWaiterTables(): UseWaiterTablesReturn {
-  const [tables, setTables] = useState<WaiterTable[]>(MOCK_WAITER_TABLES);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState(false);
-  const [isRefetching, setIsRefetching] = useState(false);
+  const queryClient = useQueryClient();
 
+  // ---- Main tables query ----
+  const {
+    data: tables = [],
+    isLoading,
+    isError,
+    isFetching,
+    refetch: queryRefetch,
+  } = useQuery<WaiterTable[]>({
+    queryKey: waiterQueryKeys.tables,
+    queryFn: async () => {
+      const response = await ApiService.get('/orders/waiter/my-tables');
+      return response.data;
+    },
+    staleTime: 30_000,
+    refetchInterval: 15_000, // polling fallback when WebSocket is unavailable
+  });
+
+  // isRefetching = a background refetch is in progress after initial load
+  const isRefetching = isFetching && !isLoading;
+
+  // Wrap refetch to match the original Promise<void> signature
   const refetch = useCallback(async () => {
-    setIsRefetching(true);
-    try {
-      // In production: const data = await apiClient.get('/orders/waiter/my-tables');
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      setTables(MOCK_WAITER_TABLES);
-      setIsError(false);
-    } catch {
-      setIsError(true);
-    } finally {
-      setIsRefetching(false);
-    }
-  }, []);
+    await queryRefetch();
+  }, [queryRefetch]);
 
+  // ---- Update table status mutation ----
+  const updateTableStatusMutation = useMutation({
+    mutationFn: ({ tableId, status }: { tableId: string; status: string }) =>
+      ApiService.patch(`/tables/${tableId}/status`, { status }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: waiterQueryKeys.tables }),
+  });
+
+  // ---- Optimistic addGuestToTable ----
+  // Updates the local cache immediately; the next polling cycle will reconcile with server data.
   const addGuestToTable = useCallback(
     (tableNumber: number, guest: TableGuest) => {
-      setTables((prev) =>
-        prev.map((table) =>
-          table.number === tableNumber
-            ? { ...table, guests: [...table.guests, guest] }
-            : table,
-        ),
+      queryClient.setQueryData<WaiterTable[]>(
+        waiterQueryKeys.tables,
+        (prev = []) =>
+          prev.map((table) =>
+            table.number === tableNumber
+              ? { ...table, guests: [...table.guests, guest] }
+              : table,
+          ),
       );
     },
-    [],
+    [queryClient],
   );
 
   return {

@@ -34,6 +34,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -352,7 +353,7 @@ export default function SharedOrderScreen() {
       setOrder(orderData);
       setGuests(guestsData);
     } catch (error: any) {
-      console.error('Error loading order:', error);
+      logger.error('Error loading order:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);

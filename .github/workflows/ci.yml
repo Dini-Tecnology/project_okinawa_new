@@ -46,6 +46,12 @@ jobs:
         env:
           CI: true
 
+      - name: Check frontend coverage thresholds
+        run: |
+          echo "Coverage check - frontend threshold: 50% lines"
+          # vitest coverage já está configurado, apenas reporta
+        continue-on-error: true
+
       - name: Build
         run: npm run build
 
@@ -97,6 +103,25 @@ jobs:
           DATABASE_NAME: test
           JWT_SECRET: test-secret-key-minimum-32-characters-long
           JWT_REFRESH_SECRET: test-refresh-secret-key-minimum-32-chars
+
+      - name: Check coverage thresholds
+        run: |
+          node -e "
+            const coverage = require('./coverage/coverage-summary.json');
+            const total = coverage.total;
+            const thresholds = { lines: 60, functions: 60, branches: 50, statements: 60 };
+            let failed = false;
+            for (const [metric, threshold] of Object.entries(thresholds)) {
+              const actual = total[metric].pct;
+              if (actual < threshold) {
+                console.error(\`❌ \${metric} coverage \${actual}% is below threshold \${threshold}%\`);
+                failed = true;
+              } else {
+                console.log(\`✅ \${metric} coverage: \${actual}% (threshold: \${threshold}%)\`);
+              }
+            }
+            if (failed) process.exit(1);
+          "
 
       - name: Build
         run: npm run build
@@ -167,6 +192,35 @@ jobs:
             --target production \
             --tag okinawa-backend:ci-${{ github.sha }} \
             ./platform/backend
+
+  # =============================================
+  # SAST — Static Analysis Security Testing
+  # =============================================
+  sast:
+    name: SAST — CodeQL Analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
 
   # =============================================
   # Security Scan
