@@ -114,7 +114,7 @@ const DemoFeedbackWidget: React.FC<{ context?: DemoFeedbackContext }> = ({ conte
         recent_actions: recentActionsBuffer.length > 0 ? recentActionsBuffer : null,
       };
 
-      const { error } = await supabase.from('demo_leads' as any).insert(payload as any);
+      const { error } = await supabase.from('demo_feedback' as any).insert(payload as any);
       if (error) throw error;
       setSent(true);
       toast.success(t('feedback', 'toastSuccess'));
