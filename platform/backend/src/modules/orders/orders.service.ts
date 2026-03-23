@@ -23,15 +23,10 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus } from '@common/enums';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
-import { ReservationsService } from '@/modules/reservations/reservations.service';
-import { TablesService } from '@/modules/tables/tables.service';
 import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
-import {
-  OrderCalculatorHelper,
-  KdsFormatterHelper,
-  WaiterStatsHelper,
-  MaitreFormatterHelper,
-} from './helpers';
+import { OrderCalculatorHelper } from './helpers';
+import { KdsService } from './kds.service';
+import { WaiterStatsService } from './waiter-stats.service';
 
 @Injectable()
 export class OrdersService {
@@ -50,15 +45,10 @@ export class OrdersService {
     private profileRepository: Repository<Profile>,
     private eventsGateway: EventsGateway,
     private loyaltyService: LoyaltyService,
-    @Inject(forwardRef(() => ReservationsService))
-    private reservationsService: ReservationsService,
-    @Inject(forwardRef(() => TablesService))
-    private tablesService: TablesService,
     private dataSource: DataSource,
     private orderCalculator: OrderCalculatorHelper,
-    private kdsFormatter: KdsFormatterHelper,
-    private waiterStatsHelper: WaiterStatsHelper,
-    private maitreFormatter: MaitreFormatterHelper,
+    private kdsService: KdsService,
+    private waiterStatsService: WaiterStatsService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -203,8 +193,15 @@ export class OrdersService {
 
     // SECURITY: Verify access permission
     if (userId && roles) {
-      const isStaff = roles.some(role =>
-        [UserRoleEnum.OWNER, UserRoleEnum.MANAGER, UserRoleEnum.WAITER, UserRoleEnum.CHEF, UserRoleEnum.BARMAN, UserRoleEnum.MAITRE].includes(role)
+      const isStaff = roles.some((role) =>
+        [
+          UserRoleEnum.OWNER,
+          UserRoleEnum.MANAGER,
+          UserRoleEnum.WAITER,
+          UserRoleEnum.CHEF,
+          UserRoleEnum.BARMAN,
+          UserRoleEnum.MAITRE,
+        ].includes(role),
       );
 
       // If not staff, must be the owner of the order
@@ -236,7 +233,10 @@ export class OrdersService {
         );
       } catch (error) {
         const err = error as Error;
-        this.logger.error(`Failed to award loyalty points for order ${order.id}: ${err.message}`, err.stack);
+        this.logger.error(
+          `Failed to award loyalty points for order ${order.id}: ${err.message}`,
+          err.stack,
+        );
       }
     }
 
@@ -263,8 +263,8 @@ export class OrdersService {
 
     // SECURITY: Verify access permission
     if (userId && roles) {
-      const isStaff = roles.some(role =>
-        [UserRoleEnum.OWNER, UserRoleEnum.MANAGER, UserRoleEnum.WAITER].includes(role)
+      const isStaff = roles.some((role) =>
+        [UserRoleEnum.OWNER, UserRoleEnum.MANAGER, UserRoleEnum.WAITER].includes(role),
       );
 
       // If not staff, must be the owner of the order
@@ -305,117 +305,24 @@ export class OrdersService {
     return updatedOrder;
   }
 
+  // ========== DELEGATION: KDS ==========
+
   async getKdsOrders(params: { type?: string; status?: string; restaurant_id?: string }) {
-    const query = this.orderRepository
-      .createQueryBuilder('order')
-      .leftJoinAndSelect('order.items', 'items')
-      .leftJoinAndSelect('items.menu_item', 'menu_item')
-      .leftJoinAndSelect('order.table', 'table')
-      .where('order.status IN (:...statuses)', {
-        statuses: params.status
-          ? [params.status]
-          : [OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.PREPARING],
-      });
-
-    if (params.restaurant_id) {
-      query.andWhere('order.restaurant_id = :restaurantId', {
-        restaurantId: params.restaurant_id,
-      });
-    }
-
-    const barCategories = this.kdsFormatter.getBarCategories();
-    if (params.type === 'bar') {
-      query.andWhere('menu_item.category IN (:...categories)', { categories: barCategories });
-    } else if (params.type === 'kitchen') {
-      query.andWhere('menu_item.category NOT IN (:...categories)', { categories: barCategories });
-    }
-
-    query.orderBy('order.created_at', 'ASC');
-    const orders = await query.getMany();
-
-    const waiterIds = orders.filter((o) => o.waiter_id).map((o) => o.waiter_id as string);
-    const waiterMap = new Map<string, string>();
-
-    if (waiterIds.length > 0) {
-      const waiters = await this.profileRepository.find({
-        where: { id: In(waiterIds) },
-        select: ['id', 'full_name'],
-      });
-      waiters.forEach((w) => waiterMap.set(w.id, w.full_name || 'Staff'));
-    }
-
-    return this.kdsFormatter.formatOrdersForKds(orders, waiterMap);
+    return this.kdsService.getKdsOrders(params);
   }
 
-  async getWaiterTables(waiterId: string) {
-    const orders = await this.orderRepository.find({
-      where: {
-        waiter_id: waiterId,
-        status: In(this.waiterStatsHelper.getActiveStatuses()),
-      },
-      relations: ['table', 'items', 'guests'],
-      order: { created_at: 'DESC' },
-    });
+  // ========== DELEGATION: WAITER / MAITRE ==========
 
-    return this.waiterStatsHelper.groupOrdersByTable(orders, waiterId);
+  async getWaiterTables(waiterId: string) {
+    return this.waiterStatsService.getWaiterTables(waiterId);
   }
 
   async getWaiterStats(waiterId: string, params: { start_date?: string; end_date?: string }) {
-    const { startDate, endDate } = this.waiterStatsHelper.parseDateRange(
-      params.start_date,
-      params.end_date,
-    );
-
-    const orders = await this.orderRepository
-      .createQueryBuilder('order')
-      .where('order.created_at >= :startDate', { startDate })
-      .andWhere('order.created_at <= :endDate', { endDate })
-      .andWhere('order.waiter_id = :waiterId', { waiterId })
-      .getMany();
-
-    const tablesAssigned = await this.tableRepository.count({
-      where: {
-        assigned_waiter_id: waiterId,
-        status: In(['occupied', 'reserved']),
-      },
-    });
-
-    return this.waiterStatsHelper.calculateStatistics(orders, tablesAssigned);
+    return this.waiterStatsService.getWaiterStats(waiterId, params);
   }
 
   async getMaitreOverview(restaurantId: string) {
-    const paginationParams = Object.assign(new PaginationDto(), { page: 1, limit: 100 });
-    const reservationsResponse = await this.reservationsService.findByRestaurant(
-      restaurantId,
-      paginationParams,
-    );
-
-    const tablesPaginationParams = Object.assign(new PaginationDto(), { page: 1, limit: 100 });
-    const tablesResponse = await this.tablesService.findAll(restaurantId, tablesPaginationParams);
-
-    const waiterIds = [
-      ...new Set(
-        tablesResponse.items
-          .filter((t: any) => t.assigned_waiter_id)
-          .map((t: any) => t.assigned_waiter_id as string),
-      ),
-    ];
-
-    const waiters =
-      waiterIds.length > 0
-        ? await this.profileRepository.find({
-            where: { id: In(waiterIds) },
-            select: ['id', 'full_name'],
-          })
-        : [];
-
-    const waiterMap = new Map(waiters.map((w) => [w.id, w.full_name || 'Staff']));
-
-    return this.maitreFormatter.buildOverview(
-      reservationsResponse.items,
-      tablesResponse.items,
-      waiterMap,
-    );
+    return this.waiterStatsService.getMaitreOverview(restaurantId);
   }
 
   // ========== PARTIAL ORDER METHODS (EPIC 17) ==========

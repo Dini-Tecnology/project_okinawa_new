@@ -1,16 +1,18 @@
 /**
  * FinancialScreen - Restaurant Financial Dashboard
- * 
+ *
  * Migrated to semantic tokens using useColors() + useMemo pattern
  * for dynamic theme support (light/dark modes).
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Text, Card, SegmentedButtons, DataTable } from 'react-native-paper';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 interface FinancialSummary {
@@ -41,14 +43,46 @@ interface Transaction {
   description: string;
 }
 
+interface FinancialData {
+  summary: FinancialSummary;
+  transactions: Transaction[];
+}
+
+// ============================================
+// QUERY KEYS
+// ============================================
+
+export const financialQueryKeys = {
+  financial: (period: string) => ['restaurant', 'financial', period] as const,
+};
+
+// ============================================
+// HELPERS
+// ============================================
+
+function getDateRange(period: string) {
+  const now = new Date();
+  switch (period) {
+    case 'today':
+      return { start: startOfDay(now), end: endOfDay(now) };
+    case 'week':
+      return { start: startOfWeek(now), end: endOfWeek(now) };
+    case 'month':
+      return { start: startOfMonth(now), end: endOfMonth(now) };
+    default:
+      return { start: startOfDay(now), end: endOfDay(now) };
+  }
+}
+
+// ============================================
+// COMPONENT
+// ============================================
+
 export default function FinancialScreen() {
   const { t } = useI18n();
   const colors = useColors();
+  const queryClient = useQueryClient();
   const [period, setPeriod] = useState('today');
-  const [summary, setSummary] = useState<FinancialSummary | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -102,64 +136,70 @@ export default function FinancialScreen() {
     },
   }), [colors]);
 
-  useEffect(() => {
-    loadFinancialData();
-  }, [period]);
-
-  const getDateRange = () => {
-    const now = new Date();
-    switch (period) {
-      case 'today':
-        return { start: startOfDay(now), end: endOfDay(now) };
-      case 'week':
-        return { start: startOfWeek(now), end: endOfWeek(now) };
-      case 'month':
-        return { start: startOfMonth(now), end: endOfMonth(now) };
-      default:
-        return { start: startOfDay(now), end: endOfDay(now) };
-    }
-  };
-
-  const loadFinancialData = async () => {
-    setLoading(true);
-    try {
-      const { start, end } = getDateRange();
+  // ---- Main financial query with 60s polling fallback ----
+  const {
+    data: financialData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery<FinancialData>({
+    queryKey: financialQueryKeys.financial(period),
+    queryFn: async () => {
+      const { start, end } = getDateRange(period);
       const [summaryResponse, transactionsResponse] = await Promise.all([
         ApiService.getFinancialSummary({
           params: {
             start_date: start.toISOString(),
             end_date: end.toISOString(),
           },
-        }),
+        } as any),
         ApiService.getFinancialReport({
           params: {
             start_date: start.toISOString(),
             end_date: end.toISOString(),
             limit: 20,
           },
-        }),
+        } as any),
       ]);
+      return {
+        summary: summaryResponse.data,
+        transactions: transactionsResponse.data,
+      };
+    },
+    staleTime: 30_000,
+    refetchInterval: 60_000, // poll every 60s as WebSocket fallback
+  });
 
-      setSummary(summaryResponse.data);
-      setTransactions(transactionsResponse.data);
-    } catch (error) {
-      console.error('Failed to load financial data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const summary = financialData?.summary ?? null;
+  const transactions = financialData?.transactions ?? [];
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadFinancialData();
-    setRefreshing(false);
-  };
+  // isRefreshing = a background refetch after initial load
+  const refreshing = isFetching && !isLoading;
+
+  // ---- WebSocket subscription for real-time financial updates ----
+  const { on, off, connected } = useWebSocket('/');
+
+  useEffect(() => {
+    if (!connected) return;
+
+    const handleFinancialUpdate = (data: FinancialData) => {
+      queryClient.setQueryData(financialQueryKeys.financial(period), data);
+    };
+
+    on('financial:update', handleFinancialUpdate);
+    on('revenue:update', handleFinancialUpdate);
+
+    return () => {
+      off('financial:update', handleFinancialUpdate);
+      off('revenue:update', handleFinancialUpdate);
+    };
+  }, [connected, period, on, off, queryClient]);
 
   return (
     <ScrollView
       style={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={refreshing} onRefresh={refetch} />
       }
     >
       <SegmentedButtons

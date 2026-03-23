@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, RefreshControl, Alert } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Text, Card, Chip, IconButton, ActivityIndicator, SegmentedButtons, Searchbar, FAB, Menu, Divider } from 'react-native-paper';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { format } from 'date-fns';
@@ -368,14 +369,15 @@ export default function OrdersScreen() {
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       ) : (
-        <FlatList
+        <FlashList
           data={filteredOrders}
           renderItem={renderOrderCard}
           keyExtractor={(item) => item.id}
+          estimatedItemSize={120}
           contentContainerStyle={styles.listContent}
           refreshControl={
-            <RefreshControl 
-              refreshing={refreshing} 
+            <RefreshControl
+              refreshing={refreshing}
               onRefresh={onRefresh}
               colors={[colors.primary]}
               tintColor={colors.primary}

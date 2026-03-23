@@ -1,136 +1,160 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, Dimensions } from 'react-native';
 import { Text, Card, IconButton, ActivityIndicator } from 'react-native-paper';
-import { LineChart, BarChart } from 'react-native-chart-kit';
+import { LineChart } from 'react-native-chart-kit';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
+import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import type { DashboardStats, RevenueData } from '../../types';
 
 const screenWidth = Dimensions.get('window').width;
+
+// ============================================
+// QUERY KEYS
+// ============================================
+
+export const dashboardQueryKeys = {
+  dashboard: ['restaurant', 'dashboard'] as const,
+};
+
+// ============================================
+// API FUNCTIONS
+// ============================================
+
+const fetchDashboard = async (): Promise<{ stats: DashboardStats; revenueData: RevenueData[] }> => {
+  const analyticsData = await ApiService.getAnalytics();
+  return {
+    stats: analyticsData.stats,
+    revenueData: analyticsData.revenueData || [],
+  };
+};
+
+// ============================================
+// COMPONENT
+// ============================================
 
 export default function DashboardScreen() {
   const { t } = useI18n();
   const { theme, isDark } = useOkinawaTheme();
   const colors = useColors();
-  
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [revenueData, setRevenueData] = useState<RevenueData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+  const queryClient = useQueryClient();
+
+  // ---- Main dashboard query with 30s polling fallback ----
+  const {
+    data: dashboardData,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useQuery({
+    queryKey: dashboardQueryKeys.dashboard,
+    queryFn: fetchDashboard,
+    staleTime: 10_000,
+    refetchInterval: 30_000, // poll every 30s as WebSocket fallback
+  });
+
+  const stats = dashboardData?.stats ?? null;
+  const revenueData = dashboardData?.revenueData ?? [];
+
+  // isRefreshing = a background refetch after initial load
+  const refreshing = isFetching && !isLoading;
+
+  // ---- WebSocket subscription for real-time dashboard updates ----
+  const { on, off, connected } = useWebSocket('/');
 
   useEffect(() => {
-    loadDashboard();
-  }, []);
+    if (!connected) return;
 
-  const loadDashboard = async () => {
-    try {
-      setLoading(true);
-      const analyticsData = await ApiService.getAnalytics();
-      setStats(analyticsData.stats);
-      setRevenueData(analyticsData.revenueData || []);
-    } catch (error) {
-      console.error(error);
-      setStats({
-        today_orders: 0,
-        today_revenue: 0,
-        active_orders: 0,
-        pending_reservations: 0,
-        tables_occupied: 0,
-        tables_total: 0,
-        avg_preparation_time: 0,
-        customer_satisfaction: 0,
-      });
-      setRevenueData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const handleDashboardUpdate = (data: { stats: DashboardStats; revenueData: RevenueData[] }) => {
+      queryClient.setQueryData(dashboardQueryKeys.dashboard, data);
+    };
 
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await loadDashboard();
-    setRefreshing(false);
-  };
+    on('dashboard:update', handleDashboardUpdate);
+
+    return () => {
+      off('dashboard:update', handleDashboardUpdate);
+    };
+  }, [connected, on, off, queryClient]);
 
   const styles = useMemo(() => StyleSheet.create({
-    container: { 
-      flex: 1, 
+    container: {
+      flex: 1,
       backgroundColor: colors.backgroundSecondary,
     },
-    loadingContainer: { 
-      flex: 1, 
-      alignItems: 'center', 
+    loadingContainer: {
+      flex: 1,
+      alignItems: 'center',
       justifyContent: 'center',
       backgroundColor: colors.background,
     },
-    title: { 
-      marginHorizontal: 20, 
+    title: {
+      marginHorizontal: 20,
       marginVertical: 16,
       color: colors.foreground,
     },
-    grid: { 
-      flexDirection: 'row', 
-      flexWrap: 'wrap', 
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
       paddingHorizontal: 12,
     },
-    statCard: { 
-      width: '48%', 
-      margin: 8, 
+    statCard: {
+      width: '48%',
+      margin: 8,
       elevation: 2,
       backgroundColor: colors.card,
     },
-    statContent: { 
-      flexDirection: 'row', 
-      alignItems: 'center', 
+    statContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 12,
     },
-    card: { 
-      margin: 16, 
+    card: {
+      margin: 16,
       elevation: 2,
       backgroundColor: colors.card,
     },
-    cardTitle: { 
+    cardTitle: {
       marginBottom: 16,
       color: colors.foreground,
     },
-    tableStats: { 
-      flexDirection: 'row', 
-      alignItems: 'center', 
+    tableStats: {
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: 16,
     },
-    tableStat: { 
+    tableStat: {
       alignItems: 'center',
     },
-    progressContainer: { 
+    progressContainer: {
       flex: 1,
     },
-    progressBar: { 
-      height: 8, 
-      backgroundColor: colors.backgroundTertiary, 
-      borderRadius: 4, 
+    progressBar: {
+      height: 8,
+      backgroundColor: colors.backgroundTertiary,
+      borderRadius: 4,
       marginBottom: 8,
     },
-    progressFill: { 
-      height: '100%', 
-      backgroundColor: colors.primary, 
+    progressFill: {
+      height: '100%',
+      backgroundColor: colors.primary,
       borderRadius: 4,
     },
-    metricsGrid: { 
-      flexDirection: 'row', 
-      gap: 16, 
+    metricsGrid: {
+      flexDirection: 'row',
+      gap: 16,
       paddingHorizontal: 16,
     },
-    metricCard: { 
-      flex: 1, 
+    metricCard: {
+      flex: 1,
       elevation: 2,
       backgroundColor: colors.card,
     },
-    metricContent: { 
+    metricContent: {
       alignItems: 'center',
     },
-    chart: { 
-      marginTop: 16, 
+    chart: {
+      marginTop: 16,
       borderRadius: 16,
     },
     statText: {
@@ -150,7 +174,7 @@ export default function DashboardScreen() {
     style: { borderRadius: 16 },
   }), [colors]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -162,9 +186,9 @@ export default function DashboardScreen() {
     <ScrollView
       style={styles.container}
       refreshControl={
-        <RefreshControl 
-          refreshing={refreshing} 
-          onRefresh={onRefresh}
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={refetch}
           colors={[colors.primary]}
           tintColor={colors.primary}
         />

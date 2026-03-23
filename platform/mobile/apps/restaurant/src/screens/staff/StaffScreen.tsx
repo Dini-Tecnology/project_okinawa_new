@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
+import { View, StyleSheet, RefreshControl } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Text, Card, Button, FAB, Chip, Searchbar, Avatar, IconButton } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -281,7 +282,7 @@ export default function StaffScreen({ navigation }: any) {
       />
 
       <View style={styles.filters}>
-        <FlatList
+        <FlashList
           horizontal
           data={roles}
           renderItem={({ item }) => (
@@ -295,19 +296,21 @@ export default function StaffScreen({ navigation }: any) {
             </Chip>
           )}
           keyExtractor={(item) => item}
+          estimatedItemSize={72}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filtersContent}
         />
       </View>
 
-      <FlatList
+      <FlashList
         data={filteredStaff}
         renderItem={renderStaffMember}
         keyExtractor={(item) => item.id}
+        estimatedItemSize={72}
         contentContainerStyle={styles.list}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
+          <RefreshControl
+            refreshing={refreshing}
             onRefresh={onRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}

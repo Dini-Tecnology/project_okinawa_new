@@ -5,6 +5,8 @@ import { OrdersController } from './orders.controller';
 import { OrdersGateway } from './orders.gateway';
 import { OrderGuestsService } from './order-guests.service';
 import { OrderGuestsController } from './order-guests.controller';
+import { KdsService } from './kds.service';
+import { WaiterStatsService } from './waiter-stats.service';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { OrderGuest } from './entities/order-guest.entity';
@@ -35,6 +37,8 @@ import {
   controllers: [OrdersController, OrderGuestsController],
   providers: [
     OrdersService,
+    KdsService,
+    WaiterStatsService,
     OrdersGateway,
     OrderGuestsService,
     OrderCalculatorHelper,
@@ -42,6 +46,6 @@ import {
     WaiterStatsHelper,
     MaitreFormatterHelper,
   ],
-  exports: [OrdersService, OrdersGateway, OrderGuestsService],
+  exports: [OrdersService, KdsService, WaiterStatsService, OrdersGateway, OrderGuestsService],
 })
 export class OrdersModule {}

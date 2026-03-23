@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, FlatList, RefreshControl, Alert } from 'react-native';
+import { View, StyleSheet, RefreshControl, Alert } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import { Text, Card, Button, FAB, Chip, Searchbar, IconButton } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -272,7 +273,7 @@ export default function MenuScreen({ navigation }: any) {
       />
 
       <View style={styles.categories}>
-        <FlatList
+        <FlashList
           horizontal
           data={categories}
           renderItem={({ item }) => (
@@ -286,19 +287,21 @@ export default function MenuScreen({ navigation }: any) {
             </Chip>
           )}
           keyExtractor={(item) => item}
+          estimatedItemSize={80}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.categoriesContent}
         />
       </View>
 
-      <FlatList
+      <FlashList
         data={filteredItems}
         renderItem={renderMenuItem}
         keyExtractor={(item) => item.id}
+        estimatedItemSize={80}
         contentContainerStyle={styles.list}
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
+          <RefreshControl
+            refreshing={refreshing}
             onRefresh={onRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}

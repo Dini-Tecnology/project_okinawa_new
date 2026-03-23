@@ -10,13 +10,13 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   RefreshControl,
   Platform,
   Dimensions,
   Alert,
 } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
 import {
   Text,
   Searchbar,
@@ -408,10 +408,11 @@ export default function ExploreScreen() {
   );
 
   const renderListView = () => (
-    <FlatList
+    <FlashList
       data={filteredRestaurants}
       renderItem={renderRestaurantCard}
       keyExtractor={(item) => item.id}
+      estimatedItemSize={200}
       contentContainerStyle={styles.listContent}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -527,7 +528,7 @@ export default function ExploreScreen() {
 
       {/* Cuisine Filters */}
       <View style={styles.filtersContainer}>
-        <FlatList
+        <FlashList
           horizontal
           data={CUISINE_FILTERS}
           renderItem={({ item }) => (
@@ -540,6 +541,7 @@ export default function ExploreScreen() {
             </Chip>
           )}
           keyExtractor={(item) => item}
+          estimatedItemSize={80}
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filtersContent}
         />
