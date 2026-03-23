@@ -89,6 +89,15 @@ export class Restaurant {
   @Column({ type: 'jsonb', nullable: true, default: '[]' })
   setup_progress: string[];
 
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  lat: number;
+
+  @Column({ type: 'decimal', precision: 10, scale: 7, nullable: true })
+  lng: number;
+
+  @Column({ type: 'int', nullable: true, default: 500 })
+  geofence_radius: number;
+
   @CreateDateColumn()
   created_at: Date;
 

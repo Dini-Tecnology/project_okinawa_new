@@ -3,8 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MenuItem } from './entities/menu-item.entity';
 import { MenuCategory } from './entities/menu-category.entity';
+import { MenuItemCustomizationGroup } from './entities/menu-item-customization-group.entity';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CreateCustomizationGroupDto } from './dto/create-customization-group.dto';
+import { UpdateCustomizationGroupDto } from './dto/update-customization-group.dto';
 import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
 
 @Injectable()
@@ -14,6 +17,8 @@ export class MenuItemsService {
     private menuItemRepository: Repository<MenuItem>,
     @InjectRepository(MenuCategory)
     private categoryRepository: Repository<MenuCategory>,
+    @InjectRepository(MenuItemCustomizationGroup)
+    private customizationGroupRepository: Repository<MenuItemCustomizationGroup>,
   ) {}
 
   async findByRestaurant(restaurantId: string, pagination?: PaginationDto) {
@@ -74,5 +79,64 @@ export class MenuItemsService {
     if (!category) throw new NotFoundException('Category not found');
     category.is_active = false;
     return this.categoryRepository.save(category);
+  }
+
+  // ========== CUSTOMIZATION GROUP METHODS ==========
+
+  /**
+   * Get all customization groups for a menu item, sorted by sort_order.
+   */
+  async findCustomizationGroups(menuItemId: string): Promise<MenuItemCustomizationGroup[]> {
+    // Verify the menu item exists
+    const menuItem = await this.menuItemRepository.findOne({ where: { id: menuItemId } });
+    if (!menuItem) throw new NotFoundException('Menu item not found');
+
+    return this.customizationGroupRepository.find({
+      where: { menu_item_id: menuItemId },
+      order: { sort_order: 'ASC', name: 'ASC' },
+    });
+  }
+
+  /**
+   * Create a customization group for a menu item.
+   */
+  async createCustomizationGroup(
+    menuItemId: string,
+    dto: CreateCustomizationGroupDto,
+  ): Promise<MenuItemCustomizationGroup> {
+    const menuItem = await this.menuItemRepository.findOne({ where: { id: menuItemId } });
+    if (!menuItem) throw new NotFoundException('Menu item not found');
+
+    const group = this.customizationGroupRepository.create({
+      ...dto,
+      menu_item_id: menuItemId,
+    });
+
+    return this.customizationGroupRepository.save(group);
+  }
+
+  /**
+   * Update a customization group.
+   */
+  async updateCustomizationGroup(
+    groupId: string,
+    dto: UpdateCustomizationGroupDto,
+  ): Promise<MenuItemCustomizationGroup> {
+    const group = await this.customizationGroupRepository.findOne({ where: { id: groupId } });
+    if (!group) throw new NotFoundException('Customization group not found');
+
+    Object.assign(group, dto);
+    return this.customizationGroupRepository.save(group);
+  }
+
+  /**
+   * Delete a customization group.
+   */
+  async deleteCustomizationGroup(groupId: string): Promise<{ message: string }> {
+    const group = await this.customizationGroupRepository.findOne({ where: { id: groupId } });
+    if (!group) throw new NotFoundException('Customization group not found');
+
+    await this.customizationGroupRepository.remove(group);
+    return { message: 'Customization group deleted successfully' };
   }
 }

@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   StyleSheet,
   ScrollView,
   Alert,
   RefreshControl,
+  Animated,
+  TouchableOpacity,
 } from 'react-native';
 import {
   Text,
   Card,
   Button,
   IconButton,
-  ActivityIndicator,
   Divider,
   Avatar,
   Chip,
@@ -24,6 +25,7 @@ import {
 } from 'react-native-paper';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as Haptics from 'expo-haptics';
 
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -82,11 +84,53 @@ interface Order {
   items: OrderItem[];
 }
 
+// Skeleton block component
+const SkeletonBlock = ({ width, height, style }: { width: number | string; height: number; style?: any }) => {
+  const colors = useColors();
+  const opacity = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, { toValue: 1, duration: 800, useNativeDriver: true }),
+        Animated.timing(opacity, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+      ]),
+    );
+    animation.start();
+    return () => animation.stop();
+  }, [opacity]);
+
+  return (
+    <Animated.View
+      style={[
+        { width, height, borderRadius: 6, backgroundColor: colors.backgroundTertiary, opacity },
+        style,
+      ]}
+    />
+  );
+};
+
+const SplitSkeleton = () => {
+  const colors = useColors();
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.backgroundSecondary, padding: 16 }}>
+      {/* Total card skeleton */}
+      <SkeletonBlock width="100%" height={100} style={{ borderRadius: 12, marginBottom: 16 }} />
+      {/* Mode selector skeleton */}
+      <SkeletonBlock width="100%" height={48} style={{ borderRadius: 8, marginBottom: 16 }} />
+      {/* Guest cards skeleton */}
+      {[1, 2, 3].map((i) => (
+        <SkeletonBlock key={i} width="100%" height={120} style={{ borderRadius: 12, marginBottom: 12 }} />
+      ))}
+    </View>
+  );
+};
+
 export default function SplitPaymentScreen() {
   useScreenTracking('Split Payment');
   const analytics = useAnalytics();
   const colors = useColors();
-  
+
   const route = useRoute();
   const navigation = useNavigation<NavigationProp>();
   const { t } = useI18n();
@@ -100,12 +144,13 @@ export default function SplitPaymentScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Split mode state
   const [splitMode, setSplitMode] = useState<SplitMode>('individual');
   const [selectedItems, setSelectedItems] = useState<Record<string, string[]>>({});
   const [fixedAmounts, setFixedAmounts] = useState<Record<string, string>>({});
-  
+
   // Payment modal state
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedGuest, setSelectedGuest] = useState<OrderGuest | null>(null);
@@ -115,6 +160,7 @@ export default function SplitPaymentScreen() {
     loadData();
   }, [orderId]);
 
+  // WebSocket for real-time updates
   useEffect(() => {
     if (connected && orderId) {
       joinRoom(`payment:${orderId}`);
@@ -123,22 +169,32 @@ export default function SplitPaymentScreen() {
         if (data.splits) {
           setSplits(data.splits);
         }
+        // Reload data to get updated guest payment statuses
+        loadData();
+      };
+
+      const handlePaymentCompleted = (data: any) => {
+        if (data.splits) {
+          setSplits(data.splits);
+        }
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       };
 
       on('payment:split_updated', handlePaymentUpdate);
-      on('payment:completed', handlePaymentUpdate);
+      on('payment:completed', handlePaymentCompleted);
 
       return () => {
         off('payment:split_updated', handlePaymentUpdate);
-        off('payment:completed', handlePaymentUpdate);
+        off('payment:completed', handlePaymentCompleted);
         leaveRoom(`payment:${orderId}`);
       };
     }
   }, [connected, orderId]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
       const [orderData, guestsData, splitsData] = await Promise.all([
         ApiService.getOrder(orderId),
         ApiService.getOrderGuests(orderId),
@@ -147,21 +203,21 @@ export default function SplitPaymentScreen() {
       setOrder(orderData);
       setGuests(guestsData);
       setSplits(splitsData);
-    } catch (error: any) {
-      console.error('Error loading data:', error);
-      Alert.alert(t('common.error'), t('errors.generic'));
+    } catch (err: any) {
+      console.error('Error loading split data:', err);
+      setError(t('split.errorCreate'));
     } finally {
       setLoading(false);
     }
-  };
+  }, [orderId, t]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
     setRefreshing(false);
-  }, []);
+  }, [loadData]);
 
-  const calculateSplitAmounts = () => {
+  const calculateSplitAmounts = useCallback(() => {
     if (!order || guests.length === 0) return {};
 
     const amounts: Record<string, number> = {};
@@ -172,26 +228,30 @@ export default function SplitPaymentScreen() {
       case 'individual':
         guests.forEach((guest) => {
           const guestItems = order.items.filter(
-            (item) => item.ordered_by === guest.guest_user_id
+            (item) => item.ordered_by === guest.guest_user_id,
           );
           amounts[guest.id] = guestItems.reduce(
             (sum, item) => sum + item.total_price,
-            0
+            0,
           );
         });
+        // Distribute tax/tip proportionally
         const subtotal = order.subtotal_amount;
-        const taxTipRatio = (order.tax_amount + order.tip_amount) / subtotal;
-        Object.keys(amounts).forEach((guestId) => {
-          amounts[guestId] = amounts[guestId] * (1 + taxTipRatio);
-        });
+        if (subtotal > 0) {
+          const taxTipRatio = (order.tax_amount + order.tip_amount) / subtotal;
+          Object.keys(amounts).forEach((guestId) => {
+            amounts[guestId] = amounts[guestId] * (1 + taxTipRatio);
+          });
+        }
         break;
 
-      case 'equal':
+      case 'equal': {
         const equalAmount = totalAmount / guestCount;
         guests.forEach((guest) => {
           amounts[guest.id] = equalAmount;
         });
         break;
+      }
 
       case 'selective':
         guests.forEach((guest) => {
@@ -201,15 +261,18 @@ export default function SplitPaymentScreen() {
             .reduce((sum, item) => sum + item.total_price, 0);
           amounts[guest.id] = itemsTotal;
         });
-        const selectedTotal = Object.values(amounts).reduce((a, b) => a + b, 0);
-        const primaryGuest = guests.find((g) => g.is_primary);
-        if (primaryGuest && selectedTotal < totalAmount) {
-          amounts[primaryGuest.id] =
-            (amounts[primaryGuest.id] || 0) + (totalAmount - selectedTotal);
+        // Assign remaining to primary guest
+        {
+          const selectedTotal = Object.values(amounts).reduce((a, b) => a + b, 0);
+          const primaryGuest = guests.find((g) => g.is_primary);
+          if (primaryGuest && selectedTotal < totalAmount) {
+            amounts[primaryGuest.id] =
+              (amounts[primaryGuest.id] || 0) + (totalAmount - selectedTotal);
+          }
         }
         break;
 
-      case 'fixed':
+      case 'fixed': {
         let fixedTotal = 0;
         guests.forEach((guest) => {
           const amount = parseFloat(fixedAmounts[guest.id] || '0');
@@ -222,12 +285,13 @@ export default function SplitPaymentScreen() {
             (amounts[primary.id] || 0) + (totalAmount - fixedTotal);
         }
         break;
+      }
     }
 
     return amounts;
-  };
+  }, [order, guests, splitMode, selectedItems, fixedAmounts]);
 
-  const handleToggleItem = (guestId: string, itemId: string) => {
+  const handleToggleItem = useCallback((guestId: string, itemId: string) => {
     setSelectedItems((prev) => {
       const guestItems = prev[guestId] || [];
       if (guestItems.includes(itemId)) {
@@ -242,51 +306,60 @@ export default function SplitPaymentScreen() {
         };
       }
     });
-  };
+  }, []);
 
-  const handleFixedAmountChange = (guestId: string, value: string) => {
+  const handleFixedAmountChange = useCallback((guestId: string, value: string) => {
     const numValue = value.replace(/[^0-9.]/g, '');
     setFixedAmounts((prev) => ({
       ...prev,
       [guestId]: numValue,
     }));
-  };
+  }, []);
 
-  const handleCreateSplits = async () => {
+  const handleCreateSplits = useCallback(async () => {
     if (!order) return;
 
     setProcessing(true);
     try {
-      const apiSplitMode = splitMode === 'fixed' ? 'split_selective' : 
-                          splitMode === 'selective' ? 'split_selective' :
-                          splitMode === 'equal' ? 'split_equal' : 'individual';
-      
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      const apiSplitMode =
+        splitMode === 'fixed'
+          ? 'split_selective'
+          : splitMode === 'selective'
+            ? 'split_selective'
+            : splitMode === 'equal'
+              ? 'split_equal'
+              : 'individual';
+
       await ApiService.createAllPaymentSplits(orderId, apiSplitMode);
       await loadData();
-      
+
       await analytics.logEvent('payment_splits_created', {
         order_id: orderId,
         split_mode: splitMode,
         guest_count: guests.length,
       });
 
-      Alert.alert(t('common.success'), t('payment.splitsCreated'));
-    } catch (error: any) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('common.success'), t('split.createSplits'));
+    } catch (err: any) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
         t('common.error'),
-        error.response?.data?.message || t('errors.generic')
+        err.response?.data?.message || t('split.errorCreate'),
       );
     } finally {
       setProcessing(false);
     }
-  };
+  }, [order, splitMode, orderId, guests.length, loadData, analytics, t]);
 
-  const handleOpenPayment = (guest: OrderGuest) => {
+  const handleOpenPayment = useCallback((guest: OrderGuest) => {
     setSelectedGuest(guest);
     setShowPaymentModal(true);
-  };
+  }, []);
 
-  const handleProcessPayment = async () => {
+  const handleProcessPayment = useCallback(async () => {
     if (!selectedGuest || !order) return;
 
     const amounts = calculateSplitAmounts();
@@ -299,19 +372,32 @@ export default function SplitPaymentScreen() {
 
     setProcessing(true);
     try {
-      const split = splits.find((s) => s.guest_user_id === selectedGuest.guest_user_id);
-      
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      const split = splits.find(
+        (s) => s.guest_user_id === selectedGuest.guest_user_id,
+      );
+
       if (!split) {
         Alert.alert(t('common.error'), t('payment.splitNotFound'));
         return;
       }
 
-      await ApiService.processSplitPayment({
-        split_id: split.id,
-        amount,
-        payment_method: paymentMethod,
-      });
+      // Generate idempotency key
+      const idempotencyKey = `split-${split.id}-${Date.now()}`;
 
+      await ApiService.processSplitPayment(
+        {
+          split_id: split.id,
+          amount,
+          payment_method: paymentMethod,
+        },
+        {
+          headers: { 'X-Idempotency-Key': idempotencyKey },
+        },
+      );
+
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       await analytics.logPurchase(orderId, amount, 'BRL');
 
       setShowPaymentModal(false);
@@ -319,230 +405,323 @@ export default function SplitPaymentScreen() {
       await loadData();
 
       Alert.alert(t('common.success'), t('payment.paymentProcessed'));
-    } catch (error: any) {
+    } catch (err: any) {
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(
         t('common.error'),
-        error.response?.data?.message || t('errors.generic')
+        err.response?.data?.message || t('split.errorPay'),
       );
     } finally {
       setProcessing(false);
     }
-  };
+  }, [selectedGuest, order, calculateSplitAmounts, splits, paymentMethod, orderId, loadData, analytics, t]);
 
-  const getPaymentStatusColor = (status: string) => {
-    switch (status) {
-      case 'paid':
-        return colors.success;
-      case 'partial':
-        return colors.warning;
-      case 'pending':
-        return colors.foregroundMuted;
-      default:
-        return colors.foregroundMuted;
-    }
-  };
+  const getPaymentStatusColor = useCallback(
+    (status: string) => {
+      switch (status) {
+        case 'paid':
+          return colors.success;
+        case 'partial':
+          return colors.warning;
+        case 'pending':
+          return colors.foregroundMuted;
+        default:
+          return colors.foregroundMuted;
+      }
+    },
+    [colors],
+  );
 
-  const styles = useMemo(() => StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: colors.backgroundSecondary,
+  const getPaymentStatusText = useCallback(
+    (status: string) => {
+      switch (status) {
+        case 'paid':
+          return t('split.personPaid');
+        case 'partial':
+          return t('payment.status.partial');
+        case 'pending':
+          return t('split.personPending');
+        default:
+          return status;
+      }
     },
-    scrollContent: {
-      padding: 16,
-      paddingBottom: 32,
-    },
-    loadingContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.backgroundSecondary,
-    },
-    loadingText: {
-      marginTop: 16,
-      color: colors.foregroundSecondary,
-    },
-    totalCard: {
-      marginBottom: 16,
-      backgroundColor: colors.primary,
-    },
-    totalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'flex-start',
-    },
-    totalLabel: {
-      color: 'rgba(255,255,255,0.8)',
-    },
-    totalAmount: {
-      color: 'white',
-      fontWeight: 'bold',
-    },
-    paidInfo: {
-      alignItems: 'flex-end',
-    },
-    paidLabel: {
-      color: 'rgba(255,255,255,0.8)',
-    },
-    paidAmount: {
-      color: 'white',
-    },
-    allPaidChip: {
-      marginTop: 12,
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      alignSelf: 'flex-start',
-    },
-    allPaidText: {
-      color: 'white',
-    },
-    card: {
-      marginBottom: 16,
-      backgroundColor: colors.card,
-    },
-    sectionTitle: {
-      marginBottom: 12,
-      color: colors.foreground,
-    },
-    segmentedButtons: {
-      marginBottom: 12,
-    },
-    modeDescription: {
-      color: colors.foregroundSecondary,
-      fontStyle: 'italic',
-    },
-    guestCard: {
-      marginBottom: 12,
-      backgroundColor: colors.card,
-    },
-    guestHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-    },
-    guestInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      flex: 1,
-    },
-    guestAvatar: {
-      backgroundColor: colors.backgroundTertiary,
-    },
-    primaryAvatar: {
-      backgroundColor: colors.primary,
-    },
-    guestDetails: {
-      marginLeft: 12,
-      flex: 1,
-    },
-    primaryBadge: {
-      color: colors.primary,
-      fontWeight: 'bold',
-    },
-    statusChip: {
-      marginTop: 4,
-      height: 20,
-      alignSelf: 'flex-start',
-    },
-    guestAmount: {
-      alignItems: 'flex-end',
-    },
-    amountText: {
-      fontWeight: 'bold',
-      color: colors.primary,
-    },
-    itemSelection: {
-      marginTop: 8,
-    },
-    divider: {
-      marginVertical: 12,
-      backgroundColor: colors.border,
-    },
-    selectItemsLabel: {
-      marginBottom: 8,
-      color: colors.foregroundSecondary,
-    },
-    selectableItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 4,
-    },
-    itemInfo: {
-      flex: 1,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      marginLeft: 8,
-    },
-    itemPrice: {
-      color: colors.foregroundSecondary,
-    },
-    fixedAmountContainer: {
-      marginTop: 8,
-    },
-    amountInput: {
-      marginBottom: 8,
-      backgroundColor: colors.card,
-    },
-    payButton: {
-      marginTop: 12,
-      backgroundColor: colors.success,
-    },
-    createSplitsButton: {
-      marginTop: 8,
-      backgroundColor: colors.primary,
-    },
-    modalContent: {
-      backgroundColor: colors.card,
-      padding: 20,
-      margin: 20,
-      borderRadius: 8,
-    },
-    modalTitle: {
-      marginBottom: 16,
-      color: colors.foreground,
-    },
-    paymentSummary: {
-      marginBottom: 16,
-      padding: 12,
-      backgroundColor: colors.backgroundSecondary,
-      borderRadius: 8,
-    },
-    paymentAmount: {
-      marginTop: 4,
-      color: colors.primary,
-      fontWeight: 'bold',
-    },
-    radioItem: {
-      paddingVertical: 4,
-    },
-    modalActions: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      marginTop: 16,
-      gap: 8,
-    },
-    guestName: {
-      color: colors.foreground,
-    },
-    itemText: {
-      color: colors.foreground,
-    },
-    paymentSummaryText: {
-      color: colors.foreground,
-    },
-  }), [colors]);
+    [t],
+  );
 
+  const getModeDescription = useCallback(
+    (mode: SplitMode): string => {
+      switch (mode) {
+        case 'individual':
+          return t('split.modeIndividualDesc');
+        case 'equal':
+          return t('split.modeEqualDesc');
+        case 'selective':
+          return t('split.modeSelectiveDesc');
+        case 'fixed':
+          return t('split.modeFixedDesc');
+      }
+    },
+    [t],
+  );
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: colors.backgroundSecondary,
+        },
+        scrollContent: {
+          padding: 16,
+          paddingBottom: 32,
+        },
+        errorContainer: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colors.backgroundSecondary,
+          padding: 32,
+        },
+        errorText: {
+          color: colors.error,
+          textAlign: 'center',
+          marginBottom: 16,
+        },
+        notFoundContainer: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colors.backgroundSecondary,
+        },
+        notFoundText: {
+          color: colors.foreground,
+        },
+        totalCard: {
+          marginBottom: 16,
+          backgroundColor: colors.primary,
+          borderRadius: 12,
+        },
+        totalHeader: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        },
+        totalLabel: {
+          color: 'rgba(255,255,255,0.8)',
+        },
+        totalAmount: {
+          color: 'white',
+          fontWeight: 'bold',
+        },
+        paidInfo: {
+          alignItems: 'flex-end',
+        },
+        paidLabel: {
+          color: 'rgba(255,255,255,0.8)',
+        },
+        paidAmount: {
+          color: 'white',
+        },
+        allPaidChip: {
+          marginTop: 12,
+          backgroundColor: 'rgba(255,255,255,0.2)',
+          alignSelf: 'flex-start',
+        },
+        allPaidText: {
+          color: 'white',
+        },
+        card: {
+          marginBottom: 16,
+          backgroundColor: colors.card,
+          borderRadius: 12,
+        },
+        sectionTitle: {
+          marginBottom: 12,
+          color: colors.foreground,
+        },
+        segmentedButtons: {
+          marginBottom: 12,
+        },
+        modeDescription: {
+          color: colors.foregroundSecondary,
+          fontStyle: 'italic',
+        },
+        guestCard: {
+          marginBottom: 12,
+          backgroundColor: colors.card,
+          borderRadius: 12,
+        },
+        guestCardPaid: {
+          borderWidth: 1,
+          borderColor: colors.success + '40',
+          backgroundColor: colors.success + '05',
+        },
+        guestCardCurrent: {
+          borderWidth: 1,
+          borderColor: colors.primary + '40',
+          backgroundColor: colors.primary + '05',
+        },
+        guestHeader: {
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        },
+        guestInfo: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          flex: 1,
+        },
+        guestAvatar: {
+          backgroundColor: colors.backgroundTertiary,
+        },
+        primaryAvatar: {
+          backgroundColor: colors.primary,
+        },
+        paidAvatar: {
+          backgroundColor: colors.success,
+        },
+        guestDetails: {
+          marginLeft: 12,
+          flex: 1,
+        },
+        guestName: {
+          color: colors.foreground,
+        },
+        primaryBadge: {
+          color: colors.primary,
+          fontWeight: 'bold',
+        },
+        statusChip: {
+          marginTop: 4,
+          height: 20,
+          alignSelf: 'flex-start',
+        },
+        guestAmount: {
+          alignItems: 'flex-end',
+        },
+        amountText: {
+          fontWeight: 'bold',
+          color: colors.primary,
+        },
+        itemSelection: {
+          marginTop: 8,
+        },
+        divider: {
+          marginVertical: 12,
+          backgroundColor: colors.border,
+        },
+        selectItemsLabel: {
+          marginBottom: 8,
+          color: colors.foregroundSecondary,
+        },
+        selectableItem: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 4,
+        },
+        itemInfo: {
+          flex: 1,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          marginLeft: 8,
+        },
+        itemText: {
+          color: colors.foreground,
+        },
+        itemPrice: {
+          color: colors.foregroundSecondary,
+        },
+        itemPaidText: {
+          color: colors.success,
+          fontStyle: 'italic',
+          fontSize: 12,
+        },
+        fixedAmountContainer: {
+          marginTop: 8,
+        },
+        fixedMaxLabel: {
+          color: colors.foregroundSecondary,
+          marginBottom: 4,
+          fontSize: 12,
+        },
+        amountInput: {
+          marginBottom: 8,
+          backgroundColor: colors.card,
+        },
+        payButton: {
+          marginTop: 12,
+          backgroundColor: colors.success,
+          borderRadius: 20,
+        },
+        createSplitsButton: {
+          marginTop: 8,
+          backgroundColor: colors.primary,
+          borderRadius: 20,
+        },
+        modalContent: {
+          backgroundColor: colors.card,
+          padding: 20,
+          margin: 20,
+          borderRadius: 12,
+        },
+        modalTitle: {
+          marginBottom: 16,
+          color: colors.foreground,
+        },
+        paymentSummary: {
+          marginBottom: 16,
+          padding: 12,
+          backgroundColor: colors.backgroundSecondary,
+          borderRadius: 8,
+        },
+        paymentSummaryText: {
+          color: colors.foreground,
+        },
+        paymentAmount: {
+          marginTop: 4,
+          color: colors.primary,
+          fontWeight: 'bold',
+        },
+        radioItem: {
+          paddingVertical: 4,
+        },
+        modalActions: {
+          flexDirection: 'row',
+          justifyContent: 'flex-end',
+          marginTop: 16,
+          gap: 8,
+        },
+      }),
+    [colors],
+  );
+
+  // Loading skeleton
   if (loading) {
+    return <SplitSkeleton />;
+  }
+
+  // Error state
+  if (error && !order) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>{t('common.loading')}</Text>
+      <View style={styles.errorContainer}>
+        <IconButton icon="alert-circle" size={48} iconColor={colors.error} />
+        <Text variant="bodyLarge" style={styles.errorText}>
+          {error}
+        </Text>
+        <Button mode="contained" onPress={loadData} buttonColor={colors.primary}>
+          {t('common.retry')}
+        </Button>
       </View>
     );
   }
 
+  // No order
   if (!order) {
     return (
-      <View style={styles.loadingContainer}>
-        <Text style={{ color: colors.foreground }}>{t('orders.notFound')}</Text>
+      <View style={styles.notFoundContainer}>
+        <Text variant="bodyLarge" style={styles.notFoundText}>
+          {t('payment.orderNotFound')}
+        </Text>
       </View>
     );
   }
@@ -550,13 +729,14 @@ export default function SplitPaymentScreen() {
   const amounts = calculateSplitAmounts();
   const totalPaid = guests.reduce((sum, g) => sum + g.amount_paid, 0);
   const allPaid = totalPaid >= order.total_amount;
+  const remaining = Math.max(0, order.total_amount - totalPaid);
 
   return (
     <View style={styles.container}>
       <ScrollView
         refreshControl={
-          <RefreshControl 
-            refreshing={refreshing} 
+          <RefreshControl
+            refreshing={refreshing}
             onRefresh={onRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}
@@ -570,7 +750,7 @@ export default function SplitPaymentScreen() {
             <View style={styles.totalHeader}>
               <View>
                 <Text variant="bodyMedium" style={styles.totalLabel}>
-                  {t('payment.totalToPay')}
+                  {t('split.total')}
                 </Text>
                 <Text variant="headlineLarge" style={styles.totalAmount}>
                   R$ {order.total_amount.toFixed(2)}
@@ -578,22 +758,29 @@ export default function SplitPaymentScreen() {
               </View>
               <View style={styles.paidInfo}>
                 <Text variant="bodyMedium" style={styles.paidLabel}>
-                  {t('payment.paid')}
+                  {t('split.totalPaid')}
                 </Text>
                 <Text variant="titleLarge" style={styles.paidAmount}>
                   R$ {totalPaid.toFixed(2)}
                 </Text>
               </View>
             </View>
-            {allPaid && (
+            {allPaid ? (
               <Chip
                 mode="flat"
                 icon="check-circle"
                 style={styles.allPaidChip}
                 textStyle={styles.allPaidText}
               >
-                {t('payment.allPaid')}
+                {t('split.allPaid')}
               </Chip>
+            ) : (
+              <Text
+                variant="bodySmall"
+                style={{ color: 'rgba(255,255,255,0.7)', marginTop: 8 }}
+              >
+                {t('split.remaining', { amount: remaining.toFixed(2) })}
+              </Text>
             )}
           </Card.Content>
         </Card>
@@ -602,150 +789,197 @@ export default function SplitPaymentScreen() {
         <Card style={styles.card}>
           <Card.Content>
             <Text variant="titleMedium" style={styles.sectionTitle}>
-              {t('payment.splitMode')}
+              {t('split.modesTitle')}
             </Text>
-            
+
             <SegmentedButtons
               value={splitMode}
-              onValueChange={(value) => setSplitMode(value as SplitMode)}
+              onValueChange={(value) => {
+                setSplitMode(value as SplitMode);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              }}
               buttons={[
-                { value: 'individual', label: t('payment.individual') },
-                { value: 'equal', label: t('payment.equal') },
-                { value: 'selective', label: t('payment.selective') },
-                { value: 'fixed', label: t('payment.fixed') },
+                { value: 'individual', label: t('split.modeIndividual') },
+                { value: 'equal', label: t('split.modeEqual') },
+                { value: 'selective', label: t('split.modeSelective') },
+                { value: 'fixed', label: t('split.modeFixed') },
               ]}
               style={styles.segmentedButtons}
             />
 
             <Text variant="bodySmall" style={styles.modeDescription}>
-              {splitMode === 'individual' && t('payment.individualDesc')}
-              {splitMode === 'equal' && t('payment.equalDesc')}
-              {splitMode === 'selective' && t('payment.selectiveDesc')}
-              {splitMode === 'fixed' && t('payment.fixedDesc')}
+              {getModeDescription(splitMode)}
             </Text>
           </Card.Content>
         </Card>
 
         {/* Guest Payment Cards */}
-        {guests.map((guest) => (
-          <Card key={guest.id} style={styles.guestCard}>
-            <Card.Content>
-              <View style={styles.guestHeader}>
-                <View style={styles.guestInfo}>
-                  <Avatar.Text
-                    size={40}
-                    label={guest.guest_name.substring(0, 2).toUpperCase()}
-                    style={[
-                      styles.guestAvatar,
-                      guest.is_primary && styles.primaryAvatar,
-                    ]}
-                  />
-                  <View style={styles.guestDetails}>
-                    <Text variant="titleSmall" style={styles.guestName}>
-                      {guest.guest_name}
-                      {guest.is_primary && (
-                        <Text style={styles.primaryBadge}> (Host)</Text>
-                      )}
-                    </Text>
-                    <Chip
-                      mode="flat"
+        {guests.map((guest) => {
+          const isPaid = guest.payment_status === 'paid';
+          const guestCardStyle = isPaid
+            ? styles.guestCardPaid
+            : guest.is_primary
+              ? styles.guestCardCurrent
+              : undefined;
+
+          return (
+            <Card key={guest.id} style={[styles.guestCard, guestCardStyle]}>
+              <Card.Content>
+                <View style={styles.guestHeader}>
+                  <View style={styles.guestInfo}>
+                    <Avatar.Text
+                      size={40}
+                      label={guest.guest_name.substring(0, 2).toUpperCase()}
                       style={[
-                        styles.statusChip,
-                        {
-                          backgroundColor:
-                            getPaymentStatusColor(guest.payment_status) + '20',
-                        },
+                        styles.guestAvatar,
+                        isPaid && styles.paidAvatar,
+                        !isPaid && guest.is_primary && styles.primaryAvatar,
                       ]}
-                      textStyle={{
-                        color: getPaymentStatusColor(guest.payment_status),
-                        fontSize: 10,
-                      }}
-                    >
-                      {t(`payment.status.${guest.payment_status}`)}
-                    </Chip>
+                    />
+                    <View style={styles.guestDetails}>
+                      <Text variant="titleSmall" style={styles.guestName}>
+                        {guest.guest_name.length > 8
+                          ? guest.guest_name.substring(0, 8) + '...'
+                          : guest.guest_name}
+                        {guest.is_primary && (
+                          <Text style={styles.primaryBadge}>
+                            {' '}
+                            ({t('split.host')})
+                          </Text>
+                        )}
+                      </Text>
+                      <Chip
+                        mode="flat"
+                        icon={isPaid ? 'check' : undefined}
+                        style={[
+                          styles.statusChip,
+                          {
+                            backgroundColor:
+                              getPaymentStatusColor(guest.payment_status) + '20',
+                          },
+                        ]}
+                        textStyle={{
+                          color: getPaymentStatusColor(guest.payment_status),
+                          fontSize: 10,
+                        }}
+                      >
+                        {getPaymentStatusText(guest.payment_status)}
+                      </Chip>
+                    </View>
+                  </View>
+                  <View style={styles.guestAmount}>
+                    <Text variant="titleMedium" style={styles.amountText}>
+                      R$ {(amounts[guest.id] || 0).toFixed(2)}
+                    </Text>
                   </View>
                 </View>
-                <View style={styles.guestAmount}>
-                  <Text variant="titleMedium" style={styles.amountText}>
-                    R$ {(amounts[guest.id] || 0).toFixed(2)}
-                  </Text>
-                </View>
-              </View>
 
-              {/* Selective Mode - Item Selection */}
-              {splitMode === 'selective' && (
-                <View style={styles.itemSelection}>
-                  <Divider style={styles.divider} />
-                  <Text variant="bodySmall" style={styles.selectItemsLabel}>
-                    {t('payment.selectItems')}:
-                  </Text>
-                  {order.items.map((item) => (
-                    <View key={item.id} style={styles.selectableItem}>
-                      <Checkbox
-                        status={
-                          selectedItems[guest.id]?.includes(item.id)
-                            ? 'checked'
-                            : 'unchecked'
-                        }
-                        onPress={() => handleToggleItem(guest.id, item.id)}
-                      />
-                      <View style={styles.itemInfo}>
-                        <Text variant="bodyMedium" style={styles.itemText}>
-                          {item.quantity}x {item.menu_item.name}
-                        </Text>
-                        <Text variant="bodySmall" style={styles.itemPrice}>
-                          R$ {item.total_price.toFixed(2)}
-                        </Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              )}
+                {/* Selective Mode - Item Selection */}
+                {splitMode === 'selective' && !isPaid && (
+                  <View style={styles.itemSelection}>
+                    <Divider style={styles.divider} />
+                    <Text variant="bodySmall" style={styles.selectItemsLabel}>
+                      {t('split.itemsTitle')}:
+                    </Text>
+                    {order.items.map((item) => {
+                      // Check if item is paid by someone else
+                      const paidSplit = splits.find(
+                        (s) =>
+                          s.status === 'paid' &&
+                          s.selected_items?.includes(item.id) &&
+                          s.guest_user_id !== guest.guest_user_id,
+                      );
 
-              {/* Fixed Mode - Amount Input */}
-              {splitMode === 'fixed' && (
-                <View style={styles.fixedAmountContainer}>
-                  <Divider style={styles.divider} />
-                  <TextInput
-                    label={t('payment.enterAmount')}
-                    value={fixedAmounts[guest.id] || ''}
-                    onChangeText={(value) =>
-                      handleFixedAmountChange(guest.id, value)
-                    }
-                    keyboardType="decimal-pad"
-                    mode="outlined"
-                    left={<TextInput.Affix text="R$" />}
-                    style={styles.amountInput}
-                  />
-                </View>
-              )}
+                      return (
+                        <View key={item.id} style={styles.selectableItem}>
+                          <Checkbox
+                            status={
+                              paidSplit
+                                ? 'checked'
+                                : selectedItems[guest.id]?.includes(item.id)
+                                  ? 'checked'
+                                  : 'unchecked'
+                            }
+                            onPress={() =>
+                              !paidSplit && handleToggleItem(guest.id, item.id)
+                            }
+                            disabled={!!paidSplit}
+                            color={paidSplit ? colors.success : undefined}
+                          />
+                          <View style={styles.itemInfo}>
+                            <View style={{ flex: 1 }}>
+                              <Text variant="bodyMedium" style={styles.itemText}>
+                                {item.quantity}x {item.menu_item.name}
+                              </Text>
+                              {paidSplit && (
+                                <Text style={styles.itemPaidText}>
+                                  {t('split.itemsPaidBy', {
+                                    name: paidSplit.guest_name,
+                                  })}
+                                </Text>
+                              )}
+                            </View>
+                            <Text variant="bodySmall" style={styles.itemPrice}>
+                              R$ {item.total_price.toFixed(2)}
+                            </Text>
+                          </View>
+                        </View>
+                      );
+                    })}
+                  </View>
+                )}
 
-              {/* Pay Button */}
-              {guest.payment_status !== 'paid' && (
-                <Button
-                  mode="contained"
-                  onPress={() => handleOpenPayment(guest)}
-                  style={styles.payButton}
-                  disabled={allPaid}
-                >
-                  {t('payment.payNow')}
-                </Button>
-              )}
-            </Card.Content>
-          </Card>
-        ))}
+                {/* Fixed Mode - Amount Input */}
+                {splitMode === 'fixed' && !isPaid && (
+                  <View style={styles.fixedAmountContainer}>
+                    <Divider style={styles.divider} />
+                    <Text style={styles.fixedMaxLabel}>
+                      {t('split.fixedMax', { max: remaining.toFixed(2) })}
+                    </Text>
+                    <TextInput
+                      label={t('payment.enterAmount')}
+                      value={fixedAmounts[guest.id] || ''}
+                      onChangeText={(value) =>
+                        handleFixedAmountChange(guest.id, value)
+                      }
+                      keyboardType="decimal-pad"
+                      mode="outlined"
+                      left={<TextInput.Affix text="R$" />}
+                      style={styles.amountInput}
+                    />
+                  </View>
+                )}
+
+                {/* Pay Button */}
+                {!isPaid && !allPaid && (
+                  <Button
+                    mode="contained"
+                    onPress={() => handleOpenPayment(guest)}
+                    style={styles.payButton}
+                    disabled={allPaid}
+                    icon="credit-card"
+                  >
+                    {t('split.cta', {
+                      amount: (amounts[guest.id] || 0).toFixed(2),
+                    })}
+                  </Button>
+                )}
+              </Card.Content>
+            </Card>
+          );
+        })}
 
         {/* Create Splits Button */}
-        {splits.length === 0 && (
+        {splits.length === 0 && !allPaid && (
           <Button
             mode="contained"
             onPress={handleCreateSplits}
             loading={processing}
             disabled={processing}
             style={styles.createSplitsButton}
-            icon="credit-card-split"
+            icon="account-group"
           >
-            {t('payment.createSplits')}
+            {t('split.createSplits')}
           </Button>
         )}
       </ScrollView>
@@ -783,25 +1017,25 @@ export default function SplitPaymentScreen() {
               labelStyle={{ color: colors.foreground }}
             />
             <RadioButton.Item
-              label="PIX"
+              label={t('payment.methodsPix')}
               value="pix"
               style={styles.radioItem}
               labelStyle={{ color: colors.foreground }}
             />
             <RadioButton.Item
-              label="Apple Pay"
+              label={t('payment.methodsApple')}
               value="apple_pay"
               style={styles.radioItem}
               labelStyle={{ color: colors.foreground }}
             />
             <RadioButton.Item
-              label="Google Pay"
+              label={t('payment.methodsGoogle')}
               value="google_pay"
               style={styles.radioItem}
               labelStyle={{ color: colors.foreground }}
             />
             <RadioButton.Item
-              label={t('payment.wallet')}
+              label={t('payment.methodsWallet')}
               value="wallet"
               style={styles.radioItem}
               labelStyle={{ color: colors.foreground }}

@@ -1,9 +1,11 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { MenuItemsService } from './menu-items.service';
 import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { CreateCustomizationGroupDto } from './dto/create-customization-group.dto';
+import { UpdateCustomizationGroupDto } from './dto/update-customization-group.dto';
 import { Public } from '@/common/decorators/public.decorator';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { MenuItemOwnerGuard } from '@/common/guards/menu-item-owner.guard';
@@ -79,5 +81,52 @@ export class MenuItemsController {
   @ApiOperation({ summary: 'Delete menu category (OWNER/MANAGER/CHEF only)' })
   deleteCategory(@Param('id') id: string) {
     return this.menuItemsService.deleteCategory(id);
+  }
+
+  // ========== CUSTOMIZATION GROUP ENDPOINTS ==========
+
+  @Public()
+  @Get(':id/customizations')
+  @ApiOperation({ summary: 'Get customization groups for a menu item' })
+  @ApiResponse({ status: 200, description: 'Returns customization groups' })
+  @ApiResponse({ status: 404, description: 'Menu item not found' })
+  findCustomizationGroups(@Param('id') id: string) {
+    return this.menuItemsService.findCustomizationGroups(id);
+  }
+
+  @Post(':id/customizations')
+  @UseGuards(JwtAuthGuard, MenuItemOwnerGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create customization group (OWNER/MANAGER only)' })
+  @ApiResponse({ status: 201, description: 'Customization group created' })
+  @ApiResponse({ status: 404, description: 'Menu item not found' })
+  createCustomizationGroup(
+    @Param('id') menuItemId: string,
+    @Body() dto: CreateCustomizationGroupDto,
+  ) {
+    return this.menuItemsService.createCustomizationGroup(menuItemId, dto);
+  }
+
+  @Patch('customizations/:groupId')
+  @UseGuards(JwtAuthGuard, MenuItemOwnerGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update customization group (OWNER/MANAGER only)' })
+  @ApiResponse({ status: 200, description: 'Customization group updated' })
+  @ApiResponse({ status: 404, description: 'Customization group not found' })
+  updateCustomizationGroup(
+    @Param('groupId') groupId: string,
+    @Body() dto: UpdateCustomizationGroupDto,
+  ) {
+    return this.menuItemsService.updateCustomizationGroup(groupId, dto);
+  }
+
+  @Delete('customizations/:groupId')
+  @UseGuards(JwtAuthGuard, MenuItemOwnerGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete customization group (OWNER/MANAGER only)' })
+  @ApiResponse({ status: 200, description: 'Customization group deleted' })
+  @ApiResponse({ status: 404, description: 'Customization group not found' })
+  deleteCustomizationGroup(@Param('groupId') groupId: string) {
+    return this.menuItemsService.deleteCustomizationGroup(groupId);
   }
 }

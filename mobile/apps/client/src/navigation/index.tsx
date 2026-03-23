@@ -57,7 +57,24 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import MenuScreen from '../screens/menu/MenuScreen';
 import CartScreen from '../screens/cart/CartScreen';
 import RestaurantScreen from '../screens/restaurant/RestaurantScreen';
-import PaymentScreen from '../screens/payment/PaymentScreen';
+import UnifiedPaymentScreen from '../screens/payment/UnifiedPaymentScreen';
+import CheckoutScreen from '../screens/payment/CheckoutScreen';
+import PaymentSuccessScreen from '../screens/payment/PaymentSuccessScreen';
+import SplitPaymentScreen from '../screens/payment/SplitPaymentScreen';
+
+// ============================================
+// EPIC 3 — Missing Screens
+// ============================================
+import NotificationsScreen from '../screens/notifications/NotificationsScreen';
+import AddressesScreen from '../screens/profile/AddressesScreen';
+import LoyaltyDetailScreen from '../screens/loyalty/LoyaltyDetailScreen';
+import CouponsScreen from '../screens/promotions/CouponsScreen';
+
+// ============================================
+// EPIC 14 — Pub & Bar Comanda (Tab System)
+// ============================================
+import TabScreen from '../screens/pub-bar/TabScreen';
+import TabPaymentScreen from '../screens/pub-bar/TabPaymentScreen';
 
 // Complete auth session for web-based OAuth
 WebBrowser.maybeCompleteAuthSession();
@@ -312,8 +329,62 @@ function MainStack() {
         options={{ title: 'Cart', ...modalScreenOptions }}
       />
       <Stack.Screen
+        name="Checkout"
+        component={CheckoutScreen}
+        options={{ title: 'Checkout', ...modalScreenOptions }}
+      />
+      <Stack.Screen
         name="Payment"
-        component={PaymentScreen}
+        component={UnifiedPaymentScreen}
+        options={{ title: 'Payment', ...modalScreenOptions }}
+      />
+      <Stack.Screen
+        name="UnifiedPayment"
+        component={UnifiedPaymentScreen}
+        options={{ title: 'Payment', ...modalScreenOptions }}
+      />
+      <Stack.Screen
+        name="SplitPayment"
+        component={SplitPaymentScreen}
+        options={{ title: 'Split Bill', ...modalScreenOptions }}
+      />
+      <Stack.Screen
+        name="PaymentSuccess"
+        component={PaymentSuccessScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
+      />
+
+      {/* EPIC 3 — Missing Screens */}
+      <Stack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+        options={{ title: 'Notifications', headerShown: false }}
+      />
+      <Stack.Screen
+        name="Addresses"
+        component={AddressesScreen}
+        options={{ title: 'Addresses', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="LoyaltyDetail"
+        component={LoyaltyDetailScreen}
+        options={{ title: 'Loyalty', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="Coupons"
+        component={CouponsScreen}
+        options={{ title: 'Coupons', ...scaleFadeScreenOptions }}
+      />
+
+      {/* EPIC 14 — Pub & Bar Comanda */}
+      <Stack.Screen
+        name="TabScreen"
+        component={TabScreen}
+        options={{ title: 'Comanda', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="TabPayment"
+        component={TabPaymentScreen}
         options={{ title: 'Payment', ...modalScreenOptions }}
       />
     </Stack.Navigator>

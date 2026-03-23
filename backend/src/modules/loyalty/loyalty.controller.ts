@@ -5,6 +5,7 @@ import {
   Patch,
   Body,
   Query,
+  Param,
   UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { LoyaltyService } from './loyalty.service';
 import { AddPointsDto } from './dto/add-points.dto';
 import { RedeemRewardDto } from './dto/redeem-reward.dto';
 import { UpdateLoyaltyProgramDto } from './dto/update-loyalty-program.dto';
+import { AddStampDto } from './dto/add-stamp.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
@@ -150,5 +152,25 @@ export class LoyaltyController {
   @ApiResponse({ status: 403, description: 'Forbidden - admin only' })
   getStatistics(@Query('restaurant_id') restaurantId: string) {
     return this.loyaltyService.getStatistics(restaurantId);
+  }
+
+  @Get('stamp-cards/:restaurantId')
+  @ApiOperation({ summary: 'Get user stamp cards for a restaurant' })
+  @ApiResponse({ status: 200, description: 'Returns user stamp cards' })
+  getStampCards(
+    @CurrentUser() user: any,
+    @Param('restaurantId') restaurantId: string,
+  ) {
+    return this.loyaltyService.getStampCards(user.id, restaurantId);
+  }
+
+  @Post('stamp-card/stamp')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER, UserRole.BARMAN)
+  @ApiOperation({ summary: 'Add a stamp to a user stamp card' })
+  @ApiResponse({ status: 200, description: 'Stamp added successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid stamp data' })
+  addStamp(@Body() addStampDto: AddStampDto) {
+    return this.loyaltyService.addStamp(addStampDto);
   }
 }

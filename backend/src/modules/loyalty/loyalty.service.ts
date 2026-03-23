@@ -6,9 +6,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { LoyaltyProgram, LoyaltyTier as LoyaltyTierEnum } from './entities/loyalty-program.entity';
+import { StampCard } from './entities/stamp-card.entity';
 import { AddPointsDto } from './dto/add-points.dto';
 import { RedeemRewardDto } from './dto/redeem-reward.dto';
 import { UpdateLoyaltyProgramDto } from './dto/update-loyalty-program.dto';
+import { AddStampDto } from './dto/add-stamp.dto';
 import { EventsGateway } from '@/modules/events/events.gateway';
 
 export interface LoyaltyTierInfo {
@@ -143,6 +145,8 @@ export class LoyaltyService {
   constructor(
     @InjectRepository(LoyaltyProgram)
     private loyaltyRepository: Repository<LoyaltyProgram>,
+    @InjectRepository(StampCard)
+    private stampCardRepository: Repository<StampCard>,
     private eventsGateway: EventsGateway,
     private dataSource: DataSource,
   ) {}
@@ -640,6 +644,82 @@ export class LoyaltyService {
     }
 
     return this.loyaltyRepository.save(loyaltyProgram);
+  }
+
+  // ========== Stamp Card Methods ==========
+
+  /**
+   * Get user's stamp cards for a restaurant
+   */
+  async getStampCards(userId: string, restaurantId: string): Promise<StampCard[]> {
+    return this.stampCardRepository.find({
+      where: { user_id: userId, restaurant_id: restaurantId },
+      order: { service_type: 'ASC' },
+    });
+  }
+
+  /**
+   * Add a stamp to a user's card (called by WAITER, BARMAN, OWNER, MANAGER roles)
+   */
+  async addStamp(dto: AddStampDto): Promise<StampCard> {
+    let card = await this.stampCardRepository.findOne({
+      where: {
+        user_id: dto.user_id,
+        restaurant_id: dto.restaurant_id,
+        service_type: dto.service_type,
+      },
+    });
+
+    // Create card if it doesn't exist
+    if (!card) {
+      card = this.stampCardRepository.create({
+        user_id: dto.user_id,
+        restaurant_id: dto.restaurant_id,
+        service_type: dto.service_type,
+        current_stamps: 0,
+        required_stamps: 10,
+        reward_description: '',
+        completed_cycles: 0,
+        completed: false,
+        completed_at: null,
+      });
+    }
+
+    // If already completed, reset for a new cycle
+    if (card.completed) {
+      card.current_stamps = 0;
+      card.completed = false;
+      card.completed_at = null;
+    }
+
+    // Add stamp
+    card.current_stamps += 1;
+
+    // Check if card is now completed
+    if (card.current_stamps >= card.required_stamps) {
+      card.completed = true;
+      card.completed_at = new Date();
+      card.completed_cycles += 1;
+
+      // Notify user about completed stamp card
+      this.eventsGateway.notifyUser(dto.user_id, {
+        type: 'loyalty:stamp_card_completed',
+        service_type: dto.service_type,
+        completed_cycles: card.completed_cycles,
+        restaurant_id: dto.restaurant_id,
+      });
+    }
+
+    // Notify user about stamp added
+    this.eventsGateway.notifyUser(dto.user_id, {
+      type: 'loyalty:stamp_added',
+      service_type: dto.service_type,
+      current_stamps: card.current_stamps,
+      required_stamps: card.required_stamps,
+      restaurant_id: dto.restaurant_id,
+    });
+
+    return this.stampCardRepository.save(card);
   }
 
   // ========== Private Helper Methods ==========

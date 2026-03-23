@@ -288,6 +288,7 @@ export default function ProfileScreen() {
           description={t('profile.addressesDesc')}
           left={(props) => <List.Icon {...props} icon="map-marker" color={colors.foregroundSecondary} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" color={colors.foregroundMuted} />}
+          onPress={() => navigation.navigate('Addresses' as never)}
           titleStyle={{ color: colors.foreground }}
           descriptionStyle={{ color: colors.foregroundSecondary }}
         />

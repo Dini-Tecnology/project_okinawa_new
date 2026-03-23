@@ -152,4 +152,79 @@ export class RestaurantsService {
     await this.restaurantRepository.save(restaurant);
     return { message: 'Restaurant deactivated successfully' };
   }
+
+  // ========== GEOFENCING METHODS ==========
+
+  /**
+   * Haversine formula: calculate distance in meters between two lat/lng points.
+   */
+  private haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371e3; // Earth radius in meters
+    const toRad = (deg: number) => (deg * Math.PI) / 180;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c;
+  }
+
+  /**
+   * Find nearby restaurants within a given radius (km).
+   * Uses Haversine formula for distance calculation.
+   */
+  async findNearby(lat: number, lng: number, radiusKm: number = 5) {
+    const restaurants = await this.restaurantRepository.find({
+      where: { is_active: true },
+    });
+
+    const radiusMeters = radiusKm * 1000;
+
+    const nearby = restaurants
+      .filter((r) => r.lat != null && r.lng != null)
+      .map((r) => {
+        const distance = this.haversineDistance(lat, lng, Number(r.lat), Number(r.lng));
+        return { ...r, distance: Math.round(distance) };
+      })
+      .filter((r) => r.distance <= radiusMeters)
+      .sort((a, b) => a.distance - b.distance);
+
+    return nearby;
+  }
+
+  /**
+   * Check if a user position is inside a restaurant's geofence.
+   * Returns the distance and whether the user is inside the geofence radius.
+   */
+  async getGeofenceStatus(restaurantId: string, userLat: number, userLng: number) {
+    const restaurant = await this.findOne(restaurantId);
+
+    if (restaurant.lat == null || restaurant.lng == null) {
+      throw new NotFoundException('Restaurant does not have geolocation configured');
+    }
+
+    const distance = this.haversineDistance(
+      userLat,
+      userLng,
+      Number(restaurant.lat),
+      Number(restaurant.lng),
+    );
+
+    const geofenceRadius = restaurant.geofence_radius || 500;
+    const isInside = distance <= geofenceRadius;
+
+    return {
+      isInside,
+      distance: Math.round(distance),
+      geofenceRadius,
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+    };
+  }
 }

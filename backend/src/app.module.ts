@@ -38,6 +38,17 @@ import { HealthModule } from './modules/health/health.module';
 import { IdentityModule } from './modules/identity/identity.module';
 import { TabsModule } from './modules/tabs/tabs.module';
 import { ClubModule } from './modules/club/club.module';
+import { ServiceConfigModule } from './modules/service-config/service-config.module';
+import { ApprovalsModule } from './modules/approvals/approvals.module';
+import { InventoryModule } from './modules/inventory/inventory.module';
+import { RestaurantWaitlistModule } from './modules/restaurant-waitlist/restaurant-waitlist.module';
+import { RecipesModule } from './modules/recipes/recipes.module';
+import { PromotionsModule } from './modules/promotions/promotions.module';
+import { CallsModule } from './modules/calls/calls.module';
+import { AddressesModule } from './modules/addresses/addresses.module';
+import { ReceiptsModule } from './modules/receipts/receipts.module';
+import { MenuCustomizationModule } from './modules/menu-customization/menu-customization.module';
+import { GeofencingModule } from './modules/geofencing/geofencing.module';
 
 @Module({
   imports: [
@@ -105,6 +116,33 @@ import { ClubModule } from './modules/club/club.module';
     // Entertainment modules (Pub & Bar, Club & Balada)
     TabsModule,
     ClubModule,
+
+    // Config Hub (EPIC 8)
+    ServiceConfigModule,
+
+    // Manager Approvals (EPIC 4)
+    ApprovalsModule,
+
+    // Stock Inventory (EPIC 5)
+    InventoryModule,
+
+    // Smart Waitlist (EPIC 10)
+    RestaurantWaitlistModule,
+
+    // Drink Recipes (EPIC 6)
+    RecipesModule,
+
+    // Loyalty & Promotions (EPIC 9)
+    PromotionsModule,
+
+    // Service Calls (EPIC 12)
+    CallsModule,
+
+    // Backend Completions (EPIC 16)
+    AddressesModule,
+    ReceiptsModule,
+    MenuCustomizationModule,
+    GeofencingModule,
   ],
 })
 export class AppModule {}

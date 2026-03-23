@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
+import { CreateGroupBookingDto } from './dto/create-group-booking.dto';
 import { UpdateReservationStatusDto } from './dto/update-reservation-status.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
@@ -84,5 +85,34 @@ export class ReservationsController {
   @ApiResponse({ status: 403, description: 'Forbidden - staff only' })
   updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateReservationStatusDto) {
     return this.reservationsService.updateStatus(id, updateStatusDto);
+  }
+
+  // ========== GROUP BOOKING ENDPOINTS (EPIC 17) ==========
+
+  @Post('group')
+  @Roles(UserRole.CUSTOMER, UserRole.OWNER, UserRole.MANAGER, UserRole.MAITRE)
+  @ApiOperation({ summary: 'Create group booking reservation (8+ guests)' })
+  @ApiResponse({ status: 201, description: 'Group booking created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid group booking data or party size too small' })
+  @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
+  createGroupBooking(
+    @CurrentUser() user: any,
+    @Body() createGroupBookingDto: CreateGroupBookingDto,
+  ) {
+    return this.reservationsService.createGroupBooking(user.id, createGroupBookingDto);
+  }
+
+  @Get('group/:restaurantId')
+  @Roles(UserRole.OWNER, UserRole.MANAGER, UserRole.MAITRE)
+  @ApiOperation({ summary: 'Get group bookings by restaurant (Staff only)' })
+  @ApiResponse({ status: 200, description: 'Returns paginated list of group bookings' })
+  @ApiResponse({ status: 403, description: 'Forbidden - staff only' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  findGroupByRestaurant(
+    @Param('restaurantId') restaurantId: string,
+    @Query() pagination: PaginationDto,
+  ) {
+    return this.reservationsService.findGroupByRestaurant(restaurantId, pagination);
   }
 }

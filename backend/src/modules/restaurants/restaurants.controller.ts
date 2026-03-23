@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RestaurantsService } from './restaurants.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
@@ -21,6 +21,25 @@ export class RestaurantsController {
   @ApiResponse({ status: 200, description: 'Returns list of restaurants' })
   findAll(@Query() filters: FilterRestaurantDto) {
     return this.restaurantsService.findAll(filters);
+  }
+
+  @Public()
+  @Get('nearby')
+  @ApiOperation({ summary: 'Find nearby restaurants using Haversine distance' })
+  @ApiResponse({ status: 200, description: 'Returns list of nearby restaurants with distance' })
+  @ApiQuery({ name: 'lat', required: true, type: Number, description: 'User latitude' })
+  @ApiQuery({ name: 'lng', required: true, type: Number, description: 'User longitude' })
+  @ApiQuery({ name: 'radius', required: false, type: Number, description: 'Search radius in km (default 5)' })
+  findNearby(
+    @Query('lat') lat: string,
+    @Query('lng') lng: string,
+    @Query('radius') radius?: string,
+  ) {
+    return this.restaurantsService.findNearby(
+      parseFloat(lat),
+      parseFloat(lng),
+      radius ? parseFloat(radius) : 5,
+    );
   }
 
   @Public()
@@ -110,5 +129,23 @@ export class RestaurantsController {
     @Body() updateProgressDto: UpdateSetupProgressDto,
   ) {
     return this.restaurantsService.updateSetupProgress(id, updateProgressDto);
+  }
+
+  // ========== GEOFENCING ENDPOINTS ==========
+
+  @Get(':id/geofence-check')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Check if user is inside restaurant geofence' })
+  @ApiResponse({ status: 200, description: 'Returns geofence status with distance' })
+  @ApiResponse({ status: 404, description: 'Restaurant not found or no geolocation configured' })
+  @ApiQuery({ name: 'lat', required: true, type: Number, description: 'User latitude' })
+  @ApiQuery({ name: 'lng', required: true, type: Number, description: 'User longitude' })
+  getGeofenceStatus(
+    @Param('id') id: string,
+    @Query('lat') lat: string,
+    @Query('lng') lng: string,
+  ) {
+    return this.restaurantsService.getGeofenceStatus(id, parseFloat(lat), parseFloat(lng));
   }
 }

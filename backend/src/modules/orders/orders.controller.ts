@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { AddItemsToOrderDto } from './dto/add-items-to-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetKdsOrdersDto } from './dto/get-kds-orders.dto';
@@ -86,6 +87,37 @@ export class OrdersController {
   @ApiResponse({ status: 403, description: 'Forbidden - staff only' })
   updateStatus(@Param('id') id: string, @Body() updateStatusDto: UpdateOrderStatusDto) {
     return this.ordersService.updateStatus(id, updateStatusDto);
+  }
+
+  // ========== PARTIAL ORDER ENDPOINTS (EPIC 17) ==========
+
+  @Post(':id/items')
+  @Roles(UserRole.CUSTOMER, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
+  @ApiOperation({ summary: 'Add items to an existing open order (partial order / comanda aberta)' })
+  @ApiResponse({ status: 200, description: 'Items added and totals recalculated' })
+  @ApiResponse({ status: 400, description: 'Order not in addable status or invalid items' })
+  @ApiResponse({ status: 404, description: 'Order or menu items not found' })
+  @ApiResponse({ status: 403, description: 'Access denied' })
+  addItemsToOrder(
+    @Param('id') id: string,
+    @Body() addItemsDto: AddItemsToOrderDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.addItemsToExistingOrder(id, addItemsDto, user.id, user.roles);
+  }
+
+  @Patch(':id/open')
+  @Roles(UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
+  @ApiOperation({ summary: 'Mark order as open for additions (WAITER/MANAGER only)' })
+  @ApiResponse({ status: 200, description: 'Order marked as open_for_additions' })
+  @ApiResponse({ status: 400, description: 'Order cannot be opened for additions' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
+  @ApiResponse({ status: 403, description: 'Forbidden - staff only' })
+  openOrderForAdditions(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ) {
+    return this.ordersService.openOrderForAdditions(id, user.id, user.roles);
   }
 
   // ========== KDS ENDPOINTS ==========

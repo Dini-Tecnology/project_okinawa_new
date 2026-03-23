@@ -48,7 +48,8 @@ import LoginScreen from '../screens/auth/LoginScreen';
 import DashboardScreen from '../screens/dashboard/DashboardScreen';
 import KDSScreen from '../screens/kds/KDSScreen';
 import BarmanKDSScreen from '../screens/barman-kds/BarmanKDSScreen';
-import WaiterDashboardScreen from '../screens/waiter-dashboard/WaiterDashboardScreen';
+import CookStationScreen from '../screens/cook/CookStationScreen';
+import WaiterCommandCenter from '../screens/waiter/WaiterCommandCenter';
 import MaitreDashboardScreen from '../screens/maitre-dashboard/MaitreDashboardScreen';
 import OrdersScreen from '../screens/orders/OrdersScreen';
 import ReservationsScreen from '../screens/reservations/ReservationsScreen';
@@ -72,6 +73,53 @@ import StaffDetailScreen from '../screens/staff/StaffDetailScreen';
 import FinancialReportScreen from '../screens/financial/FinancialReportScreen';
 import TipsDistributionScreen from '../screens/tips/TipsDistributionScreen';
 import SettingsScreen from '../screens/settings/SettingsScreen';
+
+// ============================================
+// STOCK / INVENTORY SCREENS (Epic 5)
+// ============================================
+import StockScreen from '../screens/stock/StockScreen';
+import StockItemDetailScreen from '../screens/stock/StockItemDetailScreen';
+
+// ============================================
+// CONFIG HUB SCREENS (Epic 8)
+// ============================================
+import ConfigHubScreen from '../screens/config/ConfigHubScreen';
+import ConfigProfileScreen from '../screens/config/ConfigProfileScreen';
+import ConfigServiceTypesScreen from '../screens/config/ConfigServiceTypesScreen';
+import ConfigExperienceScreen from '../screens/config/ConfigExperienceScreen';
+import ConfigFloorScreen from '../screens/config/ConfigFloorScreen';
+import ConfigKitchenScreen from '../screens/config/ConfigKitchenScreen';
+import ConfigPaymentsScreen from '../screens/config/ConfigPaymentsScreen';
+import ConfigFeaturesScreen from '../screens/config/ConfigFeaturesScreen';
+import ConfigTeamScreen from '../screens/config/ConfigTeamScreen';
+import ConfigNotificationsScreen from '../screens/config/ConfigNotificationsScreen';
+import ConfigLanguageScreen from '../screens/config/ConfigLanguageScreen';
+
+// ============================================
+// EPIC 3 — Missing Screens
+// ============================================
+import WaiterCallsScreen from '../screens/waiter-calls/WaiterCallsScreen';
+import FloorFlowScreen from '../screens/maitre/FloorFlowScreen';
+
+// ============================================
+// EPIC 15 — Restaurant Quick Wins
+// ============================================
+import RoleDashboardScreen from '../screens/dashboard/RoleDashboardScreen';
+import ReportsScreen from '../screens/reports/ReportsScreen';
+import RestaurantReviewsScreen from '../screens/reviews/RestaurantReviewsScreen';
+import LoyaltyManagementScreen from '../screens/loyalty/LoyaltyManagementScreen';
+
+// ============================================
+// EPIC 6 — Drink Recipes & Barman Station
+// ============================================
+import BarmanStationScreen from '../screens/barman/BarmanStationScreen';
+import RecipeDetailScreen from '../screens/barman/RecipeDetailScreen';
+import DrinkRecipesScreen from '../screens/drink-recipes/DrinkRecipesScreen';
+
+// ============================================
+// EPIC 12 — Service Calls Management
+// ============================================
+import CallsManagementScreen from '../screens/calls/CallsManagementScreen';
 
 // Complete auth session for web-based OAuth
 WebBrowser.maybeCompleteAuthSession();
@@ -304,6 +352,89 @@ function MainStack() {
         component={SetupHubScreen}
         options={{ title: 'Central de Configuração' }}
       />
+
+      {/* Stock Detail (Epic 5) */}
+      <Stack.Screen
+        name="StockItemDetail"
+        component={StockItemDetailScreen}
+        options={{ title: 'Detalhes do Item', ...scaleFadeScreenOptions }}
+      />
+
+      {/* Drink Recipes (Epic 6) */}
+      <Stack.Screen
+        name="DrinkRecipes"
+        component={DrinkRecipesScreen}
+        options={{ title: 'Receitas de Drinks', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="RecipeDetail"
+        component={RecipeDetailScreen}
+        options={{ title: 'Detalhe da Receita', ...scaleFadeScreenOptions }}
+      />
+
+      {/* Config Hub (Epic 8) */}
+      <Stack.Screen
+        name="ConfigHub"
+        component={ConfigHubScreen}
+        options={{ title: 'Config Hub', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigProfile"
+        component={ConfigProfileScreen}
+        options={{ title: 'Restaurant Profile', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigServiceTypes"
+        component={ConfigServiceTypesScreen}
+        options={{ title: 'Service Types', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigExperience"
+        component={ConfigExperienceScreen}
+        options={{ title: 'Customer Experience', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigFloor"
+        component={ConfigFloorScreen}
+        options={{ title: 'Floor Layout', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigKitchen"
+        component={ConfigKitchenScreen}
+        options={{ title: 'Kitchen Stations', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigPayments"
+        component={ConfigPaymentsScreen}
+        options={{ title: 'Payments', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigFeatures"
+        component={ConfigFeaturesScreen}
+        options={{ title: 'Features', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigTeam"
+        component={ConfigTeamScreen}
+        options={{ title: 'Team Configuration', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigNotifications"
+        component={ConfigNotificationsScreen}
+        options={{ title: 'Notifications', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="ConfigLanguage"
+        component={ConfigLanguageScreen}
+        options={{ title: 'Language & Format', ...scaleFadeScreenOptions }}
+      />
+
+      {/* Epic 15 — Restaurant Quick Wins */}
+      <Stack.Screen
+        name="RestaurantReviews"
+        component={RestaurantReviewsScreen}
+        options={{ title: 'Reviews', ...scaleFadeScreenOptions }}
+      />
     </Stack.Navigator>
   );
 }
@@ -354,16 +485,47 @@ function MainDrawer() {
         options={{ drawerLabel: 'Bar Display', title: 'Bar Display System' }}
       />
       <Drawer.Screen
+        name="BarmanStation"
+        component={BarmanStationScreen}
+        options={{ drawerLabel: 'Barman Station', title: 'Barman Station' }}
+      />
+      <Drawer.Screen
+        name="CookStation"
+        component={CookStationScreen}
+        options={{ drawerLabel: 'Cook Station', title: 'Cook Station' }}
+      />
+      <Drawer.Screen
         name="WaiterDashboard"
-        component={WaiterDashboardScreen}
-        options={{ drawerLabel: 'Waiter Panel', title: 'Waiter Dashboard' }}
+        component={WaiterCommandCenter}
+        options={{ drawerLabel: 'Waiter Panel', title: 'Waiter Command Center', headerShown: false }}
       />
       <Drawer.Screen
         name="MaitreDashboard"
         component={MaitreDashboardScreen}
         options={{ drawerLabel: 'Maitre Panel', title: 'Maitre Dashboard' }}
       />
-      
+
+      {/* EPIC 3 — Waiter Calls */}
+      <Drawer.Screen
+        name="WaiterCalls"
+        component={WaiterCallsScreen}
+        options={{ drawerLabel: 'Waiter Calls', title: 'Waiter Calls', headerShown: false }}
+      />
+
+      {/* EPIC 3 — Floor Flow */}
+      <Drawer.Screen
+        name="FloorFlow"
+        component={FloorFlowScreen}
+        options={{ drawerLabel: 'Floor Flow', title: 'Floor Flow', headerShown: false }}
+      />
+
+      {/* EPIC 12 — Service Calls Management */}
+      <Drawer.Screen
+        name="CallsManagement"
+        component={CallsManagementScreen}
+        options={{ drawerLabel: 'Service Calls', title: 'Service Calls', headerShown: false }}
+      />
+
       {/* Operations Management */}
       <Drawer.Screen
         name="Orders"
@@ -387,7 +549,14 @@ function MainDrawer() {
         component={MenuScreen}
         options={{ drawerLabel: 'Menu', title: 'Menu Management' }}
       />
-      
+
+      {/* Stock / Inventory (Epic 5) */}
+      <Drawer.Screen
+        name="Stock"
+        component={StockScreen}
+        options={{ drawerLabel: 'Inventory', title: 'Stock Inventory' }}
+      />
+
       {/* Financial Management */}
       <Drawer.Screen
         name="Financial"
@@ -410,6 +579,23 @@ function MainDrawer() {
         name="HR"
         component={HRScreen}
         options={{ drawerLabel: 'HR', title: 'Human Resources' }}
+      />
+
+      {/* EPIC 15 — Restaurant Quick Wins */}
+      <Drawer.Screen
+        name="RoleDashboard"
+        component={RoleDashboardScreen}
+        options={{ drawerLabel: 'My Dashboard', title: 'Role Dashboard' }}
+      />
+      <Drawer.Screen
+        name="Reports"
+        component={ReportsScreen}
+        options={{ drawerLabel: 'Reports', title: 'Analytics Reports' }}
+      />
+      <Drawer.Screen
+        name="LoyaltyManagement"
+        component={LoyaltyManagementScreen}
+        options={{ drawerLabel: 'Loyalty', title: 'Loyalty Management' }}
       />
     </Drawer.Navigator>
   );

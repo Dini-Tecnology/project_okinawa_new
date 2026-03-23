@@ -17,6 +17,7 @@ import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.entity';
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { AddItemsToOrderDto } from './dto/add-items-to-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus } from '@common/enums';
@@ -415,5 +416,182 @@ export class OrdersService {
       tablesResponse.items,
       waiterMap,
     );
+  }
+
+  // ========== PARTIAL ORDER METHODS (EPIC 17) ==========
+
+  /** Valid statuses that allow adding items */
+  private static readonly ADDABLE_STATUSES = [
+    OrderStatus.CONFIRMED,
+    OrderStatus.PREPARING,
+    OrderStatus.OPEN_FOR_ADDITIONS,
+  ];
+
+  /**
+   * Mark an existing order as open for additions (comanda aberta).
+   * Allows the customer or waiter to add more items later.
+   */
+  async openOrderForAdditions(orderId: string, userId?: string, roles?: UserRoleEnum[]) {
+    const order = await this.findOne(orderId, userId, roles);
+
+    // Only pending, confirmed, or preparing orders can be opened
+    const openableStatuses = [OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.PREPARING];
+    if (!openableStatuses.includes(order.status)) {
+      throw new BadRequestException(
+        `Cannot open order for additions. Current status: ${order.status}. Order must be pending, confirmed, or preparing.`,
+      );
+    }
+
+    order.status = OrderStatus.OPEN_FOR_ADDITIONS;
+    const updatedOrder = await this.orderRepository.save(order);
+
+    this.eventsGateway.notifyOrderUpdate(orderId, {
+      order_id: orderId,
+      status: OrderStatus.OPEN_FOR_ADDITIONS,
+      message: this.orderCalculator.getStatusMessage(OrderStatus.OPEN_FOR_ADDITIONS),
+    });
+
+    this.logger.log(`Order ${orderId} opened for additions`);
+    return updatedOrder;
+  }
+
+  /**
+   * Add items to an existing open order.
+   * Validates items, calculates new totals, saves everything in a transaction.
+   */
+  async addItemsToExistingOrder(
+    orderId: string,
+    addItemsDto: AddItemsToOrderDto,
+    userId: string,
+    roles?: UserRoleEnum[],
+  ) {
+    const order = await this.orderRepository.findOne({
+      where: { id: orderId },
+      relations: ['items'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    // Security: verify access
+    if (userId && roles) {
+      const isStaff = roles.some((role) =>
+        [UserRoleEnum.OWNER, UserRoleEnum.MANAGER, UserRoleEnum.WAITER].includes(role),
+      );
+      if (!isStaff && order.user_id !== userId) {
+        throw new ForbiddenException('Access denied');
+      }
+    }
+
+    // Validate order is in an addable status
+    if (!OrdersService.ADDABLE_STATUSES.includes(order.status)) {
+      throw new BadRequestException(
+        `Cannot add items to order. Current status: ${order.status}. Order must be confirmed, preparing, or open_for_additions.`,
+      );
+    }
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Validate menu items
+      const menuItemIds = addItemsDto.items.map((item) => item.menu_item_id);
+      const menuItems = await this.menuItemRepository.find({
+        where: { id: In(menuItemIds) },
+      });
+
+      if (menuItems.length !== menuItemIds.length) {
+        const foundIds = menuItems.map((mi) => mi.id);
+        const missingIds = menuItemIds.filter((id) => !foundIds.includes(id));
+        throw new NotFoundException(`Menu items not found: ${missingIds.join(', ')}`);
+      }
+
+      const menuItemMap = new Map(menuItems.map((mi) => [mi.id, mi]));
+      let additionalSubtotal = 0;
+      const newOrderItems: OrderItem[] = [];
+
+      for (const itemDto of addItemsDto.items) {
+        const menuItem = menuItemMap.get(itemDto.menu_item_id);
+
+        if (!menuItem) {
+          throw new NotFoundException(`Menu item ${itemDto.menu_item_id} not found`);
+        }
+
+        if (!menuItem.is_available) {
+          throw new BadRequestException(`Menu item ${menuItem.name} is not available`);
+        }
+
+        const unitPrice = Number(menuItem.price);
+        const totalPrice = unitPrice * itemDto.quantity;
+        additionalSubtotal += totalPrice;
+
+        const orderItem = this.orderItemRepository.create({
+          order_id: orderId,
+          menu_item_id: itemDto.menu_item_id,
+          quantity: itemDto.quantity,
+          unit_price: unitPrice,
+          total_price: totalPrice,
+          customizations: itemDto.customizations,
+          special_instructions: itemDto.special_instructions,
+          ordered_by: userId,
+        });
+
+        newOrderItems.push(orderItem);
+      }
+
+      // Save new items
+      await queryRunner.manager.save(newOrderItems);
+
+      // Recalculate totals
+      const newSubtotal = Number(order.subtotal) + additionalSubtotal;
+      const { taxAmount, totalAmount } = this.orderCalculator.calculateTotals(
+        newSubtotal,
+        Number(order.tip_amount) || 0,
+      );
+
+      order.subtotal = newSubtotal;
+      order.tax_amount = taxAmount;
+      order.total_amount = totalAmount;
+
+      const updatedOrder = await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+
+      // Notify
+      try {
+        this.eventsGateway.notifyOrderUpdate(orderId, {
+          order_id: orderId,
+          status: order.status,
+          message: `${addItemsDto.items.length} item(s) added`,
+          items_added: addItemsDto.items.length,
+          new_total: totalAmount,
+        });
+      } catch (notifyError) {
+        const err = notifyError as Error;
+        this.logger.warn(`Failed to notify items added: ${err.message}`);
+      }
+
+      this.logger.log(
+        `Added ${addItemsDto.items.length} items to order ${orderId}. New total: ${totalAmount}`,
+      );
+
+      // Return updated order with items
+      return this.findOne(orderId);
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const err = error as Error;
+      this.logger.error(`Failed to add items to order ${orderId}: ${err.message}`, err.stack);
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException ||
+        error instanceof ForbiddenException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Failed to add items to order');
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

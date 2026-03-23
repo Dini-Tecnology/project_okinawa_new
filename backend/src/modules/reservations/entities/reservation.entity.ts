@@ -83,6 +83,34 @@ export class Reservation {
   @Column({ type: 'text', nullable: true })
   cancellation_reason: string;
 
+  // ========== GROUP BOOKING FIELDS (EPIC 17) ==========
+
+  @Column({ type: 'boolean', default: false })
+  is_group_booking: boolean;
+
+  @Column({ type: 'int', nullable: true })
+  group_size: number | null;
+
+  @Column({ type: 'boolean', default: false })
+  pre_fixed_menu: boolean;
+
+  @Column({ type: 'varchar', nullable: true })
+  pre_fixed_menu_id: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  group_coordinator_name: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  group_coordinator_phone: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  deposit_required: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  deposit_amount: number | null;
+
+  // ========== END GROUP BOOKING FIELDS ==========
+
   @Column({ type: 'jsonb', nullable: true })
   metadata: Record<string, any>;
 

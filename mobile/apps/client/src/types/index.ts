@@ -308,6 +308,16 @@ export interface PaymentMethod {
   created_at: string;
 }
 
+// Payment Success Params
+export interface PaymentSuccessParams {
+  orderId: string;
+  amountPaid: number;
+  paymentMethod: string;
+  pointsEarned: number;
+  badge?: { text: string; icon?: string };
+  receiptId?: string;
+}
+
 // Navigation Types
 export type RootStackParamList = {
   // Auth
@@ -325,7 +335,14 @@ export type RootStackParamList = {
   RestaurantDetail: { restaurantId: string };
   Menu: { restaurantId: string };
   Cart: { restaurantId: string };
-  Checkout: { restaurantId: string };
+
+  // Payment Flow
+  Checkout: { orderId: string };
+  Payment: { orderId: string };
+  UnifiedPayment: { orderId: string };
+  SplitPayment: { orderId: string };
+  PaymentSuccess: PaymentSuccessParams;
+  DigitalReceipt: { orderId: string; transactionId?: string };
 
   // Orders
   OrderDetail: { orderId: string };

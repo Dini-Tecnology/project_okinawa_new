@@ -103,6 +103,14 @@ export const queryKeys = {
     my: ['tips', 'my'] as const,
     detail: (id: string) => ['tips', 'detail', id] as const,
   },
+
+  // Tabs (Pub & Bar Comanda)
+  tabs: {
+    all: ['tabs'] as const,
+    my: ['tabs', 'my'] as const,
+    detail: (id: string) => ['tabs', 'detail', id] as const,
+    splitOptions: (id: string) => ['tabs', 'split-options', id] as const,
+  },
 };
 
 // Helper to invalidate related queries after mutations
@@ -141,5 +149,14 @@ export const invalidateQueries = {
   afterNotificationMutation: () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.notifications.all });
     queryClient.invalidateQueries({ queryKey: queryKeys.notifications.unreadCount });
+  },
+
+  // After tab mutation (add item, close, payment)
+  afterTabMutation: (tabId?: string) => {
+    queryClient.invalidateQueries({ queryKey: queryKeys.tabs.all });
+    if (tabId) {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tabs.detail(tabId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.tabs.splitOptions(tabId) });
+    }
   },
 };

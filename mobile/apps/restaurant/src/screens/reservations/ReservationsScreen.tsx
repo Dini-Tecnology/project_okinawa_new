@@ -18,6 +18,14 @@ interface Reservation {
     id: string;
     table_number: string;
   };
+  // Group booking fields (EPIC 17)
+  is_group_booking?: boolean;
+  group_size?: number;
+  group_coordinator_name?: string;
+  group_coordinator_phone?: string;
+  deposit_required?: boolean;
+  deposit_amount?: number;
+  pre_fixed_menu?: boolean;
 }
 
 export default function ReservationsScreen({ navigation }: any) {
@@ -27,7 +35,7 @@ export default function ReservationsScreen({ navigation }: any) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'today'>('all');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'confirmed' | 'today' | 'group'>('all');
 
   useEffect(() => {
     loadReservations();
@@ -40,6 +48,8 @@ export default function ReservationsScreen({ navigation }: any) {
       if (filter !== 'all') {
         if (filter === 'today') {
           params.date = format(new Date(), 'yyyy-MM-dd');
+        } else if (filter === 'group') {
+          params.is_group = true;
         } else {
           params.status = filter;
         }
@@ -172,13 +182,41 @@ export default function ReservationsScreen({ navigation }: any) {
             <Text variant="titleMedium" style={styles.customerName}>{item.customer_name}</Text>
             <Text variant="bodySmall" style={styles.customerPhone}>{item.customer_phone}</Text>
           </View>
-          <Chip
-            style={{ backgroundColor: getStatusColor(item.status) }}
-            textStyle={{ color: colors.primaryForeground }}
-          >
-            {t(`reservations.status.${item.status}`)}
-          </Chip>
+          <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+            <Chip
+              style={{ backgroundColor: getStatusColor(item.status) }}
+              textStyle={{ color: colors.primaryForeground }}
+            >
+              {t(`reservations.status.${item.status}`)}
+            </Chip>
+            {item.is_group_booking && (
+              <Chip
+                style={{ backgroundColor: colors.info }}
+                textStyle={{ color: colors.primaryForeground, fontWeight: 'bold' }}
+                icon="account-group"
+              >
+                {t('groupBooking.badge')}
+              </Chip>
+            )}
+          </View>
         </View>
+
+        {/* Group coordinator info (EPIC 17) */}
+        {item.is_group_booking && item.group_coordinator_name && (
+          <View style={{ marginTop: 8, padding: 8, backgroundColor: colors.backgroundTertiary, borderRadius: 8 }}>
+            <Text variant="labelSmall" style={{ color: colors.foregroundSecondary }}>
+              {t('groupBooking.coordinator')}
+            </Text>
+            <Text variant="bodyMedium" style={{ color: colors.foreground }}>
+              {item.group_coordinator_name} {item.group_coordinator_phone ? `- ${item.group_coordinator_phone}` : ''}
+            </Text>
+            {item.deposit_required && item.deposit_amount && (
+              <Text variant="bodySmall" style={{ color: colors.primary, marginTop: 4 }}>
+                {t('groupBooking.deposit')}: R$ {Number(item.deposit_amount).toFixed(2)}
+              </Text>
+            )}
+          </View>
+        )}
 
         <View style={styles.details}>
           <Text variant="bodyMedium" style={styles.detailText}>
@@ -290,6 +328,15 @@ export default function ReservationsScreen({ navigation }: any) {
           selectedColor={colors.primary}
         >
           {t('reservations.status.confirmed')}
+        </Chip>
+        <Chip
+          selected={filter === 'group'}
+          onPress={() => setFilter('group')}
+          style={styles.filterChip}
+          selectedColor={colors.info}
+          icon="account-group"
+        >
+          {t('groupBooking.badge')}
         </Chip>
       </View>
 

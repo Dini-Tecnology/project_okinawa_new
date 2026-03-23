@@ -59,12 +59,12 @@ export const borderRadius = {
   '3xl': 28,
   full: 9999,
   
-  // Component specific
-  button: 12,
-  buttonLarge: 16,
-  card: 16,
-  cardLarge: 20,
-  input: 12,
+  // Component specific — aligned with Demo/mobile-v2 (rounded-2xl=16px RN, rounded-3xl=24px)
+  button: 16,
+  buttonLarge: 20,
+  card: 20,
+  cardLarge: 24,
+  input: 14,
   avatar: 9999,
   badge: 8,
   pill: 9999,
