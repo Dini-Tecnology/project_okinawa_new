@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('loyalty')
@@ -37,7 +38,7 @@ export class LoyaltyController {
   @Get('my-programs')
   @ApiOperation({ summary: 'Get all loyalty programs for current user' })
   @ApiResponse({ status: 200, description: 'Returns user loyalty programs' })
-  getMyPrograms(@CurrentUser() user: any) {
+  getMyPrograms(@CurrentUser() user: AuthenticatedUser) {
     return this.loyaltyService.getAllUserPrograms(user.id);
   }
 
@@ -47,7 +48,7 @@ export class LoyaltyController {
   @ApiResponse({ status: 200, description: 'Returns loyalty profile' })
   @ApiResponse({ status: 404, description: 'Profile not found' })
   getProfile(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.loyaltyService.getProfile(user.id, restaurantId);
@@ -91,7 +92,7 @@ export class LoyaltyController {
   @ApiQuery({ name: 'restaurant_id', required: true, type: String })
   @ApiResponse({ status: 200, description: 'Returns points history' })
   getHistory(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.loyaltyService.getHistory(user.id, restaurantId);
@@ -102,7 +103,7 @@ export class LoyaltyController {
   @ApiQuery({ name: 'restaurant_id', required: true, type: String })
   @ApiResponse({ status: 200, description: 'Returns available rewards' })
   getRewards(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.loyaltyService.getAvailableRewards(user.id, restaurantId);
@@ -115,7 +116,7 @@ export class LoyaltyController {
   @ApiResponse({ status: 400, description: 'Insufficient points or invalid reward' })
   @ApiResponse({ status: 404, description: 'Reward not found' })
   redeemReward(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Body() redeemDto: RedeemRewardDto,
   ) {
@@ -158,7 +159,7 @@ export class LoyaltyController {
   @ApiOperation({ summary: 'Get user stamp cards for a restaurant' })
   @ApiResponse({ status: 200, description: 'Returns user stamp cards' })
   getStampCards(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('restaurantId') restaurantId: string,
   ) {
     return this.loyaltyService.getStampCards(user.id, restaurantId);

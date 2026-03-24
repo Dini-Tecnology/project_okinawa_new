@@ -9,6 +9,7 @@ import { Public } from '@/common/decorators/public.decorator';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RestaurantOwnerGuard } from '@/common/guards/restaurant-owner.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('restaurants')
 @Controller('restaurants')
@@ -58,7 +59,7 @@ export class RestaurantsController {
   @ApiResponse({ status: 201, description: 'Restaurant created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid restaurant data' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  create(@Body() createRestaurantDto: CreateRestaurantDto, @CurrentUser() user: any) {
+  create(@Body() createRestaurantDto: CreateRestaurantDto, @CurrentUser() user: AuthenticatedUser) {
     return this.restaurantsService.create(createRestaurantDto, user.sub);
   }
 

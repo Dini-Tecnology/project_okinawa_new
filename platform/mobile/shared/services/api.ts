@@ -1913,6 +1913,64 @@ class ApiService {
     });
     return response.data;
   }
+
+  // ======================
+  // LEGAL ENDPOINTS
+  // ======================
+
+  /**
+   * Get the privacy policy document in the requested language.
+   */
+  async getPrivacyPolicy(lang?: string) {
+    const response = await this.api.get('/legal/privacy-policy', {
+      params: lang ? { lang } : undefined,
+    });
+    return response.data;
+  }
+
+  /**
+   * Get the terms of service document in the requested language.
+   */
+  async getTermsOfService(lang?: string) {
+    const response = await this.api.get('/legal/terms-of-service', {
+      params: lang ? { lang } : undefined,
+    });
+    return response.data;
+  }
+
+  // ======================
+  // HEALTH / MAINTENANCE ENDPOINTS
+  // ======================
+
+  /**
+   * Check current maintenance mode status.
+   */
+  async getMaintenanceStatus() {
+    const response = await this.api.get('/health/maintenance');
+    return response.data;
+  }
+
+  // ======================
+  // INTERCEPTOR HELPERS
+  // ======================
+
+  /**
+   * Register an additional response interceptor on the axios instance.
+   * Returns the interceptor ID for later removal.
+   */
+  addResponseInterceptor(
+    onFulfilled: (response: any) => any,
+    onRejected: (error: any) => any,
+  ): number {
+    return this.api.interceptors.response.use(onFulfilled, onRejected);
+  }
+
+  /**
+   * Remove a previously registered response interceptor by ID.
+   */
+  removeResponseInterceptor(id: number): void {
+    this.api.interceptors.response.eject(id);
+  }
 }
 
 export default new ApiService();

@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { HappyHourSchedule } from './entities/happy-hour-schedule.entity';
-import { CreateHappyHourScheduleDto } from './dto/create-happy-hour-schedule.dto';
+import { CreateHappyHourScheduleDto } from './dto';
 import { DayOfWeek } from '@/common/enums';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class HappyHourService {
   ) {}
 
   async createSchedule(dto: CreateHappyHourScheduleDto): Promise<HappyHourSchedule> {
-    const schedule = this.scheduleRepository.create(dto);
-    return this.scheduleRepository.save(schedule);
+    const schedule = this.scheduleRepository.create(dto as DeepPartial<HappyHourSchedule>);
+    return this.scheduleRepository.save(schedule as HappyHourSchedule);
   }
 
   async updateSchedule(id: string, dto: Partial<CreateHappyHourScheduleDto>): Promise<HappyHourSchedule> {

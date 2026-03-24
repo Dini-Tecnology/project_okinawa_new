@@ -8,10 +8,11 @@ import { CreateGroupBookingDto } from './dto/create-group-booking.dto';
 import { UpdateReservationStatusDto } from './dto/update-reservation-status.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationStatus } from '@common/enums';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
+import { ORDERS } from '@common/constants/limits';
 
 /** Minimum party size to qualify as a group booking */
-const GROUP_BOOKING_MIN_SIZE = 8;
+const GROUP_BOOKING_MIN_SIZE = ORDERS.GROUP_BOOKING_MIN_SIZE;
 
 @Injectable()
 export class ReservationsService {
@@ -51,35 +52,31 @@ export class ReservationsService {
   }
 
   async findByRestaurant(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.reservationRepository.findAndCount({
       where: { restaurant_id: restaurantId },
       relations: ['user'],
       order: { reservation_date: 'ASC', reservation_time: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findByUser(userId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.reservationRepository.findAndCount({
       where: { user_id: userId },
       relations: ['restaurant'],
       order: { reservation_date: 'DESC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findOne(id: string, userId?: string, roles?: UserRole[]) {
@@ -273,9 +270,7 @@ export class ReservationsService {
    * Only returns reservations where is_group_booking = true
    */
   async findGroupByRestaurant(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.reservationRepository.findAndCount({
       where: {
@@ -284,10 +279,10 @@ export class ReservationsService {
       },
       relations: ['user'],
       order: { reservation_date: 'ASC', reservation_time: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 }

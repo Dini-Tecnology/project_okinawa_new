@@ -40,6 +40,12 @@ export class TableSession {
   @Column('uuid', { nullable: true })
   customer_id: string;
 
+  @Column('uuid', { nullable: true })
+  primary_user_id: string;
+
+  @Column({ type: 'uuid', array: true, default: '{}' })
+  guest_user_ids: string[];
+
   @Column({ length: 100, nullable: true })
   guest_name: string;
 
@@ -68,6 +74,12 @@ export class TableSession {
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
   total_spent: number;
 
+  @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
+  total_amount: number;
+
+  @Column({ type: 'text', nullable: true })
+  notes: string;
+
   @CreateDateColumn()
   created_at: Date;
 
@@ -86,4 +98,8 @@ export class TableSession {
   @ManyToOne(() => Profile, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'customer_id' })
   customer: Profile;
+
+  @ManyToOne(() => Profile, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'primary_user_id' })
+  primary_user: Profile;
 }

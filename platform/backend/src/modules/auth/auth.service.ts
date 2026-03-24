@@ -5,6 +5,7 @@ import {
   BadRequestException,
   NotFoundException,
   ForbiddenException,
+  NotImplementedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -342,5 +343,48 @@ export class AuthService {
     }
 
     return false;
+  }
+
+  /**
+   * Find user by phone number (phone auth flow)
+   */
+  async findUserByPhone(phone: string): Promise<Profile | null> {
+    throw new NotImplementedException('Phone auth coming soon');
+  }
+
+  /**
+   * Login by phone (phone auth flow)
+   */
+  async loginByPhone(
+    user: Profile,
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{ access_token: string; refresh_token: string; expires_in: number; biometric_enrollment_token?: string }> {
+    throw new NotImplementedException('Phone auth coming soon');
+  }
+
+  /**
+   * Register by phone (phone auth flow)
+   */
+  async registerByPhone(
+    data: { phone: string; fullName: string; email?: string; birthDate?: string },
+    ipAddress?: string,
+    userAgent?: string,
+  ): Promise<{ access_token: string; refresh_token: string; user: Profile; biometric_enrollment_token?: string }> {
+    throw new NotImplementedException('Phone auth coming soon');
+  }
+
+  /**
+   * Generate phone verification token (social auth flow)
+   */
+  async generatePhoneVerificationToken(userId: string): Promise<string> {
+    throw new NotImplementedException('Phone verification coming soon');
+  }
+
+  /**
+   * Generate tokens for a user (social auth flow)
+   */
+  async generateTokens(user: Profile): Promise<{ access_token: string; refresh_token: string; expires_in: number; biometric_enrollment_token?: string }> {
+    throw new NotImplementedException('Social auth token generation coming soon');
   }
 }

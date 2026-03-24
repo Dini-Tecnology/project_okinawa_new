@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan, Between } from 'typeorm';
 import { Review } from '@/modules/reviews/entities/review.entity';
@@ -6,6 +6,8 @@ import { Order } from '@/modules/orders/entities/order.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { LoyaltyProgram } from '@/modules/loyalty/entities/loyalty-program.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
+import { CircuitBreakerService } from '@common/utils/circuit-breaker.module';
+import { CircuitBreaker } from '@common/utils/circuit-breaker';
 
 export interface SentimentAnalysis {
   review_id: string;
@@ -46,6 +48,9 @@ export interface DemandForecast {
 
 @Injectable()
 export class AiService {
+  private readonly logger = new Logger(AiService.name);
+  private readonly aiCircuitBreaker: CircuitBreaker;
+
   constructor(
     @InjectRepository(Review)
     private reviewRepository: Repository<Review>,
@@ -57,7 +62,14 @@ export class AiService {
     private loyaltyRepository: Repository<LoyaltyProgram>,
     @InjectRepository(Restaurant)
     private restaurantRepository: Repository<Restaurant>,
-  ) {}
+    private circuitBreakerService: CircuitBreakerService,
+  ) {
+    this.aiCircuitBreaker = this.circuitBreakerService.getBreaker('openai', {
+      failureThreshold: 3,
+      resetTimeout: 45_000, // 45s — OpenAI outages can be brief
+      halfOpenMax: 1,
+    });
+  }
 
   /**
    * Verify user has access to restaurant data (owner or staff)
@@ -82,8 +94,12 @@ export class AiService {
   }
 
   /**
-   * Analyze sentiment of a review
-   * (Placeholder - would integrate with actual NLP service)
+   * Analyze sentiment of a review.
+   *
+   * Currently uses rule-based heuristics. When a real NLP/OpenAI integration
+   * is added, the external call should go inside the circuit-breaker `execute`
+   * callback. The fallback returns the same rule-based result so the
+   * application degrades gracefully.
    */
   async analyzeSentiment(reviewId: string): Promise<SentimentAnalysis> {
     const review = await this.reviewRepository.findOne({
@@ -94,58 +110,74 @@ export class AiService {
       throw new Error('Review not found');
     }
 
-    // Simple rule-based sentiment analysis (placeholder for real AI)
-    const rating = review.rating;
-    let sentiment: 'positive' | 'negative' | 'neutral';
-    let score: number;
+    // Rule-based fallback (used when circuit is open or AI call fails)
+    const buildFallback = (): SentimentAnalysis => {
+      const rating = review.rating;
+      let sentiment: 'positive' | 'negative' | 'neutral';
+      let score: number;
 
-    if (rating >= 4) {
-      sentiment = 'positive';
-      score = 60 + (rating - 4) * 20;
-    } else if (rating <= 2) {
-      sentiment = 'negative';
-      score = rating * 20;
-    } else {
-      sentiment = 'neutral';
-      score = 50;
-    }
+      if (rating >= 4) {
+        sentiment = 'positive';
+        score = 60 + (rating - 4) * 20;
+      } else if (rating <= 2) {
+        sentiment = 'negative';
+        score = rating * 20;
+      } else {
+        sentiment = 'neutral';
+        score = 50;
+      }
 
-    // Extract keywords from comment (simple word extraction)
-    const keywords: string[] = [];
-    if (review.comment) {
-      const words = review.comment.toLowerCase().split(/\s+/);
-      const positiveWords = [
-        'excellent',
-        'great',
-        'amazing',
-        'delicious',
-        'wonderful',
-      ];
-      const negativeWords = ['bad', 'terrible', 'poor', 'awful', 'horrible'];
+      const keywords: string[] = [];
+      if (review.comment) {
+        const words = review.comment.toLowerCase().split(/\s+/);
+        const positiveWords = [
+          'excellent',
+          'great',
+          'amazing',
+          'delicious',
+          'wonderful',
+        ];
+        const negativeWords = ['bad', 'terrible', 'poor', 'awful', 'horrible'];
 
-      words.forEach((word) => {
-        if (positiveWords.includes(word) || negativeWords.includes(word)) {
-          keywords.push(word);
-        }
-      });
-    }
+        words.forEach((word) => {
+          if (positiveWords.includes(word) || negativeWords.includes(word)) {
+            keywords.push(word);
+          }
+        });
+      }
 
-    return {
-      review_id: reviewId,
-      sentiment,
-      score,
-      keywords: keywords.slice(0, 5),
-      aspects: {
-        food: review.food_rating ? (review.food_rating / 5) * 100 : score,
-        service: review.service_rating
-          ? (review.service_rating / 5) * 100
-          : score,
-        ambiance: review.ambiance_rating
-          ? (review.ambiance_rating / 5) * 100
-          : score,
-        value: review.value_rating ? (review.value_rating / 5) * 100 : score,
-      },
+      return {
+        review_id: reviewId,
+        sentiment,
+        score,
+        keywords: keywords.slice(0, 5),
+        aspects: {
+          food: review.food_rating ? (review.food_rating / 5) * 100 : score,
+          service: review.service_rating
+            ? (review.service_rating / 5) * 100
+            : score,
+          ambiance: review.ambiance_rating
+            ? (review.ambiance_rating / 5) * 100
+            : score,
+          value: review.value_rating ? (review.value_rating / 5) * 100 : score,
+        },
+      };
     };
+
+    return this.aiCircuitBreaker.execute<SentimentAnalysis>(
+      async () => {
+        // TODO: Replace with real OpenAI / NLP call:
+        //   const result = await openai.chat.completions.create({ ... });
+        // For now, fall through to rule-based analysis.
+        return buildFallback();
+      },
+      () => {
+        this.logger.warn(
+          `OpenAI circuit open — returning rule-based sentiment for review ${reviewId}`,
+        );
+        return buildFallback();
+      },
+    );
   }
 
   /**

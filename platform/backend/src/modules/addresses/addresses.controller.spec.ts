@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { AddressesController } from './addresses.controller';
 import { AddressesService } from './addresses.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('AddressesController', () => {
   let controller: AddressesController;
@@ -35,7 +36,7 @@ describe('AddressesController', () => {
     updated_at: new Date('2024-01-01'),
   };
 
-  const mockUser = { sub: 'user-1', email: 'user@example.com' };
+  const mockUser = mockAuthenticatedUser({ sub: 'user-1', id: 'user-1', email: 'user@example.com' });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

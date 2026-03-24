@@ -4,6 +4,7 @@ import { ReservationsService } from './reservations.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationStatusDto } from './dto/update-reservation-status.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('ReservationsController', () => {
   let controller: ReservationsController;
@@ -41,7 +42,7 @@ describe('ReservationsController', () => {
 
   describe('create', () => {
     it('should create a new reservation', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const createDto: CreateReservationDto = {
         restaurant_id: 'restaurant-1',
         reservation_date: new Date(),
@@ -74,7 +75,7 @@ describe('ReservationsController', () => {
 
   describe('findByUser', () => {
     it('should get reservations by current user', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const reservations = [mockReservation];
       const pagination = { page: 1, limit: 10 };
 
@@ -90,7 +91,7 @@ describe('ReservationsController', () => {
   describe('findOne', () => {
     it('should get reservation by id', async () => {
       mockReservationsService.findOne.mockResolvedValue(mockReservation);
-      const mockUser = { id: 'user-1', roles: ['customer'] };
+      const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['customer'] });
 
       const result = await controller.findOne('reservation-1', mockUser);
 
@@ -104,7 +105,7 @@ describe('ReservationsController', () => {
       const updateDto: UpdateReservationDto = {
         party_size: 6,
       } as any;
-      const mockUser = { id: 'user-1', roles: ['customer'] };
+      const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['customer'] });
 
       const updatedReservation = { ...mockReservation, party_size: 6 };
       mockReservationsService.update.mockResolvedValue(updatedReservation);

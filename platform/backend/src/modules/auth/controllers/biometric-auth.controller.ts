@@ -18,6 +18,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { Throttle, SkipThrottle } from '@nestjs/throttler';
 import { Request } from 'express';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { Public } from '@/common/decorators/public.decorator';
 import { BiometricService } from '../services/biometric.service';
@@ -46,7 +47,7 @@ export class BiometricAuthController {
   @ApiResponse({ status: 400, description: 'Invalid enrollment token' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async enroll(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() enrollDto: BiometricEnrollDto,
     @Req() req: Request,
     @Headers('user-agent') userAgent?: string,

@@ -12,6 +12,7 @@ import { ReceiptsService } from './receipts.service';
 import { GenerateReceiptDto } from './dto/generate-receipt.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 
 @ApiTags('receipts')
@@ -34,7 +35,7 @@ export class ReceiptsController {
   @ApiResponse({ status: 200, description: 'Returns paginated list of receipts' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  findMyReceipts(@CurrentUser() user: any, @Query() pagination: PaginationDto) {
+  findMyReceipts(@CurrentUser() user: AuthenticatedUser, @Query() pagination: PaginationDto) {
     return this.receiptsService.findByUser(user.sub, pagination);
   }
 
@@ -42,7 +43,7 @@ export class ReceiptsController {
   @ApiOperation({ summary: 'Generate a receipt for a completed order' })
   @ApiResponse({ status: 201, description: 'Receipt generated successfully' })
   @ApiResponse({ status: 409, description: 'Receipt already exists for this order' })
-  generate(@CurrentUser() user: any, @Body() dto: GenerateReceiptDto) {
+  generate(@CurrentUser() user: AuthenticatedUser, @Body() dto: GenerateReceiptDto) {
     // In production this would fetch order/payment data from their respective services.
     // For now, the controller delegates to the service with the order/payment IDs,
     // and the service handles the creation with minimal data.

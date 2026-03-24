@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsController } from './notifications.controller';
 import { NotificationsService } from './notifications.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('NotificationsController', () => {
   let controller: NotificationsController;
@@ -47,7 +48,7 @@ describe('NotificationsController', () => {
   });
 
   it('should find all notifications for user', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.findAllByUser.mockResolvedValue([{ id: 'notif-1' }]);
 
     const result = await controller.findAll(user);
@@ -57,7 +58,7 @@ describe('NotificationsController', () => {
   });
 
   it('should get unread count', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.getUnreadCount.mockResolvedValue(5);
 
     const result = await controller.getUnreadCount(user);
@@ -67,7 +68,7 @@ describe('NotificationsController', () => {
   });
 
   it('should mark as read', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.markAsRead.mockResolvedValue({ id: 'notif-1', is_read: true });
 
     const result = await controller.markAsRead('notif-1', user);
@@ -77,7 +78,7 @@ describe('NotificationsController', () => {
   });
 
   it('should mark all as read', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.markAllAsRead.mockResolvedValue({ marked_count: 3 });
 
     const result = await controller.markAllAsRead(user);

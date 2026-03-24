@@ -1,11 +1,10 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { WaiterCallsService } from '../waiter-calls.service';
 
 const createMockRepository = () => ({
-  create: vi.fn((data) => ({ id: 'test-id', ...data })),
-  save: vi.fn((data) => Promise.resolve({ id: 'test-id', ...data })),
-  findOne: vi.fn(),
-  find: vi.fn(),
+  create: jest.fn((data: any) => ({ id: 'test-id', ...data })),
+  save: jest.fn((data: any) => Promise.resolve({ id: 'test-id', ...data })),
+  findOne: jest.fn(),
+  find: jest.fn(),
 });
 
 describe('WaiterCallsService', () => {
@@ -28,7 +27,7 @@ describe('WaiterCallsService', () => {
         notes: 'Need menu please',
       };
 
-      await service.createCall(userId, dto);
+      await service.createCall(userId, dto as any);
 
       expect(waiterCallRepository.create).toHaveBeenCalledWith({
         ...dto,
@@ -46,7 +45,7 @@ describe('WaiterCallsService', () => {
         reason: 'bill',
       };
 
-      const result = await service.createCall(userId, dto);
+      const result = await service.createCall(userId, dto as any);
 
       expect(result.reason).toBe('bill');
       expect(result.status).toBe('pending');

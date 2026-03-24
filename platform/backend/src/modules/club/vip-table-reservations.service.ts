@@ -98,7 +98,7 @@ export class VipTableReservationsService {
 
     reservation.status = VipTableReservationStatus.CANCELLED;
     reservation.cancelled_at = new Date();
-    reservation.cancellation_reason = reason;
+    reservation.cancellation_reason = reason ?? '';
 
     // Cancel all guest entries
     for (const guest of reservation.guests) {

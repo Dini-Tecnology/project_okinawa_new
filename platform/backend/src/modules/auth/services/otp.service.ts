@@ -5,7 +5,7 @@
  * Supports WhatsApp and SMS channels with rate limiting.
  */
 
-import { Injectable, BadRequestException, TooManyRequestsException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan, LessThan } from 'typeorm';
 import * as crypto from 'crypto';
@@ -41,10 +41,10 @@ export class OTPService {
     // Check rate limiting
     const rateLimitCheck = await this.checkRateLimit(phoneNumber);
     if (!rateLimitCheck.allowed) {
-      throw new TooManyRequestsException({
+      throw new HttpException({
         message: 'Too many OTP requests. Please wait before trying again.',
         retry_after: rateLimitCheck.retryAfter,
-      });
+      }, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     // Invalidate any existing unused OTPs for this phone
@@ -147,10 +147,10 @@ export class OTPService {
         success: false,
       });
 
-      throw new TooManyRequestsException({
+      throw new HttpException({
         message: 'Too many failed attempts. Please request a new code.',
         retry_after: OTP_LOCKOUT_MINUTES * 60,
-      });
+      }, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     // Verify code
@@ -181,7 +181,7 @@ export class OTPService {
     await this.otpRepository.save(otpToken);
 
     // Generate temp token for next steps
-    const tempToken = this.generateTempToken(phoneNumber, otpToken.purpose);
+    const tempToken = this.generateTempToken(phoneNumber, otpToken.purpose as OTPPurpose);
 
     await this.auditLogService.log({
       action: AuditAction.OTP_VERIFIED,
@@ -194,7 +194,7 @@ export class OTPService {
 
     return {
       valid: true,
-      purpose: otpToken.purpose,
+      purpose: otpToken.purpose as OTPPurpose,
       tempToken,
     };
   }
@@ -331,7 +331,7 @@ export class OTPService {
 
       const body = new URLSearchParams({
         To: to,
-        From: from,
+        From: from || '',
         Body: `Your verification code is: ${code}. It expires in ${OTP_EXPIRY_MINUTES} minutes. Do not share this code.`,
       });
 

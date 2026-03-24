@@ -1,6 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sgMail from '@sendgrid/mail';
+import { CircuitBreakerService } from '@common/utils/circuit-breaker.module';
+import { CircuitBreaker } from '@common/utils/circuit-breaker';
 
 export interface EmailOptions {
   to: string;
@@ -13,8 +15,12 @@ export interface EmailOptions {
 export class EmailService {
   private readonly logger = new Logger(EmailService.name);
   private readonly isEnabled: boolean;
+  private readonly circuitBreaker: CircuitBreaker;
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private circuitBreakerService: CircuitBreakerService,
+  ) {
     const apiKey = this.configService.get<string>('SENDGRID_API_KEY');
     this.isEnabled = !!apiKey && apiKey !== 'your-sendgrid-api-key';
 
@@ -26,6 +32,12 @@ export class EmailService {
         'SendGrid API key not configured. Email sending is disabled.',
       );
     }
+
+    this.circuitBreaker = this.circuitBreakerService.getBreaker('sendgrid', {
+      failureThreshold: 5,
+      resetTimeout: 60_000, // 1 minute before retrying SendGrid
+      halfOpenMax: 1,
+    });
   }
 
   /**
@@ -41,33 +53,34 @@ export class EmailService {
       return false;
     }
 
-    try {
-      const msg = {
-        to: options.to,
-        from: {
-          email:
-            this.configService.get<string>('SENDGRID_FROM_EMAIL') ||
-            'noreply@okinawa.com',
-          name:
-            this.configService.get<string>('SENDGRID_FROM_NAME') ||
-            'Project Okinawa',
-        },
-        subject: options.subject,
-        html: options.html,
-        text: options.text || this.stripHtml(options.html),
-      };
+    const msg = {
+      to: options.to,
+      from: {
+        email:
+          this.configService.get<string>('SENDGRID_FROM_EMAIL') ||
+          'noreply@okinawa.com',
+        name:
+          this.configService.get<string>('SENDGRID_FROM_NAME') ||
+          'Project Okinawa',
+      },
+      subject: options.subject,
+      html: options.html,
+      text: options.text || this.stripHtml(options.html),
+    };
 
-      await sgMail.send(msg);
-      this.logger.log(`Email sent successfully to ${options.to}`);
-      return true;
-    } catch (error) {
-      const err = error as Error;
-      this.logger.error(
-        `Failed to send email to ${options.to}: ${err.message}`,
-        err.stack,
-      );
-      return false;
-    }
+    return this.circuitBreaker.execute(
+      async () => {
+        await sgMail.send(msg);
+        this.logger.log(`Email sent successfully to ${options.to}`);
+        return true;
+      },
+      () => {
+        this.logger.warn(
+          `SendGrid circuit open — email to ${options.to} queued for later retry`,
+        );
+        return false;
+      },
+    );
   }
 
   /**

@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums/user-role.enum';
 
 @ApiTags('inventory')
@@ -86,7 +87,7 @@ export class InventoryController {
   updateLevel(
     @Param('id') id: string,
     @Body() dto: UpdateItemLevelDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.inventoryService.updateLevel(id, dto);
   }

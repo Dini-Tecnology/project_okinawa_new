@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { WaiterCallsService } from './waiter-calls.service';
-import { CreateWaiterCallDto } from './dto/create-waiter-call.dto';
+import { CreateWaiterCallDto } from './dto';
 
 @ApiTags('Waiter Calls')
 @Controller('waiter-calls')

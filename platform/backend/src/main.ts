@@ -7,12 +7,14 @@ import { SentryExceptionFilter } from './common/filters/sentry-exception.filter'
 import { TransformResponseInterceptor } from './common/interceptors/transform-response.interceptor';
 import { StructuredLoggerService } from './common/logging';
 import { CsrfMiddleware, CSRF_EXCLUDED_ROUTES } from './common/middleware/csrf.middleware';
+import { MaintenanceMiddleware, MAINTENANCE_EXCLUDED_PATHS } from './common/middleware/maintenance.middleware';
 import { initializeSentry } from './config/sentry.config';
 import { swaggerConfig } from './config/swagger.config';
 import compression from 'compression';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
+import { configureRedisAdapter } from './config/socket-redis-adapter.config';
 
 async function bootstrap() {
   // Initialize Sentry BEFORE creating the app
@@ -38,6 +40,9 @@ async function bootstrap() {
   const isProduction = nodeEnv === 'production';
   const swaggerEnabled = !isProduction && configService.get<string>('SWAGGER_ENABLED') !== 'false';
 
+  // Socket.IO Redis adapter for horizontal scaling
+  await configureRedisAdapter(app);
+
   // Security middleware
   // CSP: In production, remove unsafe-inline; in dev, allow it for Swagger UI
   const cspDirectives: Record<string, string[]> = {
@@ -58,6 +63,12 @@ async function bootstrap() {
   }));
   app.use(compression());
   app.use(cookieParser()); // Required for CSRF tokens
+
+  // Maintenance mode middleware (returns 503 when active)
+  const maintenanceMiddleware = new MaintenanceMiddleware();
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    return maintenanceMiddleware.use(req, res, next);
+  });
 
   // CSRF Protection middleware (applied globally)
   const csrfMiddleware = new CsrfMiddleware();

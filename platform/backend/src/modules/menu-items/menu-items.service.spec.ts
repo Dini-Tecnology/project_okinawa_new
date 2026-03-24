@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { MenuItemsService } from './menu-items.service';
 import { MenuItem } from './entities/menu-item.entity';
 import { MenuCategory } from './entities/menu-category.entity';
+import { MenuItemCustomizationGroup } from './entities/menu-item-customization-group.entity';
 import { NotFoundException } from '@nestjs/common';
 
 describe('MenuItemsService', () => {
@@ -45,6 +46,14 @@ describe('MenuItemsService', () => {
     save: jest.fn(),
   };
 
+  const mockCustomizationGroupRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+    remove: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -56,6 +65,10 @@ describe('MenuItemsService', () => {
         {
           provide: getRepositoryToken(MenuCategory),
           useValue: mockCategoryRepository,
+        },
+        {
+          provide: getRepositoryToken(MenuItemCustomizationGroup),
+          useValue: mockCustomizationGroupRepository,
         },
       ],
     }).compile();
@@ -75,6 +88,7 @@ describe('MenuItemsService', () => {
 
       expect(result.items).toEqual([mockMenuItem]);
       expect(result.meta.total).toBe(1);
+      expect(result.meta.page).toBe(1);
       expect(mockMenuItemRepository.findAndCount).toHaveBeenCalled();
     });
   });

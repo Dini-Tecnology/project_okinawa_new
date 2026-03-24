@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { UserRole } from '@/common/enums';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -27,7 +28,7 @@ describe('UsersController', () => {
     roles: [],
   };
 
-  const mockUser = { sub: 'user-1', id: 'user-1' };
+  const mockUser = mockAuthenticatedUser({ sub: 'user-1', id: 'user-1' });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

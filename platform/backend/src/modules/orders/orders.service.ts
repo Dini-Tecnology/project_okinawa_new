@@ -23,7 +23,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus } from '@common/enums';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 import { OrderCalculatorHelper } from './helpers';
 import { KdsService } from './kds.service';
 import { WaiterStatsService } from './waiter-stats.service';
@@ -153,35 +153,31 @@ export class OrdersService {
   }
 
   async findByRestaurant(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.orderRepository.findAndCount({
       where: { restaurant_id: restaurantId },
       relations: ['items', 'items.menu_item', 'user'],
       order: { created_at: 'DESC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findByUser(userId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.orderRepository.findAndCount({
       where: { user_id: userId },
       relations: ['items', 'items.menu_item', 'restaurant'],
       order: { created_at: 'DESC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findOne(id: string, userId?: string, roles?: UserRoleEnum[]) {

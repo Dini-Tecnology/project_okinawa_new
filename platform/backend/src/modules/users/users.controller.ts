@@ -6,6 +6,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('users')
@@ -21,20 +22,20 @@ export class UsersController {
 
   @Get('me')
   @ApiOperation({ summary: 'Get current user profile' })
-  getMe(@CurrentUser() user: any) {
+  getMe(@CurrentUser() user: AuthenticatedUser) {
     return this.usersService.findOne(user.sub);
   }
 
   @Patch('me')
   @ApiOperation({ summary: 'Update current user profile' })
-  updateMe(@CurrentUser() user: any, @Body() updateProfileDto: UpdateProfileDto) {
+  updateMe(@CurrentUser() user: AuthenticatedUser, @Body() updateProfileDto: UpdateProfileDto) {
     return this.usersService.update(user.sub, updateProfileDto);
   }
 
   @Delete('me')
   @ApiOperation({ summary: 'Delete current user account' })
   @ApiResponse({ status: 200, description: 'Account deleted successfully' })
-  deleteAccount(@CurrentUser() user: any) {
+  deleteAccount(@CurrentUser() user: AuthenticatedUser) {
     return this.usersService.deleteAccount(user.sub);
   }
 

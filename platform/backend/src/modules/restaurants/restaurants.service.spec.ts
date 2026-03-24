@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RestaurantsService } from './restaurants.service';
 import { Restaurant } from './entities/restaurant.entity';
+import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
 import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
 import { NotFoundException } from '@nestjs/common';
 import { UserRole as UserRoleEnum } from '@/common/enums';
@@ -68,7 +69,7 @@ describe('RestaurantsService', () => {
 
   describe('findAll', () => {
     it('should return all active restaurants', async () => {
-      const filters = {};
+      const filters = {} as FilterRestaurantDto;
 
       mockQueryBuilder.getManyAndCount.mockResolvedValue([[mockRestaurant], 1]);
 
@@ -80,7 +81,7 @@ describe('RestaurantsService', () => {
     });
 
     it('should filter by city', async () => {
-      const filters = { city: 'New York' };
+      const filters = { city: 'New York' } as FilterRestaurantDto;
 
       mockQueryBuilder.getManyAndCount.mockResolvedValue([[mockRestaurant], 1]);
 
@@ -91,7 +92,7 @@ describe('RestaurantsService', () => {
     });
 
     it('should filter by service type', async () => {
-      const filters = { serviceType: 'dine_in' };
+      const filters = { serviceType: 'dine_in' } as FilterRestaurantDto;
 
       mockQueryBuilder.getManyAndCount.mockResolvedValue([[mockRestaurant], 1]);
 
@@ -106,7 +107,7 @@ describe('RestaurantsService', () => {
         latitude: 40.7128,
         longitude: -74.006,
         radius: 5,
-      };
+      } as FilterRestaurantDto;
 
       mockQueryBuilder.getManyAndCount.mockResolvedValue([[mockRestaurant], 1]);
 

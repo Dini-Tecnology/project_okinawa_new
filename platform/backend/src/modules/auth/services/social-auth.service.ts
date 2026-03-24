@@ -9,7 +9,7 @@ import { Injectable, UnauthorizedException, BadRequestException, Logger } from '
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import * as crypto from 'crypto';
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { SocialProvider } from '../dto/social-auth.dto';
@@ -193,8 +193,8 @@ export class SocialAuthService {
       phone: phoneNumber,
       phone_verified: true,
       avatar_url: tokenData.avatarUrl,
-      birth_date: additionalData?.birthDate ? new Date(additionalData.birthDate) : undefined,
       preferences: {
+        birth_date: additionalData?.birthDate,
         social_providers: [
           {
             provider: tokenData.provider,
@@ -203,9 +203,9 @@ export class SocialAuthService {
           },
         ],
       },
-    });
+    } as DeepPartial<Profile>);
 
-    await this.profileRepository.save(user);
+    await this.profileRepository.save(user as Profile);
 
     await this.auditLogService.log({
       userId: user.id,

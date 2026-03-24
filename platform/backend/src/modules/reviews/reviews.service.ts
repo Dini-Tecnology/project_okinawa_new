@@ -13,6 +13,7 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { OwnerResponseDto } from './dto/owner-response.dto';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { UserRole as UserRoleEnum } from '@/common/enums';
+import { PAGINATION } from '@common/constants/limits';
 
 @Injectable()
 export class ReviewsService {
@@ -118,7 +119,7 @@ export class ReviewsService {
 
     query
       .orderBy('review.created_at', 'DESC')
-      .take(options?.limit || 20)
+      .take(options?.limit || PAGINATION.REVIEWS_DEFAULT)
       .skip(options?.offset || 0);
 
     const [reviews, total] = await query.getManyAndCount();
@@ -359,7 +360,7 @@ export class ReviewsService {
   /**
    * Get recent reviews (for homepage/feed)
    */
-  async getRecentReviews(limit: number = 10) {
+  async getRecentReviews(limit: number = PAGINATION.RECENT_REVIEWS) {
     return this.reviewRepository.find({
       where: {
         is_visible: true,
@@ -374,7 +375,7 @@ export class ReviewsService {
   /**
    * Get top rated reviews for a restaurant
    */
-  async getTopReviews(restaurantId: string, limit: number = 5) {
+  async getTopReviews(restaurantId: string, limit: number = PAGINATION.TOP_REVIEWS) {
     return this.reviewRepository.find({
       where: {
         restaurant_id: restaurantId,

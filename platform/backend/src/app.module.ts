@@ -49,6 +49,7 @@ import { AddressesModule } from './modules/addresses/addresses.module';
 import { ReceiptsModule } from './modules/receipts/receipts.module';
 import { MenuCustomizationModule } from './modules/menu-customization/menu-customization.module';
 import { GeofencingModule } from './modules/geofencing/geofencing.module';
+import { LegalModule } from './modules/legal/legal.module';
 
 @Module({
   imports: [
@@ -143,6 +144,9 @@ import { GeofencingModule } from './modules/geofencing/geofencing.module';
     ReceiptsModule,
     MenuCustomizationModule,
     GeofencingModule,
+
+    // Legal (Privacy Policy & Terms of Service)
+    LegalModule,
   ],
 })
 export class AppModule {}

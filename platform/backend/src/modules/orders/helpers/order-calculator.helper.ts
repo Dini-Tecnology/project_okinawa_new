@@ -42,6 +42,7 @@ export class OrderCalculatorHelper {
       [OrderStatus.DELIVERING]: 'Your order is on the way!',
       [OrderStatus.COMPLETED]: 'Order completed. Thank you!',
       [OrderStatus.CANCELLED]: 'Order has been cancelled',
+      [OrderStatus.OPEN_FOR_ADDITIONS]: 'Order is open for additions',
     };
     return messages[status] || 'Order status updated';
   }

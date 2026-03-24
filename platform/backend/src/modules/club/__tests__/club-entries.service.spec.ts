@@ -1,12 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ClubEntriesService } from '../club-entries.service';
 import { ClubEntryStatus, ClubEntryPurchaseType } from '@/common/enums';
 
 const createMockRepository = () => ({
-  create: vi.fn((data) => ({ id: 'test-id', ...data })),
-  save: vi.fn((data) => Promise.resolve({ id: 'test-id', ...data })),
-  findOne: vi.fn(),
-  find: vi.fn(),
+  create: jest.fn((data: any) => ({ id: 'test-id', ...data })),
+  save: jest.fn((data: any) => Promise.resolve({ id: 'test-id', ...data })),
+  findOne: jest.fn(),
+  find: jest.fn(),
 });
 
 describe('ClubEntriesService', () => {
@@ -125,9 +124,10 @@ describe('ClubEntriesService', () => {
 
     it('should accept entry from yesterday if before 6am', async () => {
       // Mock time to 3am
+      jest.useFakeTimers();
       const earlyMorning = new Date();
       earlyMorning.setHours(3, 0, 0, 0);
-      vi.setSystemTime(earlyMorning);
+      jest.setSystemTime(earlyMorning);
 
       const yesterday = new Date(earlyMorning);
       yesterday.setDate(yesterday.getDate() - 1);
@@ -142,7 +142,7 @@ describe('ClubEntriesService', () => {
 
       expect(result.valid).toBe(true);
 
-      vi.useRealTimers();
+      jest.useRealTimers();
     });
 
     it('should return not found for invalid QR code', async () => {
@@ -223,6 +223,10 @@ describe('ClubEntriesService', () => {
   describe('checkIn', () => {
     it('should create check-in record', async () => {
       checkInOutRepository.findOne.mockResolvedValue(null); // No existing check-in
+      entryRepository.findOne.mockResolvedValue({
+        id: 'entry-123',
+        status: ClubEntryStatus.ACTIVE,
+      }); // For useEntry call
 
       await service.checkIn('user-123', {
         restaurant_id: 'club-123',

@@ -29,6 +29,17 @@ export enum AuditAction {
   PROFILE_UPDATED = 'profile_updated',
   TOKEN_REFRESH = 'token_refresh',
   SUSPICIOUS_ACTIVITY = 'suspicious_activity',
+  BIOMETRIC_ENROLL = 'biometric_enroll',
+  BIOMETRIC_DEVICE_MISMATCH = 'biometric_device_mismatch',
+  BIOMETRIC_LOGIN = 'biometric_login',
+  BIOMETRIC_REVOKE = 'biometric_revoke',
+  OTP_SENT = 'otp_sent',
+  OTP_MAX_ATTEMPTS = 'otp_max_attempts',
+  OTP_FAILED = 'otp_failed',
+  OTP_VERIFIED = 'otp_verified',
+  SOCIAL_LOGIN = 'social_login',
+  SOCIAL_LINK = 'social_link',
+  SOCIAL_REGISTER_START = 'social_register_start',
 }
 
 @Entity('audit_logs')

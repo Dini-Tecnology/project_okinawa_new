@@ -20,15 +20,15 @@ describe('ApprovalsService', () => {
     item_name: 'Picanha Grelhada',
     table_id: 'table-1',
     requester_id: 'waiter-1',
-    resolver_id: null,
+    resolver_id: undefined,
     reason: 'Client changed their mind about this dish',
-    resolution_note: null,
+    resolution_note: undefined,
     amount: 89.9,
     status: ApprovalStatus.PENDING,
     order_id: 'order-1',
     created_at: new Date('2026-03-23T14:00:00Z'),
     updated_at: new Date('2026-03-23T14:00:00Z'),
-    resolved_at: null,
+    resolved_at: undefined,
     requester: { id: 'waiter-1', full_name: 'Carlos Silva' } as any,
   };
 
@@ -118,7 +118,7 @@ describe('ApprovalsService', () => {
         reason: 'Courtesy for loyal customer',
       };
 
-      const approvalWithDefaults = { ...mockApproval, amount: 0, table_id: null, order_id: null };
+      const approvalWithDefaults = { ...mockApproval, amount: 0, table_id: undefined, order_id: undefined };
       mockApprovalRepository.create.mockReturnValue(approvalWithDefaults);
       mockApprovalRepository.save.mockResolvedValue(approvalWithDefaults);
 
@@ -127,8 +127,8 @@ describe('ApprovalsService', () => {
       expect(mockApprovalRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
           amount: 0,
-          table_id: null,
-          order_id: null,
+          table_id: undefined,
+          order_id: undefined,
         }),
       );
     });
@@ -318,7 +318,7 @@ describe('ApprovalsService', () => {
       ).rejects.toThrow(ConflictException);
     });
 
-    it('should set resolution_note to null when no note provided', async () => {
+    it('should set resolution_note to empty string when no note provided', async () => {
       const resolveDto: ResolveApprovalDto = { decision: 'approved' };
 
       mockApprovalRepository.findOne.mockResolvedValue({ ...mockApproval });
@@ -329,7 +329,7 @@ describe('ApprovalsService', () => {
       await service.resolve('approval-1', resolveDto, 'manager-1');
 
       const savedEntity = mockApprovalRepository.save.mock.calls[0][0];
-      expect(savedEntity.resolution_note).toBeNull();
+      expect(savedEntity.resolution_note).toBe('');
     });
   });
 

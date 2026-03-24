@@ -19,6 +19,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('tips')
@@ -32,7 +33,7 @@ export class TipsController {
   @ApiOperation({ summary: 'Create a tip' })
   @ApiResponse({ status: 201, description: 'Tip created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid tip data' })
-  create(@CurrentUser() user: any, @Body() createTipDto: CreateTipDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() createTipDto: CreateTipDto) {
     return this.tipsService.create(user.id, createTipDto);
   }
 
@@ -111,14 +112,14 @@ export class TipsController {
   @ApiResponse({ status: 200, description: 'Returns staff tips' })
   @ApiResponse({ status: 403, description: 'Access denied - can only view own tips or admin required' })
   getStaffTips(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('staffId') staffId: string,
     @Query('start_date') startDate?: string,
     @Query('end_date') endDate?: string,
   ) {
     // SECURITY: Users can only see their own tips, unless they are OWNER/MANAGER
-    const isAdmin = (user.roles || []).some((role: UserRole) =>
-      [UserRole.OWNER, UserRole.MANAGER].includes(role)
+    const isAdmin = (user.roles || []).some((role: string) =>
+      [UserRole.OWNER as string, UserRole.MANAGER as string].includes(role)
     );
 
     if (!isAdmin && user.id !== staffId) {

@@ -188,7 +188,7 @@ describe('ReceiptsService', () => {
       const receipts = [mockReceipt, { ...mockReceipt, id: 'receipt-2', order_id: 'order-2' }];
       mockReceiptRepo.findAndCount.mockResolvedValue([receipts, 2]);
 
-      const pagination: PaginationDto = { page: 1, limit: 10 };
+      const pagination = { page: 1, limit: 10 } as PaginationDto;
 
       const result = await service.findByUser('user-1', pagination);
 
@@ -207,7 +207,7 @@ describe('ReceiptsService', () => {
     it('should return empty paginated list when user has no receipts', async () => {
       mockReceiptRepo.findAndCount.mockResolvedValue([[], 0]);
 
-      const pagination: PaginationDto = { page: 1, limit: 10 };
+      const pagination = { page: 1, limit: 10 } as PaginationDto;
 
       const result = await service.findByUser('user-no-receipts', pagination);
 
@@ -219,7 +219,7 @@ describe('ReceiptsService', () => {
     it('should calculate correct skip for page 2', async () => {
       mockReceiptRepo.findAndCount.mockResolvedValue([[], 0]);
 
-      const pagination: PaginationDto = { page: 2, limit: 5 };
+      const pagination = { page: 2, limit: 5 } as PaginationDto;
 
       await service.findByUser('user-1', pagination);
 
@@ -234,14 +234,14 @@ describe('ReceiptsService', () => {
     it('should use defaults when page and limit are not provided', async () => {
       mockReceiptRepo.findAndCount.mockResolvedValue([[], 0]);
 
-      const pagination: PaginationDto = {};
+      const pagination = {} as PaginationDto;
 
       await service.findByUser('user-1', pagination);
 
       expect(mockReceiptRepo.findAndCount).toHaveBeenCalledWith(
         expect.objectContaining({
           skip: 0,
-          take: 10,
+          take: 20,
         }),
       );
     });
@@ -254,7 +254,7 @@ describe('ReceiptsService', () => {
       }));
       mockReceiptRepo.findAndCount.mockResolvedValue([manyReceipts, 15]);
 
-      const pagination: PaginationDto = { page: 2, limit: 5 };
+      const pagination = { page: 2, limit: 5 } as PaginationDto;
 
       const result = await service.findByUser('user-1', pagination);
 

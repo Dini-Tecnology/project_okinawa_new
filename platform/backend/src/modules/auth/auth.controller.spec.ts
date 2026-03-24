@@ -7,6 +7,7 @@ import { LoginDto } from './dto/login.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ConfirmResetPasswordDto } from './dto/confirm-reset-password.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -33,11 +34,7 @@ describe('AuthController', () => {
     regenerateBackupCodes: jest.fn(),
   };
 
-  const mockUser = {
-    id: 'user-1',
-    email: 'test@example.com',
-    full_name: 'Test User',
-  };
+  const mockUser = mockAuthenticatedUser({ id: 'user-1', email: 'test@example.com' });
 
   const mockTokens = {
     access_token: 'access-token-123',
@@ -154,7 +151,7 @@ describe('AuthController', () => {
 
   describe('getCurrentUser', () => {
     it('should get current user profile', async () => {
-      const currentUser = { id: 'user-1' };
+      const currentUser = mockAuthenticatedUser({ id: 'user-1' });
 
       mockAuthService.getCurrentUser.mockResolvedValue(mockUser);
 
@@ -167,7 +164,7 @@ describe('AuthController', () => {
 
   describe('updateProfile', () => {
     it('should update user profile', async () => {
-      const currentUser = { id: 'user-1' };
+      const currentUser = mockAuthenticatedUser({ id: 'user-1' });
       const updateDto: UpdateAuthDto = {
         email: 'updated@example.com',
       };
@@ -214,7 +211,7 @@ describe('AuthController', () => {
 
   describe('logout', () => {
     it('should logout user successfully', async () => {
-      const currentUser = { id: 'user-1' };
+      const currentUser = mockAuthenticatedUser({ id: 'user-1' });
       const authorization = 'Bearer access-token-123';
       const refreshToken = 'refresh-token-123';
 
@@ -240,7 +237,7 @@ describe('AuthController', () => {
   });
 
   describe('MFA endpoints', () => {
-    const currentUser = { id: 'user-1' };
+    const currentUser = mockAuthenticatedUser({ id: 'user-1' });
 
     describe('setupMfa', () => {
       it('should setup MFA and return secret', async () => {

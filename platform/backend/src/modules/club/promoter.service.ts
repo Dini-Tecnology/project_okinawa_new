@@ -1,4 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { Promoter, PromoterSale, PromoterPayment } from './entities/promoter.entity';
 
 /**
@@ -7,10 +9,14 @@ import { Promoter, PromoterSale, PromoterPayment } from './entities/promoter.ent
  */
 @Injectable()
 export class PromoterService {
-  // In-memory storage for demo (replace with TypeORM repository in production)
-  private promoters: Promoter[] = [];
-  private sales: PromoterSale[] = [];
-  private payments: PromoterPayment[] = [];
+  constructor(
+    @InjectRepository(Promoter)
+    private readonly promoterRepo: Repository<Promoter>,
+    @InjectRepository(PromoterSale)
+    private readonly saleRepo: Repository<PromoterSale>,
+    @InjectRepository(PromoterPayment)
+    private readonly paymentRepo: Repository<PromoterPayment>,
+  ) {}
 
   /**
    * Register a new promoter
@@ -26,19 +32,18 @@ export class PromoterService {
       commissionType?: 'percentage' | 'fixed_per_entry' | 'fixed_per_table' | 'tiered';
       commissionRate?: number;
       pixKey?: string;
-    }
+    },
   ): Promise<Promoter> {
     // Generate unique promoter code
     const promoterCode = this.generatePromoterCode(data.name);
-    
+
     // Check for duplicate code
-    const existing = this.promoters.find(p => p.promoterCode === promoterCode);
+    const existing = await this.promoterRepo.findOne({ where: { promoterCode } });
     if (existing) {
       throw new ConflictException('Promoter code already exists');
     }
 
-    const promoter: Promoter = {
-      id: this.generateId(),
+    const promoter = this.promoterRepo.create({
       restaurantId,
       userId: data.userId,
       name: data.name,
@@ -55,19 +60,16 @@ export class PromoterService {
       totalCommissionEarned: 0,
       pendingCommission: 0,
       pixKey: data.pixKey,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    this.promoters.push(promoter);
-    return promoter;
+    return this.promoterRepo.save(promoter);
   }
 
   /**
    * Get promoter by ID
    */
   async getPromoterById(id: string): Promise<Promoter> {
-    const promoter = this.promoters.find(p => p.id === id);
+    const promoter = await this.promoterRepo.findOne({ where: { id } });
     if (!promoter) {
       throw new NotFoundException('Promoter not found');
     }
@@ -78,7 +80,9 @@ export class PromoterService {
    * Get promoter by code
    */
   async getPromoterByCode(code: string): Promise<Promoter> {
-    const promoter = this.promoters.find(p => p.promoterCode === code.toUpperCase());
+    const promoter = await this.promoterRepo.findOne({
+      where: { promoterCode: code.toUpperCase() },
+    });
     if (!promoter) {
       throw new NotFoundException('Promoter not found');
     }
@@ -93,24 +97,24 @@ export class PromoterService {
     filters?: {
       status?: string;
       search?: string;
-    }
+    },
   ): Promise<Promoter[]> {
-    let result = this.promoters.filter(p => p.restaurantId === restaurantId);
+    const qb = this.promoterRepo
+      .createQueryBuilder('p')
+      .where('p.restaurantId = :restaurantId', { restaurantId });
 
     if (filters?.status) {
-      result = result.filter(p => p.status === filters.status);
+      qb.andWhere('p.status = :status', { status: filters.status });
     }
 
     if (filters?.search) {
-      const search = filters.search.toLowerCase();
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(search) ||
-        p.nickname?.toLowerCase().includes(search) ||
-        p.promoterCode.toLowerCase().includes(search)
+      qb.andWhere(
+        '(LOWER(p.name) LIKE :search OR LOWER(p.nickname) LIKE :search OR LOWER(p.promoterCode) LIKE :search)',
+        { search: `%${filters.search.toLowerCase()}%` },
       );
     }
 
-    return result;
+    return qb.getMany();
   }
 
   /**
@@ -118,12 +122,12 @@ export class PromoterService {
    */
   async updatePromoterStatus(
     id: string,
-    status: 'active' | 'inactive' | 'suspended' | 'pending_approval'
+    status: 'active' | 'inactive' | 'suspended' | 'pending_approval',
   ): Promise<Promoter> {
     const promoter = await this.getPromoterById(id);
     promoter.status = status;
     promoter.updatedAt = new Date();
-    return promoter;
+    return this.promoterRepo.save(promoter);
   }
 
   /**
@@ -136,17 +140,17 @@ export class PromoterService {
       commissionRate?: number;
       fixedCommissionAmount?: number;
       tieredRates?: { tier: number; minEntries: number; maxEntries?: number; rate: number }[];
-    }
+    },
   ): Promise<Promoter> {
     const promoter = await this.getPromoterById(id);
-    
+
     if (data.commissionType) promoter.commissionType = data.commissionType;
     if (data.commissionRate !== undefined) promoter.commissionRate = data.commissionRate;
     if (data.fixedCommissionAmount !== undefined) promoter.fixedCommissionAmount = data.fixedCommissionAmount;
     if (data.tieredRates) promoter.tieredRates = data.tieredRates;
-    
+
     promoter.updatedAt = new Date();
-    return promoter;
+    return this.promoterRepo.save(promoter);
   }
 
   /**
@@ -162,10 +166,10 @@ export class PromoterService {
       customerPhone?: string;
       quantity: number;
       saleAmount: number;
-    }
+    },
   ): Promise<PromoterSale> {
     const promoter = await this.getPromoterById(promoterId);
-    
+
     if (promoter.status !== 'active') {
       throw new BadRequestException('Promoter is not active');
     }
@@ -173,8 +177,7 @@ export class PromoterService {
     // Calculate commission
     const commissionAmount = this.calculateCommission(promoter, data.saleAmount, data.quantity);
 
-    const sale: PromoterSale = {
-      id: this.generateId(),
+    const sale = this.saleRepo.create({
       promoterId,
       restaurantId: promoter.restaurantId,
       eventDate: data.eventDate,
@@ -186,25 +189,24 @@ export class PromoterService {
       saleAmount: data.saleAmount,
       commissionAmount,
       commissionStatus: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    this.sales.push(sale);
+    const savedSale = await this.saleRepo.save(sale);
 
     // Update promoter stats
-    promoter.totalRevenueGenerated += data.saleAmount;
-    promoter.pendingCommission += commissionAmount;
-    
+    promoter.totalRevenueGenerated = Number(promoter.totalRevenueGenerated) + data.saleAmount;
+    promoter.pendingCommission = Number(promoter.pendingCommission) + commissionAmount;
+
     if (data.saleType === 'entry' || data.saleType === 'guest_list') {
       promoter.totalEntriesSold += data.quantity;
     } else if (data.saleType === 'vip_table') {
       promoter.totalTablesSold += data.quantity;
     }
-    
-    promoter.updatedAt = new Date();
 
-    return sale;
+    promoter.updatedAt = new Date();
+    await this.promoterRepo.save(promoter);
+
+    return savedSale;
   }
 
   /**
@@ -213,30 +215,30 @@ export class PromoterService {
   private calculateCommission(promoter: Promoter, saleAmount: number, quantity: number): number {
     switch (promoter.commissionType) {
       case 'percentage':
-        return (saleAmount * promoter.commissionRate) / 100;
-      
+        return (saleAmount * Number(promoter.commissionRate)) / 100;
+
       case 'fixed_per_entry':
-        return (promoter.fixedCommissionAmount || 0) * quantity;
-      
+        return (Number(promoter.fixedCommissionAmount) || 0) * quantity;
+
       case 'fixed_per_table':
-        return promoter.fixedCommissionAmount || 0;
-      
+        return Number(promoter.fixedCommissionAmount) || 0;
+
       case 'tiered':
         if (!promoter.tieredRates?.length) return 0;
-        
+
         // Find applicable tier based on total entries sold
         const totalSales = promoter.totalEntriesSold + quantity;
         const tier = promoter.tieredRates
           .sort((a, b) => b.minEntries - a.minEntries)
           .find(t => totalSales >= t.minEntries);
-        
+
         if (tier) {
           return (saleAmount * tier.rate) / 100;
         }
-        return (saleAmount * promoter.commissionRate) / 100;
-      
+        return (saleAmount * Number(promoter.commissionRate)) / 100;
+
       default:
-        return (saleAmount * promoter.commissionRate) / 100;
+        return (saleAmount * Number(promoter.commissionRate)) / 100;
     }
   }
 
@@ -250,45 +252,54 @@ export class PromoterService {
       endDate?: Date;
       saleType?: string;
       commissionStatus?: string;
-    }
+    },
   ): Promise<PromoterSale[]> {
-    let result = this.sales.filter(s => s.promoterId === promoterId);
+    const qb = this.saleRepo
+      .createQueryBuilder('s')
+      .where('s.promoterId = :promoterId', { promoterId });
 
     if (filters?.startDate) {
-      result = result.filter(s => s.eventDate >= filters.startDate!);
+      qb.andWhere('s.eventDate >= :startDate', { startDate: filters.startDate });
     }
 
     if (filters?.endDate) {
-      result = result.filter(s => s.eventDate <= filters.endDate!);
+      qb.andWhere('s.eventDate <= :endDate', { endDate: filters.endDate });
     }
 
     if (filters?.saleType) {
-      result = result.filter(s => s.saleType === filters.saleType);
+      qb.andWhere('s.saleType = :saleType', { saleType: filters.saleType });
     }
 
     if (filters?.commissionStatus) {
-      result = result.filter(s => s.commissionStatus === filters.commissionStatus);
+      qb.andWhere('s.commissionStatus = :commissionStatus', {
+        commissionStatus: filters.commissionStatus,
+      });
     }
 
-    return result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    qb.orderBy('s.createdAt', 'DESC');
+
+    return qb.getMany();
   }
 
   /**
    * Approve pending commissions
    */
   async approveCommissions(saleIds: string[]): Promise<PromoterSale[]> {
-    const approvedSales: PromoterSale[] = [];
+    const sales = await this.saleRepo.findByIds(saleIds);
 
-    for (const saleId of saleIds) {
-      const sale = this.sales.find(s => s.id === saleId);
-      if (sale && sale.commissionStatus === 'pending') {
-        sale.commissionStatus = 'approved';
-        sale.updatedAt = new Date();
-        approvedSales.push(sale);
-      }
+    const approvedSales = sales.filter(s => s.commissionStatus === 'pending');
+
+    if (approvedSales.length === 0) {
+      return [];
     }
 
-    return approvedSales;
+    const now = new Date();
+    for (const sale of approvedSales) {
+      sale.commissionStatus = 'approved';
+      sale.updatedAt = now;
+    }
+
+    return this.saleRepo.save(approvedSales);
   }
 
   /**
@@ -300,14 +311,13 @@ export class PromoterService {
       saleIds: string[];
       paymentMethod: 'pix' | 'bank_transfer' | 'cash';
       processedBy: string;
-    }
+    },
   ): Promise<PromoterPayment> {
     const promoter = await this.getPromoterById(promoterId);
-    
+
     // Get approved sales
-    const salesToPay = this.sales.filter(
-      s => data.saleIds.includes(s.id) && s.commissionStatus === 'approved'
-    );
+    const allSales = await this.saleRepo.findByIds(data.saleIds);
+    const salesToPay = allSales.filter(s => s.commissionStatus === 'approved');
 
     if (salesToPay.length === 0) {
       throw new BadRequestException('No approved sales to pay');
@@ -315,60 +325,55 @@ export class PromoterService {
 
     // Calculate total payment
     const totalAmount = salesToPay.reduce((sum, s) => sum + Number(s.commissionAmount), 0);
-    
+
     // Get period range
     const dates = salesToPay.map(s => new Date(s.eventDate));
     const periodStart = new Date(Math.min(...dates.map(d => d.getTime())));
     const periodEnd = new Date(Math.max(...dates.map(d => d.getTime())));
 
-    const payment: PromoterPayment = {
-      id: this.generateId(),
+    const payment = this.paymentRepo.create({
       promoterId,
       restaurantId: promoter.restaurantId,
       amount: totalAmount,
       paymentMethod: data.paymentMethod,
-      status: 'processing',
+      status: 'completed',
       periodStart,
       periodEnd,
       salesCount: salesToPay.length,
       saleIds: salesToPay.map(s => s.id),
       processedBy: data.processedBy,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+      processedAt: new Date(),
+    });
 
-    this.payments.push(payment);
+    const savedPayment = await this.paymentRepo.save(payment);
 
     // Update sales status
+    const now = new Date();
     for (const sale of salesToPay) {
       sale.commissionStatus = 'paid';
-      sale.paidAt = new Date();
-      sale.paymentReference = payment.id;
-      sale.updatedAt = new Date();
+      sale.paidAt = now;
+      sale.paymentReference = savedPayment.id;
+      sale.updatedAt = now;
     }
+    await this.saleRepo.save(salesToPay);
 
     // Update promoter stats
-    promoter.totalCommissionEarned += totalAmount;
-    promoter.pendingCommission -= totalAmount;
-    promoter.updatedAt = new Date();
+    promoter.totalCommissionEarned = Number(promoter.totalCommissionEarned) + totalAmount;
+    promoter.pendingCommission = Number(promoter.pendingCommission) - totalAmount;
+    promoter.updatedAt = now;
+    await this.promoterRepo.save(promoter);
 
-    // Simulate payment completion
-    setTimeout(() => {
-      payment.status = 'completed';
-      payment.processedAt = new Date();
-      payment.updatedAt = new Date();
-    }, 2000);
-
-    return payment;
+    return savedPayment;
   }
 
   /**
    * Get payment history for promoter
    */
   async getPromoterPayments(promoterId: string): Promise<PromoterPayment[]> {
-    return this.payments
-      .filter(p => p.promoterId === promoterId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    return this.paymentRepo.find({
+      where: { promoterId },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   /**
@@ -383,28 +388,38 @@ export class PromoterService {
     recentPayments: PromoterPayment[];
   }> {
     const promoter = await this.getPromoterById(promoterId);
-    
+
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    
-    const currentMonthSales = this.sales.filter(
-      s => s.promoterId === promoterId && new Date(s.eventDate) >= startOfMonth
-    );
 
-    const pendingSales = this.sales.filter(
-      s => s.promoterId === promoterId && s.commissionStatus === 'pending'
-    );
+    // Current month aggregated stats
+    const monthStats = await this.saleRepo
+      .createQueryBuilder('s')
+      .select('COALESCE(SUM(s.quantity), 0)', 'totalQuantity')
+      .addSelect('COALESCE(SUM(s.saleAmount), 0)', 'totalRevenue')
+      .addSelect('COALESCE(SUM(s.commissionAmount), 0)', 'totalCommission')
+      .where('s.promoterId = :promoterId', { promoterId })
+      .andWhere('s.eventDate >= :startOfMonth', { startOfMonth })
+      .getRawOne();
 
-    const recentPayments = this.payments
-      .filter(p => p.promoterId === promoterId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-      .slice(0, 5);
+    // Pending sales
+    const pendingSales = await this.saleRepo.find({
+      where: { promoterId, commissionStatus: 'pending' },
+      order: { createdAt: 'DESC' },
+    });
+
+    // Recent payments (last 5)
+    const recentPayments = await this.paymentRepo.find({
+      where: { promoterId },
+      order: { createdAt: 'DESC' },
+      take: 5,
+    });
 
     return {
       promoter,
-      currentMonthSales: currentMonthSales.reduce((sum, s) => sum + s.quantity, 0),
-      currentMonthRevenue: currentMonthSales.reduce((sum, s) => sum + Number(s.saleAmount), 0),
-      currentMonthCommission: currentMonthSales.reduce((sum, s) => sum + Number(s.commissionAmount), 0),
+      currentMonthSales: Number(monthStats?.totalQuantity) || 0,
+      currentMonthRevenue: Number(monthStats?.totalRevenue) || 0,
+      currentMonthCommission: Number(monthStats?.totalCommission) || 0,
       pendingSales,
       recentPayments,
     };
@@ -415,13 +430,11 @@ export class PromoterService {
    */
   async getPromoterLeaderboard(
     restaurantId: string,
-    period: 'day' | 'week' | 'month' | 'all'
+    period: 'day' | 'week' | 'month' | 'all',
   ): Promise<Array<Promoter & { periodSales: number; periodRevenue: number }>> {
-    const promoters = this.promoters.filter(p => p.restaurantId === restaurantId && p.status === 'active');
-    
     const now = new Date();
     let startDate: Date;
-    
+
     switch (period) {
       case 'day':
         startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -436,15 +449,44 @@ export class PromoterService {
         startDate = new Date(0);
     }
 
-    const leaderboard = promoters.map(promoter => {
-      const periodSales = this.sales.filter(
-        s => s.promoterId === promoter.id && new Date(s.eventDate) >= startDate
-      );
+    // Get active promoters for the restaurant
+    const promoters = await this.promoterRepo.find({
+      where: { restaurantId, status: 'active' },
+    });
 
+    if (promoters.length === 0) {
+      return [];
+    }
+
+    const promoterIds = promoters.map(p => p.id);
+
+    // Aggregate sales per promoter for the period
+    const salesAgg = await this.saleRepo
+      .createQueryBuilder('s')
+      .select('s.promoterId', 'promoterId')
+      .addSelect('COALESCE(SUM(s.quantity), 0)', 'totalQuantity')
+      .addSelect('COALESCE(SUM(s.saleAmount), 0)', 'totalRevenue')
+      .where('s.promoterId IN (:...promoterIds)', { promoterIds })
+      .andWhere('s.eventDate >= :startDate', { startDate })
+      .groupBy('s.promoterId')
+      .getRawMany();
+
+    // Build a lookup map
+    const salesMap = new Map<string, { totalQuantity: number; totalRevenue: number }>();
+    for (const row of salesAgg) {
+      salesMap.set(row.promoterId, {
+        totalQuantity: Number(row.totalQuantity) || 0,
+        totalRevenue: Number(row.totalRevenue) || 0,
+      });
+    }
+
+    // Merge and sort
+    const leaderboard = promoters.map(promoter => {
+      const stats = salesMap.get(promoter.id);
       return {
         ...promoter,
-        periodSales: periodSales.reduce((sum, s) => sum + s.quantity, 0),
-        periodRevenue: periodSales.reduce((sum, s) => sum + Number(s.saleAmount), 0),
+        periodSales: stats?.totalQuantity || 0,
+        periodRevenue: stats?.totalRevenue || 0,
       };
     });
 
@@ -461,15 +503,8 @@ export class PromoterService {
       .join('')
       .toUpperCase()
       .slice(0, 3);
-    
+
     const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
     return `${prefix}${suffix}`;
-  }
-
-  /**
-   * Generate unique ID
-   */
-  private generateId(): string {
-    return Math.random().toString(36).substring(2, 15);
   }
 }

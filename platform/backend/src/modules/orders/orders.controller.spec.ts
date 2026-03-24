@@ -6,6 +6,7 @@ import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { GetKdsOrdersDto } from './dto/get-kds-orders.dto';
 import { GetWaiterStatsDto } from './dto/get-waiter-stats.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
@@ -48,7 +49,7 @@ describe('OrdersController', () => {
 
   describe('create', () => {
     it('should create a new order', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const createDto: CreateOrderDto = {
         restaurant_id: 'restaurant-1',
         items: [{ menu_item_id: 'item-1', quantity: 2 }],
@@ -80,7 +81,7 @@ describe('OrdersController', () => {
 
   describe('findByUser', () => {
     it('should get orders by current user', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const orders = [mockOrder];
       const pagination = { page: 1, limit: 10 };
 
@@ -96,7 +97,7 @@ describe('OrdersController', () => {
   describe('findOne', () => {
     it('should get order by id', async () => {
       mockOrdersService.findOne.mockResolvedValue(mockOrder);
-      const mockUser = { id: 'user-1', roles: ['customer'] };
+      const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['customer'] });
 
       const result = await controller.findOne('order-1', mockUser);
 
@@ -110,7 +111,7 @@ describe('OrdersController', () => {
       const updateDto: UpdateOrderDto = {
         special_instructions: 'No onions',
       };
-      const mockUser = { id: 'user-1', roles: ['customer'] };
+      const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['customer'] });
 
       const updatedOrder = { ...mockOrder, special_instructions: 'No onions' };
       mockOrdersService.update.mockResolvedValue(updatedOrder);
@@ -181,7 +182,7 @@ describe('OrdersController', () => {
   describe('Waiter endpoints', () => {
     describe('getWaiterTables', () => {
       it('should get waiter assigned tables with orders', async () => {
-        const user = { id: 'waiter-1' };
+        const user = mockAuthenticatedUser({ id: 'waiter-1' });
         const tables = [
           {
             id: 'table-1',
@@ -201,7 +202,7 @@ describe('OrdersController', () => {
 
     describe('getWaiterStats', () => {
       it('should get waiter statistics', async () => {
-        const user = { id: 'waiter-1' };
+        const user = mockAuthenticatedUser({ id: 'waiter-1' });
         const query: GetWaiterStatsDto = {
           start_date: '2024-01-01',
           end_date: '2024-12-31',

@@ -4,6 +4,7 @@ import { ReceiptsController } from './receipts.controller';
 import { ReceiptsService } from './receipts.service';
 import { GenerateReceiptDto } from './dto/generate-receipt.dto';
 import { PaginationDto } from '@/common/dto/pagination.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('ReceiptsController', () => {
   let controller: ReceiptsController;
@@ -32,7 +33,7 @@ describe('ReceiptsController', () => {
     created_at: new Date('2024-06-15T20:00:00Z'),
   };
 
-  const mockUser = { sub: 'user-1', email: 'user@example.com' };
+  const mockUser = mockAuthenticatedUser({ sub: 'user-1', id: 'user-1', email: 'user@example.com' });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -43,7 +44,10 @@ describe('ReceiptsController', () => {
           useValue: mockReceiptsService,
         },
       ],
-    }).compile();
+    })
+      .overrideGuard(require('@/modules/auth/guards/jwt-auth.guard').JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     controller = module.get<ReceiptsController>(ReceiptsController);
 
@@ -88,7 +92,7 @@ describe('ReceiptsController', () => {
       };
       mockReceiptsService.findByUser.mockResolvedValue(paginatedResult);
 
-      const pagination: PaginationDto = { page: 1, limit: 10 };
+      const pagination = { page: 1, limit: 10 } as PaginationDto;
 
       const result = await controller.findMyReceipts(mockUser, pagination);
 
@@ -112,7 +116,7 @@ describe('ReceiptsController', () => {
       };
       mockReceiptsService.findByUser.mockResolvedValue(emptyResult);
 
-      const pagination: PaginationDto = { page: 1, limit: 10 };
+      const pagination = { page: 1, limit: 10 } as PaginationDto;
 
       const result = await controller.findMyReceipts(mockUser, pagination);
 
@@ -183,23 +187,13 @@ describe('ReceiptsController', () => {
 
     it('should use current user sub as user_id when generating receipt', async () => {
       const generateDto: GenerateReceiptDto = { orderId: 'order-5' };
-      const differentUser = { sub: 'user-99', email: 'other@example.com' };
+      const differentUser = mockAuthenticatedUser({ sub: 'user-99', id: 'user-99', email: 'other@example.com' });
       mockReceiptsService.generate.mockResolvedValue({ ...mockReceipt, user_id: 'user-99' });
 
       await controller.generate(differentUser, generateDto);
 
-      expect(mockReceiptsService.generate).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.anything(),
-        'user-99',
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-        expect.anything(),
-      );
+      const callArgs = mockReceiptsService.generate.mock.calls[0];
+      expect(callArgs[2]).toBe('user-99');
     });
   });
 });

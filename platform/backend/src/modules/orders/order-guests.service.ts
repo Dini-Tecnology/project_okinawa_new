@@ -6,6 +6,7 @@ import { Order } from './entities/order.entity';
 import { AddOrderGuestDto } from './dto/add-order-guest.dto';
 import { NotificationsService } from '../notifications/notifications.service';
 import { NotificationType } from '../notifications/entities/notification.entity';
+import { PAGINATION } from '@common/constants/limits';
 
 @Injectable()
 export class OrderGuestsService {
@@ -156,8 +157,8 @@ export class OrderGuestsService {
   /**
    * Get orders where user is a guest with pagination
    */
-  async getOrdersAsGuest(userId: string, page: number = 1, limit: number = 10) {
-    const validLimit = Math.min(Math.max(1, limit), 50);
+  async getOrdersAsGuest(userId: string, page: number = 1, limit: number = PAGINATION.GUEST_ORDERS_DEFAULT) {
+    const validLimit = Math.min(Math.max(1, limit), PAGINATION.GUEST_ORDERS_MAX);
     const validPage = Math.max(1, page);
     const skip = (validPage - 1) * validLimit;
 

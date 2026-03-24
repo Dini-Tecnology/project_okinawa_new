@@ -13,12 +13,10 @@ import { ReservationsService } from '@/modules/reservations/reservations.service
 import { TablesService } from '@/modules/tables/tables.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { OrderStatus, OrderType } from '@common/enums';
-import {
-  OrderCalculatorHelper,
-  KdsFormatterHelper,
-  WaiterStatsHelper,
-  MaitreFormatterHelper,
-} from './helpers';
+import { OrderCalculatorHelper } from './helpers';
+import { KdsService } from './kds.service';
+import { WaiterStatsService } from './waiter-stats.service';
+import { OrderAdditionsService } from './order-additions.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -201,6 +199,33 @@ describe('OrdersService', () => {
     findAll: jest.fn(),
   };
 
+  const mockKdsService = {
+    getKdsOrders: jest.fn().mockResolvedValue([]),
+  };
+
+  const mockWaiterStatsService = {
+    getWaiterTables: jest.fn().mockResolvedValue([]),
+    getWaiterStats: jest.fn().mockResolvedValue({
+      tables_assigned: 0,
+      active_orders: 0,
+      today_tips: 0,
+      today_sales: 0,
+    }),
+    getMaitreOverview: jest.fn().mockResolvedValue({
+      reservations: [],
+      tables: [],
+      summary: {
+        total_reservations: 0,
+        available_tables: 0,
+      },
+    }),
+  };
+
+  const mockOrderAdditionsService = {
+    openOrderForAdditions: jest.fn(),
+    addItemsToExistingOrder: jest.fn(),
+  };
+
   const mockQueryRunner = {
     connect: jest.fn().mockResolvedValue(undefined),
     startTransaction: jest.fn().mockResolvedValue(undefined),
@@ -272,9 +297,18 @@ describe('OrdersService', () => {
           useValue: mockDataSource,
         },
         OrderCalculatorHelper,
-        KdsFormatterHelper,
-        WaiterStatsHelper,
-        MaitreFormatterHelper,
+        {
+          provide: KdsService,
+          useValue: mockKdsService,
+        },
+        {
+          provide: WaiterStatsService,
+          useValue: mockWaiterStatsService,
+        },
+        {
+          provide: OrderAdditionsService,
+          useValue: mockOrderAdditionsService,
+        },
       ],
     }).compile();
 
@@ -491,17 +525,8 @@ describe('OrdersService', () => {
   });
 
   describe('getKdsOrders', () => {
-    it('should return KDS orders for kitchen', async () => {
-      const mockKdsQueryBuilder = {
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([mockOrder]),
-      };
-
-      mockOrderRepository.createQueryBuilder = jest.fn().mockReturnValue(mockKdsQueryBuilder);
-      mockProfileRepository.find.mockResolvedValue([mockProfile]);
+    it('should delegate to kdsService and return KDS orders', async () => {
+      mockKdsService.getKdsOrders.mockResolvedValue([mockOrder]);
 
       const result = await service.getKdsOrders({
         type: 'kitchen',
@@ -510,67 +535,28 @@ describe('OrdersService', () => {
 
       expect(result).toBeDefined();
       expect(Array.isArray(result)).toBe(true);
-      expect(mockOrderRepository.createQueryBuilder).toHaveBeenCalled();
-    });
-
-    it('should return KDS orders for bar', async () => {
-      const mockKdsQueryBuilder = {
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([mockOrder]),
-      };
-
-      mockOrderRepository.createQueryBuilder = jest.fn().mockReturnValue(mockKdsQueryBuilder);
-      mockProfileRepository.find.mockResolvedValue([]);
-
-      const result = await service.getKdsOrders({
-        type: 'bar',
+      expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({
+        type: 'kitchen',
         restaurant_id: 'restaurant-1',
       });
-
-      expect(result).toBeDefined();
-      expect(Array.isArray(result)).toBe(true);
     });
 
-    it('should return orders with default statuses when status not provided', async () => {
-      const mockKdsQueryBuilder = {
-        leftJoinAndSelect: jest.fn().mockReturnThis(),
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        orderBy: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
-      };
-
-      mockOrderRepository.createQueryBuilder = jest.fn().mockReturnValue(mockKdsQueryBuilder);
+    it('should return empty array when no orders', async () => {
+      mockKdsService.getKdsOrders.mockResolvedValue([]);
 
       const result = await service.getKdsOrders({});
 
       expect(result).toEqual([]);
-      expect(mockKdsQueryBuilder.where).toHaveBeenCalledWith(
-        'order.status IN (:...statuses)',
-        expect.objectContaining({
-          statuses: expect.arrayContaining([
-            OrderStatus.PENDING,
-            OrderStatus.CONFIRMED,
-            OrderStatus.PREPARING,
-          ]),
-        }),
-      );
+      expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({});
     });
   });
 
   describe('getWaiterTables', () => {
-    it('should return tables assigned to waiter', async () => {
-      const orderWithTable = {
-        ...mockOrder,
-        table: mockTable,
-        guests: [],
-        party_size: 2,
-      };
-
-      mockOrderRepository.find.mockResolvedValue([orderWithTable]);
+    it('should delegate to waiterStatsService and return tables', async () => {
+      const mockTables = [
+        { number: '1', status: 'occupied', guests: 2 },
+      ];
+      mockWaiterStatsService.getWaiterTables.mockResolvedValue(mockTables);
 
       const result = await service.getWaiterTables('waiter-1');
 
@@ -579,23 +565,11 @@ describe('OrdersService', () => {
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]).toHaveProperty('number');
       expect(result[0]).toHaveProperty('status');
+      expect(mockWaiterStatsService.getWaiterTables).toHaveBeenCalledWith('waiter-1');
     });
 
-    it('should return empty array if waiter has no orders', async () => {
-      mockOrderRepository.find.mockResolvedValue([]);
-
-      const result = await service.getWaiterTables('waiter-1');
-
-      expect(result).toEqual([]);
-    });
-
-    it('should skip orders without tables', async () => {
-      const orderWithoutTable = {
-        ...mockOrder,
-        table: null,
-      };
-
-      mockOrderRepository.find.mockResolvedValue([orderWithoutTable]);
+    it('should return empty array if waiter has no tables', async () => {
+      mockWaiterStatsService.getWaiterTables.mockResolvedValue([]);
 
       const result = await service.getWaiterTables('waiter-1');
 
@@ -604,27 +578,14 @@ describe('OrdersService', () => {
   });
 
   describe('getWaiterStats', () => {
-    it('should return waiter statistics', async () => {
-      const completedOrder = {
-        ...mockOrder,
-        status: OrderStatus.COMPLETED,
-        tip_amount: 10,
+    it('should delegate to waiterStatsService and return statistics', async () => {
+      const mockStats = {
+        tables_assigned: 3,
+        active_orders: 2,
+        today_tips: 50,
+        today_sales: 500,
       };
-
-      const activeOrder = {
-        ...mockOrder,
-        id: 'order-2',
-        status: OrderStatus.PREPARING,
-      };
-
-      const mockStatsQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([completedOrder, activeOrder]),
-      };
-
-      mockOrderRepository.createQueryBuilder = jest.fn().mockReturnValue(mockStatsQueryBuilder);
-      mockTableRepository.count.mockResolvedValue(3);
+      mockWaiterStatsService.getWaiterStats.mockResolvedValue(mockStats);
 
       const result = await service.getWaiterStats('waiter-1', {});
 
@@ -634,17 +595,16 @@ describe('OrdersService', () => {
       expect(result).toHaveProperty('today_tips');
       expect(result).toHaveProperty('today_sales');
       expect(result.tables_assigned).toBe(3);
+      expect(mockWaiterStatsService.getWaiterStats).toHaveBeenCalledWith('waiter-1', {});
     });
 
-    it('should filter by date range when provided', async () => {
-      const mockStatsQueryBuilder = {
-        where: jest.fn().mockReturnThis(),
-        andWhere: jest.fn().mockReturnThis(),
-        getMany: jest.fn().mockResolvedValue([]),
-      };
-
-      mockOrderRepository.createQueryBuilder = jest.fn().mockReturnValue(mockStatsQueryBuilder);
-      mockTableRepository.count.mockResolvedValue(0);
+    it('should pass date range params to waiterStatsService', async () => {
+      mockWaiterStatsService.getWaiterStats.mockResolvedValue({
+        tables_assigned: 0,
+        active_orders: 0,
+        today_tips: 0,
+        today_sales: 0,
+      });
 
       const result = await service.getWaiterStats('waiter-1', {
         start_date: '2024-01-01',
@@ -652,34 +612,24 @@ describe('OrdersService', () => {
       });
 
       expect(result).toBeDefined();
-      expect(mockStatsQueryBuilder.where).toHaveBeenCalled();
+      expect(mockWaiterStatsService.getWaiterStats).toHaveBeenCalledWith('waiter-1', {
+        start_date: '2024-01-01',
+        end_date: '2024-01-31',
+      });
     });
   });
 
   describe('getMaitreOverview', () => {
-    it('should return maitre dashboard overview', async () => {
-      const mockReservation = {
-        id: 'res-1',
-        party_size: 4,
-        reservation_date: new Date(),
-        reservation_time: '19:00',
-        status: 'confirmed',
-        table_id: 'table-1',
-        user: { full_name: 'John Doe' },
+    it('should delegate to waiterStatsService and return maitre dashboard overview', async () => {
+      const mockOverview = {
+        reservations: [{ id: 'res-1', party_size: 4, status: 'confirmed' }],
+        tables: [{ id: 'table-1', table_number: '1', status: 'available' }],
+        summary: {
+          total_reservations: 1,
+          available_tables: 1,
+        },
       };
-
-      const mockTableData = {
-        id: 'table-1',
-        table_number: '1',
-        seats: 4,
-        status: 'available',
-        section: 'main',
-        assigned_waiter_id: 'waiter-1',
-      };
-
-      mockReservationsService.findByRestaurant.mockResolvedValue({ items: [mockReservation], total: 1, page: 1, limit: 100 });
-      mockTablesService.findAll.mockResolvedValue({ items: [mockTableData], total: 1, page: 1, limit: 100 });
-      mockProfileRepository.find.mockResolvedValue([mockProfile]);
+      mockWaiterStatsService.getMaitreOverview.mockResolvedValue(mockOverview);
 
       const result = await service.getMaitreOverview('restaurant-1');
 
@@ -689,11 +639,18 @@ describe('OrdersService', () => {
       expect(result).toHaveProperty('summary');
       expect(result.summary).toHaveProperty('total_reservations');
       expect(result.summary).toHaveProperty('available_tables');
+      expect(mockWaiterStatsService.getMaitreOverview).toHaveBeenCalledWith('restaurant-1');
     });
 
     it('should handle empty reservations and tables', async () => {
-      mockReservationsService.findByRestaurant.mockResolvedValue({ items: [], total: 0, page: 1, limit: 100 });
-      mockTablesService.findAll.mockResolvedValue({ items: [], total: 0, page: 1, limit: 100 });
+      mockWaiterStatsService.getMaitreOverview.mockResolvedValue({
+        reservations: [],
+        tables: [],
+        summary: {
+          total_reservations: 0,
+          available_tables: 0,
+        },
+      });
 
       const result = await service.getMaitreOverview('restaurant-1');
 

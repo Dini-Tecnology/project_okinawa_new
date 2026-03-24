@@ -6,6 +6,7 @@ import { WithdrawWalletDto } from './dto/withdraw-wallet.dto';
 import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('PaymentsController', () => {
   let controller: PaymentsController;
@@ -59,7 +60,7 @@ describe('PaymentsController', () => {
 
   describe('processPayment', () => {
     it('should process payment for order', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const processDto: ProcessPaymentDto = {
         order_id: 'order-1',
         payment_method_id: 'pm-1',
@@ -77,7 +78,7 @@ describe('PaymentsController', () => {
 
   describe('getWallet', () => {
     it('should get wallet balance', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
 
       mockPaymentsService.getWallet.mockResolvedValue(mockWallet);
 
@@ -90,7 +91,7 @@ describe('PaymentsController', () => {
 
   describe('rechargeWallet', () => {
     it('should recharge wallet', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const rechargeDto: RechargeWalletDto = {
         amount: 500,
         payment_method_id: 'pm-1',
@@ -108,7 +109,7 @@ describe('PaymentsController', () => {
 
   describe('withdrawWallet', () => {
     it('should withdraw from wallet', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const withdrawDto: WithdrawWalletDto = {
         amount: 200,
       } as any;
@@ -125,7 +126,7 @@ describe('PaymentsController', () => {
 
   describe('getTransactions', () => {
     it('should get wallet transactions', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const transactions = [
         {
           id: 'txn-1',
@@ -146,7 +147,7 @@ describe('PaymentsController', () => {
 
   describe('getPaymentMethods', () => {
     it('should get payment methods', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const methods = [mockPaymentMethod];
 
       mockPaymentsService.getPaymentMethods.mockResolvedValue(methods);
@@ -160,7 +161,7 @@ describe('PaymentsController', () => {
 
   describe('createPaymentMethod', () => {
     it('should create payment method', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const createDto: CreatePaymentMethodDto = {
         type: 'credit_card',
         card_number: '4242424242424242',
@@ -180,7 +181,7 @@ describe('PaymentsController', () => {
 
   describe('updatePaymentMethod', () => {
     it('should update payment method', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const updateDto: UpdatePaymentMethodDto = {
         is_default: false,
       };
@@ -201,7 +202,7 @@ describe('PaymentsController', () => {
 
   describe('deletePaymentMethod', () => {
     it('should delete payment method', async () => {
-      const user = { id: 'user-1' };
+      const user = mockAuthenticatedUser({ id: 'user-1' });
       const deleteResponse = { message: 'Payment method deleted successfully' };
 
       mockPaymentsService.deletePaymentMethod.mockResolvedValue(deleteResponse);

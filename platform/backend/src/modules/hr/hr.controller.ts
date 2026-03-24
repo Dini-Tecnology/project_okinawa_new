@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('hr')
@@ -52,7 +53,7 @@ export class HrController {
   @ApiResponse({ status: 201, description: 'Check-in successful' })
   @ApiResponse({ status: 400, description: 'Already checked in' })
   checkIn(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.hrService.checkIn(user.sub, restaurantId);
@@ -65,7 +66,7 @@ export class HrController {
   @ApiResponse({ status: 200, description: 'Check-out successful' })
   @ApiResponse({ status: 400, description: 'Not checked in' })
   checkOut(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.hrService.checkOut(user.sub, restaurantId);
@@ -94,7 +95,7 @@ export class HrController {
   @ApiResponse({ status: 201, description: 'Leave request created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid leave request data' })
   createLeaveRequest(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() data: any,
   ) {
     return this.hrService.createLeaveRequest(user.sub, data);
@@ -107,7 +108,7 @@ export class HrController {
   @ApiResponse({ status: 404, description: 'Leave request not found' })
   @ApiResponse({ status: 403, description: 'Forbidden - admin only' })
   updateLeaveRequest(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() data: { status: LeaveRequestStatus; rejection_reason?: string },
   ) {

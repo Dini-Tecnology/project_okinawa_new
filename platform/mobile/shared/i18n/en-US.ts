@@ -156,6 +156,13 @@ export const enUS = {
       delivered: 'Delivered',
       completed: 'Completed',
       cancelled: 'Cancelled',
+      refunded: 'Refunded',
+    },
+    card: {
+      items: 'Items',
+      total: 'Total',
+      table: 'Table',
+      timeAgo: '{{minutes}} min ago',
     },
     noOrders: "You haven't placed any orders yet",
   },
@@ -2249,6 +2256,24 @@ export const enUS = {
       help: 'Help',
       emergency: 'Emergency',
     },
+  },
+
+  // Legal
+  legal: {
+    privacyPolicy: 'Privacy Policy',
+    termsOfService: 'Terms of Service',
+    lastUpdated: 'Last updated',
+    version: 'Version',
+    loading: 'Loading document...',
+    error: 'Could not load the document. Please try again.',
+  },
+
+  // Maintenance
+  maintenance: {
+    title: 'Under Maintenance',
+    message: 'We are currently performing scheduled maintenance. Please try again shortly.',
+    estimatedEnd: 'Estimated return',
+    retry: 'Check again',
   },
 };
 

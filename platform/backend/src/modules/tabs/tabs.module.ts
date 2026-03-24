@@ -1,5 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { TabsService } from './tabs.service';
 import { TabsController } from './tabs.controller';
 import { TabsGateway } from './tabs.gateway';
@@ -27,6 +29,15 @@ import { HappyHourController } from './happy-hour.controller';
       RestaurantTable,
       Profile,
     ]),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION') || '7d',
+        },
+      }),
+    }),
     EventsModule,
     NotificationsModule,
   ],

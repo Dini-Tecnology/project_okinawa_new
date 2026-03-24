@@ -8,7 +8,7 @@ import { CreateMenuItemDto } from './dto/create-menu-item.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateCustomizationGroupDto } from './dto/create-customization-group.dto';
 import { UpdateCustomizationGroupDto } from './dto/update-customization-group.dto';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()
 export class MenuItemsService {
@@ -22,18 +22,16 @@ export class MenuItemsService {
   ) {}
 
   async findByRestaurant(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.menuItemRepository.findAndCount({
       where: { restaurant_id: restaurantId, is_available: true },
       order: { category: 'ASC', name: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findCategories(restaurantId: string) {

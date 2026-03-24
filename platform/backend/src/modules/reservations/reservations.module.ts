@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
 import { ReservationsGateway } from './reservations.gateway';
@@ -12,6 +14,15 @@ import { NotificationsModule } from '../notifications/notifications.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Reservation, ReservationGuest]),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION') || '7d',
+        },
+      }),
+    }),
     NotificationsModule,
   ],
   controllers: [ReservationsController, ReservationGuestsController],

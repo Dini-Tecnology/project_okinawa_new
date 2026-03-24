@@ -21,7 +21,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import type { Order, RootStackParamList } from '../../types';
-import OrderCard from './OrderCard';
+import { OrderCard } from '@okinawa/shared/components/orders/OrderCard';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type FilterType = 'all' | 'active' | 'completed';

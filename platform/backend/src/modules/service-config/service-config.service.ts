@@ -1,7 +1,7 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { RestaurantConfig } from './entities/restaurant-config.entity';
+import { RestaurantConfig, ConfigProfile } from './entities/restaurant-config.entity';
 import { CreateConfigDto } from './dto/create-config.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UpdateServiceTypesDto } from './dto/update-service-types.dto';
@@ -123,7 +123,7 @@ export class ServiceConfigService {
    */
   async updateProfile(restaurantId: string, dto: UpdateProfileDto): Promise<RestaurantConfig> {
     const config = await this.getConfig(restaurantId);
-    config.profile = { ...config.profile, ...dto };
+    config.profile = { ...config.profile, ...dto } as ConfigProfile;
 
     const saved = await this.configRepository.save(config);
     this.gateway.emitConfigUpdated(restaurantId, 'profile');

@@ -27,7 +27,7 @@ describe('ServiceConfigService', () => {
     enabled_features: {},
     team_config: {},
     setup_complete: false,
-    setup_completed_at: null,
+    setup_completed_at: undefined,
     created_at: new Date(),
     updated_at: new Date(),
   };
@@ -346,7 +346,7 @@ describe('ServiceConfigService', () => {
         enabled_features: {},
         team_config: {},
         setup_complete: false,
-        setup_completed_at: null,
+        setup_completed_at: undefined,
       };
       mockConfigRepository.create.mockReturnValue(emptyConfig);
       mockConfigRepository.save.mockResolvedValue(emptyConfig);

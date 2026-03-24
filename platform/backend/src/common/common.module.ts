@@ -5,12 +5,14 @@ import { CacheConfigModule, CacheService } from './cache';
 import { TracingModule } from './tracing';
 import { StructuredLoggerService, LoggingInterceptor } from './logging';
 import { IdempotencyService } from './idempotency';
+import { CircuitBreakerModule } from './utils/circuit-breaker.module';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Global()
 @Module({
   imports: [
     CacheConfigModule,
+    CircuitBreakerModule,
     TracingModule.forRoot({
       serviceName: 'okinawa-api',
       enabled: process.env.NODE_ENV === 'production',
@@ -37,6 +39,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     IdempotencyService,
     // Modules
     CacheConfigModule,
+    CircuitBreakerModule,
     TracingModule,
   ],
 })

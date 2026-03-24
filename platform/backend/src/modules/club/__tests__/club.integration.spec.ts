@@ -1,6 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, afterEach } from 'vitest';
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
+// @ts-nocheck
+/**
+ * Club API Integration Tests
+ *
+ * Uses Jest global fetch mocks (no MSW / vitest dependency).
+ */
 
 // Mock data
 const mockEntry = {
@@ -10,8 +13,8 @@ const mockEntry = {
   eventDate: '2025-02-01',
   entryType: 'advance',
   ticketTier: 'pista',
-  price: 60.00,
-  consumptionCredit: 30.00,
+  price: 60.0,
+  consumptionCredit: 30.0,
   status: 'paid',
   qrCode: 'TK-ENTRY0-AB',
   qrPayload: 'base64encodedpayload',
@@ -25,7 +28,7 @@ const mockVipTable = {
   restaurantId: 'rest-456',
   eventDate: '2025-02-01',
   guestCount: 8,
-  minimumSpend: 2000.00,
+  minimumSpend: 2000.0,
   currentSpend: 0,
   status: 'confirmed',
   guests: [],
@@ -63,231 +66,259 @@ const mockOccupancy = {
   lastUpdated: new Date().toISOString(),
 };
 
-// MSW handlers
-const handlers = [
-  // Purchase entry
-  http.post('/api/club-entries', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      ...mockEntry,
-      ticketTier: body.ticketTier || mockEntry.ticketTier,
-      eventDate: body.eventDate || mockEntry.eventDate,
-    }, { status: 201 });
-  }),
+// ---------- fetch mock router ----------
+function createFetchMock() {
+  return jest.fn(async (url: string, init?: RequestInit) => {
+    const method = (init?.method || 'GET').toUpperCase();
+    const body = init?.body ? JSON.parse(init.body as string) : {};
 
-  // Get my entries
-  http.get('/api/club-entries/my', () => {
-    return HttpResponse.json({
-      entries: [mockEntry],
-      total: 1,
-    });
-  }),
+    // POST /api/club-entries
+    if (method === 'POST' && url === '/api/club-entries') {
+      return new Response(
+        JSON.stringify({
+          ...mockEntry,
+          ticketTier: body.ticketTier || mockEntry.ticketTier,
+          eventDate: body.eventDate || mockEntry.eventDate,
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
 
-  // Validate entry
-  http.post('/api/club-entries/validate', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    const qrCode = body.qrCode as string;
-    
-    if (qrCode === 'INVALID') {
-      return HttpResponse.json({
-        valid: false,
-        error: 'Invalid QR code',
+    // GET /api/club-entries/my
+    if (method === 'GET' && url === '/api/club-entries/my') {
+      return new Response(JSON.stringify({ entries: [mockEntry], total: 1 }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
       });
     }
-    
-    if (qrCode === 'USED') {
-      return HttpResponse.json({
-        valid: false,
-        error: 'Entry already used',
+
+    // POST /api/club-entries/validate
+    if (method === 'POST' && url === '/api/club-entries/validate') {
+      const qrCode = body.qrCode as string;
+      if (qrCode === 'INVALID') {
+        return new Response(JSON.stringify({ valid: false, error: 'Invalid QR code' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      if (qrCode === 'USED') {
+        return new Response(JSON.stringify({ valid: false, error: 'Entry already used' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+      return new Response(JSON.stringify({ valid: true, entry: mockEntry }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
       });
     }
-    
-    return HttpResponse.json({
-      valid: true,
-      entry: mockEntry,
+
+    // POST /api/club-entries/check-in
+    if (method === 'POST' && url === '/api/club-entries/check-in') {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          entryId: body.entryId,
+          checkedInAt: new Date().toISOString(),
+          wristbandColor: 'green',
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // POST /api/club-entries/check-out
+    if (method === 'POST' && url === '/api/club-entries/check-out') {
+      return new Response(
+        JSON.stringify({ success: true, entryId: body.entryId, checkedOutAt: new Date().toISOString() }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // POST /api/vip-tables
+    if (method === 'POST' && url === '/api/vip-tables') {
+      return new Response(
+        JSON.stringify({
+          ...mockVipTable,
+          tableId: body.tableId || mockVipTable.tableId,
+          guestCount: body.guestCount || mockVipTable.guestCount,
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/vip-tables/available
+    if (method === 'GET' && url.startsWith('/api/vip-tables/available')) {
+      const eventDate = new URL(url, 'http://localhost').searchParams.get('eventDate');
+      return new Response(
+        JSON.stringify({
+          tables: [
+            { id: 'table-vip-1', name: 'Camarote Premium', capacity: 10, minimumSpend: 2000, available: true },
+            { id: 'table-vip-2', name: 'Camarote Gold', capacity: 8, minimumSpend: 1500, available: true },
+            { id: 'table-vip-3', name: 'Camarote Standard', capacity: 6, minimumSpend: 1000, available: false },
+          ],
+          eventDate,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/vip-tables/:id/tab
+    if (method === 'GET' && /^\/api\/vip-tables\/[^/]+\/tab$/.test(url)) {
+      const tableId = url.split('/')[3];
+      return new Response(
+        JSON.stringify({
+          tableId,
+          tabId: 'tab-vip-001',
+          items: [],
+          currentSpend: 500.0,
+          minimumSpend: 2000.0,
+          remainingMinimum: 1500.0,
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // POST /api/queue
+    if (method === 'POST' && url === '/api/queue') {
+      return new Response(
+        JSON.stringify({
+          ...mockQueueEntry,
+          priority: body.priority || mockQueueEntry.priority,
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/queue/position
+    if (method === 'GET' && url === '/api/queue/position') {
+      return new Response(
+        JSON.stringify({ position: 12, estimatedWaitMinutes: 20, status: 'waiting', aheadOfYou: 11 }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // DELETE /api/queue/:id
+    if (method === 'DELETE' && url.startsWith('/api/queue/')) {
+      return new Response(JSON.stringify({ success: true, message: 'Left queue successfully' }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // POST /api/guest-list
+    if (method === 'POST' && url === '/api/guest-list') {
+      return new Response(
+        JSON.stringify({
+          id: 'gl-001',
+          name: body.name,
+          phone: body.phone,
+          eventDate: body.eventDate,
+          companions: body.companions || 0,
+          status: 'confirmed',
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // POST /api/birthday-entries
+    if (method === 'POST' && url === '/api/birthday-entries') {
+      return new Response(
+        JSON.stringify({
+          ...mockBirthdayEntry,
+          eventDate: body.eventDate || mockBirthdayEntry.eventDate,
+          companions: body.companions || mockBirthdayEntry.companions,
+          status: 'pending',
+        }),
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // PUT /api/birthday-entries/:id/approve
+    if (method === 'PUT' && /\/api\/birthday-entries\/[^/]+\/approve$/.test(url)) {
+      return new Response(
+        JSON.stringify({ ...mockBirthdayEntry, status: 'approved', qrCode: 'BD-USER12-XY' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // PUT /api/birthday-entries/:id/reject
+    if (method === 'PUT' && /\/api\/birthday-entries\/[^/]+\/reject$/.test(url)) {
+      return new Response(
+        JSON.stringify({ id: 'bd-001', status: 'rejected', rejectionReason: body.reason || 'Invalid documentation' }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/occupancy/:restaurantId
+    if (method === 'GET' && /^\/api\/occupancy\/[^/]+$/.test(url)) {
+      const restaurantId = url.split('/').pop();
+      return new Response(
+        JSON.stringify({ ...mockOccupancy, restaurantId }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/lineup/:restaurantId/:date
+    if (method === 'GET' && /^\/api\/lineup\/[^/]+\/[^/]+$/.test(url)) {
+      const parts = url.split('/');
+      return new Response(
+        JSON.stringify({
+          restaurantId: parts[3],
+          eventDate: parts[4],
+          slots: [
+            { time: '23:00', artist: 'DJ Opening', genre: 'House' },
+            { time: '01:00', artist: 'DJ Snake', genre: 'EDM', isHeadliner: true },
+            { time: '03:00', artist: 'DJ Closing', genre: 'Tech House' },
+          ],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // GET /api/promoters/:id/sales
+    if (method === 'GET' && /^\/api\/promoters\/[^/]+\/sales$/.test(url)) {
+      return new Response(
+        JSON.stringify({
+          promoterId: 'promo-001',
+          totalSales: 45,
+          totalRevenue: 3600.0,
+          pendingCommission: 360.0,
+          sales: [
+            { date: '2025-01-30', count: 12, revenue: 960.0 },
+            { date: '2025-01-31', count: 33, revenue: 2640.0 },
+          ],
+        }),
+        { status: 200, headers: { 'Content-Type': 'application/json' } },
+      );
+    }
+
+    // fallback
+    return new Response(JSON.stringify({ error: 'Not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' },
     });
-  }),
+  });
+}
 
-  // Check-in
-  http.post('/api/club-entries/check-in', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      success: true,
-      entryId: body.entryId,
-      checkedInAt: new Date().toISOString(),
-      wristbandColor: 'green',
-    });
-  }),
-
-  // Check-out
-  http.post('/api/club-entries/check-out', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      success: true,
-      entryId: body.entryId,
-      checkedOutAt: new Date().toISOString(),
-    });
-  }),
-
-  // VIP Tables - Reserve
-  http.post('/api/vip-tables', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      ...mockVipTable,
-      tableId: body.tableId || mockVipTable.tableId,
-      guestCount: body.guestCount || mockVipTable.guestCount,
-    }, { status: 201 });
-  }),
-
-  // VIP Tables - Available
-  http.get('/api/vip-tables/available', ({ request }) => {
-    const url = new URL(request.url);
-    const eventDate = url.searchParams.get('eventDate');
-    
-    return HttpResponse.json({
-      tables: [
-        { id: 'table-vip-1', name: 'Camarote Premium', capacity: 10, minimumSpend: 2000, available: true },
-        { id: 'table-vip-2', name: 'Camarote Gold', capacity: 8, minimumSpend: 1500, available: true },
-        { id: 'table-vip-3', name: 'Camarote Standard', capacity: 6, minimumSpend: 1000, available: false },
-      ],
-      eventDate,
-    });
-  }),
-
-  // VIP Table tab
-  http.get('/api/vip-tables/:id/tab', ({ params }) => {
-    return HttpResponse.json({
-      tableId: params.id,
-      tabId: 'tab-vip-001',
-      items: [],
-      currentSpend: 500.00,
-      minimumSpend: 2000.00,
-      remainingMinimum: 1500.00,
-    });
-  }),
-
-  // Queue - Join
-  http.post('/api/queue', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      ...mockQueueEntry,
-      priority: body.priority || mockQueueEntry.priority,
-    }, { status: 201 });
-  }),
-
-  // Queue - Position
-  http.get('/api/queue/position', () => {
-    return HttpResponse.json({
-      position: 12,
-      estimatedWaitMinutes: 20,
-      status: 'waiting',
-      aheadOfYou: 11,
-    });
-  }),
-
-  // Queue - Leave
-  http.delete('/api/queue/:id', () => {
-    return HttpResponse.json({
-      success: true,
-      message: 'Left queue successfully',
-    });
-  }),
-
-  // Guest List - Add
-  http.post('/api/guest-list', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      id: 'gl-001',
-      name: body.name,
-      phone: body.phone,
-      eventDate: body.eventDate,
-      companions: body.companions || 0,
-      status: 'confirmed',
-    }, { status: 201 });
-  }),
-
-  // Birthday Entry - Request
-  http.post('/api/birthday-entries', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      ...mockBirthdayEntry,
-      eventDate: body.eventDate || mockBirthdayEntry.eventDate,
-      companions: body.companions || mockBirthdayEntry.companions,
-      status: 'pending',
-    }, { status: 201 });
-  }),
-
-  // Birthday Entry - Approve
-  http.put('/api/birthday-entries/:id/approve', () => {
-    return HttpResponse.json({
-      ...mockBirthdayEntry,
-      status: 'approved',
-      qrCode: 'BD-USER12-XY',
-    });
-  }),
-
-  // Birthday Entry - Reject
-  http.put('/api/birthday-entries/:id/reject', async ({ request }) => {
-    const body = await request.json() as Record<string, unknown>;
-    return HttpResponse.json({
-      id: 'bd-001',
-      status: 'rejected',
-      rejectionReason: body.reason || 'Invalid documentation',
-    });
-  }),
-
-  // Occupancy
-  http.get('/api/occupancy/:restaurantId', ({ params }) => {
-    return HttpResponse.json({
-      ...mockOccupancy,
-      restaurantId: params.restaurantId,
-    });
-  }),
-
-  // Lineup
-  http.get('/api/lineup/:restaurantId/:date', ({ params }) => {
-    return HttpResponse.json({
-      restaurantId: params.restaurantId,
-      eventDate: params.date,
-      slots: [
-        { time: '23:00', artist: 'DJ Opening', genre: 'House' },
-        { time: '01:00', artist: 'DJ Snake', genre: 'EDM', isHeadliner: true },
-        { time: '03:00', artist: 'DJ Closing', genre: 'Tech House' },
-      ],
-    });
-  }),
-
-  // Promoter - Sales
-  http.get('/api/promoters/:id/sales', () => {
-    return HttpResponse.json({
-      promoterId: 'promo-001',
-      totalSales: 45,
-      totalRevenue: 3600.00,
-      pendingCommission: 360.00,
-      sales: [
-        { date: '2025-01-30', count: 12, revenue: 960.00 },
-        { date: '2025-01-31', count: 33, revenue: 2640.00 },
-      ],
-    });
-  }),
-];
-
-const server = setupServer(...handlers);
-
-beforeAll(() => server.listen({ onUnhandledRequest: 'bypass' }));
-afterEach(() => server.resetHandlers());
-afterAll(() => server.close());
-
+// ---------- test suite ----------
 describe('Club API Integration Tests', () => {
+  let originalFetch: typeof globalThis.fetch;
+
+  beforeAll(() => {
+    originalFetch = globalThis.fetch;
+    globalThis.fetch = createFetchMock() as any;
+  });
+
+  afterAll(() => {
+    globalThis.fetch = originalFetch;
+  });
+
   describe('Entry Management', () => {
     it('should purchase an entry ticket', async () => {
       const response = await fetch('/api/club-entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventDate: '2025-02-01',
-          ticketTier: 'pista',
-        }),
+        body: JSON.stringify({ eventDate: '2025-02-01', ticketTier: 'pista' }),
       });
 
       expect(response.status).toBe(201);
@@ -371,11 +402,7 @@ describe('Club API Integration Tests', () => {
       const response = await fetch('/api/vip-tables', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          tableId: 'table-vip-1',
-          eventDate: '2025-02-01',
-          guestCount: 8,
-        }),
+        body: JSON.stringify({ tableId: 'table-vip-1', eventDate: '2025-02-01', guestCount: 8 }),
       });
 
       expect(response.status).toBe(201);
@@ -399,10 +426,7 @@ describe('Club API Integration Tests', () => {
       const response = await fetch('/api/queue', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          restaurantId: 'rest-456',
-          priority: 'standard',
-        }),
+        body: JSON.stringify({ restaurantId: 'rest-456', priority: 'standard' }),
       });
 
       expect(response.status).toBe(201);
@@ -421,9 +445,7 @@ describe('Club API Integration Tests', () => {
     });
 
     it('should leave queue', async () => {
-      const response = await fetch('/api/queue/queue-001', {
-        method: 'DELETE',
-      });
+      const response = await fetch('/api/queue/queue-001', { method: 'DELETE' });
 
       expect(response.status).toBe(200);
       const data = await response.json();
@@ -436,10 +458,7 @@ describe('Club API Integration Tests', () => {
       const response = await fetch('/api/birthday-entries', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          eventDate: '2025-02-01',
-          companions: 2,
-        }),
+        body: JSON.stringify({ eventDate: '2025-02-01', companions: 2 }),
       });
 
       expect(response.status).toBe(201);
@@ -500,7 +519,7 @@ describe('Club API Integration Tests', () => {
       expect(response.status).toBe(200);
       const data = await response.json();
       expect(data.totalSales).toBe(45);
-      expect(data.pendingCommission).toBe(360.00);
+      expect(data.pendingCommission).toBe(360.0);
     });
   });
 });

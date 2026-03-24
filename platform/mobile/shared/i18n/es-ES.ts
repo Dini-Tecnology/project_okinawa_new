@@ -156,6 +156,13 @@ export const esES = {
       delivered: 'Entregado',
       completed: 'Completado',
       cancelled: 'Cancelado',
+      refunded: 'Reembolsado',
+    },
+    card: {
+      items: 'Artículos',
+      total: 'Total',
+      table: 'Mesa',
+      timeAgo: '{{minutes}} min atrás',
     },
     noOrders: 'Aún no has hecho ningún pedido',
   },
@@ -2249,6 +2256,24 @@ export const esES = {
       help: 'Ayuda',
       emergency: 'Emergencia',
     },
+  },
+
+  // Legal
+  legal: {
+    privacyPolicy: 'Politica de Privacidad',
+    termsOfService: 'Terminos de Servicio',
+    lastUpdated: 'Ultima actualizacion',
+    version: 'Version',
+    loading: 'Cargando documento...',
+    error: 'No se pudo cargar el documento. Intente nuevamente.',
+  },
+
+  // Maintenance
+  maintenance: {
+    title: 'En Mantenimiento',
+    message: 'Estamos realizando un mantenimiento programado. Por favor, intente nuevamente en breve.',
+    estimatedEnd: 'Estimacion de retorno',
+    retry: 'Verificar nuevamente',
   },
 };
 

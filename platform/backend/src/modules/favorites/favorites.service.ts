@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { Favorite } from './entities/favorite.entity';
 import { AddFavoriteDto } from './dto/add-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()
 export class FavoritesService {
@@ -36,19 +36,17 @@ export class FavoritesService {
   }
 
   async getFavorites(userId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.favoriteRepository.findAndCount({
       where: { user_id: userId },
       relations: ['restaurant'],
       order: { created_at: 'DESC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async removeFavorite(userId: string, restaurantId: string) {

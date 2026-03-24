@@ -8,14 +8,15 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
+import { getWsCorsConfig } from '@common/config/ws-cors.config';
 import { Approval } from './entities/approval.entity';
 
 @WebSocketGateway({
   namespace: '/approvals',
-  cors: {
-    origin: '*',
-  },
+  cors: getWsCorsConfig(),
 })
 export class ApprovalsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(ApprovalsGateway.name);
@@ -23,19 +24,49 @@ export class ApprovalsGateway implements OnGatewayConnection, OnGatewayDisconnec
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Approval client connected: ${client.id}`);
+  constructor(private jwtService: JwtService) {}
+
+  async handleConnection(client: AuthenticatedSocket) {
+    try {
+      const token = client.handshake.auth?.token;
+
+      if (!token) {
+        this.logger.warn(`Approval client ${client.id} rejected: no token`);
+        client.disconnect();
+        return;
+      }
+
+      const payload = await this.jwtService.verifyAsync(token);
+
+      client.user = {
+        id: payload.sub,
+        email: payload.email,
+        roles: payload.roles || [],
+        restaurant_id: payload.restaurant_id,
+      };
+
+      this.logger.log(
+        `Approval client connected: ${client.id} (user: ${client.user.email})`,
+      );
+    } catch (error: any) {
+      this.logger.error(`Approval client ${client.id} auth error: ${error.message}`);
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Approval client disconnected: ${client.id}`);
+  handleDisconnect(client: AuthenticatedSocket) {
+    const userId = client.user?.id ?? 'unknown';
+    this.logger.log(`Approval client disconnected: ${client.id} (user: ${userId})`);
   }
 
   @SubscribeMessage('joinRestaurant')
   handleJoinRestaurant(
     @MessageBody() data: { restaurantId: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
   ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join(`restaurant:${data.restaurantId}`);
     client.join(`restaurant:${data.restaurantId}:managers`);
     return { event: 'joined', data: { restaurantId: data.restaurantId } };
@@ -44,8 +75,11 @@ export class ApprovalsGateway implements OnGatewayConnection, OnGatewayDisconnec
   @SubscribeMessage('leaveRestaurant')
   handleLeaveRestaurant(
     @MessageBody() data: { restaurantId: string },
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
   ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.leave(`restaurant:${data.restaurantId}`);
     client.leave(`restaurant:${data.restaurantId}:managers`);
     return { event: 'left', data: { restaurantId: data.restaurantId } };

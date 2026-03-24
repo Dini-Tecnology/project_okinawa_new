@@ -13,6 +13,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 import { PaymentSplitService } from './payment-split.service';
 import { CalculateSplitDto } from './dto/calculate-split.dto';
@@ -66,10 +67,10 @@ export class PaymentSplitController {
   @ApiResponse({ status: 403, description: 'Access denied - not authorized for this order' })
   async getOrderSplits(
     @Param('orderId') orderId: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     // SECURITY: Service verifies user is participant or staff
-    return this.paymentSplitService.getOrderSplits(orderId, user.id, user.roles);
+    return this.paymentSplitService.getOrderSplits(orderId, user.id, user.roles as UserRole[]);
   }
 
   @Get('orders/:orderId/status')

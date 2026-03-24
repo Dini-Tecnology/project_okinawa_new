@@ -11,6 +11,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 
@@ -27,7 +28,7 @@ export class OrdersController {
   @ApiResponse({ status: 201, description: 'Order created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid order data' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
-  create(@CurrentUser() user: any, @Body() createOrderDto: CreateOrderDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() createOrderDto: CreateOrderDto) {
     return this.ordersService.create(user.id, createOrderDto);
   }
 
@@ -51,7 +52,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns paginated user orders' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  findByUser(@CurrentUser() user: any, @Query() pagination: PaginationDto) {
+  findByUser(@CurrentUser() user: AuthenticatedUser, @Query() pagination: PaginationDto) {
     return this.ordersService.findByUser(user.id, pagination);
   }
 
@@ -61,8 +62,8 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns order details' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.ordersService.findOne(id, user.id, user.roles);
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.ordersService.findOne(id, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id')
@@ -74,9 +75,9 @@ export class OrdersController {
   update(
     @Param('id') id: string,
     @Body() updateOrderDto: UpdateOrderDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.ordersService.update(id, updateOrderDto, user.id, user.roles);
+    return this.ordersService.update(id, updateOrderDto, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id/status')
@@ -101,9 +102,9 @@ export class OrdersController {
   addItemsToOrder(
     @Param('id') id: string,
     @Body() addItemsDto: AddItemsToOrderDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.ordersService.addItemsToExistingOrder(id, addItemsDto, user.id, user.roles);
+    return this.ordersService.addItemsToExistingOrder(id, addItemsDto, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id/open')
@@ -115,9 +116,9 @@ export class OrdersController {
   @ApiResponse({ status: 403, description: 'Forbidden - staff only' })
   openOrderForAdditions(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.ordersService.openOrderForAdditions(id, user.id, user.roles);
+    return this.ordersService.openOrderForAdditions(id, user.id, user.roles as UserRole[]);
   }
 
   // ========== KDS ENDPOINTS ==========
@@ -147,7 +148,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get waiter assigned tables with orders (WAITER/MAITRE only)' })
   @ApiResponse({ status: 200, description: 'Returns tables assigned to current waiter' })
   @ApiResponse({ status: 403, description: 'Forbidden - waiter/maitre only' })
-  getWaiterTables(@CurrentUser() user: any) {
+  getWaiterTables(@CurrentUser() user: AuthenticatedUser) {
     return this.ordersService.getWaiterTables(user.id);
   }
 
@@ -156,7 +157,7 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get waiter statistics (WAITER/MAITRE only)' })
   @ApiResponse({ status: 200, description: 'Returns waiter stats (sales, tips, tables)' })
   @ApiResponse({ status: 403, description: 'Forbidden - waiter/maitre only' })
-  getWaiterStats(@CurrentUser() user: any, @Query() query: GetWaiterStatsDto) {
+  getWaiterStats(@CurrentUser() user: AuthenticatedUser, @Query() query: GetWaiterStatsDto) {
     return this.ordersService.getWaiterStats(user.id, query);
   }
 

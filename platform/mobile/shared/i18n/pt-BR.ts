@@ -156,6 +156,13 @@ export const ptBR = {
       delivered: 'Entregue',
       completed: 'Concluído',
       cancelled: 'Cancelado',
+      refunded: 'Reembolsado',
+    },
+    card: {
+      items: 'Itens',
+      total: 'Total',
+      table: 'Mesa',
+      timeAgo: '{{minutes}} min atrás',
     },
     noOrders: 'Você ainda não fez nenhum pedido',
   },
@@ -2244,6 +2251,24 @@ export const ptBR = {
       help: 'Ajuda',
       emergency: 'Emergência',
     },
+  },
+
+  // Legal
+  legal: {
+    privacyPolicy: 'Politica de Privacidade',
+    termsOfService: 'Termos de Serviço',
+    lastUpdated: 'Ultima atualização',
+    version: 'Versão',
+    loading: 'Carregando documento...',
+    error: 'Não foi possivel carregar o documento. Tente novamente.',
+  },
+
+  // Maintenance
+  maintenance: {
+    title: 'Em Manutenção',
+    message: 'Estamos realizando uma manutenção programada. Por favor, tente novamente em breve.',
+    estimatedEnd: 'Previsão de retorno',
+    retry: 'Verificar novamente',
   },
 };
 

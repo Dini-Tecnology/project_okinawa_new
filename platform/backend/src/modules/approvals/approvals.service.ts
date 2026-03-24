@@ -5,7 +5,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between } from 'typeorm';
+import { Repository, Between, DeepPartial } from 'typeorm';
 import { Approval, ApprovalStatus } from './entities/approval.entity';
 import { CreateApprovalDto } from './dto/create-approval.dto';
 import { ResolveApprovalDto } from './dto/resolve-approval.dto';
@@ -29,15 +29,15 @@ export class ApprovalsService {
       restaurant_id: dto.restaurant_id,
       type: dto.type,
       item_name: dto.item_name,
-      table_id: dto.table_id || null,
+      table_id: dto.table_id || undefined,
       requester_id: requesterId,
       reason: dto.reason,
       amount: dto.amount || 0,
-      order_id: dto.order_id || null,
+      order_id: dto.order_id || undefined,
       status: ApprovalStatus.PENDING,
-    });
+    } as DeepPartial<Approval>);
 
-    const savedApproval = await this.approvalRepository.save(approval);
+    const savedApproval = await this.approvalRepository.save(approval as Approval);
 
     try {
       this.approvalsGateway.emitNewApproval(dto.restaurant_id, savedApproval);
@@ -132,7 +132,7 @@ export class ApprovalsService {
     approval.status = dto.decision as ApprovalStatus;
     approval.resolver_id = resolverId;
     approval.resolved_at = new Date();
-    approval.resolution_note = dto.note || null;
+    approval.resolution_note = dto.note || '';
 
     const savedApproval = await this.approvalRepository.save(approval);
 

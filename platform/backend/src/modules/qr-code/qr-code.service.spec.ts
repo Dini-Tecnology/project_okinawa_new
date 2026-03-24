@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { QrCodeService } from './qr-code.service';
+import { QrCodeSecurityService } from './qr-code-security.service';
 
 describe('QrCodeService', () => {
   let service: QrCodeService;
@@ -10,10 +11,21 @@ describe('QrCodeService', () => {
   };
 
   beforeEach(async () => {
+    const mockSecurityService = {
+      generateSignature: jest.fn().mockReturnValue('mock-signature'),
+      validateSignature: jest.fn().mockReturnValue(true),
+      generateTableQRUrl: jest.fn().mockReturnValue('https://app.okinawa.com/scan/r1/t1?sig=abc&v=1'),
+      generateDeepLinkUrl: jest.fn(),
+      parseQRUrl: jest.fn(),
+      validateQRUrl: jest.fn(),
+      generateDisplayHash: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         QrCodeService,
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: QrCodeSecurityService, useValue: mockSecurityService },
       ],
     }).compile();
 

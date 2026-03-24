@@ -8,7 +8,8 @@ import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { UpdateSetupProgressDto } from './dto/update-setup-progress.dto';
 import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
 import { UserRole as UserRoleEnum } from '@/common/enums';
-import { PaginatedResponseDto } from '@/common/dto/pagination.dto';
+import { PaginatedResponseDto, toPaginationDto } from '@/common/dto/pagination.dto';
+import { GEOFENCING } from '@common/constants/limits';
 
 @Injectable()
 export class RestaurantsService {
@@ -20,9 +21,7 @@ export class RestaurantsService {
   ) {}
 
   async findAll(filters: FilterRestaurantDto) {
-    const page = filters.page || 1;
-    const limit = filters.limit || 10;
-    const skip = (page - 1) * limit;
+    const pagination = toPaginationDto(filters);
 
     const query = this.restaurantRepository
       .createQueryBuilder('restaurant')
@@ -56,13 +55,11 @@ export class RestaurantsService {
     }
 
     const [items, total] = await query
-      .skip(skip)
-      .take(limit)
+      .skip(pagination.offset)
+      .take(pagination.limit)
       .getManyAndCount();
 
-    const totalPages = Math.ceil(total / limit);
-
-    return new PaginatedResponseDto(items, total, page, limit);
+    return new PaginatedResponseDto(items, total, pagination.page!, pagination.limit!);
   }
 
   async findOne(id: string) {
@@ -159,7 +156,7 @@ export class RestaurantsService {
    * Haversine formula: calculate distance in meters between two lat/lng points.
    */
   private haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371e3; // Earth radius in meters
+    const R = GEOFENCING.EARTH_RADIUS_METERS; // Earth radius in meters
     const toRad = (deg: number) => (deg * Math.PI) / 180;
 
     const dLat = toRad(lat2 - lat1);
@@ -179,12 +176,12 @@ export class RestaurantsService {
    * Find nearby restaurants within a given radius (km).
    * Uses Haversine formula for distance calculation.
    */
-  async findNearby(lat: number, lng: number, radiusKm: number = 5) {
+  async findNearby(lat: number, lng: number, radiusKm: number = GEOFENCING.DEFAULT_SEARCH_RADIUS_KM) {
     const restaurants = await this.restaurantRepository.find({
       where: { is_active: true },
     });
 
-    const radiusMeters = radiusKm * 1000;
+    const radiusMeters = radiusKm * GEOFENCING.KM_TO_METERS;
 
     const nearby = restaurants
       .filter((r) => r.lat != null && r.lng != null)

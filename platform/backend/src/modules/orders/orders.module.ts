@@ -1,5 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { OrdersGateway } from './orders.gateway';
@@ -29,6 +31,15 @@ import {
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, OrderGuest, MenuItem, RestaurantTable, Profile]),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION') || '7d',
+        },
+      }),
+    }),
     EventsModule,
     LoyaltyModule,
     NotificationsModule,

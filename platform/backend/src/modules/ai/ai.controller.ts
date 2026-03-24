@@ -18,6 +18,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('ai')
@@ -45,7 +46,7 @@ export class AiController {
   @ApiOperation({ summary: 'Get personalized menu recommendations for user' })
   @ApiQuery({ name: 'restaurant_id', required: true, type: String })
   getMenuRecommendations(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.aiService.getMenuRecommendations(user.id, restaurantId);

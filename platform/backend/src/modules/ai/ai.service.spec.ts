@@ -7,6 +7,7 @@ import { Order } from '@/modules/orders/entities/order.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { LoyaltyProgram } from '@/modules/loyalty/entities/loyalty-program.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
+import { CircuitBreakerService } from '@common/utils/circuit-breaker.module';
 
 describe('AiService', () => {
   let service: AiService;
@@ -189,6 +190,14 @@ describe('AiService', () => {
     }),
   };
 
+  const mockCircuitBreakerService = {
+    getBreaker: jest.fn().mockReturnValue({
+      fire: jest.fn().mockImplementation((fn) => fn()),
+      isOpen: jest.fn().mockReturnValue(false),
+      execute: jest.fn().mockImplementation((fn) => fn()),
+    }),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -202,6 +211,7 @@ describe('AiService', () => {
           provide: DataSource,
           useValue: mockDataSource,
         },
+        { provide: CircuitBreakerService, useValue: mockCircuitBreakerService },
       ],
     }).compile();
 

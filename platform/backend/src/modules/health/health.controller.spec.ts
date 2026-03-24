@@ -7,6 +7,7 @@ import {
   DiskHealthIndicator,
   HealthCheckResult,
 } from '@nestjs/terminus';
+import { CircuitBreakerHealthIndicator } from './circuit-breaker.health';
 
 describe('HealthController', () => {
   let controller: HealthController;
@@ -14,6 +15,7 @@ describe('HealthController', () => {
   let dbIndicator: jest.Mocked<TypeOrmHealthIndicator>;
   let memoryIndicator: jest.Mocked<MemoryHealthIndicator>;
   let diskIndicator: jest.Mocked<DiskHealthIndicator>;
+  let circuitBreakerHealthIndicator: jest.Mocked<CircuitBreakerHealthIndicator>;
 
   const mockHealthResult: HealthCheckResult = {
     status: 'ok',
@@ -50,6 +52,14 @@ describe('HealthController', () => {
       checkStorage: jest.fn(),
     };
 
+    const mockCircuitBreakerHealthIndicator = {
+      check: jest.fn().mockResolvedValue({
+        circuit_breakers: { status: 'up', circuits: 'none registered' },
+      }),
+      getStatus: jest.fn(),
+      isHealthy: jest.fn().mockReturnValue(true),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [HealthController],
       providers: [
@@ -57,6 +67,7 @@ describe('HealthController', () => {
         { provide: TypeOrmHealthIndicator, useValue: mockDbIndicator },
         { provide: MemoryHealthIndicator, useValue: mockMemoryIndicator },
         { provide: DiskHealthIndicator, useValue: mockDiskIndicator },
+        { provide: CircuitBreakerHealthIndicator, useValue: mockCircuitBreakerHealthIndicator },
       ],
     }).compile();
 
@@ -65,6 +76,7 @@ describe('HealthController', () => {
     dbIndicator = module.get(TypeOrmHealthIndicator);
     memoryIndicator = module.get(MemoryHealthIndicator);
     diskIndicator = module.get(DiskHealthIndicator);
+    circuitBreakerHealthIndicator = module.get(CircuitBreakerHealthIndicator);
   });
 
   it('should be defined', () => {

@@ -11,7 +11,7 @@ import {
 import { MenuCustomizationService } from './menu-customization.service';
 import { CreateCustomizationGroupDto } from './dto/create-customization-group.dto';
 import { UpdateCustomizationGroupDto } from './dto/update-customization-group.dto';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CustomizationOption } from './entities/customization-group.entity';
 
 @Controller('menu-customization')

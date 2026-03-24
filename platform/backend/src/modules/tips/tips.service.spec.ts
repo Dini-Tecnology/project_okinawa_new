@@ -252,21 +252,23 @@ describe('TipsService', () => {
 
   describe('getTransactions', () => {
     it('should return tip transactions for restaurant', async () => {
-      mockTipRepository.find.mockResolvedValue([mockTip]);
+      mockTipRepository.findAndCount.mockResolvedValue([[mockTip], 1]);
 
       const startDate = new Date('2024-01-01');
       const endDate = new Date('2024-12-31');
       const result = await service.getTransactions('restaurant-1', startDate, endDate);
 
-      expect(result).toEqual([mockTip]);
-      expect(mockTipRepository.find).toHaveBeenCalledWith({
+      expect(result.data).toEqual([mockTip]);
+      expect(result.meta.total).toBe(1);
+      expect(mockTipRepository.findAndCount).toHaveBeenCalledWith({
         where: {
           restaurant_id: 'restaurant-1',
           created_at: expect.anything(),
         },
         relations: ['customer', 'staff'],
         order: { created_at: 'DESC' },
-        take: 50,
+        take: 20,
+        skip: 0,
       });
     });
   });

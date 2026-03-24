@@ -6,6 +6,7 @@ import { CreateNotificationDto } from './dto/create-notification.dto';
 import { MarkAsReadDto } from './dto/mark-as-read.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { EventsGateway } from '@/modules/events/events.gateway';
+import { PAGINATION } from '@common/constants/limits';
 
 // Re-export for consumers
 export { NotificationType, RelatedType } from './entities/notification.entity';
@@ -114,12 +115,8 @@ export class NotificationsService {
       offset?: number;
     },
   ) {
-    // Bound limit and offset to prevent abuse
-    const MAX_LIMIT = 100;
-    const MAX_OFFSET = 10000;
-
-    const limit = Math.min(Math.max(options?.limit || 50, 1), MAX_LIMIT);
-    const offset = Math.min(Math.max(options?.offset || 0, 0), MAX_OFFSET);
+    const limit = Math.min(Math.max(options?.limit || PAGINATION.NOTIFICATIONS_DEFAULT, 1), PAGINATION.NOTIFICATIONS_MAX);
+    const offset = Math.min(Math.max(options?.offset || 0, 0), PAGINATION.NOTIFICATIONS_MAX_OFFSET);
 
     const query = this.notificationRepository.createQueryBuilder('notification')
       .where('notification.user_id = :userId', { userId });

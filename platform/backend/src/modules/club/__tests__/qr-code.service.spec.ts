@@ -1,13 +1,11 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-
 // Mock crypto module
-vi.mock('crypto', () => ({
-  createHmac: vi.fn(() => ({
-    update: vi.fn().mockReturnThis(),
-    digest: vi.fn().mockReturnValue('mocksignature12345678'),
+jest.mock('crypto', () => ({
+  createHmac: jest.fn(() => ({
+    update: jest.fn().mockReturnThis(),
+    digest: jest.fn().mockReturnValue('mocksignature12345678'),
   })),
-  randomBytes: vi.fn(() => ({
-    toString: vi.fn().mockReturnValue('abc123def456'),
+  randomBytes: jest.fn(() => ({
+    toString: jest.fn().mockReturnValue('abc123def456'),
   })),
 }));
 
@@ -279,7 +277,7 @@ describe('QrCodeService', () => {
       futureDate.setDate(futureDate.getDate() + 7);
 
       const qr1 = service.generateEntryQrCode({
-        entryId: 'entry-001',
+        entryId: 'aaa-001',
         userId: 'user-1',
         restaurantId: 'rest-1',
         eventDate: futureDate,
@@ -287,7 +285,7 @@ describe('QrCodeService', () => {
       });
 
       const qr2 = service.generateEntryQrCode({
-        entryId: 'entry-002',
+        entryId: 'bbb-002',
         userId: 'user-2',
         restaurantId: 'rest-1',
         eventDate: futureDate,

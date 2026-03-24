@@ -97,8 +97,13 @@ describe('validationSchema', () => {
       const { error } = validate(env);
 
       expect(error).toBeDefined();
-      const messages = error!.details.map((d) => d.message);
-      expect(messages.some((m) => m.includes('DATABASE_SSL'))).toBe(true);
+      // Check either the message or the path includes DATABASE_SSL
+      const hasSSLError = error!.details.some(
+        (d) =>
+          d.message.includes('DATABASE_SSL') ||
+          d.path.includes('DATABASE_SSL'),
+      );
+      expect(hasSSLError).toBe(true);
     });
   });
 

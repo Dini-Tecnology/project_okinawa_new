@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { WaitlistEntry, WaitlistStatus, SeatingPreference, WaitlistBarOrder } from './entities';
 import { JoinWaitlistDto, CallGuestDto, AddBarOrderDto, UpdateWaitlistEntryDto } from './dto';
+import { ORDERS } from '@common/constants/limits';
 
 export interface WaitlistStats {
   totalWaiting: number;
@@ -19,7 +20,7 @@ export interface WaitlistStats {
 
 @Injectable()
 export class WaitlistService {
-  private readonly BASE_WAIT_PER_GROUP = 5; // minutes per group ahead
+  private readonly BASE_WAIT_PER_GROUP = ORDERS.WAITLIST_WAIT_PER_GROUP_MINUTES; // minutes per group ahead
 
   constructor(
     @InjectRepository(WaitlistEntry)
@@ -76,7 +77,7 @@ export class WaitlistService {
     return {
       id: savedEntry.id,
       position: savedEntry.position,
-      estimatedWaitMinutes: savedEntry.estimated_wait_minutes,
+      estimatedWaitMinutes: savedEntry.estimated_wait_minutes ?? 0,
     };
   }
 

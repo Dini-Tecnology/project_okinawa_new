@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { Receipt, ReceiptItemSnapshot } from './entities/receipt.entity';
-import { PaginationDto, PaginatedResponseDto } from '@/common/dto/pagination.dto';
+import { PaginationDto, PaginatedResponseDto, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()
 export class ReceiptsService {
@@ -50,9 +50,9 @@ export class ReceiptsService {
       total,
       payment_method: paymentMethod,
       generated_at: new Date(),
-    });
+    } as DeepPartial<Receipt>);
 
-    return this.receiptRepository.save(receipt);
+    return this.receiptRepository.save(receipt as Receipt);
   }
 
   /**
@@ -74,17 +74,15 @@ export class ReceiptsService {
    * Find all receipts for a user with pagination.
    */
   async findByUser(userId: string, pagination: PaginationDto): Promise<PaginatedResponseDto<Receipt>> {
-    const page = pagination.page || 1;
-    const limit = pagination.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.receiptRepository.findAndCount({
       where: { user_id: userId },
       order: { generated_at: 'DESC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return new PaginatedResponseDto(items, total, page, limit);
+    return new PaginatedResponseDto(items, total, dto.page!, dto.limit!);
   }
 }

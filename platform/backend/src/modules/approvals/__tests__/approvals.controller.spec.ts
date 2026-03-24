@@ -4,6 +4,7 @@ import { ApprovalsService } from '../approvals.service';
 import { CreateApprovalDto } from '../dto/create-approval.dto';
 import { ResolveApprovalDto } from '../dto/resolve-approval.dto';
 import { ApprovalType, ApprovalStatus } from '../entities/approval.entity';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('ApprovalsController', () => {
   let controller: ApprovalsController;
@@ -36,8 +37,8 @@ describe('ApprovalsController', () => {
     resolved_at: null,
   };
 
-  const mockUser = { id: 'user-1', roles: ['manager'] };
-  const mockWaiterUser = { id: 'waiter-1', roles: ['waiter'] };
+  const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['manager'] });
+  const mockWaiterUser = mockAuthenticatedUser({ id: 'waiter-1', roles: ['waiter'] });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

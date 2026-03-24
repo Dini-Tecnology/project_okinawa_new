@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HrController } from './hr.controller';
 import { HrService } from './hr.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('HrController', () => {
   let controller: HrController;
@@ -24,7 +25,7 @@ describe('HrController', () => {
 
   it('should check in', async () => {
     mockService.checkIn.mockResolvedValue({ id: 'attendance-1' });
-    const result = await controller.checkIn({ id: 'user-1' }, {} as any);
+    const result = await controller.checkIn(mockAuthenticatedUser({ id: 'user-1' }), {} as any);
     expect(result).toBeDefined();
   });
 });

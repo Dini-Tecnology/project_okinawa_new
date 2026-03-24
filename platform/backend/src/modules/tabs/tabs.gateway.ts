@@ -8,13 +8,14 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
+import { getWsCorsConfig } from '@common/config/ws-cors.config';
 
 @WebSocketGateway({
   namespace: '/tabs',
-  cors: {
-    origin: '*',
-  },
+  cors: getWsCorsConfig(),
 })
 export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(TabsGateway.name);
@@ -22,22 +23,61 @@ export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Tab client connected: ${client.id}`);
+  constructor(private jwtService: JwtService) {}
+
+  async handleConnection(client: AuthenticatedSocket) {
+    try {
+      const token = client.handshake.auth?.token;
+
+      if (!token) {
+        this.logger.warn(`Tab client ${client.id} rejected: no token`);
+        client.disconnect();
+        return;
+      }
+
+      const payload = await this.jwtService.verifyAsync(token);
+
+      client.user = {
+        id: payload.sub,
+        email: payload.email,
+        roles: payload.roles || [],
+        restaurant_id: payload.restaurant_id,
+      };
+
+      this.logger.log(
+        `Tab client connected: ${client.id} (user: ${client.user.email})`,
+      );
+    } catch (error: any) {
+      this.logger.error(`Tab client ${client.id} auth error: ${error.message}`);
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Tab client disconnected: ${client.id}`);
+  handleDisconnect(client: AuthenticatedSocket) {
+    const userId = client.user?.id ?? 'unknown';
+    this.logger.log(`Tab client disconnected: ${client.id} (user: ${userId})`);
   }
 
   @SubscribeMessage('joinTab')
-  handleJoinTab(@ConnectedSocket() client: Socket, @MessageBody() tabId: string) {
+  handleJoinTab(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() tabId: string,
+  ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join(`tab:${tabId}`);
     return { event: 'joined', tabId };
   }
 
   @SubscribeMessage('leaveTab')
-  handleLeaveTab(@ConnectedSocket() client: Socket, @MessageBody() tabId: string) {
+  handleLeaveTab(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() tabId: string,
+  ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.leave(`tab:${tabId}`);
     return { event: 'left', tabId };
   }

@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { WaiterCall } from './entities/waiter-call.entity';
-import { CreateWaiterCallDto } from './dto/create-waiter-call.dto';
+import { CreateWaiterCallDto } from './dto';
 
 @Injectable()
 export class WaiterCallsService {

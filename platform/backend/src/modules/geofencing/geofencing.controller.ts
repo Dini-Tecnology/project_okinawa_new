@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { GeofencingService } from './geofencing.service';
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 
 class CheckLocationDto {
   restaurantId: string;

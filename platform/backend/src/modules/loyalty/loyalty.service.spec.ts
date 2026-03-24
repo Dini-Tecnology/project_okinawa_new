@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { LoyaltyService } from './loyalty.service';
 import { LoyaltyProgram } from './entities/loyalty-program.entity';
+import { StampCard } from './entities/stamp-card.entity';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { BadRequestException } from '@nestjs/common';
 
@@ -72,6 +73,13 @@ describe('LoyaltyService', () => {
     notifyRestaurant: jest.fn(),
   };
 
+  const mockStampCardRepository = {
+    find: jest.fn(),
+    findOne: jest.fn(),
+    create: jest.fn(),
+    save: jest.fn(),
+  };
+
   const mockDataSource = {
     transaction: jest.fn().mockImplementation((cb) => cb({
       findOne: jest.fn().mockResolvedValue(mockLoyalty),
@@ -102,6 +110,10 @@ describe('LoyaltyService', () => {
         {
           provide: getRepositoryToken(LoyaltyProgram),
           useValue: mockLoyaltyRepository,
+        },
+        {
+          provide: getRepositoryToken(StampCard),
+          useValue: mockStampCardRepository,
         },
         {
           provide: EventsGateway,

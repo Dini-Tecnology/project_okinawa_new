@@ -5,6 +5,7 @@ import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
 import { UpdateSetupProgressDto } from './dto/update-setup-progress.dto';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('RestaurantsController', () => {
   let controller: RestaurantsController;
@@ -49,10 +50,10 @@ describe('RestaurantsController', () => {
 
   describe('findAll', () => {
     it('should get all restaurants with filters', async () => {
-      const filters: FilterRestaurantDto = {
+      const filters = {
         city: 'New York',
         serviceType: 'dine-in',
-      };
+      } as FilterRestaurantDto;
 
       const restaurants = [mockRestaurant];
       mockRestaurantsService.findAll.mockResolvedValue(restaurants);
@@ -77,7 +78,7 @@ describe('RestaurantsController', () => {
 
   describe('create', () => {
     it('should create a new restaurant', async () => {
-      const user = { sub: 'user-1' };
+      const user = mockAuthenticatedUser({ sub: 'user-1' });
       const createDto: CreateRestaurantDto = {
         name: 'New Restaurant',
         cuisine_type: 'Italian',

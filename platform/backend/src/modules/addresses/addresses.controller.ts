@@ -14,6 +14,7 @@ import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('addresses')
 @Controller('addresses')
@@ -25,7 +26,7 @@ export class AddressesController {
   @Get()
   @ApiOperation({ summary: 'Get all addresses for the current user' })
   @ApiResponse({ status: 200, description: 'Returns list of user addresses' })
-  findAll(@CurrentUser() user: any) {
+  findAll(@CurrentUser() user: AuthenticatedUser) {
     return this.addressesService.findByUser(user.sub);
   }
 
@@ -33,7 +34,7 @@ export class AddressesController {
   @ApiOperation({ summary: 'Create a new address' })
   @ApiResponse({ status: 201, description: 'Address created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid address data' })
-  create(@CurrentUser() user: any, @Body() dto: CreateAddressDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateAddressDto) {
     return this.addressesService.create(user.sub, dto);
   }
 
@@ -44,7 +45,7 @@ export class AddressesController {
   @ApiResponse({ status: 403, description: 'Not the owner of this address' })
   update(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() dto: UpdateAddressDto,
   ) {
     return this.addressesService.update(id, user.sub, dto);
@@ -55,7 +56,7 @@ export class AddressesController {
   @ApiResponse({ status: 200, description: 'Address deleted successfully' })
   @ApiResponse({ status: 404, description: 'Address not found' })
   @ApiResponse({ status: 403, description: 'Not the owner of this address' })
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.addressesService.remove(id, user.sub);
   }
 
@@ -64,7 +65,7 @@ export class AddressesController {
   @ApiResponse({ status: 200, description: 'Address set as default' })
   @ApiResponse({ status: 404, description: 'Address not found' })
   @ApiResponse({ status: 403, description: 'Not the owner of this address' })
-  setDefault(@Param('id') id: string, @CurrentUser() user: any) {
+  setDefault(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.addressesService.setDefault(id, user.sub);
   }
 }

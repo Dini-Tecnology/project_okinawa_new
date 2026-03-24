@@ -7,12 +7,12 @@ import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, FindOptionsWhere, DeepPartial } from 'typeorm';
 import { TableQrCode, QRCodeStyle } from '../tables/entities/table-qr-code.entity';
-import { TableSession } from '../tables/entities/table-session.entity';
-import { QrScanLog } from '../tables/entities/qr-scan-log.entity';
+import { TableSession, SessionStatus } from '../tables/entities/table-session.entity';
+import { QrScanLog, ScanResult } from '../tables/entities/qr-scan-log.entity';
 import { BatchGenerateQRDto } from './dto/batch-generate-qr.dto';
-import { StartTableSessionDto, EndTableSessionDto } from './dto/table-session.dto';
+import { StartSessionDto, EndSessionDto } from './dto/table-session.dto';
 
 @ApiTags('qr-code')
 @Controller('qr-code')
@@ -179,7 +179,7 @@ export class QrCodeController {
   async batchGenerateQR(@Body() dto: BatchGenerateQRDto, @Req() req: any) {
     const results = await this.qrCodeService.batchGenerateTableQR(
       dto.restaurant_id,
-      dto.tables.map((t) => ({ tableId: t.table_id, tableNumber: t.table_number })),
+      dto.tables.map((t) => ({ tableId: t.table_id, tableNumber: t.table_number || '' })),
       {
         style: dto.style,
         colorPrimary: dto.color_primary,
@@ -259,10 +259,10 @@ export class QrCodeController {
         restaurant_id: validation.restaurantId,
         table_id: validation.tableId,
         scanned_by: req.user?.id,
-        scan_result: validation.valid ? 'valid' : 'invalid',
+        scan_result: validation.valid ? ScanResult.SUCCESS : ScanResult.INVALID,
         device_info: body.device_info,
         ip_address: req.ip,
-      });
+      } as any);
       await this.scanLogRepository.save(scanLog);
     }
 
@@ -307,18 +307,18 @@ export class QrCodeController {
   @Post('session/start')
   @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Start a table session after scanning QR code' })
-  async startSession(@Body() dto: StartTableSessionDto, @Req() req: any) {
+  async startSession(@Body() dto: StartSessionDto, @Req() req: any) {
     // Check for existing active session
     const existingSession = await this.sessionRepository.findOne({
       where: {
         table_id: dto.table_id,
-        status: 'active',
-      },
+        status: SessionStatus.ACTIVE,
+      } as FindOptionsWhere<TableSession>,
     });
 
     if (existingSession) {
       // Check if user can join existing session
-      if (dto.join_existing) {
+      if ((dto as any).join_existing) {
         // Add user to existing session
         const guests = existingSession.guest_user_ids || [];
         if (!guests.includes(req.user.id) && existingSession.primary_user_id !== req.user.id) {
@@ -348,11 +348,11 @@ export class QrCodeController {
       table_id: dto.table_id,
       primary_user_id: req.user.id,
       guest_count: dto.guest_count || 1,
-      status: 'active',
+      status: SessionStatus.ACTIVE,
       started_at: new Date(),
-    });
+    } as DeepPartial<TableSession>);
 
-    await this.sessionRepository.save(session);
+    await this.sessionRepository.save(session as TableSession);
 
     return {
       session_id: session.id,
@@ -365,7 +365,7 @@ export class QrCodeController {
   @Post('session/end')
   @Roles(UserRole.CUSTOMER, UserRole.WAITER, UserRole.MANAGER)
   @ApiOperation({ summary: 'End a table session' })
-  async endSession(@Body() dto: EndTableSessionDto, @Req() req: any) {
+  async endSession(@Body() dto: EndSessionDto, @Req() req: any) {
     const session = await this.sessionRepository.findOne({
       where: { id: dto.session_id },
     });
@@ -383,10 +383,10 @@ export class QrCodeController {
       throw new HttpException('You cannot end this session', HttpStatus.FORBIDDEN);
     }
 
-    session.status = 'completed';
+    session.status = SessionStatus.COMPLETED;
     session.ended_at = new Date();
-    session.total_amount = dto.total_amount;
-    session.notes = dto.notes;
+    session.total_amount = (dto as any).total_amount;
+    session.notes = (dto as any).notes;
 
     await this.sessionRepository.save(session);
 
@@ -404,7 +404,7 @@ export class QrCodeController {
   @ApiOperation({ summary: 'Get active session for a table' })
   async getActiveSession(@Param('tableId') tableId: string) {
     const session = await this.sessionRepository.findOne({
-      where: { table_id: tableId, status: 'active' },
+      where: { table_id: tableId, status: SessionStatus.ACTIVE } as FindOptionsWhere<TableSession>,
       relations: ['primary_user', 'table'],
     });
 
@@ -417,7 +417,7 @@ export class QrCodeController {
       session_id: session.id,
       started_at: session.started_at,
       guest_count: session.guest_count,
-      host_name: session.primary_user?.name,
+      host_name: session.primary_user?.full_name,
       table_number: session.table?.table_number,
     };
   }
@@ -443,7 +443,7 @@ export class QrCodeController {
 
     const [scans, total] = await query.getManyAndCount();
 
-    const validScans = scans.filter((s) => s.scan_result === 'valid').length;
+    const validScans = scans.filter((s) => s.scan_result === ScanResult.SUCCESS).length;
     const tableStats = scans.reduce((acc, scan) => {
       acc[scan.table_id] = (acc[scan.table_id] || 0) + 1;
       return acc;

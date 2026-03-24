@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import {
   ClubEntry,
   GuestListEntry,
@@ -62,6 +64,15 @@ import { QrCodeController } from './qr-code.controller';
       MenuItem,
       Profile,
     ]),
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRATION') || '7d',
+        },
+      }),
+    }),
     EventsModule,
     NotificationsModule,
   ],

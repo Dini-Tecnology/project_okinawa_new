@@ -76,6 +76,17 @@ import CouponsScreen from '../screens/promotions/CouponsScreen';
 import TabScreen from '../screens/pub-bar/TabScreen';
 import TabPaymentScreen from '../screens/pub-bar/TabPaymentScreen';
 
+// ============================================
+// LEGAL SCREENS (Privacy Policy & Terms of Service)
+// ============================================
+import { PrivacyPolicyScreen, TermsOfServiceScreen } from '@/shared/screens/legal';
+
+// ============================================
+// MAINTENANCE SCREEN
+// ============================================
+import { MaintenanceScreen } from '@/shared/screens/MaintenanceScreen';
+import { useMaintenanceCheck } from '@/shared/hooks/useMaintenanceCheck';
+
 // Complete auth session for web-based OAuth
 WebBrowser.maybeCompleteAuthSession();
 
@@ -387,6 +398,18 @@ function MainStack() {
         component={TabPaymentScreen}
         options={{ title: 'Payment', ...modalScreenOptions }}
       />
+
+      {/* Legal Screens */}
+      <Stack.Screen
+        name="PrivacyPolicy"
+        component={PrivacyPolicyScreen}
+        options={{ title: 'Privacy Policy', ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="TermsOfService"
+        component={TermsOfServiceScreen}
+        options={{ title: 'Terms of Service', ...scaleFadeScreenOptions }}
+      />
     </Stack.Navigator>
   );
 }
@@ -409,10 +432,11 @@ function MainStack() {
 export default function Navigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { isInMaintenance, message: maintenanceMessage, estimatedEnd, clearMaintenance } = useMaintenanceCheck();
 
   useEffect(() => {
     checkAuth();
-    
+
     // Listen for auth state changes
     const unsubscribe = authService.onAuthStateChange((authenticated) => {
       setIsAuthenticated(authenticated);
@@ -456,6 +480,17 @@ export default function Navigation() {
   // Show nothing while checking auth (splash screen should be visible)
   if (isLoading) {
     return null;
+  }
+
+  // Show maintenance screen when backend returns 503 with maintenance flag
+  if (isInMaintenance) {
+    return (
+      <MaintenanceScreen
+        message={maintenanceMessage}
+        estimatedEnd={estimatedEnd}
+        onMaintenanceOver={clearMaintenance}
+      />
+    );
   }
 
   return (

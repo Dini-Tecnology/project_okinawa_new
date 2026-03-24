@@ -572,7 +572,12 @@ describe('AuthService', () => {
     });
 
     it('should fall back to legacy password if credential service returns invalid', async () => {
-      mockCredentialService.verifyPassword.mockResolvedValue({ valid: false });
+      // Reset mocks to avoid leakage from prior tests
+      mockCredentialService.verifyPassword.mockReset();
+      mockProfileRepository.findOne.mockReset();
+      (bcrypt.compare as jest.Mock).mockReset();
+
+      mockCredentialService.verifyPassword.mockResolvedValue({ valid: false, locked: false, attemptsRemaining: 0 });
       mockProfileRepository.findOne.mockResolvedValue({
         ...mockUser,
         preferences: { password: 'hashedLegacyPassword' },
@@ -581,6 +586,7 @@ describe('AuthService', () => {
 
       const result = await service.validatePassword(mockUser.id, 'legacy_password');
 
+      expect(bcrypt.compare).toHaveBeenCalledWith('legacy_password', 'hashedLegacyPassword');
       expect(result).toBe(true);
     });
 

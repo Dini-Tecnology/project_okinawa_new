@@ -17,6 +17,14 @@ export class TableQRGenerateDto {
   @IsUUID('4', { message: 'Table ID must be a valid UUID' })
   @IsNotEmpty({ message: 'Table ID is required' })
   table_id: string;
+
+  @ApiPropertyOptional({
+    description: 'Table number/name for display',
+    example: 'T-01',
+  })
+  @IsOptional()
+  @IsString()
+  table_number?: string;
 }
 
 export class BatchGenerateQRDto {

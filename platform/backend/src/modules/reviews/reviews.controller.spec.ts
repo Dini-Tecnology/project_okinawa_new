@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsService } from './reviews.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('ReviewsController', () => {
   let controller: ReviewsController;
@@ -38,7 +39,7 @@ describe('ReviewsController', () => {
   });
 
   it('should create a review', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     const dto = { restaurant_id: 'restaurant-1', rating: 5 };
     mockService.create.mockResolvedValue({ id: 'review-1', ...dto });
 
@@ -67,7 +68,7 @@ describe('ReviewsController', () => {
   });
 
   it('should update a review', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     const dto = { comment: 'Updated' };
     mockService.update.mockResolvedValue({ id: 'review-1', ...dto });
 

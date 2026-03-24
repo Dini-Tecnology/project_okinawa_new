@@ -8,13 +8,14 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
+import { getWsCorsConfig } from '@common/config/ws-cors.config';
 
 @WebSocketGateway({
   namespace: '/queue',
-  cors: {
-    origin: '*',
-  },
+  cors: getWsCorsConfig(),
 })
 export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(QueueGateway.name);
@@ -22,28 +23,73 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Queue client connected: ${client.id}`);
+  constructor(private jwtService: JwtService) {}
+
+  async handleConnection(client: AuthenticatedSocket) {
+    try {
+      const token = client.handshake.auth?.token;
+
+      if (!token) {
+        this.logger.warn(`Queue client ${client.id} rejected: no token`);
+        client.disconnect();
+        return;
+      }
+
+      const payload = await this.jwtService.verifyAsync(token);
+
+      client.user = {
+        id: payload.sub,
+        email: payload.email,
+        roles: payload.roles || [],
+        restaurant_id: payload.restaurant_id,
+      };
+
+      this.logger.log(
+        `Queue client connected: ${client.id} (user: ${client.user.email})`,
+      );
+    } catch (error: any) {
+      this.logger.error(`Queue client ${client.id} auth error: ${error.message}`);
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Queue client disconnected: ${client.id}`);
+  handleDisconnect(client: AuthenticatedSocket) {
+    const userId = client.user?.id ?? 'unknown';
+    this.logger.log(`Queue client disconnected: ${client.id} (user: ${userId})`);
   }
 
   @SubscribeMessage('joinQueueRoom')
-  handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() restaurantId: string) {
+  handleJoinRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() restaurantId: string,
+  ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join(`queue:${restaurantId}`);
     return { event: 'joined', restaurantId };
   }
 
   @SubscribeMessage('leaveQueueRoom')
-  handleLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody() restaurantId: string) {
+  handleLeaveRoom(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() restaurantId: string,
+  ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.leave(`queue:${restaurantId}`);
     return { event: 'left', restaurantId };
   }
 
   @SubscribeMessage('subscribeToMyPosition')
-  handleSubscribePosition(@ConnectedSocket() client: Socket, @MessageBody() data: { restaurantId: string; userId: string }) {
+  handleSubscribePosition(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() data: { restaurantId: string; userId: string },
+  ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     client.join(`queue:${data.restaurantId}:user:${data.userId}`);
     return { event: 'subscribed', ...data };
   }

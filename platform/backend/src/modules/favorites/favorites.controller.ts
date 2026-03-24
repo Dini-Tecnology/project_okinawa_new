@@ -15,6 +15,7 @@ import { AddFavoriteDto } from './dto/add-favorite.dto';
 import { UpdateFavoriteDto } from './dto/update-favorite.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 
 @ApiTags('favorites')
@@ -29,7 +30,7 @@ export class FavoritesController {
   @ApiResponse({ status: 201, description: 'Restaurant added to favorites' })
   @ApiResponse({ status: 400, description: 'Invalid restaurant ID' })
   @ApiResponse({ status: 409, description: 'Restaurant already in favorites' })
-  addFavorite(@CurrentUser() user: any, @Body() addFavoriteDto: AddFavoriteDto) {
+  addFavorite(@CurrentUser() user: AuthenticatedUser, @Body() addFavoriteDto: AddFavoriteDto) {
     return this.favoritesService.addFavorite(user.id, addFavoriteDto);
   }
 
@@ -38,7 +39,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: 'Returns paginated list of favorites' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  getFavorites(@CurrentUser() user: any, @Query() pagination: PaginationDto) {
+  getFavorites(@CurrentUser() user: AuthenticatedUser, @Query() pagination: PaginationDto) {
     return this.favoritesService.getFavorites(user.id, pagination);
   }
 
@@ -46,7 +47,7 @@ export class FavoritesController {
   @ApiOperation({ summary: 'Check if restaurant is favorited' })
   @ApiResponse({ status: 200, description: 'Returns favorite status' })
   async isFavorite(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('restaurantId') restaurantId: string,
   ) {
     const isFavorite = await this.favoritesService.isFavorite(user.id, restaurantId);
@@ -58,7 +59,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: 'Notes updated successfully' })
   @ApiResponse({ status: 404, description: 'Favorite not found' })
   updateNotes(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('restaurantId') restaurantId: string,
     @Body('notes') notes: string,
   ) {
@@ -70,7 +71,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: 'Favorite updated successfully' })
   @ApiResponse({ status: 404, description: 'Favorite not found' })
   updateFavorite(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('restaurantId') restaurantId: string,
     @Body() updateFavoriteDto: UpdateFavoriteDto,
   ) {
@@ -82,7 +83,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: 'Restaurant removed from favorites' })
   @ApiResponse({ status: 404, description: 'Favorite not found' })
   removeFavorite(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('restaurantId') restaurantId: string,
   ) {
     return this.favoritesService.removeFavorite(user.id, restaurantId);

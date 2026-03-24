@@ -24,6 +24,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('reviews')
@@ -35,7 +36,7 @@ export class ReviewsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new review' })
-  create(@CurrentUser() user: any, @Body() createReviewDto: CreateReviewDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() createReviewDto: CreateReviewDto) {
     return this.reviewsService.create(user.id, createReviewDto);
   }
 
@@ -95,7 +96,7 @@ export class ReviewsController {
 
   @Get('user')
   @ApiOperation({ summary: 'Get reviews created by current user' })
-  findByUser(@CurrentUser() user: any) {
+  findByUser(@CurrentUser() user: AuthenticatedUser) {
     return this.reviewsService.findByUser(user.id);
   }
 
@@ -109,7 +110,7 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Update a review (only by owner)' })
   update(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateReviewDto: UpdateReviewDto,
   ) {
     return this.reviewsService.update(id, user.id, updateReviewDto);
@@ -121,7 +122,7 @@ export class ReviewsController {
   @ApiOperation({ summary: 'Add owner response to a review' })
   addOwnerResponse(
     @Param('id') id: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() ownerResponseDto: OwnerResponseDto,
   ) {
     return this.reviewsService.addOwnerResponse(
@@ -150,7 +151,7 @@ export class ReviewsController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a review (soft delete)' })
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.reviewsService.remove(id, user.id);
   }
 }

@@ -25,6 +25,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('financial')
@@ -36,11 +37,11 @@ export class FinancialController {
   constructor(private readonly financialService: FinancialService) {}
 
   // SECURITY: Helper to verify user has access to restaurant
-  private verifyRestaurantAccess(user: any, restaurantId: string): void {
+  private verifyRestaurantAccess(user: AuthenticatedUser, restaurantId: string): void {
     const userRestaurants = user.restaurants || [];
     const hasAccess = userRestaurants.some(
-      (r: any) => r.id === restaurantId &&
-        [UserRole.OWNER, UserRole.MANAGER].includes(r.role)
+      (r: { id: string; role: string }) => r.id === restaurantId &&
+        [UserRole.OWNER as string, UserRole.MANAGER as string].includes(r.role)
     );
 
     if (!hasAccess) {
@@ -53,7 +54,7 @@ export class FinancialController {
   @ApiResponse({ status: 201, description: 'Transaction created successfully' })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   createTransaction(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() createTransactionDto: CreateTransactionDto,
   ) {
     this.verifyRestaurantAccess(user, createTransactionDto.restaurant_id);
@@ -75,7 +76,7 @@ export class FinancialController {
   @ApiOperation({ summary: 'Get financial summary for date range' })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getSummary(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query() queryDto: FinancialReportQueryDto,
   ) {
@@ -89,7 +90,7 @@ export class FinancialController {
   @ApiQuery({ name: 'offset', required: false, type: Number })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getTransactions(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query() queryDto: FinancialReportQueryDto,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
@@ -110,7 +111,7 @@ export class FinancialController {
   @ApiQuery({ name: 'end_date', required: true, type: String })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getDailySummary(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
@@ -129,7 +130,7 @@ export class FinancialController {
   @ApiQuery({ name: 'end_date', required: true, type: String })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getRevenueByCategory(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
@@ -148,7 +149,7 @@ export class FinancialController {
   @ApiQuery({ name: 'end_date', required: true, type: String })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getExpensesByCategory(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
@@ -167,7 +168,7 @@ export class FinancialController {
   @ApiQuery({ name: 'end_date', required: true, type: String })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getProfitLoss(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
@@ -186,7 +187,7 @@ export class FinancialController {
   @ApiQuery({ name: 'end_date', required: true, type: String })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   getCashFlow(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,
@@ -213,7 +214,7 @@ export class FinancialController {
   @ApiResponse({ status: 200, description: 'Report exported successfully' })
   @ApiResponse({ status: 403, description: 'Access denied - not affiliated with restaurant' })
   exportReport(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('restaurant_id') restaurantId: string,
     @Query('start_date') startDate: string,
     @Query('end_date') endDate: string,

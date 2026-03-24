@@ -1,20 +1,19 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { QueueService } from '../queue.service';
 import { QueueEntryStatus } from '@/common/enums';
 
 const createMockRepository = () => ({
-  create: vi.fn((data) => ({ id: 'test-id', ...data })),
-  save: vi.fn((data) => Promise.resolve(Array.isArray(data) ? data : { id: 'test-id', ...data })),
-  findOne: vi.fn(),
-  find: vi.fn(),
-  count: vi.fn(),
-  createQueryBuilder: vi.fn(() => ({
-    where: vi.fn().mockReturnThis(),
-    andWhere: vi.fn().mockReturnThis(),
-    orderBy: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
-    getOne: vi.fn().mockResolvedValue(null),
-    getRawOne: vi.fn().mockResolvedValue({ avg: 15 }),
+  create: jest.fn((data: any) => ({ id: 'test-id', ...data })),
+  save: jest.fn((data: any) => Promise.resolve(Array.isArray(data) ? data : { id: 'test-id', ...data })),
+  findOne: jest.fn(),
+  find: jest.fn(),
+  count: jest.fn(),
+  createQueryBuilder: jest.fn(() => ({
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    select: jest.fn().mockReturnThis(),
+    getOne: jest.fn().mockResolvedValue(null),
+    getRawOne: jest.fn().mockResolvedValue({ avg: 15 }),
   })),
 });
 
@@ -64,10 +63,12 @@ describe('QueueService', () => {
     it('should call next person in queue', async () => {
       const mockEntry = { id: 'entry-1', status: QueueEntryStatus.WAITING };
       queueRepository.createQueryBuilder.mockReturnValue({
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        orderBy: vi.fn().mockReturnThis(),
-        getOne: vi.fn().mockResolvedValue(mockEntry),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(mockEntry),
+        getRawOne: jest.fn().mockResolvedValue({ avg: 15 }),
       });
 
       await service.callNext('club-123');
@@ -116,10 +117,12 @@ describe('QueueService', () => {
     it('should return queue statistics', async () => {
       queueRepository.count.mockResolvedValueOnce(10).mockResolvedValueOnce(2);
       queueRepository.createQueryBuilder.mockReturnValue({
-        select: vi.fn().mockReturnThis(),
-        where: vi.fn().mockReturnThis(),
-        andWhere: vi.fn().mockReturnThis(),
-        getRawOne: vi.fn().mockResolvedValue({ avg: 20 }),
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        select: jest.fn().mockReturnThis(),
+        getOne: jest.fn().mockResolvedValue(null),
+        getRawOne: jest.fn().mockResolvedValue({ avg: 20 }),
       });
 
       const result = await service.getQueueStats('club-123');

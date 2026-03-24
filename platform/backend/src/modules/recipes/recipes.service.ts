@@ -4,7 +4,7 @@ import { Repository, IsNull, In } from 'typeorm';
 import { DrinkRecipe } from './entities/drink-recipe.entity';
 import { CreateRecipeDto } from './dto/create-recipe.dto';
 import { UpdateRecipeDto } from './dto/update-recipe.dto';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()
 export class RecipesService {
@@ -18,9 +18,7 @@ export class RecipesService {
    * Global defaults have restaurant_id = null.
    */
   async findByRestaurant(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 20;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.recipeRepository.findAndCount({
       where: [
@@ -28,29 +26,27 @@ export class RecipesService {
         { restaurant_id: IsNull(), is_active: true },
       ],
       order: { category: 'ASC', name: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   /**
    * List only global/default recipes (restaurant_id = null).
    */
   async findDefaults(pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 20;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.recipeRepository.findAndCount({
       where: { restaurant_id: IsNull(), is_active: true },
       order: { category: 'ASC', name: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   /**

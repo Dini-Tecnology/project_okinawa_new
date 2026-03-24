@@ -23,6 +23,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 
 @ApiTags('approvals')
@@ -38,7 +39,7 @@ export class ApprovalsController {
   @ApiResponse({ status: 201, description: 'Approval request created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid approval data' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
-  create(@Body() dto: CreateApprovalDto, @CurrentUser() user: any) {
+  create(@Body() dto: CreateApprovalDto, @CurrentUser() user: AuthenticatedUser) {
     return this.approvalsService.create(dto, user.id);
   }
 
@@ -108,7 +109,7 @@ export class ApprovalsController {
   resolve(
     @Param('id') id: string,
     @Body() dto: ResolveApprovalDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.approvalsService.resolve(id, dto, user.id);
   }

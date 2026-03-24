@@ -5,6 +5,7 @@ import { CreateInventoryItemDto } from '../dto/create-inventory-item.dto';
 import { UpdateInventoryItemDto } from '../dto/update-inventory-item.dto';
 import { UpdateItemLevelDto } from '../dto/update-item-level.dto';
 import { InventoryCategory, InventoryUnit } from '../entities/inventory-item.entity';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('InventoryController', () => {
   let controller: InventoryController;
@@ -49,7 +50,7 @@ describe('InventoryController', () => {
     estimatedStockValue: 1500.0,
   };
 
-  const mockUser = { id: 'user-1', roles: [{ role: 'manager' }] };
+  const mockUser = mockAuthenticatedUser({ id: 'user-1', roles: ['manager'] });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

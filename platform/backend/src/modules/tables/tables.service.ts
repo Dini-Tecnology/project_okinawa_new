@@ -6,7 +6,7 @@ import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { UpdateTableStatusDto } from './dto/update-table-status.dto';
 import { EventsGateway } from '@/modules/events/events.gateway';
-import { PaginationDto, paginate } from '@/common/dto/pagination.dto';
+import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()
 export class TablesService {
@@ -54,18 +54,16 @@ export class TablesService {
   }
 
   async findAll(restaurantId: string, pagination?: PaginationDto) {
-    const page = pagination?.page || 1;
-    const limit = pagination?.limit || 10;
-    const skip = (page - 1) * limit;
+    const dto = toPaginationDto(pagination);
 
     const [items, total] = await this.tableRepository.findAndCount({
       where: { restaurant_id: restaurantId },
       order: { table_number: 'ASC' },
-      skip,
-      take: limit,
+      skip: dto.offset,
+      take: dto.limit,
     });
 
-    return paginate(items, total, { page, limit } as PaginationDto);
+    return paginate(items, total, dto);
   }
 
   async findOne(id: string) {

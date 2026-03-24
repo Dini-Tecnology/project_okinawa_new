@@ -8,7 +8,10 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Logger } from '@nestjs/common';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
+import { getWsCorsConfig } from '@common/config/ws-cors.config';
 import { WaitlistEntry } from './entities';
 
 export interface WaitlistUpdatePayload {
@@ -26,9 +29,7 @@ export interface WaitlistUpdatePayload {
 
 @WebSocketGateway({
   namespace: '/waitlist',
-  cors: {
-    origin: '*',
-  },
+  cors: getWsCorsConfig(),
 })
 export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(WaitlistGateway.name);
@@ -36,12 +37,39 @@ export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
-    this.logger.log(`Waitlist client connected: ${client.id}`);
+  constructor(private jwtService: JwtService) {}
+
+  async handleConnection(client: AuthenticatedSocket) {
+    try {
+      const token = client.handshake.auth?.token;
+
+      if (!token) {
+        this.logger.warn(`Waitlist client ${client.id} rejected: no token`);
+        client.disconnect();
+        return;
+      }
+
+      const payload = await this.jwtService.verifyAsync(token);
+
+      client.user = {
+        id: payload.sub,
+        email: payload.email,
+        roles: payload.roles || [],
+        restaurant_id: payload.restaurant_id,
+      };
+
+      this.logger.log(
+        `Waitlist client connected: ${client.id} (user: ${client.user.email})`,
+      );
+    } catch (error: any) {
+      this.logger.error(`Waitlist client ${client.id} auth error: ${error.message}`);
+      client.disconnect();
+    }
   }
 
-  handleDisconnect(client: Socket) {
-    this.logger.log(`Waitlist client disconnected: ${client.id}`);
+  handleDisconnect(client: AuthenticatedSocket) {
+    const userId = client.user?.id ?? 'unknown';
+    this.logger.log(`Waitlist client disconnected: ${client.id} (user: ${userId})`);
   }
 
   /**
@@ -49,9 +77,12 @@ export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect
    */
   @SubscribeMessage('subscribe:waitlist')
   handleSubscribeWaitlist(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { restaurantId: string },
   ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const room = `waitlist:${data.restaurantId}`;
     client.join(room);
     this.logger.log(`Client ${client.id} joined room ${room}`);
@@ -63,9 +94,12 @@ export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect
    */
   @SubscribeMessage('unsubscribe:waitlist')
   handleUnsubscribeWaitlist(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { restaurantId: string },
   ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const room = `waitlist:${data.restaurantId}`;
     client.leave(room);
     this.logger.log(`Client ${client.id} left room ${room}`);
@@ -77,9 +111,12 @@ export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect
    */
   @SubscribeMessage('subscribe:myPosition')
   handleSubscribePosition(
-    @ConnectedSocket() client: Socket,
+    @ConnectedSocket() client: AuthenticatedSocket,
     @MessageBody() data: { restaurantId: string; userId: string },
   ) {
+    if (!client.user) {
+      return { event: 'error', data: { message: 'Unauthorized' } };
+    }
     const room = `waitlist:${data.restaurantId}:user:${data.userId}`;
     client.join(room);
     this.logger.log(`Client ${client.id} subscribed to position in ${room}`);

@@ -1,10 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { TabsService } from './tabs.service';
-import { CreateTabDto } from './dto/create-tab.dto';
-import { AddTabItemDto } from './dto/add-tab-item.dto';
-import { JoinTabDto } from './dto/join-tab.dto';
-import { ProcessTabPaymentDto } from './dto/process-tab-payment.dto';
+import { CreateTabDto, AddTabItemDto, JoinTabDto, ProcessTabPaymentDto } from './dto';
 import { TabStatus } from '@/common/enums';
 
 @ApiTags('Tabs')

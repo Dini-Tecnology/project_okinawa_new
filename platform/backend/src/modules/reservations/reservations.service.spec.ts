@@ -52,6 +52,18 @@ describe('ReservationsService', () => {
     }),
   };
 
+  const mockQueryRunner = {
+    connect: jest.fn().mockResolvedValue(undefined),
+    startTransaction: jest.fn().mockResolvedValue(undefined),
+    commitTransaction: jest.fn().mockResolvedValue(undefined),
+    rollbackTransaction: jest.fn().mockResolvedValue(undefined),
+    release: jest.fn().mockResolvedValue(undefined),
+    manager: {
+      findOne: jest.fn(),
+      save: jest.fn().mockImplementation((entity) => Promise.resolve(entity)),
+    },
+  };
+
   const mockDataSource = {
     transaction: jest.fn().mockImplementation((cb) => cb({
       findOne: jest.fn(),
@@ -63,20 +75,21 @@ describe('ReservationsService', () => {
         execute: jest.fn().mockResolvedValue({ affected: 1 }),
       }),
     })),
-    createQueryRunner: jest.fn().mockReturnValue({
-      connect: jest.fn(),
-      startTransaction: jest.fn(),
-      commitTransaction: jest.fn(),
-      rollbackTransaction: jest.fn(),
-      release: jest.fn(),
-      manager: {
-        findOne: jest.fn(),
-        save: jest.fn(),
-      },
-    }),
+    createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
+    // Restore mock implementations after clearAllMocks
+    mockDataSource.createQueryRunner.mockReturnValue(mockQueryRunner);
+    mockQueryRunner.connect.mockResolvedValue(undefined);
+    mockQueryRunner.startTransaction.mockResolvedValue(undefined);
+    mockQueryRunner.commitTransaction.mockResolvedValue(undefined);
+    mockQueryRunner.rollbackTransaction.mockResolvedValue(undefined);
+    mockQueryRunner.release.mockResolvedValue(undefined);
+    mockQueryRunner.manager.save.mockImplementation((entity) => Promise.resolve(entity));
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ReservationsService,
@@ -93,8 +106,6 @@ describe('ReservationsService', () => {
 
     service = module.get<ReservationsService>(ReservationsService);
     reservationRepository = module.get(getRepositoryToken(Reservation));
-
-    jest.clearAllMocks();
   });
 
   describe('create', () => {
@@ -107,13 +118,12 @@ describe('ReservationsService', () => {
       };
 
       mockReservationRepository.create.mockReturnValue(mockReservation);
-      mockReservationRepository.save.mockResolvedValue(mockReservation);
+      // create() now uses queryRunner.manager.save (set up in mockDataSource)
 
       const result = await service.create('user-1', createDto);
 
       expect(result).toEqual(mockReservation);
       expect(mockReservationRepository.create).toHaveBeenCalled();
-      expect(mockReservationRepository.save).toHaveBeenCalled();
     });
 
     it('should throw InternalServerErrorException on save error', async () => {
@@ -125,7 +135,8 @@ describe('ReservationsService', () => {
       };
 
       mockReservationRepository.create.mockReturnValue(mockReservation);
-      mockReservationRepository.save.mockRejectedValue(new Error('DB Error'));
+      // Override queryRunner.manager.save to reject
+      mockQueryRunner.manager.save.mockRejectedValueOnce(new Error('DB Error'));
 
       await expect(service.create('user-1', createDto)).rejects.toThrow(
         'Failed to create reservation',

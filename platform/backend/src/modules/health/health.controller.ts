@@ -8,6 +8,7 @@ import {
   DiskHealthIndicator,
 } from '@nestjs/terminus';
 import { Public } from '@/common/decorators/public.decorator';
+import { CircuitBreakerHealthIndicator } from './circuit-breaker.health';
 
 /** Maximum heap memory in bytes (500MB) */
 const MAX_HEAP_MEMORY_BYTES = 500 * 1024 * 1024;
@@ -24,6 +25,7 @@ export class HealthController {
     private db: TypeOrmHealthIndicator,
     private memory: MemoryHealthIndicator,
     private disk: DiskHealthIndicator,
+    private circuitBreakerHealth: CircuitBreakerHealthIndicator,
   ) {}
 
   @Get()
@@ -49,6 +51,9 @@ export class HealthController {
           path: '/',
           thresholdPercent: MIN_DISK_SPACE_PERCENT,
         }),
+
+      // Circuit breaker status (open circuits = degraded)
+      () => this.circuitBreakerHealth.check('circuit_breakers'),
     ]);
   }
 
@@ -74,5 +79,24 @@ export class HealthController {
       // Only check database for readiness
       () => this.db.pingCheck('database'),
     ]);
+  }
+
+  @Get('maintenance')
+  @Public()
+  @ApiOperation({ summary: 'Check current maintenance mode status' })
+  @ApiResponse({ status: 200, description: 'Returns maintenance mode status' })
+  async maintenanceStatus() {
+    const isMaintenanceMode = process.env.MAINTENANCE_MODE === 'true';
+    const message =
+      process.env.MAINTENANCE_MESSAGE ||
+      'We are currently performing scheduled maintenance. Please try again later.';
+    const estimatedEnd = process.env.MAINTENANCE_ESTIMATED_END || null;
+
+    return {
+      maintenance: isMaintenanceMode,
+      message: isMaintenanceMode ? message : null,
+      estimatedEnd: isMaintenanceMode ? estimatedEnd : null,
+      timestamp: new Date().toISOString(),
+    };
   }
 }

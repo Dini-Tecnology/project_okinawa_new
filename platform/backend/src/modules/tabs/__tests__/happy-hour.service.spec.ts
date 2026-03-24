@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+// @ts-nocheck
 import { HappyHourService } from '../happy-hour.service';
 import { DayOfWeek } from '@/common/enums';
 
 const createMockRepository = () => ({
-  create: vi.fn((data) => ({ id: 'test-id', ...data })),
-  save: vi.fn((data) => Promise.resolve({ id: 'test-id', ...data })),
-  findOne: vi.fn(),
-  find: vi.fn(),
-  delete: vi.fn(),
+  create: jest.fn((data) => ({ id: 'test-id', ...data })),
+  save: jest.fn((data) => Promise.resolve({ id: 'test-id', ...data })),
+  findOne: jest.fn(),
+  find: jest.fn(),
+  delete: jest.fn(),
 });
 
 describe('HappyHourService', () => {
@@ -19,11 +19,15 @@ describe('HappyHourService', () => {
     service = new HappyHourService(scheduleRepository as any);
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('createSchedule', () => {
     it('should create a new happy hour schedule', async () => {
       const dto = {
         restaurant_id: 'rest-123',
-        name: 'Happy Hour Clássico',
+        name: 'Happy Hour Classico',
         days: [DayOfWeek.MON, DayOfWeek.TUE, DayOfWeek.WED, DayOfWeek.THU, DayOfWeek.FRI],
         start_time: '17:00',
         end_time: '20:00',
@@ -71,8 +75,9 @@ describe('HappyHourService', () => {
   describe('getActivePromotions', () => {
     it('should return active promotions for current day and time', async () => {
       // Mock current time: Wednesday at 18:00
+      jest.useFakeTimers();
       const mockDate = new Date('2024-01-10T18:00:00'); // Wednesday
-      vi.setSystemTime(mockDate);
+      jest.setSystemTime(mockDate);
 
       const schedules = [
         {
@@ -99,14 +104,13 @@ describe('HappyHourService', () => {
 
       expect(result).toHaveLength(1);
       expect(result[0].name).toBe('Weekday Happy Hour');
-
-      vi.useRealTimers();
     });
 
     it('should return empty if outside happy hour time', async () => {
       // Mock current time: Wednesday at 21:00 (after happy hour)
+      jest.useFakeTimers();
       const mockDate = new Date('2024-01-10T21:00:00');
-      vi.setSystemTime(mockDate);
+      jest.setSystemTime(mockDate);
 
       const schedules = [
         {
@@ -124,15 +128,14 @@ describe('HappyHourService', () => {
       const result = await service.getActivePromotions('rest-123');
 
       expect(result).toHaveLength(0);
-
-      vi.useRealTimers();
     });
   });
 
   describe('calculateDiscount', () => {
     it('should calculate percentage discount correctly', async () => {
+      jest.useFakeTimers();
       const mockDate = new Date('2024-01-10T18:00:00'); // Wednesday at 18:00
-      vi.setSystemTime(mockDate);
+      jest.setSystemTime(mockDate);
 
       scheduleRepository.find.mockResolvedValue([
         {
@@ -153,13 +156,12 @@ describe('HappyHourService', () => {
       expect(result.discountedPrice).toBe(70);
       expect(result.discountAmount).toBe(30);
       expect(result.discountReason).toBe('Happy Hour 30% OFF');
-
-      vi.useRealTimers();
     });
 
     it('should calculate fixed discount correctly', async () => {
+      jest.useFakeTimers();
       const mockDate = new Date('2024-01-10T18:00:00');
-      vi.setSystemTime(mockDate);
+      jest.setSystemTime(mockDate);
 
       scheduleRepository.find.mockResolvedValue([
         {
@@ -179,8 +181,6 @@ describe('HappyHourService', () => {
 
       expect(result.discountedPrice).toBe(20);
       expect(result.discountAmount).toBe(5);
-
-      vi.useRealTimers();
     });
 
     it('should return no discount if no active promotions', async () => {
@@ -194,8 +194,9 @@ describe('HappyHourService', () => {
     });
 
     it('should apply discount only to specified categories', async () => {
+      jest.useFakeTimers();
       const mockDate = new Date('2024-01-10T18:00:00');
-      vi.setSystemTime(mockDate);
+      jest.setSystemTime(mockDate);
 
       scheduleRepository.find.mockResolvedValue([
         {
@@ -229,8 +230,6 @@ describe('HappyHourService', () => {
         20,
       );
       expect(foodResult.discountAmount).toBe(0);
-
-      vi.useRealTimers();
     });
   });
 

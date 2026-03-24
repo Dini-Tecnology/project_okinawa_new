@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnalyticsService } from './analytics.service';
+import { AnalyticsMetricsService } from './analytics-metrics.service';
+import { AnalyticsAggregationService } from './analytics-aggregation.service';
+import { AnalyticsForecastService } from './analytics-forecast.service';
 import { AnalyticsController } from './analytics.controller';
 import { Order } from '@/modules/orders/entities/order.entity';
 import { Reservation } from '@/modules/reservations/entities/reservation.entity';
@@ -33,12 +36,15 @@ import {
   ],
   controllers: [AnalyticsController],
   providers: [
-    AnalyticsService,
     MetricsCalculatorHelper,
     SalesAggregatorHelper,
     CustomerAnalyticsHelper,
     PerformanceMetricsHelper,
     ForecastHelper,
+    AnalyticsMetricsService,
+    AnalyticsAggregationService,
+    AnalyticsForecastService,
+    AnalyticsService,
   ],
   exports: [AnalyticsService],
 })

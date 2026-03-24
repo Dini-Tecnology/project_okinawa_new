@@ -12,6 +12,7 @@ import { RedeemRewardDto } from './dto/redeem-reward.dto';
 import { UpdateLoyaltyProgramDto } from './dto/update-loyalty-program.dto';
 import { AddStampDto } from './dto/add-stamp.dto';
 import { EventsGateway } from '@/modules/events/events.gateway';
+import { PAGINATION } from '@common/constants/limits';
 
 export interface LoyaltyTierInfo {
   name: LoyaltyTierEnum;
@@ -514,8 +515,8 @@ export class LoyaltyService {
   /**
    * Get leaderboard for restaurant with pagination
    */
-  async getLeaderboard(restaurantId: string, limit: number = 10, page: number = 1) {
-    const validLimit = Math.min(Math.max(1, limit), 100);
+  async getLeaderboard(restaurantId: string, limit: number = PAGINATION.LEADERBOARD_DEFAULT, page: number = 1) {
+    const validLimit = Math.min(Math.max(1, limit), PAGINATION.LEADERBOARD_MAX);
     const validPage = Math.max(1, page);
     const skip = (validPage - 1) * validLimit;
 

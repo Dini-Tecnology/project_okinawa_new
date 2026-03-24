@@ -23,6 +23,7 @@ import { UpdateAuthDto } from './dto/update-auth.dto';
 import { EnableMfaDto, VerifyMfaDto, DisableMfaDto } from './dto/enable-mfa.dto';
 import { Public } from '@/common/decorators/public.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { MfaService } from './services/mfa.service';
 
@@ -110,7 +111,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Get current user' })
   @ApiResponse({ status: 200, description: 'Returns current user profile' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async getCurrentUser(@CurrentUser() user: any) {
+  async getCurrentUser(@CurrentUser() user: AuthenticatedUser) {
     return this.authService.getCurrentUser(user.id);
   }
 
@@ -121,7 +122,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateProfile(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() updateAuthDto: UpdateAuthDto,
     @Req() req: Request,
     @Headers('user-agent') userAgent?: string,
@@ -169,7 +170,7 @@ export class AuthController {
     },
   })
   async logout(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Req() req: Request,
     @Headers('authorization') authorization: string,
     @Headers('user-agent') userAgent?: string,
@@ -189,7 +190,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Returns MFA secret and QR code URL' })
   @ApiResponse({ status: 400, description: 'MFA already enabled' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async setupMfa(@CurrentUser() user: any) {
+  async setupMfa(@CurrentUser() user: AuthenticatedUser) {
     return this.mfaService.setupMfa(user.id);
   }
 
@@ -201,7 +202,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'MFA setup not initiated' })
   @ApiResponse({ status: 401, description: 'Invalid TOTP code' })
   async enableMfa(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() enableMfaDto: EnableMfaDto,
     @Req() req: Request,
     @Headers('user-agent') userAgent?: string,
@@ -219,7 +220,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'MFA not enabled' })
   @ApiResponse({ status: 401, description: 'Invalid password or TOTP code' })
   async disableMfa(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() disableMfaDto: DisableMfaDto,
     @Req() req: Request,
     @Headers('user-agent') userAgent?: string,
@@ -243,7 +244,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'MFA code verified' })
   @ApiResponse({ status: 401, description: 'Invalid MFA code' })
   async verifyMfa(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() verifyMfaDto: VerifyMfaDto,
   ) {
     const isValid = await this.mfaService.verifyMfaCode(user.id, verifyMfaDto.totp_code);
@@ -259,7 +260,7 @@ export class AuthController {
   @SkipThrottle()
   @ApiOperation({ summary: 'Check MFA status for current user' })
   @ApiResponse({ status: 200, description: 'Returns MFA enabled status' })
-  async getMfaStatus(@CurrentUser() user: any) {
+  async getMfaStatus(@CurrentUser() user: AuthenticatedUser) {
     const enabled = await this.mfaService.isMfaEnabled(user.id);
     return { mfa_enabled: enabled };
   }
@@ -273,7 +274,7 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'MFA not enabled' })
   @ApiResponse({ status: 401, description: 'Invalid TOTP code' })
   async regenerateBackupCodes(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() verifyMfaDto: VerifyMfaDto,
     @Req() req: Request,
     @Headers('user-agent') userAgent?: string,

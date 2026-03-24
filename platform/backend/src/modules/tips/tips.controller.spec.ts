@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TipsController } from './tips.controller';
 import { TipsService } from './tips.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('TipsController', () => {
   let controller: TipsController;
@@ -31,7 +32,7 @@ describe('TipsController', () => {
 
   it('should create a tip', async () => {
     mockService.create.mockResolvedValue({ id: 'tip-1' });
-    const result = await controller.create({ id: 'user-1' }, { amount: 10 } as any);
+    const result = await controller.create(mockAuthenticatedUser({ id: 'user-1' }), { amount: 10 } as any);
     expect(result).toBeDefined();
   });
 
@@ -43,7 +44,7 @@ describe('TipsController', () => {
 
   it('should get staff tips', async () => {
     mockService.findByStaff.mockResolvedValue([{ id: 'tip-1' }]);
-    const mockUser = { id: 'staff-1', roles: ['waiter'] };
+    const mockUser = mockAuthenticatedUser({ id: 'staff-1', roles: ['waiter'] });
     const result = await controller.getStaffTips(mockUser, 'staff-1');
     expect(result).toBeDefined();
   });

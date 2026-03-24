@@ -1,323 +1,160 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyticsService } from './analytics.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Order } from '../orders/entities/order.entity';
-import { Reservation } from '../reservations/entities/reservation.entity';
-import { Review } from '../reviews/entities/review.entity';
-import { LoyaltyProgram } from '../loyalty/entities/loyalty-program.entity';
-import { Tip } from '../tips/entities/tip.entity';
-import { RestaurantTable } from '../tables/entities/restaurant-table.entity';
-import { FinancialTransaction } from '../financial/entities/financial-transaction.entity';
-import { Attendance } from '../hr/entities/attendance.entity';
-import {
-  MetricsCalculatorHelper,
-  SalesAggregatorHelper,
-  CustomerAnalyticsHelper,
-  PerformanceMetricsHelper,
-  ForecastHelper,
-} from './helpers';
+import { AnalyticsMetricsService } from './analytics-metrics.service';
+import { AnalyticsAggregationService } from './analytics-aggregation.service';
+import { AnalyticsForecastService } from './analytics-forecast.service';
 
-describe('AnalyticsService', () => {
+describe('AnalyticsService (facade)', () => {
   let service: AnalyticsService;
-  let orderRepository: Repository<Order>;
-  let reservationRepository: Repository<Reservation>;
-  let reviewRepository: Repository<Review>;
-  let loyaltyProgramRepository: Repository<LoyaltyProgram>;
-  let tipRepository: Repository<Tip>;
-  let tableRepository: Repository<RestaurantTable>;
-  let financialTransactionRepository: Repository<FinancialTransaction>;
-  let attendanceRepository: Repository<Attendance>;
+  let metricsService: AnalyticsMetricsService;
+  let aggregationService: AnalyticsAggregationService;
+  let forecastService: AnalyticsForecastService;
 
-  const mockQueryBuilder = () => ({
-    select: jest.fn().mockReturnThis(),
-    addSelect: jest.fn().mockReturnThis(),
-    where: jest.fn().mockReturnThis(),
-    andWhere: jest.fn().mockReturnThis(),
-    orWhere: jest.fn().mockReturnThis(),
-    setParameters: jest.fn().mockReturnThis(),
-    getRawOne: jest.fn(),
-    getRawMany: jest.fn(),
-    getCount: jest.fn(),
-    getMany: jest.fn(),
-    groupBy: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
-    leftJoinAndSelect: jest.fn().mockReturnThis(),
-  });
+  const mockDashboard = {
+    today: { revenue: 500, orders: 10, reservations: 5, average_order_value: 50 },
+    week: { revenue: 3500, orders: 70, reservations: 35, average_order_value: 50 },
+    month: { revenue: 15000, orders: 300, reservations: 150, average_order_value: 50 },
+    comparisons: {
+      revenue_vs_last_week: 9.38,
+      orders_vs_last_week: 7.69,
+      revenue_vs_last_month: 7.14,
+      orders_vs_last_month: 7.14,
+    },
+  };
+
+  const mockRealTime = {
+    active_orders: 10,
+    active_reservations: 5,
+    occupied_tables: 15,
+    staff_on_duty: 8,
+    revenue_last_hour: 125,
+  };
+
+  const mockSales = {
+    period: { start_date: new Date(), end_date: new Date() },
+    total_revenue: 250,
+    total_orders: 2,
+    average_order_value: 125,
+    top_selling_items: [],
+    sales_by_day: [],
+    sales_by_hour: [],
+    peak_hours: [],
+  };
+
+  const mockCustomer = {
+    total_customers: 2,
+    new_customers: 1,
+    returning_customers: 1,
+    loyalty_members: 2,
+    loyalty_distribution: [],
+    average_visits_per_customer: 1.5,
+    average_spend_per_customer: 162.5,
+    top_customers: [],
+  };
+
+  const mockPerformance = {
+    overall_rating: 4.5,
+    total_reviews: 2,
+    rating_distribution: { five_star: 1, four_star: 1, three_star: 0, two_star: 0, one_star: 0 },
+    sentiment_score: 90,
+    table_turnover_rate: 0,
+    average_wait_time: 0,
+    reservation_no_show_rate: 33.33,
+    staff_efficiency: { average_order_completion_time: 0, average_tips_per_staff: 22.5, attendance_rate: 66.67 },
+  };
+
+  const mockForecast = {
+    forecast: [{ date: '2024-02-01', predicted_revenue: 550 }],
+    confidence: 85,
+  };
+
+  const mockMetricsService = {
+    getDashboardMetrics: jest.fn().mockResolvedValue(mockDashboard),
+    getRealTimeMetrics: jest.fn().mockResolvedValue(mockRealTime),
+  };
+
+  const mockAggregationService = {
+    getSalesAnalytics: jest.fn().mockResolvedValue(mockSales),
+    getCustomerAnalytics: jest.fn().mockResolvedValue(mockCustomer),
+    getRestaurantPerformance: jest.fn().mockResolvedValue(mockPerformance),
+  };
+
+  const mockForecastService = {
+    getRevenueForecast: jest.fn().mockResolvedValue(mockForecast),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AnalyticsService,
-        {
-          provide: getRepositoryToken(Order),
-          useValue: {
-            count: jest.fn(),
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(Reservation),
-          useValue: {
-            count: jest.fn(),
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(Review),
-          useValue: {
-            count: jest.fn(),
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(LoyaltyProgram),
-          useValue: {
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(Tip),
-          useValue: {
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(RestaurantTable),
-          useValue: {
-            count: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(FinancialTransaction),
-          useValue: {
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        {
-          provide: getRepositoryToken(Attendance),
-          useValue: {
-            count: jest.fn(),
-            find: jest.fn(),
-            createQueryBuilder: jest.fn(() => mockQueryBuilder()),
-          },
-        },
-        MetricsCalculatorHelper,
-        SalesAggregatorHelper,
-        CustomerAnalyticsHelper,
-        PerformanceMetricsHelper,
-        ForecastHelper,
+        { provide: AnalyticsMetricsService, useValue: mockMetricsService },
+        { provide: AnalyticsAggregationService, useValue: mockAggregationService },
+        { provide: AnalyticsForecastService, useValue: mockForecastService },
       ],
     }).compile();
 
     service = module.get<AnalyticsService>(AnalyticsService);
-    orderRepository = module.get<Repository<Order>>(getRepositoryToken(Order));
-    reservationRepository = module.get<Repository<Reservation>>(getRepositoryToken(Reservation));
-    reviewRepository = module.get<Repository<Review>>(getRepositoryToken(Review));
-    loyaltyProgramRepository = module.get<Repository<LoyaltyProgram>>(getRepositoryToken(LoyaltyProgram));
-    tipRepository = module.get<Repository<Tip>>(getRepositoryToken(Tip));
-    tableRepository = module.get<Repository<RestaurantTable>>(getRepositoryToken(RestaurantTable));
-    financialTransactionRepository = module.get<Repository<FinancialTransaction>>(getRepositoryToken(FinancialTransaction));
-    attendanceRepository = module.get<Repository<Attendance>>(getRepositoryToken(Attendance));
+    metricsService = module.get(AnalyticsMetricsService);
+    aggregationService = module.get(AnalyticsAggregationService);
+    forecastService = module.get(AnalyticsForecastService);
+
+    jest.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
+  // ────────── Metrics delegates ──────────
 
   describe('getDashboardMetrics', () => {
-    it('should return dashboard metrics', async () => {
-      const mockOrdersMetrics = {
-        today_revenue: 500,
-        today_orders: 10,
-        week_revenue: 3500,
-        week_orders: 70,
-        month_revenue: 15000,
-        month_orders: 300,
-        last_week_revenue: 3200,
-        last_week_orders: 65,
-        last_month_revenue: 14000,
-        last_month_orders: 280,
-      };
-
-      const ordersQB = mockQueryBuilder();
-      ordersQB.getRawOne.mockResolvedValue(mockOrdersMetrics);
-      jest.spyOn(orderRepository, 'createQueryBuilder').mockReturnValue(ordersQB as any);
-
-      const mockReservationsMetrics = {
-        today_reservations: 5,
-        week_reservations: 35,
-        month_reservations: 150,
-      };
-
-      const reservationsQB = mockQueryBuilder();
-      reservationsQB.getRawOne.mockResolvedValue(mockReservationsMetrics);
-      jest.spyOn(reservationRepository, 'createQueryBuilder').mockReturnValue(reservationsQB as any);
-
-      const result = await service.getDashboardMetrics('restaurant-1');
-
-      expect(result).toBeDefined();
-      expect(result.today).toBeDefined();
-      expect(result.week).toBeDefined();
-      expect(result.month).toBeDefined();
-      expect(result.comparisons).toBeDefined();
+    it('should delegate to metricsService.getDashboardMetrics', async () => {
+      await service.getDashboardMetrics('r1');
+      expect(mockMetricsService.getDashboardMetrics).toHaveBeenCalledWith('r1');
     });
   });
 
   describe('getRealTimeMetrics', () => {
-    it('should return real-time metrics', async () => {
-      jest.spyOn(orderRepository, 'count').mockResolvedValue(10);
-      jest.spyOn(reservationRepository, 'count').mockResolvedValue(5);
-      jest.spyOn(tableRepository, 'count').mockResolvedValue(15);
-      jest.spyOn(attendanceRepository, 'count').mockResolvedValue(8);
-      jest.spyOn(orderRepository, 'find').mockResolvedValue([
-        { total_amount: 50 },
-        { total_amount: 75 },
-      ] as any);
-
-      const result = await service.getRealTimeMetrics('restaurant-1');
-
-      expect(result).toBeDefined();
-      expect(result.active_orders).toBe(10);
-      expect(result.active_reservations).toBe(5);
-      expect(result.occupied_tables).toBe(15);
-      expect(result.staff_on_duty).toBe(8);
-      expect(result.revenue_last_hour).toBeDefined();
+    it('should delegate to metricsService.getRealTimeMetrics', async () => {
+      await service.getRealTimeMetrics('r1');
+      expect(mockMetricsService.getRealTimeMetrics).toHaveBeenCalledWith('r1');
     });
   });
 
+  // ────────── Aggregation delegates ──────────
+
   describe('getSalesAnalytics', () => {
-    it('should return sales analytics', async () => {
-      const mockOrders = [
-        {
-          id: 'order-1',
-          total_amount: 100,
-          created_at: new Date('2024-01-15T10:00:00'),
-          items: [
-            { menu_item_id: 'item-1', quantity: 2, unit_price: 25 },
-            { menu_item_id: 'item-2', quantity: 1, unit_price: 50 },
-          ]
-        },
-        {
-          id: 'order-2',
-          total_amount: 150,
-          created_at: new Date('2024-01-15T14:00:00'),
-          items: [
-            { menu_item_id: 'item-1', quantity: 3, unit_price: 25 },
-            { menu_item_id: 'item-3', quantity: 1, unit_price: 75 },
-          ]
-        },
-      ];
-
-      jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders as any);
-
-      const result = await service.getSalesAnalytics(
-        'restaurant-1',
-        new Date('2024-01-01'),
-        new Date('2024-01-31'),
-      );
-
-      expect(result).toBeDefined();
-      expect(result.total_revenue).toBe(250);
-      expect(result.total_orders).toBe(2);
-      expect(result.period).toBeDefined();
-      expect(result.top_selling_items).toBeDefined();
-      expect(result.sales_by_day).toBeDefined();
-      expect(result.sales_by_hour).toBeDefined();
+    it('should delegate to aggregationService.getSalesAnalytics', async () => {
+      const start = new Date('2024-01-01');
+      const end = new Date('2024-01-31');
+      await service.getSalesAnalytics('r1', start, end);
+      expect(mockAggregationService.getSalesAnalytics).toHaveBeenCalledWith('r1', start, end);
     });
   });
 
   describe('getCustomerAnalytics', () => {
-    it('should return customer analytics', async () => {
-      const mockOrders = [
-        { user_id: 'user-1', total_amount: 100 },
-        { user_id: 'user-2', total_amount: 150 },
-        { user_id: 'user-1', total_amount: 75 },
-      ];
-
-      const mockLoyaltyPrograms = [
-        { tier: 'gold', user_id: 'user-1', restaurant_id: 'restaurant-1' },
-        { tier: 'silver', user_id: 'user-2', restaurant_id: 'restaurant-1' },
-      ];
-
-      jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders as any);
-      jest.spyOn(loyaltyProgramRepository, 'find').mockResolvedValue(mockLoyaltyPrograms as any);
-
-      const result = await service.getCustomerAnalytics(
-        'restaurant-1',
-        new Date('2024-01-01'),
-        new Date('2024-01-31'),
-      );
-
-      expect(result).toBeDefined();
-      expect(result.total_customers).toBe(2);
-      expect(result.loyalty_members).toBe(2);
+    it('should delegate to aggregationService.getCustomerAnalytics', async () => {
+      const start = new Date('2024-01-01');
+      const end = new Date('2024-01-31');
+      await service.getCustomerAnalytics('r1', start, end);
+      expect(mockAggregationService.getCustomerAnalytics).toHaveBeenCalledWith('r1', start, end);
     });
   });
 
   describe('getRestaurantPerformance', () => {
-    it('should return restaurant performance metrics', async () => {
-      const mockReviews = [
-        { rating: 5, comment: 'Great!' },
-        { rating: 4, comment: 'Good' },
-      ];
-      jest.spyOn(reviewRepository, 'find').mockResolvedValue(mockReviews as any);
-
-      const mockReservations = [
-        { id: 'res-1', status: 'completed' },
-        { id: 'res-2', status: 'no_show' },
-        { id: 'res-3', status: 'completed' },
-      ];
-      jest.spyOn(reservationRepository, 'find').mockResolvedValue(mockReservations as any);
-
-      const mockTips = [
-        { staff_id: 'staff-1', amount: 10 },
-        { staff_id: 'staff-1', amount: 15 },
-        { staff_id: 'staff-2', amount: 20 },
-      ];
-      jest.spyOn(tipRepository, 'find').mockResolvedValue(mockTips as any);
-
-      const mockAttendances = [
-        { status: 'present' },
-        { status: 'late' },
-        { status: 'absent' },
-      ];
-      jest.spyOn(attendanceRepository, 'find').mockResolvedValue(mockAttendances as any);
-
-      const result = await service.getRestaurantPerformance('restaurant-1');
-
-      expect(result).toBeDefined();
-      expect(result.overall_rating).toBeDefined();
-      expect(result.total_reviews).toBe(2);
-      expect(result.rating_distribution).toBeDefined();
-      expect(result.reservation_no_show_rate).toBeDefined();
-      expect(result.staff_efficiency.average_tips_per_staff).toBeDefined();
-      expect(result.staff_efficiency.attendance_rate).toBeDefined();
+    it('should delegate to aggregationService.getRestaurantPerformance', async () => {
+      await service.getRestaurantPerformance('r1');
+      expect(mockAggregationService.getRestaurantPerformance).toHaveBeenCalledWith('r1');
     });
   });
 
+  // ────────── Forecast delegates ──────────
+
   describe('getRevenueForecast', () => {
-    it('should return revenue forecast', async () => {
-      const mockOrders = [
-        { total_amount: 500, created_at: new Date('2024-01-01') },
-        { total_amount: 550, created_at: new Date('2024-01-02') },
-        { total_amount: 600, created_at: new Date('2024-01-03') },
-      ];
-      jest.spyOn(orderRepository, 'find').mockResolvedValue(mockOrders as any);
+    it('should delegate to forecastService.getRevenueForecast', async () => {
+      await service.getRevenueForecast('r1', 7);
+      expect(mockForecastService.getRevenueForecast).toHaveBeenCalledWith('r1', 7);
+    });
 
-      const result = await service.getRevenueForecast('restaurant-1', 7);
-
-      expect(result).toBeDefined();
-      expect(result.forecast).toBeDefined();
-      expect(result.confidence).toBeDefined();
-      expect(Array.isArray(result.forecast)).toBe(true);
+    it('should pass undefined days when not specified', async () => {
+      await service.getRevenueForecast('r1');
+      expect(mockForecastService.getRevenueForecast).toHaveBeenCalledWith('r1', undefined);
     });
   });
 });

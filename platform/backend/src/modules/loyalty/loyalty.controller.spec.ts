@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoyaltyController } from './loyalty.controller';
 import { LoyaltyService } from './loyalty.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('LoyaltyController', () => {
   let controller: LoyaltyController;
@@ -36,7 +37,7 @@ describe('LoyaltyController', () => {
   });
 
   it('should get my programs', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.getAllUserPrograms.mockResolvedValue([{ id: 'prog-1', points: 500 }]);
 
     const result = await controller.getMyPrograms(user);
@@ -46,7 +47,7 @@ describe('LoyaltyController', () => {
   });
 
   it('should get profile', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     mockService.getProfile.mockResolvedValue({ points: 1000, tier: 'Gold' });
 
     const result = await controller.getProfile(user, 'restaurant-1');
@@ -66,7 +67,7 @@ describe('LoyaltyController', () => {
   });
 
   it('should redeem reward', async () => {
-    const user = { id: 'user-1' };
+    const user = mockAuthenticatedUser({ id: 'user-1' });
     const dto = { reward_id: 'reward-1' };
     mockService.redeemReward.mockResolvedValue({ success: true });
 

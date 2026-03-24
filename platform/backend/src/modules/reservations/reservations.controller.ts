@@ -9,6 +9,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 import { PaginationDto } from '@/common/dto/pagination.dto';
 
@@ -25,7 +26,7 @@ export class ReservationsController {
   @ApiResponse({ status: 201, description: 'Reservation created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid reservation data' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
-  create(@CurrentUser() user: any, @Body() createReservationDto: CreateReservationDto) {
+  create(@CurrentUser() user: AuthenticatedUser, @Body() createReservationDto: CreateReservationDto) {
     return this.reservationsService.create(user.id, createReservationDto);
   }
 
@@ -49,7 +50,7 @@ export class ReservationsController {
   @ApiResponse({ status: 200, description: 'Returns paginated user reservations' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  findByUser(@CurrentUser() user: any, @Query() pagination: PaginationDto) {
+  findByUser(@CurrentUser() user: AuthenticatedUser, @Query() pagination: PaginationDto) {
     return this.reservationsService.findByUser(user.id, pagination);
   }
 
@@ -59,8 +60,8 @@ export class ReservationsController {
   @ApiResponse({ status: 200, description: 'Returns reservation details' })
   @ApiResponse({ status: 404, description: 'Reservation not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.reservationsService.findOne(id, user.id, user.roles);
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+    return this.reservationsService.findOne(id, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id')
@@ -72,9 +73,9 @@ export class ReservationsController {
   update(
     @Param('id') id: string,
     @Body() updateReservationDto: UpdateReservationDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.reservationsService.update(id, updateReservationDto, user.id, user.roles);
+    return this.reservationsService.update(id, updateReservationDto, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id/status')
@@ -96,7 +97,7 @@ export class ReservationsController {
   @ApiResponse({ status: 400, description: 'Invalid group booking data or party size too small' })
   @ApiResponse({ status: 403, description: 'Forbidden - insufficient permissions' })
   createGroupBooking(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() createGroupBookingDto: CreateGroupBookingDto,
   ) {
     return this.reservationsService.createGroupBooking(user.id, createGroupBookingDto);

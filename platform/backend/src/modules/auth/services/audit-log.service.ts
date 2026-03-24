@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { AuditLog } from '../entities/audit-log.entity';
 
 export interface AuditLogData {
@@ -43,14 +43,12 @@ export class AuditLogService {
       entity_id: data.entityId,
       ip_address: data.ipAddress,
       user_agent: data.userAgent,
-      old_values: sanitizedOldValues,
-      new_values: sanitizedNewValues,
-      metadata: sanitizedMetadata,
+      metadata: { ...sanitizedMetadata, old_values: sanitizedOldValues, new_values: sanitizedNewValues },
       success: data.success ?? true,
       failure_reason: data.failureReason,
-    });
+    } as DeepPartial<AuditLog>);
 
-    return this.auditLogRepository.save(auditLog);
+    return this.auditLogRepository.save(auditLog as AuditLog);
   }
 
   /**

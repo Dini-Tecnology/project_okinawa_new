@@ -23,6 +23,7 @@ import { MarkAsReadDto } from './dto/mark-as-read.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
+import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums';
@@ -54,7 +55,7 @@ export class NotificationsController {
     description: 'Returns user notifications with pagination',
   })
   findAll(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Query('unread_only') unreadOnly?: string | boolean,
     @Query('type') type?: string,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
@@ -71,7 +72,7 @@ export class NotificationsController {
   @Get('unread-count')
   @ApiOperation({ summary: 'Get unread notifications count' })
   @ApiResponse({ status: 200, description: 'Returns unread count' })
-  async getUnreadCount(@CurrentUser() user: any) {
+  async getUnreadCount(@CurrentUser() user: AuthenticatedUser) {
     const count = await this.notificationsService.getUnreadCount(user.id);
     return { unread_count: count };
   }
@@ -82,7 +83,7 @@ export class NotificationsController {
     status: 200,
     description: 'Returns notification statistics for the user',
   })
-  getStatistics(@CurrentUser() user: any) {
+  getStatistics(@CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.getStatistics(user.id);
   }
 
@@ -90,7 +91,7 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Get a specific notification' })
   @ApiResponse({ status: 200, description: 'Returns the notification' })
   @ApiResponse({ status: 404, description: 'Notification not found' })
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  findOne(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.findOne(id, user.id);
   }
 
@@ -102,7 +103,7 @@ export class NotificationsController {
   update(
     @Param('id') id: string,
     @Body() updateDto: UpdateNotificationDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.notificationsService.update(id, updateDto, user.id);
   }
@@ -110,7 +111,7 @@ export class NotificationsController {
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark notification as read' })
   @ApiResponse({ status: 200, description: 'Notification marked as read' })
-  markAsRead(@Param('id') id: string, @CurrentUser() user: any) {
+  markAsRead(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.markAsRead(id, user.id);
   }
 
@@ -122,7 +123,7 @@ export class NotificationsController {
   })
   markMultipleAsRead(
     @Body() markAsReadDto: MarkAsReadDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.notificationsService.markMultipleAsRead(markAsReadDto, user.id);
   }
@@ -133,14 +134,14 @@ export class NotificationsController {
     status: 200,
     description: 'All notifications marked as read',
   })
-  markAllAsRead(@CurrentUser() user: any) {
+  markAllAsRead(@CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.markAllAsRead(user.id);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a notification' })
   @ApiResponse({ status: 200, description: 'Notification deleted' })
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  remove(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.remove(id, user.id);
   }
 
@@ -150,7 +151,7 @@ export class NotificationsController {
     status: 200,
     description: 'All read notifications deleted',
   })
-  deleteAllRead(@CurrentUser() user: any) {
+  deleteAllRead(@CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.deleteAllRead(user.id);
   }
 }

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AiController } from './ai.controller';
 import { AiService } from './ai.service';
+import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('AiController', () => {
   let controller: AiController;
@@ -15,7 +16,7 @@ describe('AiController', () => {
     getBusinessInsights: jest.fn(),
   };
 
-  const mockUser = { id: 'user-1', sub: 'user-1' };
+  const mockUser = mockAuthenticatedUser({ id: 'user-1', sub: 'user-1' });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

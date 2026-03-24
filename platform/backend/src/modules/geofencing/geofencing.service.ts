@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Restaurant } from '../restaurants/entities/restaurant.entity';
+import { GEOFENCING } from '@common/constants/limits';
 
 export interface GeofenceCheckResult {
   isNearby: boolean;
@@ -21,7 +22,7 @@ export class GeofencingService {
    * Haversine formula — great-circle distance between two points on Earth
    */
   private haversineDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
-    const R = 6371000; // Earth radius in metres
+    const R = GEOFENCING.EARTH_RADIUS_METERS; // Earth radius in metres
     const toRad = (deg: number) => (deg * Math.PI) / 180;
     const dLat = toRad(lat2 - lat1);
     const dLng = toRad(lng2 - lng1);
@@ -41,7 +42,7 @@ export class GeofencingService {
 
     const restaurantLat = Number((restaurant as any).lat);
     const restaurantLng = Number((restaurant as any).lng);
-    const radius = Number((restaurant as any).geofence_radius) || 500;
+    const radius = Number((restaurant as any).geofence_radius) || GEOFENCING.DEFAULT_GEOFENCE_RADIUS_METERS;
 
     if (!restaurantLat || !restaurantLng) {
       return { isNearby: false, restaurantId, distanceMeters: -1, radiusMeters: radius };

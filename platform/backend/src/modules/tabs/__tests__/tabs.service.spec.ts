@@ -1,24 +1,23 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TabsService } from '../tabs.service';
 import { TabStatus, TabType, TabMemberRole, TabMemberStatus, OrderItemStatus } from '@/common/enums';
 
 // Mock repositories
 const createMockRepository = () => ({
-  create: vi.fn((data) => ({ id: 'test-id', ...data })),
-  save: vi.fn((data) => Promise.resolve({ id: 'test-id', ...data })),
-  findOne: vi.fn(),
-  find: vi.fn(),
-  update: vi.fn(),
-  createQueryBuilder: vi.fn(() => ({
-    where: vi.fn().mockReturnThis(),
-    andWhere: vi.fn().mockReturnThis(),
-    innerJoin: vi.fn().mockReturnThis(),
-    leftJoinAndSelect: vi.fn().mockReturnThis(),
-    distinctOn: vi.fn().mockReturnThis(),
-    orderBy: vi.fn().mockReturnThis(),
-    addOrderBy: vi.fn().mockReturnThis(),
-    getMany: vi.fn().mockResolvedValue([]),
-    getOne: vi.fn().mockResolvedValue(null),
+  create: jest.fn((data: any) => ({ id: 'test-id', ...data })),
+  save: jest.fn((data: any) => Promise.resolve({ id: 'test-id', ...data })),
+  findOne: jest.fn(),
+  find: jest.fn(),
+  update: jest.fn(),
+  createQueryBuilder: jest.fn(() => ({
+    where: jest.fn().mockReturnThis(),
+    andWhere: jest.fn().mockReturnThis(),
+    innerJoin: jest.fn().mockReturnThis(),
+    leftJoinAndSelect: jest.fn().mockReturnThis(),
+    distinctOn: jest.fn().mockReturnThis(),
+    orderBy: jest.fn().mockReturnThis(),
+    addOrderBy: jest.fn().mockReturnThis(),
+    getMany: jest.fn().mockResolvedValue([]),
+    getOne: jest.fn().mockResolvedValue(null),
   })),
 });
 

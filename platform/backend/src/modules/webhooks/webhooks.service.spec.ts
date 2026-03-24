@@ -1,21 +1,21 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { WebhooksService } from './webhooks.service';
-import { WebhookSubscription } from './entities/webhook-subscription.entity';
-import { WebhookDelivery } from './entities/webhook-delivery.entity';
-import { NotFoundException } from '@nestjs/common';
+import { WebhookManagementService } from './webhook-management.service';
+import { WebhookDeliveryService } from './webhook-delivery.service';
+import { WebhookSignatureService } from './webhook-signature.service';
+import { WebhookEvent } from './entities/webhook-subscription.entity';
 
-describe('WebhooksService', () => {
+describe('WebhooksService (facade)', () => {
   let service: WebhooksService;
-  let subscriptionRepository: Repository<WebhookSubscription>;
-  let deliveryRepository: Repository<WebhookDelivery>;
+  let managementService: WebhookManagementService;
+  let deliveryService: WebhookDeliveryService;
+  let signatureService: WebhookSignatureService;
 
   const mockSubscription = {
     id: 'sub-1',
     restaurant_id: 'restaurant-1',
     url: 'https://example.com/webhook',
-    events: ['order.created', 'order.updated'],
+    events: [WebhookEvent.ORDER_CREATED],
     secret: 'secret-key',
     is_active: true,
     created_at: new Date(),
@@ -27,133 +27,143 @@ describe('WebhooksService', () => {
     event_type: 'order.created',
     payload: { order_id: 'order-1' },
     status: 'pending',
-    attempt_count: 0,
-    created_at: new Date(),
   };
 
-  const mockSubscriptionRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    remove: jest.fn(),
+  const mockManagementService = {
+    createSubscription: jest.fn().mockResolvedValue(mockSubscription),
+    getSubscriptions: jest.fn().mockResolvedValue([mockSubscription]),
+    getSubscription: jest.fn().mockResolvedValue(mockSubscription),
+    updateSubscription: jest.fn().mockResolvedValue({ ...mockSubscription, is_active: false }),
+    deleteSubscription: jest.fn().mockResolvedValue({ message: 'Webhook subscription deleted successfully' }),
+    getDeliveries: jest.fn().mockResolvedValue({ deliveries: [mockDelivery], total: 1, limit: 50, offset: 0 }),
   };
 
-  const mockDeliveryRepository = {
-    create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    findAndCount: jest.fn(),
+  const mockDeliveryService = {
+    triggerEvent: jest.fn().mockResolvedValue(undefined),
+    deliverWebhook: jest.fn().mockResolvedValue(undefined),
+    retryDelivery: jest.fn().mockResolvedValue(mockDelivery),
+    testWebhook: jest.fn().mockResolvedValue(mockDelivery),
+  };
+
+  const mockSignatureService = {
+    generateSignature: jest.fn().mockReturnValue('mock-signature'),
+    verifySignature: jest.fn().mockReturnValue(true),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WebhooksService,
-        { provide: getRepositoryToken(WebhookSubscription), useValue: mockSubscriptionRepository },
-        { provide: getRepositoryToken(WebhookDelivery), useValue: mockDeliveryRepository },
+        { provide: WebhookManagementService, useValue: mockManagementService },
+        { provide: WebhookDeliveryService, useValue: mockDeliveryService },
+        { provide: WebhookSignatureService, useValue: mockSignatureService },
       ],
     }).compile();
 
     service = module.get<WebhooksService>(WebhooksService);
-    subscriptionRepository = module.get(getRepositoryToken(WebhookSubscription));
-    deliveryRepository = module.get(getRepositoryToken(WebhookDelivery));
+    managementService = module.get(WebhookManagementService);
+    deliveryService = module.get(WebhookDeliveryService);
+    signatureService = module.get(WebhookSignatureService);
 
     jest.clearAllMocks();
   });
 
+  // ────────── Management delegates ──────────
+
   describe('createSubscription', () => {
-    it('should create a webhook subscription', async () => {
-      const createDto = {
-        restaurant_id: 'restaurant-1',
-        url: 'https://example.com/webhook',
-        events: ['order.created'],
-      };
-
-      mockSubscriptionRepository.create.mockReturnValue(mockSubscription);
-      mockSubscriptionRepository.save.mockResolvedValue(mockSubscription);
-
-      const result = await service.createSubscription(createDto as any);
-
-      expect(result).toBeDefined();
-      expect(mockSubscriptionRepository.create).toHaveBeenCalled();
-      expect(mockSubscriptionRepository.save).toHaveBeenCalled();
+    it('should delegate to managementService.createSubscription', async () => {
+      const dto = { restaurant_id: 'r1', url: 'https://example.com', events: [WebhookEvent.ORDER_CREATED] } as any;
+      await service.createSubscription(dto);
+      expect(mockManagementService.createSubscription).toHaveBeenCalledWith(dto);
     });
   });
 
   describe('getSubscriptions', () => {
-    it('should return all subscriptions for a restaurant', async () => {
-      mockSubscriptionRepository.find.mockResolvedValue([mockSubscription]);
-
-      const result = await service.getSubscriptions('restaurant-1');
-
-      expect(result).toEqual([mockSubscription]);
-      expect(mockSubscriptionRepository.find).toHaveBeenCalledWith({
-        where: { restaurant_id: 'restaurant-1' },
-        order: { created_at: 'DESC' },
-      });
+    it('should delegate to managementService.getSubscriptions', async () => {
+      await service.getSubscriptions('restaurant-1');
+      expect(mockManagementService.getSubscriptions).toHaveBeenCalledWith('restaurant-1');
     });
   });
 
   describe('getSubscription', () => {
-    it('should return a subscription by id', async () => {
-      mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
-
-      const result = await service.getSubscription('sub-1');
-
-      expect(result).toEqual(mockSubscription);
-    });
-
-    it('should throw NotFoundException if not found', async () => {
-      mockSubscriptionRepository.findOne.mockResolvedValue(null);
-
-      await expect(service.getSubscription('sub-1')).rejects.toThrow(NotFoundException);
+    it('should delegate to managementService.getSubscription', async () => {
+      await service.getSubscription('sub-1');
+      expect(mockManagementService.getSubscription).toHaveBeenCalledWith('sub-1');
     });
   });
 
   describe('updateSubscription', () => {
-    it('should update a subscription', async () => {
-      mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
-      mockSubscriptionRepository.save.mockResolvedValue({
-        ...mockSubscription,
-        is_active: false,
-      });
-
-      const result = await service.updateSubscription('sub-1', { is_active: false } as any);
-
-      expect(result.is_active).toBe(false);
-    });
-
-    it('should throw NotFoundException if not found', async () => {
-      mockSubscriptionRepository.findOne.mockResolvedValue(null);
-
-      await expect(
-        service.updateSubscription('sub-1', { is_active: false } as any),
-      ).rejects.toThrow(NotFoundException);
+    it('should delegate to managementService.updateSubscription', async () => {
+      const dto = { is_active: false } as any;
+      await service.updateSubscription('sub-1', dto);
+      expect(mockManagementService.updateSubscription).toHaveBeenCalledWith('sub-1', dto);
     });
   });
 
   describe('deleteSubscription', () => {
-    it('should delete a subscription', async () => {
-      mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
-      mockSubscriptionRepository.remove.mockResolvedValue(mockSubscription);
-
-      const result = await service.deleteSubscription('sub-1');
-
-      expect(result).toEqual({ message: 'Webhook subscription deleted successfully' });
+    it('should delegate to managementService.deleteSubscription', async () => {
+      await service.deleteSubscription('sub-1');
+      expect(mockManagementService.deleteSubscription).toHaveBeenCalledWith('sub-1');
     });
   });
 
   describe('getDeliveries', () => {
-    it('should return deliveries for a subscription', async () => {
-      mockDeliveryRepository.findAndCount.mockResolvedValue([[mockDelivery], 1]);
+    it('should delegate to managementService.getDeliveries', async () => {
+      await service.getDeliveries('sub-1', 50, 0);
+      expect(mockManagementService.getDeliveries).toHaveBeenCalledWith('sub-1', 50, 0);
+    });
+  });
 
-      const result = await service.getDeliveries('sub-1');
+  // ────────── Delivery delegates ──────────
 
-      expect(result).toBeDefined();
-      expect(result.deliveries).toEqual([mockDelivery]);
-      expect(result.total).toBe(1);
+  describe('triggerEvent', () => {
+    it('should delegate to deliveryService.triggerEvent', async () => {
+      await service.triggerEvent('restaurant-1', WebhookEvent.ORDER_CREATED, { id: 'order-1' });
+      expect(mockDeliveryService.triggerEvent).toHaveBeenCalledWith(
+        'restaurant-1',
+        WebhookEvent.ORDER_CREATED,
+        { id: 'order-1' },
+      );
+    });
+  });
+
+  describe('deliverWebhook', () => {
+    it('should delegate to deliveryService.deliverWebhook', async () => {
+      await service.deliverWebhook('delivery-1');
+      expect(mockDeliveryService.deliverWebhook).toHaveBeenCalledWith('delivery-1');
+    });
+  });
+
+  describe('retryDelivery', () => {
+    it('should delegate to deliveryService.retryDelivery', async () => {
+      await service.retryDelivery('delivery-1');
+      expect(mockDeliveryService.retryDelivery).toHaveBeenCalledWith('delivery-1');
+    });
+  });
+
+  describe('testWebhook', () => {
+    it('should fetch subscription then delegate to deliveryService.testWebhook', async () => {
+      await service.testWebhook('sub-1');
+      expect(mockManagementService.getSubscription).toHaveBeenCalledWith('sub-1');
+      expect(mockDeliveryService.testWebhook).toHaveBeenCalledWith(mockSubscription);
+    });
+  });
+
+  // ────────── Signature delegates ──────────
+
+  describe('generateSignature', () => {
+    it('should delegate to signatureService.generateSignature', () => {
+      const payload = { event: 'order.created' };
+      service.generateSignature(payload, 'secret');
+      expect(mockSignatureService.generateSignature).toHaveBeenCalledWith(payload, 'secret');
+    });
+  });
+
+  describe('verifySignature', () => {
+    it('should delegate to signatureService.verifySignature', () => {
+      const payload = { event: 'order.created' };
+      service.verifySignature(payload, 'secret', 'sig');
+      expect(mockSignatureService.verifySignature).toHaveBeenCalledWith(payload, 'secret', 'sig');
     });
   });
 });

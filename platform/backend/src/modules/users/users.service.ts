@@ -5,6 +5,8 @@ import { Profile } from './entities/profile.entity';
 import { UserRole as UserRoleEntity } from '@/modules/user-roles/entities/user-role.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { UserRole } from '@/common/enums';
+import { PAGINATION } from '@common/constants/limits';
+import { toPaginationDto } from '@/common/dto/pagination.dto';
 
 export interface FindUsersParams {
   page?: number;
@@ -36,7 +38,8 @@ export class UsersService {
   }
 
   async findAll(params: FindUsersParams = {}) {
-    const { page = 1, limit = 20, search, role } = params;
+    const { search, role } = params;
+    const dto = toPaginationDto({ page: params.page, limit: params.limit });
 
     const queryBuilder = this.profileRepository
       .createQueryBuilder('profile')
@@ -56,18 +59,18 @@ export class UsersService {
 
     queryBuilder
       .orderBy('profile.created_at', 'DESC')
-      .skip((page - 1) * limit)
-      .take(limit);
+      .skip(dto.offset)
+      .take(dto.limit);
 
     const [data, total] = await queryBuilder.getManyAndCount();
 
     return {
       data,
       meta: {
-        page,
-        limit,
+        page: dto.page!,
+        limit: dto.limit!,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / dto.limit!),
       },
     };
   }

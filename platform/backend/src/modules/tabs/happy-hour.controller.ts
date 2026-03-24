@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { HappyHourService } from './happy-hour.service';
-import { CreateHappyHourScheduleDto } from './dto/create-happy-hour-schedule.dto';
+import { CreateHappyHourScheduleDto } from './dto';
 
 @ApiTags('Happy Hour')
 @Controller('happy-hour')

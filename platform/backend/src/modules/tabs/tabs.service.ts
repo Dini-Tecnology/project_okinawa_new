@@ -1,13 +1,10 @@
 import { Injectable, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DeepPartial } from 'typeorm';
 import { Tab, TabMember, TabItem, TabPayment } from './entities';
 import { TabStatus, TabType, TabMemberRole, TabMemberStatus, OrderItemStatus } from '@/common/enums';
 import { PaymentSplitStatus } from '@/modules/payments/entities/payment-split.entity';
-import { CreateTabDto } from './dto/create-tab.dto';
-import { AddTabItemDto } from './dto/add-tab-item.dto';
-import { JoinTabDto } from './dto/join-tab.dto';
-import { ProcessTabPaymentDto } from './dto/process-tab-payment.dto';
+import { CreateTabDto, AddTabItemDto, JoinTabDto, ProcessTabPaymentDto } from './dto';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -51,10 +48,10 @@ export class TabsService {
       deposit_credit: dto.deposit_credit || 0,
       preauth_amount: dto.preauth_amount,
       preauth_transaction_id: dto.preauth_transaction_id,
-      invite_token: dto.type === TabType.GROUP ? uuidv4() : null,
-    });
+      invite_token: dto.type === TabType.GROUP ? uuidv4() : undefined,
+    } as DeepPartial<Tab>);
 
-    const savedTab = await this.tabRepository.save(tab);
+    const savedTab = await this.tabRepository.save(tab as Tab);
 
     // Add host as first member
     await this.tabMemberRepository.save({
@@ -109,7 +106,7 @@ export class TabsService {
       }
       // Rejoin if left
       existingMember.status = TabMemberStatus.ACTIVE;
-      existingMember.left_at = null;
+      existingMember.left_at = null as unknown as Date;
       return this.tabMemberRepository.save(existingMember);
     }
 

@@ -25,6 +25,8 @@ describe('SentryExceptionFilter', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [SentryExceptionFilter],
     }).compile();
@@ -36,14 +38,12 @@ describe('SentryExceptionFilter', () => {
         getRequest: () => mockRequest,
         getResponse: () => mockResponse,
       }),
-      getType: jest.fn(),
+      getType: jest.fn().mockReturnValue('http'),
       getArgs: jest.fn(),
       getArgByIndex: jest.fn(),
       switchToRpc: jest.fn(),
       switchToWs: jest.fn(),
     } as any;
-
-    jest.clearAllMocks();
   });
 
   it('should be defined', () => {

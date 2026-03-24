@@ -52,6 +52,12 @@ export { default as LiquidGlassNav } from './LiquidGlassNav';
 export { default as RestaurantLiquidGlassNav } from './RestaurantLiquidGlassNav';
 
 // ============================================
+// DOMAIN COMPONENTS
+// ============================================
+export { OrderCard } from './orders/OrderCard';
+export type { OrderCardProps, OrderCardOrder, OrderCardItem } from './orders/OrderCard';
+
+// ============================================
 // UTILITY COMPONENTS
 // ============================================
 export { LoadingSpinner } from './LoadingSpinner';
