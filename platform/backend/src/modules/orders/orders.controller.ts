@@ -1,6 +1,9 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
+import { KdsService } from './kds.service';
+import { WaiterStatsService } from './waiter-stats.service';
+import { OrderAdditionsService } from './order-additions.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { AddItemsToOrderDto } from './dto/add-items-to-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
@@ -20,7 +23,12 @@ import { PaginationDto } from '@/common/dto/pagination.dto';
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly kdsService: KdsService,
+    private readonly waiterStatsService: WaiterStatsService,
+    private readonly orderAdditionsService: OrderAdditionsService,
+  ) {}
 
   @Post()
   @Roles(UserRole.CUSTOMER, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
@@ -104,7 +112,7 @@ export class OrdersController {
     @Body() addItemsDto: AddItemsToOrderDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.ordersService.addItemsToExistingOrder(id, addItemsDto, user.id, user.roles as UserRole[]);
+    return this.orderAdditionsService.addItemsToExistingOrder(id, addItemsDto, user.id, user.roles as UserRole[]);
   }
 
   @Patch(':id/open')
@@ -118,7 +126,7 @@ export class OrdersController {
     @Param('id') id: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.ordersService.openOrderForAdditions(id, user.id, user.roles as UserRole[]);
+    return this.orderAdditionsService.openOrderForAdditions(id, user.id, user.roles as UserRole[]);
   }
 
   // ========== KDS ENDPOINTS ==========
@@ -129,7 +137,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns kitchen orders for KDS display' })
   @ApiResponse({ status: 403, description: 'Forbidden - kitchen staff only' })
   getKitchenOrders(@Query() query: GetKdsOrdersDto) {
-    return this.ordersService.getKdsOrders({ ...query, type: 'kitchen' });
+    return this.kdsService.getKdsOrders({ ...query, type: 'kitchen' });
   }
 
   @Get('kds/bar')
@@ -138,7 +146,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns bar orders for KDS display' })
   @ApiResponse({ status: 403, description: 'Forbidden - bar staff only' })
   getBarOrders(@Query() query: GetKdsOrdersDto) {
-    return this.ordersService.getKdsOrders({ ...query, type: 'bar' });
+    return this.kdsService.getKdsOrders({ ...query, type: 'bar' });
   }
 
   // ========== WAITER ENDPOINTS ==========
@@ -149,7 +157,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns tables assigned to current waiter' })
   @ApiResponse({ status: 403, description: 'Forbidden - waiter/maitre only' })
   getWaiterTables(@CurrentUser() user: AuthenticatedUser) {
-    return this.ordersService.getWaiterTables(user.id);
+    return this.waiterStatsService.getWaiterTables(user.id);
   }
 
   @Get('waiter/stats')
@@ -158,7 +166,7 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns waiter stats (sales, tips, tables)' })
   @ApiResponse({ status: 403, description: 'Forbidden - waiter/maitre only' })
   getWaiterStats(@CurrentUser() user: AuthenticatedUser, @Query() query: GetWaiterStatsDto) {
-    return this.ordersService.getWaiterStats(user.id, query);
+    return this.waiterStatsService.getWaiterStats(user.id, query);
   }
 
   // ========== MAITRE ENDPOINTS ==========
@@ -169,6 +177,6 @@ export class OrdersController {
   @ApiResponse({ status: 200, description: 'Returns overview for maitre dashboard' })
   @ApiResponse({ status: 403, description: 'Forbidden - maitre only' })
   getMaitreOverview(@Query('restaurant_id') restaurantId: string) {
-    return this.ordersService.getMaitreOverview(restaurantId);
+    return this.waiterStatsService.getMaitreOverview(restaurantId);
   }
 }

@@ -41,7 +41,8 @@ import * as Haptics from 'expo-haptics';
 import { useQuery } from '@tanstack/react-query';
 
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import { t } from '@/shared/i18n';
+import { t, getLanguage } from '@/shared/i18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import ApiService from '@/shared/services/api';
 import { queryKeys } from '@/shared/config/react-query';
 import { useTab } from '../../hooks/useTab';
@@ -200,7 +201,7 @@ function DrinkItemRow({
           variant="bodyMedium"
           style={{ color: colors.primary, fontWeight: '600', marginTop: 2 }}
         >
-          R$ {Number(item.price).toFixed(2)}
+          {formatCurrency(Number(item.price), getLanguage())}
         </Text>
       </View>
       <QuantityCounter
@@ -591,7 +592,7 @@ export default function RoundBuilderSheet({
                       {t('tab.round.total')} ({roundItemCount} {t('tab.items')})
                     </Text>
                     <Text variant="titleLarge" style={styles.totalAmount}>
-                      R$ {roundTotal.toFixed(2)}
+                      {formatCurrency(roundTotal, getLanguage())}
                     </Text>
                   </View>
                   <Button

@@ -196,10 +196,10 @@ function QueueEntryCard({
             <IconButton
               icon="check-circle"
               size={18}
-              iconColor="#FFFFFF"
+              iconColor={colors.primaryForeground}
               style={{ margin: 0, padding: 0, width: 18, height: 18 }}
             />
-            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 14, marginLeft: 4 }}>
+            <Text style={{ color: colors.primaryForeground, fontWeight: '700', fontSize: 14, marginLeft: 4 }}>
               {t('club.door.admit')}
             </Text>
           </TouchableOpacity>
@@ -428,7 +428,7 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
             paddingHorizontal: 20,
           }}
         >
-          <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '700' }}>
+          <Text style={{ color: colors.primaryForeground, fontSize: 22, fontWeight: '700' }}>
             {t('club.door.title')}
           </Text>
         </LinearGradient>
@@ -452,10 +452,10 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
       >
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: '#FFFFFF', fontSize: 22, fontWeight: '700' }}>
+            <Text style={{ color: colors.primaryForeground, fontSize: 22, fontWeight: '700' }}>
               {t('club.door.title')}
             </Text>
-            <Text style={{ color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 4 }}>
+            <Text style={{ color: colors.glassStrong, fontSize: 13, marginTop: 4 }}>
               {t('club.door.waiting')}: {waitingCount}
             </Text>
           </View>
@@ -465,12 +465,12 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: 'rgba(255,255,255,0.2)',
+              backgroundColor: colors.glassBorder,
               alignItems: 'center',
               justifyContent: 'center',
             }}
           >
-            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 18 }}>
+            <Text style={{ color: colors.primaryForeground, fontWeight: '700', fontSize: 18 }}>
               {waitingCount}
             </Text>
           </View>
@@ -489,16 +489,16 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
             marginTop: 14,
             paddingVertical: 10,
             borderRadius: 16,
-            backgroundColor: 'rgba(255,255,255,0.2)',
+            backgroundColor: colors.glassBorder,
           }}
         >
           <IconButton
             icon="qrcode-scan"
             size={18}
-            iconColor="#FFFFFF"
+            iconColor={colors.primaryForeground}
             style={{ margin: 0, padding: 0, width: 18, height: 18 }}
           />
-          <Text style={{ color: '#FFFFFF', fontWeight: '600', fontSize: 14, marginLeft: 6 }}>
+          <Text style={{ color: colors.primaryForeground, fontWeight: '600', fontSize: 14, marginLeft: 6 }}>
             {t('club.door.scan')}
           </Text>
         </TouchableOpacity>

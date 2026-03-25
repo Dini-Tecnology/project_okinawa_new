@@ -32,9 +32,10 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -353,7 +354,7 @@ export default function SharedOrderScreen() {
       setOrder(orderData);
       setGuests(guestsData);
     } catch (error: any) {
-      logger.error('Error loading order:', error);
+      console.error('Error loading order:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);
@@ -499,8 +500,6 @@ export default function SharedOrderScreen() {
                 size={28}
                 onPress={() => navigation.navigate('QRScanner', { orderId })}
                 iconColor={colors.foreground}
-                accessibilityLabel="Scan QR code for order"
-                accessibilityRole="button"
               />
             </View>
           </Card.Content>
@@ -542,11 +541,11 @@ export default function SharedOrderScreen() {
                       <Text variant="bodySmall" style={styles.guestPayment}>
                         {guest.payment_status === 'paid' ? (
                           <Text style={styles.paidText}>
-                            {t('payment.paid')}: R$ {guest.amount_paid.toFixed(2)}
+                            {t('payment.paid')}: {formatCurrency(guest.amount_paid, getLanguage())}
                           </Text>
                         ) : (
                           <Text style={styles.pendingText}>
-                            {t('payment.pending')}: R$ {guest.amount_due.toFixed(2)}
+                            {t('payment.pending')}: {formatCurrency(guest.amount_due, getLanguage())}
                           </Text>
                         )}
                       </Text>
@@ -558,8 +557,6 @@ export default function SharedOrderScreen() {
                       size={20}
                       onPress={() => handleRemoveGuest(guest.id)}
                       iconColor={colors.mutedForeground}
-                      accessibilityLabel={`Remove ${guest.guest_name} from order`}
-                      accessibilityRole="button"
                     />
                   )}
                 </View>
@@ -596,7 +593,7 @@ export default function SharedOrderScreen() {
                     </Chip>
                   </View>
                   <Text variant="bodyMedium" style={styles.itemPrice}>
-                    R$ {item.total_price.toFixed(2)}
+                    {formatCurrency(item.total_price, getLanguage())}
                   </Text>
                 </View>
               ))}
@@ -614,14 +611,14 @@ export default function SharedOrderScreen() {
             <View style={styles.summaryRow}>
               <Text variant="bodyMedium" style={styles.summaryLabel}>{t('orders.subtotal')}</Text>
               <Text variant="bodyMedium" style={styles.summaryValue}>
-                R$ {order.subtotal_amount.toFixed(2)}
+                {formatCurrency(order.subtotal_amount, getLanguage())}
               </Text>
             </View>
             
             <View style={styles.summaryRow}>
               <Text variant="bodyMedium" style={styles.summaryLabel}>{t('orders.tax')}</Text>
               <Text variant="bodyMedium" style={styles.summaryValue}>
-                R$ {order.tax_amount.toFixed(2)}
+                {formatCurrency(order.tax_amount, getLanguage())}
               </Text>
             </View>
             
@@ -629,7 +626,7 @@ export default function SharedOrderScreen() {
               <View style={styles.summaryRow}>
                 <Text variant="bodyMedium" style={styles.summaryLabel}>{t('orders.tip')}</Text>
                 <Text variant="bodyMedium" style={styles.summaryValue}>
-                  R$ {order.tip_amount.toFixed(2)}
+                  {formatCurrency(order.tip_amount, getLanguage())}
                 </Text>
               </View>
             )}
@@ -639,7 +636,7 @@ export default function SharedOrderScreen() {
             <View style={styles.totalRow}>
               <Text variant="titleLarge" style={styles.totalLabel}>{t('orders.total')}</Text>
               <Text variant="titleLarge" style={styles.totalAmount}>
-                R$ {order.total_amount.toFixed(2)}
+                {formatCurrency(order.total_amount, getLanguage())}
               </Text>
             </View>
           </Card.Content>
@@ -682,7 +679,6 @@ export default function SharedOrderScreen() {
             onChangeText={setNewGuestName}
             mode="outlined"
             style={styles.guestInput}
-            accessibilityLabel="Guest name"
           />
           <View style={styles.modalActions}>
             <Button

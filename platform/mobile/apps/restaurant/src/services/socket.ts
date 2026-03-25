@@ -14,11 +14,19 @@ type OrderStatus =
   | 'completed'
   | 'cancelled';
 
+interface OrderItemPayload {
+  menu_item_id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  special_instructions?: string;
+}
+
 interface NewOrderPayload {
   order_id: string;
   user_id: string;
   customer_name: string;
-  items: any[];
+  items: OrderItemPayload[];
   total_amount: number;
   order_type: string;
   table_id?: string;
@@ -43,12 +51,12 @@ interface NotificationPayload {
   type: string;
   title: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 class SocketService {
   private socket: Socket | null = null;
-  private listeners: Map<string, Set<Function>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   async connect() {
     const token = await AsyncStorage.getItem('access_token');
@@ -82,7 +90,7 @@ class SocketService {
       console.log('Socket disconnected');
     });
 
-    this.socket.on('error', (error: any) => {
+    this.socket.on('error', (error: Error) => {
       console.error('Socket error:', error);
     });
 
@@ -97,7 +105,7 @@ class SocketService {
     });
 
     // Order cancellations
-    this.socket.on('order:cancelled', (data: any) => {
+    this.socket.on('order:cancelled', (data: { order_id: string; reason?: string; cancelled_by?: string }) => {
       this.emit('order:cancelled', data);
     });
 
@@ -107,12 +115,12 @@ class SocketService {
     });
 
     // Reservation updates
-    this.socket.on('reservation:update', (data: any) => {
+    this.socket.on('reservation:update', (data: ReservationPayload) => {
       this.emit('reservation:update', data);
     });
 
     // Table status updates
-    this.socket.on('table:update', (data: any) => {
+    this.socket.on('table:update', (data: { table_id: string; status: string; updated_by?: string }) => {
       this.emit('table:update', data);
     });
 
@@ -131,7 +139,7 @@ class SocketService {
   }
 
   // Event subscription
-  on(event: string, callback: Function) {
+  on(event: string, callback: (data: unknown) => void) {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
@@ -144,7 +152,7 @@ class SocketService {
   }
 
   // Unsubscribe from event
-  off(event: string, callback?: Function) {
+  off(event: string, callback?: (data: unknown) => void) {
     if (callback) {
       this.listeners.get(event)?.delete(callback);
     } else {
@@ -153,7 +161,7 @@ class SocketService {
   }
 
   // Emit to local listeners
-  private emit(event: string, data: any) {
+  private emit(event: string, data: unknown) {
     const callbacks = this.listeners.get(event);
     if (callbacks) {
       callbacks.forEach((callback) => callback(data));
@@ -161,7 +169,7 @@ class SocketService {
   }
 
   // Send events to server
-  send(event: string, data: any) {
+  send(event: string, data: Record<string, unknown>) {
     if (this.socket?.connected) {
       this.socket.emit(event, data);
     } else {

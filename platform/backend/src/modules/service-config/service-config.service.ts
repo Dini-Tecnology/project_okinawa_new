@@ -87,10 +87,10 @@ export class ServiceConfigService {
       config.experience_flags = createConfigDto.experienceFlags;
     }
     if (createConfigDto.floorLayout) {
-      config.floor_layout = createConfigDto.floorLayout as any;
+      config.floor_layout = createConfigDto.floorLayout as unknown as RestaurantConfig['floor_layout'];
     }
     if (createConfigDto.kitchenStations) {
-      config.kitchen_stations = createConfigDto.kitchenStations as any;
+      config.kitchen_stations = createConfigDto.kitchenStations as unknown as RestaurantConfig['kitchen_stations'];
     }
     if (createConfigDto.paymentConfig) {
       config.payment_config = {
@@ -104,7 +104,7 @@ export class ServiceConfigService {
       config.enabled_features = createConfigDto.enabledFeatures;
     }
     if (createConfigDto.teamConfig) {
-      config.team_config = createConfigDto.teamConfig as any;
+      config.team_config = createConfigDto.teamConfig as unknown as RestaurantConfig['team_config'];
     }
 
     config.setup_complete = true;
@@ -167,10 +167,10 @@ export class ServiceConfigService {
     const config = await this.getConfig(restaurantId);
 
     if (dto.sections !== undefined) {
-      config.floor_layout = { ...config.floor_layout, sections: dto.sections as any };
+      config.floor_layout = { ...config.floor_layout, sections: dto.sections as unknown as RestaurantConfig['floor_layout']['sections'] };
     }
     if (dto.tables !== undefined) {
-      config.floor_layout = { ...config.floor_layout, tables: dto.tables as any };
+      config.floor_layout = { ...config.floor_layout, tables: dto.tables as unknown as RestaurantConfig['floor_layout']['tables'] };
     }
 
     const saved = await this.configRepository.save(config);
@@ -187,7 +187,7 @@ export class ServiceConfigService {
     const config = await this.getConfig(restaurantId);
 
     if (dto.stations !== undefined) {
-      config.kitchen_stations = { ...config.kitchen_stations, stations: dto.stations as any };
+      config.kitchen_stations = { ...config.kitchen_stations, stations: dto.stations as unknown as RestaurantConfig['kitchen_stations']['stations'] };
     }
     if (dto.routing !== undefined) {
       config.kitchen_stations = {
@@ -312,8 +312,8 @@ export class ServiceConfigService {
   /**
    * Check if profile section has minimum required data
    */
-  private isSectionComplete(profile: Record<string, any> | null | undefined): boolean {
+  private isSectionComplete(profile: any | null | undefined): boolean {
     if (!profile) return false;
-    return !!(profile.name && profile.name.length > 0);
+    return !!(profile.name && String(profile.name).length > 0);
   }
 }

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { QueueService } from './queue.service';
 import { JoinQueueDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Virtual Queue')
 @Controller('queue')
@@ -11,14 +12,14 @@ export class QueueController {
 
   @Post()
   @ApiOperation({ summary: 'Join the virtual queue' })
-  async joinQueue(@Req() req: any, @Body() dto: JoinQueueDto) {
+  async joinQueue(@Req() req: AuthenticatedRequest, @Body() dto: JoinQueueDto) {
     return this.queueService.joinQueue(req.user.id, dto);
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Get my queue position' })
   async getMyPosition(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Query('restaurantId') restaurantId: string,
   ) {
     return this.queueService.getMyQueueEntry(req.user.id, restaurantId);
@@ -27,7 +28,7 @@ export class QueueController {
   @Delete('my')
   @ApiOperation({ summary: 'Leave the queue' })
   async leaveQueue(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Query('restaurantId') restaurantId: string,
   ) {
     return this.queueService.leaveQueue(req.user.id, restaurantId);

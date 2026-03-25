@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/com
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { WaiterCallsService } from './waiter-calls.service';
 import { CreateWaiterCallDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Waiter Calls')
 @Controller('waiter-calls')
@@ -11,13 +12,13 @@ export class WaiterCallsController {
 
   @Post()
   @ApiOperation({ summary: 'Call a waiter' })
-  async createCall(@Req() req: any, @Body() dto: CreateWaiterCallDto) {
+  async createCall(@Req() req: AuthenticatedRequest, @Body() dto: CreateWaiterCallDto) {
     return this.waiterCallsService.createCall(req.user.id, dto);
   }
 
   @Put(':id/acknowledge')
   @ApiOperation({ summary: 'Acknowledge a waiter call (staff)' })
-  async acknowledgeCall(@Param('id') id: string, @Req() req: any) {
+  async acknowledgeCall(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.waiterCallsService.acknowledgeCall(id, req.user.id);
   }
 

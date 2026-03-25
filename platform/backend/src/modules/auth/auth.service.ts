@@ -1,10 +1,9 @@
 import {
   Injectable,
   UnauthorizedException,
-  ConflictException,
   BadRequestException,
   NotFoundException,
-  ForbiddenException,
+  ConflictException,
   NotImplementedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -17,14 +16,14 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { ConfirmResetPasswordDto } from './dto/confirm-reset-password.dto';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 import { EmailService } from '@/common/services/email.service';
-// Identity module services (provided globally)
 import {
   AuditLogService,
   CredentialService,
-  AuditAction,
 } from '@/modules/identity';
 import { PasswordResetService } from './password-reset.service';
 import { TokenService } from './token.service';
+import { AuthRegistrationService } from './auth-registration.service';
+import { AuthLoginService } from './auth-login.service';
 
 @Injectable()
 export class AuthService {
@@ -32,140 +31,27 @@ export class AuthService {
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
     private emailService: EmailService,
-    // Identity module services (injected from global module)
     private auditLogService: AuditLogService,
     private credentialService: CredentialService,
-    // Focused sub-services
     private passwordResetService: PasswordResetService,
     private tokenService: TokenService,
+    private registrationService: AuthRegistrationService,
+    private loginService: AuthLoginService,
   ) {}
 
+  // ========== DELEGATION: REGISTRATION ==========
+
   async register(registerDto: RegisterDto, ipAddress?: string, userAgent?: string) {
-    const existingUser = await this.profileRepository.findOne({
-      where: { email: registerDto.email },
-    });
-
-    if (existingUser) {
-      throw new ConflictException('Email already registered');
-    }
-
-    // Create user profile (no password in preferences anymore)
-    const user = this.profileRepository.create({
-      email: registerDto.email,
-      full_name: registerDto.full_name,
-      preferences: {},
-    });
-
-    await this.profileRepository.save(user);
-
-    // Create credentials in separate table (secure storage)
-    await this.credentialService.createCredential(user.id, registerDto.password);
-
-    // Log registration
-    await this.auditLogService.log({
-      userId: user.id,
-      action: AuditAction.REGISTER,
-      entityType: 'user',
-      entityId: user.id,
-      ipAddress,
-      userAgent,
-      success: true,
-    });
-
-    const tokens = await this.tokenService.generateTokens(user);
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-      },
-      ...tokens,
-    };
+    return this.registrationService.register(registerDto, ipAddress, userAgent);
   }
+
+  // ========== DELEGATION: LOGIN ==========
 
   async login(loginDto: LoginDto, ipAddress?: string, userAgent?: string) {
-    const user = await this.profileRepository.findOne({
-      where: { email: loginDto.email },
-      relations: ['roles', 'roles.restaurant'],
-    });
-
-    if (!user) {
-      await this.auditLogService.logFailedLogin(
-        loginDto.email,
-        ipAddress,
-        userAgent,
-        'User not found',
-      );
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Check credentials using the new credential service
-    const verifyResult = await this.credentialService.verifyPassword(
-      user.id,
-      loginDto.password,
-      ipAddress,
-    );
-
-    if (verifyResult.locked) {
-      await this.auditLogService.logAccountLockout(user.id, ipAddress, 'max_attempts');
-      throw new ForbiddenException(
-        'Account is temporarily locked due to too many failed login attempts. Please try again later.',
-      );
-    }
-
-    if (!verifyResult.valid) {
-      // Check if password is in old preferences format (migration support)
-      const legacyPassword = user.preferences?.password;
-      if (legacyPassword) {
-        const isLegacyValid = await bcrypt.compare(loginDto.password, legacyPassword);
-        if (isLegacyValid) {
-          // Migrate to new credential table
-          await this.credentialService.migrateFromPreferences(user.id, legacyPassword);
-          // Clear password from preferences (security cleanup)
-          user.preferences = { ...user.preferences };
-          delete user.preferences.password;
-          await this.profileRepository.save(user);
-        } else {
-          await this.auditLogService.logFailedLogin(
-            loginDto.email,
-            ipAddress,
-            userAgent,
-            `Invalid password. ${verifyResult.attemptsRemaining} attempts remaining.`,
-          );
-          throw new UnauthorizedException('Invalid credentials');
-        }
-      } else {
-        await this.auditLogService.logFailedLogin(
-          loginDto.email,
-          ipAddress,
-          userAgent,
-          `Invalid password. ${verifyResult.attemptsRemaining} attempts remaining.`,
-        );
-        throw new UnauthorizedException('Invalid credentials');
-      }
-    }
-
-    if (!user.is_active) {
-      throw new UnauthorizedException('Account is inactive');
-    }
-
-    // Log successful login
-    await this.auditLogService.logLogin(user.id, ipAddress, userAgent);
-
-    const tokens = await this.tokenService.generateTokens(user);
-
-    return {
-      user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        avatar_url: user.avatar_url,
-        roles: user.roles,
-      },
-      ...tokens,
-    };
+    return this.loginService.login(loginDto, ipAddress, userAgent);
   }
+
+  // ========== CORE AUTH OPERATIONS ==========
 
   async logout(
     userId: string,
@@ -175,10 +61,7 @@ export class AuthService {
     userAgent?: string,
   ) {
     await this.tokenService.blacklistTokensOnLogout(userId, accessToken, refreshToken, ipAddress);
-
-    // Log logout
     await this.auditLogService.logLogout(userId, ipAddress, userAgent);
-
     return { message: 'Logged out successfully' };
   }
 
@@ -245,14 +128,12 @@ export class AuthService {
         throw new BadRequestException('Current password is required to change password');
       }
 
-      // Verify current password
       const verifyResult = await this.credentialService.verifyPassword(
         userId,
         updateAuthDto.current_password,
       );
 
       if (!verifyResult.valid) {
-        // Try legacy password if credential service fails
         const legacyPassword = user.preferences?.password;
         if (legacyPassword) {
           const isLegacyValid = await bcrypt.compare(
@@ -267,17 +148,13 @@ export class AuthService {
         }
       }
 
-      // Change password using credential service
       const result = await this.credentialService.changePassword(userId, updateAuthDto.password);
 
       if (!result.success) {
         throw new BadRequestException(result.message);
       }
 
-      // Log password change
       await this.auditLogService.logPasswordChange(userId, ipAddress, userAgent);
-
-      // Send confirmation email
       await this.emailService.sendPasswordChangedEmail(user.email, user.full_name);
     }
 
@@ -333,7 +210,6 @@ export class AuthService {
       return true;
     }
 
-    // Try legacy password if credential service fails
     const user = await this.profileRepository.findOne({
       where: { id: userId },
     });

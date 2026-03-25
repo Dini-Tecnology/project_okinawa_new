@@ -69,7 +69,7 @@ export class SocialAuthService {
   async authenticate(
     provider: SocialProvider,
     idToken: string,
-    deviceInfo?: any,
+    deviceInfo?: Record<string, string>,
     ipAddress?: string,
   ): Promise<SocialAuthResult> {
     // Validate token with provider

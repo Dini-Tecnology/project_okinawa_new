@@ -39,7 +39,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import { t } from '@/shared/i18n';
+import { t, getLanguage } from '@/shared/i18n';
+import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
 import { useTab, useTabSplitOptions } from '../../hooks/useTab';
 import type { TabItem } from '../../hooks/useTab';
 
@@ -458,7 +459,7 @@ export default function TabPaymentScreen() {
                 {item.name}
               </Text>
               <Text variant="bodyMedium" style={styles.itemPrice}>
-                R$ {item.totalPrice.toFixed(2)}
+                {formatCurrency(item.totalPrice, getLanguage())}
               </Text>
             </View>
           ))}
@@ -471,7 +472,7 @@ export default function TabPaymentScreen() {
               {t('tab.payment.subtotal')}
             </Text>
             <Text variant="bodyMedium" style={styles.totalValue}>
-              R$ {subtotal.toFixed(2)}
+              {formatCurrency(subtotal, getLanguage())}
             </Text>
           </View>
 
@@ -481,7 +482,7 @@ export default function TabPaymentScreen() {
               {t('tab.payment.serviceFee')} (10%)
             </Text>
             <Text variant="bodyMedium" style={styles.totalValue}>
-              R$ {serviceFee.toFixed(2)}
+              {formatCurrency(serviceFee, getLanguage())}
             </Text>
           </View>
 
@@ -492,7 +493,7 @@ export default function TabPaymentScreen() {
                 Credits
               </Text>
               <Text variant="bodyMedium" style={{ color: colors.success }}>
-                -R$ {(Number(tab.cover_charge_credit) + Number(tab.deposit_credit)).toFixed(2)}
+                -{formatCurrency(Number(tab.cover_charge_credit) + Number(tab.deposit_credit), getLanguage())}
               </Text>
             </View>
           )}
@@ -505,7 +506,7 @@ export default function TabPaymentScreen() {
               {t('tab.total')}
             </Text>
             <Text variant="titleLarge" style={styles.grandTotalValue}>
-              R$ {total.toFixed(2)}
+              {formatCurrency(total, getLanguage())}
             </Text>
           </View>
         </View>
@@ -529,9 +530,7 @@ export default function TabPaymentScreen() {
                 Haptics.selectionAsync();
                 setSelectedMethod(method.type);
               }}
-              accessibilityRole="button"
               accessibilityLabel={method.label}
-              accessibilityState={{ selected: selectedMethod === method.type }}
             >
               <Icon
                 name={method.icon}
@@ -580,7 +579,7 @@ export default function TabPaymentScreen() {
             {t('tab.total')}
           </Text>
           <Text variant="titleLarge" style={{ color: colors.primary, fontWeight: 'bold' }}>
-            R$ {total.toFixed(2)}
+            {formatCurrency(total, getLanguage())}
           </Text>
         </View>
         <Button

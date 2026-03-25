@@ -29,8 +29,9 @@ import {
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { t } from '@okinawa/shared/i18n';
+import { t, getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { ApiService } from '@okinawa/shared/services/api';
 import * as Haptics from 'expo-haptics';
 
@@ -164,7 +165,7 @@ function ConfirmationView({
                 {t('club.birthday.total')}
               </Text>
               <Text variant="titleLarge" style={{ color: colors.primary, fontWeight: '700' }}>
-                R$ {booking.totalPrice.toFixed(2)}
+                {formatCurrency(booking.totalPrice, getLanguage())}
               </Text>
             </View>
           </Card.Content>
@@ -215,9 +216,6 @@ function PackageCard({
         onSelect(pkg);
       }}
       activeOpacity={0.7}
-      accessibilityRole="button"
-      accessibilityLabel={`${pkg.name}: R$ ${pkg.price.toFixed(2)} per person`}
-      accessibilityState={{ selected: isSelected }}
     >
       <Card
         style={[
@@ -256,7 +254,7 @@ function PackageCard({
             </View>
             <View style={styles.priceContainer}>
               <Text variant="titleLarge" style={{ color: colors.primary, fontWeight: '700' }}>
-                R$ {pkg.price.toFixed(2)}
+                {formatCurrency(pkg.price, getLanguage())}
               </Text>
               <Text variant="bodySmall" style={{ color: colors.foregroundMuted }}>
                 {t('club.birthday.perPerson')}
@@ -462,9 +460,6 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setSelectedDate(d.value);
               }}
-              accessibilityRole="button"
-              accessibilityLabel={d.label}
-              accessibilityState={{ selected: selectedDate === d.value }}
               style={[
                 styles.dateChip,
                 {
@@ -558,7 +553,6 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
           onChangeText={setCelebrantName}
           mode="outlined"
           style={styles.input}
-          accessibilityLabel="Celebrant name"
         />
       </View>
 
@@ -572,7 +566,6 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
           multiline
           numberOfLines={3}
           style={styles.input}
-          accessibilityLabel="Birthday message"
         />
       </View>
 
@@ -599,7 +592,7 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
                 {t('club.birthday.partySize')}
               </Text>
               <Text variant="bodyMedium" style={{ color: colors.foreground }}>
-                {partySize}x R$ {selectedPackage.price.toFixed(2)}
+                {partySize}x {formatCurrency(selectedPackage.price, getLanguage())}
               </Text>
             </View>
             <View style={[styles.summaryRow, styles.totalRow, { borderTopColor: colors.border }]}>
@@ -607,7 +600,7 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
                 {t('club.birthday.total')}
               </Text>
               <Text variant="titleLarge" style={{ color: colors.primary, fontWeight: '700' }}>
-                R$ {totalPrice.toFixed(2)}
+                {formatCurrency(totalPrice, getLanguage())}
               </Text>
             </View>
           </Card.Content>

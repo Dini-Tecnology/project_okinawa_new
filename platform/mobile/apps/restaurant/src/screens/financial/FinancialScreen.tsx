@@ -1,18 +1,18 @@
 /**
  * FinancialScreen - Restaurant Financial Dashboard
- *
+ * 
  * Migrated to semantic tokens using useColors() + useMemo pattern
  * for dynamic theme support (light/dark modes).
  */
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Text, Card, SegmentedButtons, DataTable } from 'react-native-paper';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 
 interface FinancialSummary {
@@ -43,46 +43,14 @@ interface Transaction {
   description: string;
 }
 
-interface FinancialData {
-  summary: FinancialSummary;
-  transactions: Transaction[];
-}
-
-// ============================================
-// QUERY KEYS
-// ============================================
-
-export const financialQueryKeys = {
-  financial: (period: string) => ['restaurant', 'financial', period] as const,
-};
-
-// ============================================
-// HELPERS
-// ============================================
-
-function getDateRange(period: string) {
-  const now = new Date();
-  switch (period) {
-    case 'today':
-      return { start: startOfDay(now), end: endOfDay(now) };
-    case 'week':
-      return { start: startOfWeek(now), end: endOfWeek(now) };
-    case 'month':
-      return { start: startOfMonth(now), end: endOfMonth(now) };
-    default:
-      return { start: startOfDay(now), end: endOfDay(now) };
-  }
-}
-
-// ============================================
-// COMPONENT
-// ============================================
-
 export default function FinancialScreen() {
   const { t } = useI18n();
   const colors = useColors();
-  const queryClient = useQueryClient();
   const [period, setPeriod] = useState('today');
+  const [summary, setSummary] = useState<FinancialSummary | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const styles = useMemo(() => StyleSheet.create({
     container: {
@@ -136,70 +104,64 @@ export default function FinancialScreen() {
     },
   }), [colors]);
 
-  // ---- Main financial query with 60s polling fallback ----
-  const {
-    data: financialData,
-    isLoading,
-    isFetching,
-    refetch,
-  } = useQuery<FinancialData>({
-    queryKey: financialQueryKeys.financial(period),
-    queryFn: async () => {
-      const { start, end } = getDateRange(period);
+  useEffect(() => {
+    loadFinancialData();
+  }, [period]);
+
+  const getDateRange = () => {
+    const now = new Date();
+    switch (period) {
+      case 'today':
+        return { start: startOfDay(now), end: endOfDay(now) };
+      case 'week':
+        return { start: startOfWeek(now), end: endOfWeek(now) };
+      case 'month':
+        return { start: startOfMonth(now), end: endOfMonth(now) };
+      default:
+        return { start: startOfDay(now), end: endOfDay(now) };
+    }
+  };
+
+  const loadFinancialData = async () => {
+    setLoading(true);
+    try {
+      const { start, end } = getDateRange();
       const [summaryResponse, transactionsResponse] = await Promise.all([
         ApiService.getFinancialSummary({
           params: {
             start_date: start.toISOString(),
             end_date: end.toISOString(),
           },
-        } as any),
+        }),
         ApiService.getFinancialReport({
           params: {
             start_date: start.toISOString(),
             end_date: end.toISOString(),
             limit: 20,
           },
-        } as any),
+        }),
       ]);
-      return {
-        summary: summaryResponse.data,
-        transactions: transactionsResponse.data,
-      };
-    },
-    staleTime: 30_000,
-    refetchInterval: 60_000, // poll every 60s as WebSocket fallback
-  });
 
-  const summary = financialData?.summary ?? null;
-  const transactions = financialData?.transactions ?? [];
+      setSummary(summaryResponse.data);
+      setTransactions(transactionsResponse.data);
+    } catch (error) {
+      console.error('Failed to load financial data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // isRefreshing = a background refetch after initial load
-  const refreshing = isFetching && !isLoading;
-
-  // ---- WebSocket subscription for real-time financial updates ----
-  const { on, off, connected } = useWebSocket('/');
-
-  useEffect(() => {
-    if (!connected) return;
-
-    const handleFinancialUpdate = (data: FinancialData) => {
-      queryClient.setQueryData(financialQueryKeys.financial(period), data);
-    };
-
-    on('financial:update', handleFinancialUpdate);
-    on('revenue:update', handleFinancialUpdate);
-
-    return () => {
-      off('financial:update', handleFinancialUpdate);
-      off('revenue:update', handleFinancialUpdate);
-    };
-  }, [connected, period, on, off, queryClient]);
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadFinancialData();
+    setRefreshing(false);
+  };
 
   return (
     <ScrollView
       style={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={refetch} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
     >
       <SegmentedButtons
@@ -222,7 +184,7 @@ export default function FinancialScreen() {
                   {t('financial.revenue')}
                 </Text>
                 <Text variant="displaySmall" style={styles.revenue}>
-                  R$ {summary.total_revenue.toFixed(2)}
+                  {formatCurrency(summary.total_revenue, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -244,7 +206,7 @@ export default function FinancialScreen() {
                   {t('financial.averageTicket')}
                 </Text>
                 <Text variant="displaySmall" style={{ color: colors.foreground }}>
-                  R$ {summary.average_order_value.toFixed(2)}
+                  {formatCurrency(summary.average_order_value, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -255,7 +217,7 @@ export default function FinancialScreen() {
                   {t('tips.title')}
                 </Text>
                 <Text variant="displaySmall" style={styles.tips}>
-                  R$ {summary.total_tips.toFixed(2)}
+                  {formatCurrency(summary.total_tips, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -267,31 +229,31 @@ export default function FinancialScreen() {
               <View style={styles.paymentMethod}>
                 <Text variant="bodyMedium" style={styles.paymentMethodText}>{t('payment.creditCard')}</Text>
                 <Text variant="bodyMedium" style={styles.amount}>
-                  R$ {summary.payment_methods.credit_card.toFixed(2)}
+                  {formatCurrency(summary.payment_methods.credit_card, getLanguage())}
                 </Text>
               </View>
               <View style={styles.paymentMethod}>
                 <Text variant="bodyMedium" style={styles.paymentMethodText}>{t('payment.debitCard')}</Text>
                 <Text variant="bodyMedium" style={styles.amount}>
-                  R$ {summary.payment_methods.debit_card.toFixed(2)}
+                  {formatCurrency(summary.payment_methods.debit_card, getLanguage())}
                 </Text>
               </View>
               <View style={styles.paymentMethod}>
                 <Text variant="bodyMedium" style={styles.paymentMethodText}>{t('payment.cash')}</Text>
                 <Text variant="bodyMedium" style={styles.amount}>
-                  R$ {summary.payment_methods.cash.toFixed(2)}
+                  {formatCurrency(summary.payment_methods.cash, getLanguage())}
                 </Text>
               </View>
               <View style={styles.paymentMethod}>
                 <Text variant="bodyMedium" style={styles.paymentMethodText}>{t('payment.pix')}</Text>
                 <Text variant="bodyMedium" style={styles.amount}>
-                  R$ {summary.payment_methods.pix.toFixed(2)}
+                  {formatCurrency(summary.payment_methods.pix, getLanguage())}
                 </Text>
               </View>
               <View style={styles.paymentMethod}>
                 <Text variant="bodyMedium" style={styles.paymentMethodText}>{t('payment.wallet')}</Text>
                 <Text variant="bodyMedium" style={styles.amount}>
-                  R$ {summary.payment_methods.wallet.toFixed(2)}
+                  {formatCurrency(summary.payment_methods.wallet, getLanguage())}
                 </Text>
               </View>
             </Card.Content>
@@ -312,7 +274,7 @@ export default function FinancialScreen() {
                     <DataTable.Cell textStyle={{ color: colors.foreground }}>{item.name}</DataTable.Cell>
                     <DataTable.Cell numeric textStyle={{ color: colors.foreground }}>{item.quantity}</DataTable.Cell>
                     <DataTable.Cell numeric textStyle={{ color: colors.foreground }}>
-                      R$ {item.revenue.toFixed(2)}
+                      {formatCurrency(item.revenue, getLanguage())}
                     </DataTable.Cell>
                   </DataTable.Row>
                 ))}
@@ -339,7 +301,7 @@ export default function FinancialScreen() {
                 </DataTable.Cell>
                 <DataTable.Cell textStyle={{ color: colors.foreground }}>{transaction.payment_method}</DataTable.Cell>
                 <DataTable.Cell numeric textStyle={{ color: colors.foreground }}>
-                  R$ {transaction.amount.toFixed(2)}
+                  {formatCurrency(transaction.amount, getLanguage())}
                 </DataTable.Cell>
               </DataTable.Row>
             ))}

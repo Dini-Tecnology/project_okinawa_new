@@ -351,8 +351,8 @@ export class OTPService {
         logger.error(`Twilio API error: ${response.status}`, undefined, {
           method: 'sendOTPViaProvider',
           statusCode: response.status,
-          error: (errorData as any)?.message,
-        } as any);
+          error: (errorData as Record<string, unknown>)?.message,
+        });
         return { success: false };
       }
 

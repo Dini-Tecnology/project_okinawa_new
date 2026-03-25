@@ -126,7 +126,7 @@ function sanitizeData(data: unknown, depth: number = 0): unknown {
 
 export function initializeSentry() {
   if (!process.env.SENTRY_DSN) {
-    console.warn('⚠️  Sentry DSN not configured. Skipping Sentry initialization.');
+    logger.warn('Sentry DSN not configured. Skipping Sentry initialization.');
     return;
   }
 

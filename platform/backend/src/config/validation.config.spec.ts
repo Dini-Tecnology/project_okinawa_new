@@ -96,8 +96,9 @@ describe('validationSchema', () => {
 
       const { error } = validate(env);
 
+      // When DATABASE_SSL is absent in production, the default 'false' kicks in,
+      // which then fails the production constraint requiring 'true'.
       expect(error).toBeDefined();
-      // Check either the message or the path includes DATABASE_SSL
       const hasSSLError = error!.details.some(
         (d) =>
           d.message.includes('DATABASE_SSL') ||

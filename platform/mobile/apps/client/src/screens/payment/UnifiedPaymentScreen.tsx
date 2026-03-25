@@ -32,7 +32,8 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
+import { formatCurrency as fmtCurrencyUtil } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import type { RootStackParamList, PaymentSuccessParams } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -256,7 +257,7 @@ export default function UnifiedPaymentScreen() {
         setSelectedSavedCard(methodsResponse[0].id);
       }
     } catch (err: any) {
-      logger.error('Failed to load payment data:', err);
+      console.error('Failed to load payment data:', err);
       setError(t('payment.errorGeneric'));
       await analytics.logError('Failed to load payment data', 'PAYMENT_DATA_LOAD_ERROR', false);
     } finally {
@@ -276,7 +277,7 @@ export default function UnifiedPaymentScreen() {
     [subtotal, order, tipAmount, pointsDiscount],
   );
 
-  const formatCurrency = useCallback((value: number) => `R$ ${value.toFixed(2)}`, []);
+  const formatCurrency = useCallback((value: number) => fmtCurrencyUtil(value, getLanguage()), []);
 
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
@@ -839,9 +840,6 @@ export default function UnifiedPaymentScreen() {
                     onPress={() => !isDisabled && handleSelectMethod(method.type)}
                     activeOpacity={0.7}
                     disabled={isDisabled}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${getMethodLabel(method.type)} payment method`}
-                    accessibilityState={{ selected: isSelected, disabled: isDisabled }}
                   >
                     <IconButton
                       icon={method.icon}
@@ -1034,9 +1032,6 @@ export default function UnifiedPaymentScreen() {
                     ]}
                     onPress={() => setTipPercent(tip)}
                     activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel={tip === 0 ? 'No tip' : `Tip ${tip} percent`}
-                    accessibilityState={{ selected: isSelected }}
                   >
                     <Text
                       style={[
@@ -1062,7 +1057,7 @@ export default function UnifiedPaymentScreen() {
             </View>
             {tipPercent > 0 && (
               <Text variant="bodySmall" style={styles.tipInfo}>
-                {t('payment.tipAdding', { amount: formatCurrency(tipAmount).replace('R$ ', '') })}
+                {t('payment.tipAdding', { amount: formatCurrency(tipAmount) })}
               </Text>
             )}
           </Card.Content>

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In, IsNull } from 'typeorm';
 import { ClubEntry, ClubCheckInOut } from './entities';
 import { ClubEntryStatus, ClubEntryPurchaseType } from '@/common/enums';
 import { PurchaseClubEntryDto, ValidateClubEntryDto, CheckInDto, CheckOutDto } from './dto';
@@ -132,7 +132,7 @@ export class ClubEntriesService {
       : [ClubEntryStatus.ACTIVE];
 
     return this.entryRepository.find({
-      where: { user_id: userId, status: statuses as any },
+      where: { user_id: userId, status: In(statuses) },
       relations: ['restaurant'],
       order: { event_date: 'ASC' },
     });
@@ -147,7 +147,7 @@ export class ClubEntriesService {
       where: {
         restaurant_id: dto.restaurant_id,
         user_id: userId,
-        check_out_at: null as any,
+        check_out_at: IsNull(),
       },
     });
 

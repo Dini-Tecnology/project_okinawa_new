@@ -19,7 +19,7 @@ export interface SplitCalculation {
   service_charge: number;
   tip_amount: number;
   total: number;
-  items?: any[];
+  items?: Array<{ item_id: string; name: string; quantity: number; price: number }>;
 }
 
 @Injectable()
@@ -114,7 +114,7 @@ export class PaymentSplitService {
         tip_amount: 0,
         total,
         items: items.map((i) => ({
-          id: i.id,
+          item_id: i.id,
           name: i.menu_item?.name || 'Item',
           quantity: i.quantity,
           price: i.total_price,
@@ -199,7 +199,7 @@ export class PaymentSplitService {
         tip_amount: 0,
         total,
         items: selectedItems.map((i) => ({
-          id: i.id,
+          item_id: i.id,
           name: i.menu_item?.name || 'Item',
           quantity: i.quantity,
           price: i.total_price,

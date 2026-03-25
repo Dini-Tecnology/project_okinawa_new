@@ -126,8 +126,9 @@ export class QrCodeService {
       });
 
       return qrCode;
-    } catch (error: any) {
-      throw new Error(`Failed to generate styled QR code: ${error?.message || 'Unknown error'}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to generate styled QR code: ${message}`);
     }
   }
 
@@ -149,8 +150,9 @@ export class QrCodeService {
       });
 
       return qrCode;
-    } catch (error: any) {
-      throw new Error(`Failed to generate QR code: ${error?.message || 'Unknown error'}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      throw new Error(`Failed to generate QR code: ${message}`);
     }
   }
 

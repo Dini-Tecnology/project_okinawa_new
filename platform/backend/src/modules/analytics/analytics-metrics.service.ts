@@ -7,6 +7,8 @@ import { RestaurantTable, TableStatus } from '@/modules/tables/entities/restaura
 import { Attendance } from '@/modules/hr/entities/attendance.entity';
 import { MetricsCalculatorHelper } from './helpers';
 import { ANALYTICS } from '@common/constants/limits';
+import { OrderStatus } from '@common/enums/order-status.enum';
+import { ReservationStatus } from '@common/enums/reservation-status.enum';
 import { DashboardMetrics } from './analytics.service';
 
 @Injectable()
@@ -101,13 +103,13 @@ export class AnalyticsMetricsService {
     today.setHours(0, 0, 0, 0);
 
     const [activeOrders, activeReservations, occupiedTables, staffOnDuty, recentOrders] = await Promise.all([
-      this.orderRepository.count({ where: { restaurant_id: restaurantId, status: 'pending' as any } }),
+      this.orderRepository.count({ where: { restaurant_id: restaurantId, status: OrderStatus.PENDING } }),
       this.reservationRepository.count({
-        where: { restaurant_id: restaurantId, reservation_date: MoreThanOrEqual(today), status: 'confirmed' as any },
+        where: { restaurant_id: restaurantId, reservation_date: MoreThanOrEqual(today), status: ReservationStatus.CONFIRMED },
       }),
       this.tableRepository.count({ where: { restaurant_id: restaurantId, status: TableStatus.OCCUPIED } }),
       this.attendanceRepository.count({
-        where: { restaurant_id: restaurantId, date: MoreThanOrEqual(today), check_in: MoreThanOrEqual('00:00:00' as any), check_out: null as any },
+        where: { restaurant_id: restaurantId, date: MoreThanOrEqual(today), check_in: MoreThanOrEqual('00:00:00' as any), check_out: undefined },
       }),
       this.orderRepository.find({ where: { restaurant_id: restaurantId, created_at: MoreThanOrEqual(oneHourAgo) } }),
     ]);

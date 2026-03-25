@@ -280,7 +280,7 @@ export default function QRCodeGeneratorScreen() {
 
         {/* Style Badge */}
         <View style={[styles.styleBadge, { backgroundColor: selectedConfig?.primaryColor }]}>
-          <Icon name={selectedConfig?.icon || 'qrcode'} size={14} color="#fff" />
+          <Icon name={selectedConfig?.icon || 'qrcode'} size={14} color={colors.primaryForeground} />
           <Text style={styles.styleBadgeText}>{selectedConfig?.name}</Text>
         </View>
       </Card>
@@ -311,13 +311,13 @@ export default function QRCodeGeneratorScreen() {
                 { backgroundColor: config.primaryColor },
               ]}
             >
-              <Icon name={config.icon} size={24} color="#fff" />
+              <Icon name={config.icon} size={24} color={colors.primaryForeground} />
             </View>
             <Text style={styles.styleName}>{config.name}</Text>
             <Text style={styles.styleDescription}>{config.description}</Text>
             {selectedStyle === config.id && (
               <View style={[styles.selectedIndicator, { backgroundColor: config.primaryColor }]}>
-                <Icon name="check" size={14} color="#fff" />
+                <Icon name="check" size={14} color={colors.primaryForeground} />
               </View>
             )}
           </TouchableOpacity>
@@ -468,7 +468,7 @@ const createStyles = (colors: any) =>
       borderRadius: 20,
     },
     styleBadgeText: {
-      color: '#fff',
+      color: colors.primaryForeground,
       fontSize: 12,
       fontWeight: '600',
     },

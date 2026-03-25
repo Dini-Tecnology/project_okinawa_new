@@ -10,6 +10,8 @@ import { View, StyleSheet, FlatList, RefreshControl } from 'react-native';
 import { Text, Card, Button, SegmentedButtons, Chip, DataTable } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { format } from 'date-fns';
 
@@ -203,7 +205,7 @@ export default function TipsScreen() {
         <View style={styles.transactionHeader}>
           <View>
             <Text variant="titleMedium" style={styles.transactionAmount}>
-              R$ {item.amount.toFixed(2)}
+              {formatCurrency(item.amount, getLanguage())}
             </Text>
             <Text variant="bodySmall" style={styles.date}>
               {format(new Date(item.created_at), 'dd/MM/yyyy HH:mm')}
@@ -262,7 +264,7 @@ export default function TipsScreen() {
                   {t('tips.title')}
                 </Text>
                 <Text variant="displaySmall" style={styles.totalTips}>
-                  R$ {summary.total_tips.toFixed(2)}
+                  {formatCurrency(summary.total_tips, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -282,7 +284,7 @@ export default function TipsScreen() {
                   {t('financial.averageTicket')}
                 </Text>
                 <Text variant="displaySmall" style={styles.displayText}>
-                  R$ {summary.average_tip.toFixed(2)}
+                  {formatCurrency(summary.average_tip, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -293,7 +295,7 @@ export default function TipsScreen() {
                   {t('orders.status.pending')}
                 </Text>
                 <Text variant="displaySmall" style={styles.pending}>
-                  R$ {summary.pending_distribution.toFixed(2)}
+                  {formatCurrency(summary.pending_distribution, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>
@@ -305,8 +307,6 @@ export default function TipsScreen() {
               onPress={distributeTips}
               style={styles.distributeButton}
               icon="share"
-              accessibilityRole="button"
-              accessibilityLabel={t('tips.tipDistribution')}
             >
               {t('tips.tipDistribution')}
             </Button>
@@ -327,7 +327,7 @@ export default function TipsScreen() {
                     <DataTable.Cell textStyle={styles.tableText}>{staff.staff_name}</DataTable.Cell>
                     <DataTable.Cell numeric textStyle={styles.tableText}>{staff.tips_count}</DataTable.Cell>
                     <DataTable.Cell numeric textStyle={styles.tableText}>
-                      R$ {staff.total_tips.toFixed(2)}
+                      {formatCurrency(staff.total_tips, getLanguage())}
                     </DataTable.Cell>
                   </DataTable.Row>
                 ))}

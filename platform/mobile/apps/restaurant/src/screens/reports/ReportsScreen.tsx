@@ -27,6 +27,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BarChart } from 'react-native-chart-kit';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useAuth } from '@/shared/hooks/useAuth';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
@@ -314,7 +316,7 @@ export default function ReportsScreen() {
     return (
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
         <Text variant="bodyLarge" style={{ color: colors.foregroundSecondary, marginBottom: 16, textAlign: 'center' }}>{t('common.error')}</Text>
-        <TouchableOpacity onPress={loadData} accessibilityRole="button" accessibilityLabel={t('common.retry')}>
+        <TouchableOpacity onPress={loadData} accessibilityLabel={t('common.retry')}>
           <Text variant="labelLarge" style={{ color: colors.primary, fontWeight: '600' }}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
@@ -381,7 +383,6 @@ export default function ReportsScreen() {
               {/* Export button */}
               <TouchableOpacity
                 onPress={handleExport}
-                accessibilityRole="button"
                 accessibilityLabel={t('reports.export')}
                 style={{
                   flexDirection: 'row',
@@ -408,9 +409,6 @@ export default function ReportsScreen() {
             <TouchableOpacity
               key={r}
               onPress={() => setDateRange(r)}
-              accessibilityRole="button"
-              accessibilityLabel={t(`reports.dateRange.${r}`)}
-              accessibilityState={{ selected: dateRange === r }}
               style={{
                 flex: 1,
                 alignItems: 'center',
@@ -438,7 +436,7 @@ export default function ReportsScreen() {
           <KpiCard
             iconName="cash-multiple"
             label={t('reports.totalRevenue')}
-            value={`R$ ${(salesData?.total_revenue ?? 0).toLocaleString('pt-BR')}`}
+            value={formatCurrency(salesData?.total_revenue ?? 0, getLanguage())}
             gradientColors={[colors.primary, colors.accent]}
             colors={colors}
           />
@@ -452,7 +450,7 @@ export default function ReportsScreen() {
           <KpiCard
             iconName="ticket-percent"
             label={t('reports.avgTicket') ?? 'Ticket Medio'}
-            value={`R$ ${avgTicket.toFixed(0)}`}
+            value={formatCurrency(avgTicket, getLanguage(), { showCents: false })}
             gradientColors={[colors.accent, colors.warning]}
             colors={colors}
           />
@@ -479,7 +477,7 @@ export default function ReportsScreen() {
                   <MaterialCommunityIcons name="trending-up" size={14} color={colors.primary} />
                 </View>
                 <Text style={{ fontSize: 13, fontWeight: '600', color: colors.foreground }}>
-                  R$ {(salesData?.total_revenue ?? 0).toLocaleString('pt-BR')}
+                  {formatCurrency(salesData?.total_revenue ?? 0, getLanguage())}
                 </Text>
               </View>
               {salesData?.wow_comparison !== undefined && salesData.wow_comparison !== 0 && (
@@ -512,7 +510,7 @@ export default function ReportsScreen() {
                   height={200}
                   chartConfig={chartConfig}
                   style={{ borderRadius: 16 }}
-                  yAxisLabel="R$"
+                  yAxisLabel={getCurrencySymbol(getLanguage())}
                   yAxisSuffix=""
                 />
               </View>
@@ -627,7 +625,7 @@ export default function ReportsScreen() {
                   {item.quantity_sold}
                 </Text>
                 <Text style={{ width: 80, fontSize: 12, color: colors.success, fontWeight: '600', textAlign: 'right' }}>
-                  R$ {(item.revenue ?? 0).toFixed(0)}
+                  {formatCurrency(item.revenue ?? 0, getLanguage(), { showCents: false })}
                 </Text>
               </View>
             ))}
@@ -665,7 +663,7 @@ export default function ReportsScreen() {
               <View key={s.id} style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border }}>
                 <Text style={{ flex: 1, fontSize: 13, color: colors.foreground, fontWeight: '500' }} numberOfLines={1}>{s.name}</Text>
                 <Text style={{ width: 60, fontSize: 12, color: colors.foregroundSecondary, textAlign: 'right' }}>{s.orders_handled}</Text>
-                <Text style={{ width: 60, fontSize: 12, color: colors.foregroundSecondary, textAlign: 'right' }}>R$ {s.tips.toFixed(0)}</Text>
+                <Text style={{ width: 60, fontSize: 12, color: colors.foregroundSecondary, textAlign: 'right' }}>{formatCurrency(s.tips, getLanguage(), { showCents: false })}</Text>
                 <Text style={{ width: 60, fontSize: 12, color: colors.accent, fontWeight: '600', textAlign: 'right' }}>{s.rating.toFixed(1)}</Text>
               </View>
             ))}

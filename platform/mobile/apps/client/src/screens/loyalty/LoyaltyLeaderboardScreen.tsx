@@ -160,7 +160,7 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
       borderColor: colors.cardForeground,
     },
     statsName: {
-      color: 'rgba(255,255,255,0.8)',
+      color: colors.glassStrong,
       fontSize: typography.sizes.sm,
     },
     statsPoints: {
@@ -186,7 +186,7 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
     },
     progressBar: {
       height: 8,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: colors.glassBorder,
       borderRadius: 4,
       marginBottom: spacing.xs,
     },
@@ -196,7 +196,7 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
       borderRadius: 4,
     },
     progressText: {
-      color: 'rgba(255,255,255,0.8)',
+      color: colors.glassStrong,
       fontSize: typography.sizes.xs,
     },
     statsRow: {
@@ -212,13 +212,13 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
       fontWeight: typography.weights.bold as any,
     },
     statLabel: {
-      color: 'rgba(255,255,255,0.7)',
+      color: colors.glassBorder,
       fontSize: typography.sizes.xs,
     },
     statDivider: {
       width: 1,
       height: 30,
-      backgroundColor: 'rgba(255,255,255,0.2)',
+      backgroundColor: colors.glassBorder,
     },
     tabContainer: {
       flexDirection: 'row',
@@ -259,13 +259,13 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
       height: 56,
       borderRadius: 28,
       borderWidth: 3,
-      borderColor: '#C0C0C0',
+      borderColor: colors.border,
     },
     podiumAvatar1: {
       width: 72,
       height: 72,
       borderRadius: 36,
-      borderColor: '#FFD700',
+      borderColor: colors.ratingGold,
     },
     podiumBadge: {
       position: 'absolute',

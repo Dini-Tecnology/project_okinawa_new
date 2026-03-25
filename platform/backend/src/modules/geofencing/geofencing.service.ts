@@ -40,9 +40,9 @@ export class GeofencingService {
     const restaurant = await this.restaurantRepo.findOne({ where: { id: restaurantId } });
     if (!restaurant) throw new NotFoundException(`Restaurant ${restaurantId} not found`);
 
-    const restaurantLat = Number((restaurant as any).lat);
-    const restaurantLng = Number((restaurant as any).lng);
-    const radius = Number((restaurant as any).geofence_radius) || GEOFENCING.DEFAULT_GEOFENCE_RADIUS_METERS;
+    const restaurantLat = Number(restaurant.lat);
+    const restaurantLng = Number(restaurant.lng);
+    const radius = Number(restaurant.geofence_radius) || GEOFENCING.DEFAULT_GEOFENCE_RADIUS_METERS;
 
     if (!restaurantLat || !restaurantLng) {
       return { isNearby: false, restaurantId, distanceMeters: -1, radiusMeters: radius };
@@ -68,20 +68,20 @@ export class GeofencingService {
       lat,
       lng,
       geofence_radius: radiusMeters,
-    } as any);
+    } as Partial<Restaurant>);
   }
 
   async getGeofenceConfig(restaurantId: string) {
     const restaurant = await this.restaurantRepo.findOne({
       where: { id: restaurantId },
-      select: ['id', 'name', 'lat', 'lng', 'geofence_radius'] as any,
+      select: ['id', 'name', 'lat', 'lng', 'geofence_radius'] as (keyof Restaurant)[],
     });
     if (!restaurant) throw new NotFoundException(`Restaurant ${restaurantId} not found`);
     return {
       restaurantId: restaurant.id,
-      lat: (restaurant as any).lat,
-      lng: (restaurant as any).lng,
-      radiusMeters: (restaurant as any).geofence_radius ?? 500,
+      lat: restaurant.lat,
+      lng: restaurant.lng,
+      radiusMeters: restaurant.geofence_radius ?? 500,
     };
   }
 }

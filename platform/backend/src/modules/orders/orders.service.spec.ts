@@ -9,14 +9,9 @@ import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.enti
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
-import { ReservationsService } from '@/modules/reservations/reservations.service';
-import { TablesService } from '@/modules/tables/tables.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { OrderStatus, OrderType } from '@common/enums';
 import { OrderCalculatorHelper } from './helpers';
-import { KdsService } from './kds.service';
-import { WaiterStatsService } from './waiter-stats.service';
-import { OrderAdditionsService } from './order-additions.service';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -27,8 +22,6 @@ describe('OrdersService', () => {
   let profileRepository: Repository<Profile>;
   let eventsGateway: EventsGateway;
   let loyaltyService: LoyaltyService;
-  let reservationsService: ReservationsService;
-  let tablesService: TablesService;
 
   const mockOrder = {
     id: 'order-1',
@@ -191,41 +184,6 @@ describe('OrdersService', () => {
     awardPointsFromOrder: jest.fn(),
   };
 
-  const mockReservationsService = {
-    findByRestaurant: jest.fn(),
-  };
-
-  const mockTablesService = {
-    findAll: jest.fn(),
-  };
-
-  const mockKdsService = {
-    getKdsOrders: jest.fn().mockResolvedValue([]),
-  };
-
-  const mockWaiterStatsService = {
-    getWaiterTables: jest.fn().mockResolvedValue([]),
-    getWaiterStats: jest.fn().mockResolvedValue({
-      tables_assigned: 0,
-      active_orders: 0,
-      today_tips: 0,
-      today_sales: 0,
-    }),
-    getMaitreOverview: jest.fn().mockResolvedValue({
-      reservations: [],
-      tables: [],
-      summary: {
-        total_reservations: 0,
-        available_tables: 0,
-      },
-    }),
-  };
-
-  const mockOrderAdditionsService = {
-    openOrderForAdditions: jest.fn(),
-    addItemsToExistingOrder: jest.fn(),
-  };
-
   const mockQueryRunner = {
     connect: jest.fn().mockResolvedValue(undefined),
     startTransaction: jest.fn().mockResolvedValue(undefined),
@@ -285,30 +243,10 @@ describe('OrdersService', () => {
           useValue: mockLoyaltyService,
         },
         {
-          provide: ReservationsService,
-          useValue: mockReservationsService,
-        },
-        {
-          provide: TablesService,
-          useValue: mockTablesService,
-        },
-        {
           provide: DataSource,
           useValue: mockDataSource,
         },
         OrderCalculatorHelper,
-        {
-          provide: KdsService,
-          useValue: mockKdsService,
-        },
-        {
-          provide: WaiterStatsService,
-          useValue: mockWaiterStatsService,
-        },
-        {
-          provide: OrderAdditionsService,
-          useValue: mockOrderAdditionsService,
-        },
       ],
     }).compile();
 
@@ -320,9 +258,6 @@ describe('OrdersService', () => {
     profileRepository = module.get(getRepositoryToken(Profile));
     eventsGateway = module.get(EventsGateway);
     loyaltyService = module.get(LoyaltyService);
-    reservationsService = module.get(ReservationsService);
-    tablesService = module.get(TablesService);
-
     jest.clearAllMocks();
   });
 
@@ -524,140 +459,4 @@ describe('OrdersService', () => {
     });
   });
 
-  describe('getKdsOrders', () => {
-    it('should delegate to kdsService and return KDS orders', async () => {
-      mockKdsService.getKdsOrders.mockResolvedValue([mockOrder]);
-
-      const result = await service.getKdsOrders({
-        type: 'kitchen',
-        restaurant_id: 'restaurant-1',
-      });
-
-      expect(result).toBeDefined();
-      expect(Array.isArray(result)).toBe(true);
-      expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({
-        type: 'kitchen',
-        restaurant_id: 'restaurant-1',
-      });
-    });
-
-    it('should return empty array when no orders', async () => {
-      mockKdsService.getKdsOrders.mockResolvedValue([]);
-
-      const result = await service.getKdsOrders({});
-
-      expect(result).toEqual([]);
-      expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({});
-    });
-  });
-
-  describe('getWaiterTables', () => {
-    it('should delegate to waiterStatsService and return tables', async () => {
-      const mockTables = [
-        { number: '1', status: 'occupied', guests: 2 },
-      ];
-      mockWaiterStatsService.getWaiterTables.mockResolvedValue(mockTables);
-
-      const result = await service.getWaiterTables('waiter-1');
-
-      expect(result).toBeDefined();
-      expect(Array.isArray(result)).toBe(true);
-      expect(result.length).toBeGreaterThan(0);
-      expect(result[0]).toHaveProperty('number');
-      expect(result[0]).toHaveProperty('status');
-      expect(mockWaiterStatsService.getWaiterTables).toHaveBeenCalledWith('waiter-1');
-    });
-
-    it('should return empty array if waiter has no tables', async () => {
-      mockWaiterStatsService.getWaiterTables.mockResolvedValue([]);
-
-      const result = await service.getWaiterTables('waiter-1');
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('getWaiterStats', () => {
-    it('should delegate to waiterStatsService and return statistics', async () => {
-      const mockStats = {
-        tables_assigned: 3,
-        active_orders: 2,
-        today_tips: 50,
-        today_sales: 500,
-      };
-      mockWaiterStatsService.getWaiterStats.mockResolvedValue(mockStats);
-
-      const result = await service.getWaiterStats('waiter-1', {});
-
-      expect(result).toBeDefined();
-      expect(result).toHaveProperty('tables_assigned');
-      expect(result).toHaveProperty('active_orders');
-      expect(result).toHaveProperty('today_tips');
-      expect(result).toHaveProperty('today_sales');
-      expect(result.tables_assigned).toBe(3);
-      expect(mockWaiterStatsService.getWaiterStats).toHaveBeenCalledWith('waiter-1', {});
-    });
-
-    it('should pass date range params to waiterStatsService', async () => {
-      mockWaiterStatsService.getWaiterStats.mockResolvedValue({
-        tables_assigned: 0,
-        active_orders: 0,
-        today_tips: 0,
-        today_sales: 0,
-      });
-
-      const result = await service.getWaiterStats('waiter-1', {
-        start_date: '2024-01-01',
-        end_date: '2024-01-31',
-      });
-
-      expect(result).toBeDefined();
-      expect(mockWaiterStatsService.getWaiterStats).toHaveBeenCalledWith('waiter-1', {
-        start_date: '2024-01-01',
-        end_date: '2024-01-31',
-      });
-    });
-  });
-
-  describe('getMaitreOverview', () => {
-    it('should delegate to waiterStatsService and return maitre dashboard overview', async () => {
-      const mockOverview = {
-        reservations: [{ id: 'res-1', party_size: 4, status: 'confirmed' }],
-        tables: [{ id: 'table-1', table_number: '1', status: 'available' }],
-        summary: {
-          total_reservations: 1,
-          available_tables: 1,
-        },
-      };
-      mockWaiterStatsService.getMaitreOverview.mockResolvedValue(mockOverview);
-
-      const result = await service.getMaitreOverview('restaurant-1');
-
-      expect(result).toBeDefined();
-      expect(result).toHaveProperty('reservations');
-      expect(result).toHaveProperty('tables');
-      expect(result).toHaveProperty('summary');
-      expect(result.summary).toHaveProperty('total_reservations');
-      expect(result.summary).toHaveProperty('available_tables');
-      expect(mockWaiterStatsService.getMaitreOverview).toHaveBeenCalledWith('restaurant-1');
-    });
-
-    it('should handle empty reservations and tables', async () => {
-      mockWaiterStatsService.getMaitreOverview.mockResolvedValue({
-        reservations: [],
-        tables: [],
-        summary: {
-          total_reservations: 0,
-          available_tables: 0,
-        },
-      });
-
-      const result = await service.getMaitreOverview('restaurant-1');
-
-      expect(result.reservations).toEqual([]);
-      expect(result.tables).toEqual([]);
-      expect(result.summary.total_reservations).toBe(0);
-      expect(result.summary.available_tables).toBe(0);
-    });
-  });
 });

@@ -20,6 +20,31 @@ export interface AuthenticatedSocket extends Socket {
   };
 }
 
+export interface OrderNotificationData {
+  order_id: string;
+  status?: string;
+  restaurant_id?: string;
+  user_id?: string;
+  [key: string]: unknown;
+}
+
+export interface ReservationNotificationData {
+  reservation_id?: string;
+  restaurant_id?: string;
+  user_id?: string;
+  status?: string;
+  [key: string]: unknown;
+}
+
+export interface NotificationData {
+  id?: string;
+  type: string;
+  title?: string;
+  message?: string;
+  data?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
 @WebSocketGateway({
   cors: {
     origin: ['http://localhost:19006', 'http://localhost:3001'],
@@ -208,37 +233,37 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // Public methods to be called by services
 
-  notifyNewOrder(restaurantId: string, orderData: any) {
+  notifyNewOrder(restaurantId: string, orderData: OrderNotificationData) {
     this.server.to(`restaurant:${restaurantId}`).emit('order:new', orderData);
   }
 
-  notifyOrderUpdate(orderId: string, updateData: any) {
+  notifyOrderUpdate(orderId: string, updateData: OrderNotificationData) {
     this.server.to(`order:${orderId}`).emit('order:update', updateData);
   }
 
-  notifyOrderCancelled(orderId: string, restaurantId: string, data: any) {
+  notifyOrderCancelled(orderId: string, restaurantId: string, data: OrderNotificationData) {
     // Notify restaurant
     this.server.to(`restaurant:${restaurantId}`).emit('order:cancelled', data);
     // Notify customer
     this.server.to(`order:${orderId}`).emit('order:update', {
+      ...data,
       order_id: orderId,
       status: 'cancelled',
-      ...data,
     });
   }
 
-  notifyNewReservation(restaurantId: string, reservationData: any) {
+  notifyNewReservation(restaurantId: string, reservationData: ReservationNotificationData) {
     this.server
       .to(`restaurant:${restaurantId}`)
       .emit('reservation:new', reservationData);
   }
 
-  notifyReservationUpdate(reservationId: string, updateData: any) {
+  notifyReservationUpdate(reservationId: string, updateData: ReservationNotificationData) {
     // Notify the reservation room
     this.server.to(`reservation:${reservationId}`).emit('reservation:update', updateData);
   }
 
-  notifyReservationConfirmed(reservationId: string, userId: string, data: any) {
+  notifyReservationConfirmed(reservationId: string, userId: string, data: ReservationNotificationData) {
     // Notify reservation room
     this.server.to(`reservation:${reservationId}`).emit('reservation:confirmed', {
       reservation_id: reservationId,
@@ -256,7 +281,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  notifyReservationCancelled(reservationId: string, restaurantId: string, userId: string, data: any) {
+  notifyReservationCancelled(reservationId: string, restaurantId: string, userId: string, data: ReservationNotificationData) {
     // Notify restaurant
     this.server.to(`restaurant:${restaurantId}`).emit('reservation:cancelled', {
       reservation_id: reservationId,
@@ -274,7 +299,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  notifyUser(userId: string, notification: any) {
+  notifyUser(userId: string, notification: NotificationData) {
     const userSocketSet = this.userSockets.get(userId);
     if (userSocketSet) {
       userSocketSet.forEach((socketId) => {
@@ -284,7 +309,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  notifyRestaurant(restaurantId: string, notification: any) {
+  notifyRestaurant(restaurantId: string, notification: NotificationData) {
     this.server
       .to(`restaurant:${restaurantId}`)
       .emit('notification', notification);
@@ -346,7 +371,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // Public method to send notification with badge update
-  sendNotification(userId: string, notification: any) {
+  sendNotification(userId: string, notification: NotificationData) {
     const userSocketSet = this.userSockets.get(userId);
     if (userSocketSet) {
       userSocketSet.forEach((socketId) => {

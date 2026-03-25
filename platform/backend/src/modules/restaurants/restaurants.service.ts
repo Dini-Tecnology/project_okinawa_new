@@ -4,8 +4,6 @@ import { Repository } from 'typeorm';
 import { Restaurant } from './entities/restaurant.entity';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
-import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
-import { UpdateSetupProgressDto } from './dto/update-setup-progress.dto';
 import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
 import { UserRole as UserRoleEnum } from '@/common/enums';
 import { PaginatedResponseDto, toPaginationDto } from '@/common/dto/pagination.dto';
@@ -95,52 +93,6 @@ export class RestaurantsService {
     const restaurant = await this.findOne(id);
     Object.assign(restaurant, updateData);
     return this.restaurantRepository.save(restaurant);
-  }
-
-  // ========== SERVICE CONFIG METHODS ==========
-
-  async getServiceConfig(id: string) {
-    const restaurant = await this.findOne(id);
-    return {
-      service_config: restaurant.service_config || null,
-    };
-  }
-
-  async updateServiceConfig(id: string, updateConfigDto: UpdateServiceConfigDto) {
-    const restaurant = await this.findOne(id);
-
-    // Merge new config with existing config
-    const currentConfig = restaurant.service_config || {};
-    const updatedConfig = {
-      ...currentConfig,
-      ...updateConfigDto,
-    };
-
-    restaurant.service_config = updatedConfig;
-    const savedRestaurant = await this.restaurantRepository.save(restaurant);
-
-    return {
-      service_config: savedRestaurant.service_config,
-    };
-  }
-
-  // ========== SETUP PROGRESS METHODS ==========
-
-  async getSetupProgress(id: string) {
-    const restaurant = await this.findOne(id);
-    return {
-      setup_progress: restaurant.setup_progress || [],
-    };
-  }
-
-  async updateSetupProgress(id: string, updateProgressDto: UpdateSetupProgressDto) {
-    const restaurant = await this.findOne(id);
-    restaurant.setup_progress = updateProgressDto.completedSteps;
-    const savedRestaurant = await this.restaurantRepository.save(restaurant);
-
-    return {
-      setup_progress: savedRestaurant.setup_progress,
-    };
   }
 
   async softDelete(id: string) {

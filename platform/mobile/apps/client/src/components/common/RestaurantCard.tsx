@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, Chip, IconButton } from 'react-native-paper';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { t, getLanguage } from '@okinawa/shared/i18n';
 import type { Restaurant } from '../../types';
 
 interface RestaurantCardProps {
@@ -53,7 +55,7 @@ export default function RestaurantCard({ restaurant, onPress }: RestaurantCardPr
 
           {restaurant.min_order_amount && (
             <Text variant="bodySmall" style={styles.minOrder}>
-              Pedido mínimo: R$ {restaurant.min_order_amount.toFixed(2)}
+              {t('restaurants.minOrder')}: {formatCurrency(restaurant.min_order_amount, getLanguage())}
             </Text>
           )}
         </Card.Content>

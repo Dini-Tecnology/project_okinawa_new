@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AnalyticsService } from './analytics.service';
 import { AnalyticsMetricsService } from './analytics-metrics.service';
 import { AnalyticsAggregationService } from './analytics-aggregation.service';
+import { AnalyticsPerformanceService } from './analytics-performance.service';
 import { AnalyticsForecastService } from './analytics-forecast.service';
 import { AnalyticsController } from './analytics.controller';
 import { Order } from '@/modules/orders/entities/order.entity';
@@ -43,6 +44,7 @@ import {
     ForecastHelper,
     AnalyticsMetricsService,
     AnalyticsAggregationService,
+    AnalyticsPerformanceService,
     AnalyticsForecastService,
     AnalyticsService,
   ],

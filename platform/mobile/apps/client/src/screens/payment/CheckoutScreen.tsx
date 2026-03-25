@@ -21,9 +21,10 @@ import * as Haptics from 'expo-haptics';
 
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -184,7 +185,7 @@ export default function CheckoutScreen() {
       const orderData = await ApiService.getOrder(orderId);
       setOrder(orderData);
     } catch (err: any) {
-      logger.error('Failed to load order:', err);
+      console.error('Failed to load order:', err);
       setError(t('checkout.errorLoad'));
       await analytics.logError('Failed to load checkout order', 'CHECKOUT_LOAD_ERROR', false);
     } finally {
@@ -203,9 +204,9 @@ export default function CheckoutScreen() {
 
   const total = useMemo(() => subtotal + serviceFee + tipAmount, [subtotal, serviceFee, tipAmount]);
 
-  const formatCurrency = useCallback((value: number) => {
-    return `R$ ${value.toFixed(2)}`;
-  }, []);
+  const fmtCurrency = useCallback((value: number) =>
+    formatCurrency(value, getLanguage()),
+  []);
 
   const handleConfirmAndPay = useCallback(async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -466,11 +467,11 @@ export default function CheckoutScreen() {
                     {item.menu_item.name}
                   </Text>
                   <Text variant="bodySmall" style={styles.itemQty}>
-                    {item.quantity}x {formatCurrency(item.menu_item.price)}
+                    {item.quantity}x {fmtCurrency(item.menu_item.price)}
                   </Text>
                 </View>
                 <Text variant="bodyMedium" style={styles.itemPrice}>
-                  {formatCurrency(item.menu_item.price * item.quantity)}
+                  {fmtCurrency(item.menu_item.price * item.quantity)}
                 </Text>
               </View>
             ))}
@@ -495,9 +496,6 @@ export default function CheckoutScreen() {
                     ]}
                     onPress={() => setSelectedTip(tip)}
                     activeOpacity={0.7}
-                    accessibilityRole="button"
-                    accessibilityLabel={tip === 0 ? 'No tip' : `Tip ${tip} percent`}
-                    accessibilityState={{ selected: isSelected }}
                   >
                     <Text
                       style={[
@@ -514,7 +512,7 @@ export default function CheckoutScreen() {
                           { color: isSelected ? colors.primary : colors.foregroundMuted },
                         ]}
                       >
-                        {formatCurrency(subtotal * (tip / 100))}
+                        {fmtCurrency(subtotal * (tip / 100))}
                       </Text>
                     )}
                   </TouchableOpacity>
@@ -536,7 +534,7 @@ export default function CheckoutScreen() {
                 {t('checkout.subtotal')}
               </Text>
               <Text variant="bodyMedium" style={styles.summaryValue}>
-                {formatCurrency(subtotal)}
+                {fmtCurrency(subtotal)}
               </Text>
             </View>
 
@@ -545,7 +543,7 @@ export default function CheckoutScreen() {
                 {t('checkout.serviceFee')}
               </Text>
               <Text variant="bodyMedium" style={styles.summaryValue}>
-                {formatCurrency(serviceFee)}
+                {fmtCurrency(serviceFee)}
               </Text>
             </View>
 
@@ -555,7 +553,7 @@ export default function CheckoutScreen() {
                   {t('checkout.tipLabel')} ({selectedTip}%)
                 </Text>
                 <Text variant="bodyMedium" style={styles.summaryValue}>
-                  {formatCurrency(tipAmount)}
+                  {fmtCurrency(tipAmount)}
                 </Text>
               </View>
             )}
@@ -567,7 +565,7 @@ export default function CheckoutScreen() {
                 {t('checkout.total')}
               </Text>
               <Text variant="titleLarge" style={styles.totalValue}>
-                {formatCurrency(total)}
+                {fmtCurrency(total)}
               </Text>
             </View>
           </Card.Content>

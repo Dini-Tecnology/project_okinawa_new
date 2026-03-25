@@ -32,7 +32,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Haptics from 'expo-haptics';
 
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import { t } from '@/shared/i18n';
+import { t, getLanguage } from '@/shared/i18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { useTab } from '../../hooks/useTab';
 import type { TabItem } from '../../hooks/useTab';
 import RoundBuilderSheet from './RoundBuilderSheet';
@@ -221,7 +222,7 @@ function RoundCard({
                 variant="bodyMedium"
                 style={{ color: colors.foreground, fontWeight: '600' }}
               >
-                R$ {lineTotal}
+                {formatCurrency(lineTotal, getLanguage())}
               </Text>
             </View>
           );
@@ -246,7 +247,7 @@ function RoundCard({
             variant="titleSmall"
             style={{ color: colors.primary, fontWeight: 'bold' }}
           >
-            R$ {round.total.toFixed(2)}
+            {formatCurrency(round.total, getLanguage())}
           </Text>
         </View>
       </Card.Content>
@@ -587,7 +588,7 @@ export default function TabScreen() {
             {t('tab.total')}
           </Text>
           <Text variant="headlineMedium" style={styles.totalAmount}>
-            R$ {tabTotal.toFixed(2)}
+            {formatCurrency(tabTotal, getLanguage())}
           </Text>
           <Badge
             style={[styles.itemCountBadge, { backgroundColor: colors.primary }]}
@@ -620,7 +621,7 @@ export default function TabScreen() {
             {t('tab.total')}
           </Text>
           <Text variant="titleLarge" style={{ color: colors.primary, fontWeight: 'bold' }}>
-            R$ {tabTotal.toFixed(2)}
+            {formatCurrency(tabTotal, getLanguage())}
           </Text>
         </View>
         <View style={styles.bottomButtons}>

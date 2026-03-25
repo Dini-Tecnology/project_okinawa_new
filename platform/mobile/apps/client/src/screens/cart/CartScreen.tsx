@@ -6,6 +6,8 @@ import ApiService from '@/shared/services/api';
 import { useCart } from '@/shared/contexts/CartContext';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 
 /**
  * CartScreen - Shopping cart management screen
@@ -92,7 +94,7 @@ export default function CartScreen() {
 
       Alert.alert(
         t('common.success'),
-        t('orders.orderPlaced'),
+        t('orders.orderPlaced') || 'Seu pedido foi realizado!',
         [
           {
             text: t('common.ok'),
@@ -270,7 +272,7 @@ export default function CartScreen() {
           <View style={styles.itemInfo}>
             <Text variant="titleMedium" style={styles.itemName}>{item.name}</Text>
             <Text variant="bodyMedium" style={styles.price}>
-              R$ {item.price.toFixed(2)} {t('menu.each')}
+              {formatCurrency(item.price, getLanguage())} {t('menu.each') || 'cada'}
             </Text>
           </View>
           <IconButton
@@ -278,8 +280,6 @@ export default function CartScreen() {
             size={20}
             onPress={() => cart.removeItem(item.id)}
             iconColor={colors.error}
-            accessibilityLabel={`Remove ${item.name} from cart`}
-            accessibilityRole="button"
           />
         </View>
 
@@ -289,8 +289,6 @@ export default function CartScreen() {
             size={20}
             onPress={() => cart.updateQuantity(item.id, item.quantity - 1)}
             mode="contained"
-            accessibilityLabel={`Decrease quantity of ${item.name}`}
-            accessibilityRole="button"
           />
           <Text variant="titleMedium" style={styles.quantity}>
             {item.quantity}
@@ -300,11 +298,9 @@ export default function CartScreen() {
             size={20}
             onPress={() => cart.updateQuantity(item.id, item.quantity + 1)}
             mode="contained"
-            accessibilityLabel={`Increase quantity of ${item.name}`}
-            accessibilityRole="button"
           />
           <Text variant="titleMedium" style={styles.itemTotal}>
-            R$ {(item.price * item.quantity).toFixed(2)}
+            {formatCurrency(item.price * item.quantity, getLanguage())}
           </Text>
         </View>
 
@@ -316,7 +312,6 @@ export default function CartScreen() {
           multiline
           numberOfLines={2}
           style={styles.instructionsInput}
-          accessibilityLabel={`Special instructions for ${item.name}`}
         />
       </Card.Content>
     </Card>
@@ -344,7 +339,6 @@ export default function CartScreen() {
               multiline
               numberOfLines={3}
               style={styles.orderInstructions}
-              accessibilityLabel="Special instructions for the order"
             />
 
             <Card style={styles.tipCard}>
@@ -385,9 +379,8 @@ export default function CartScreen() {
                   }}
                   mode="outlined"
                   keyboardType="decimal-pad"
-                  left={<TextInput.Affix text="R$" />}
+                  left={<TextInput.Affix text={getCurrencySymbol(getLanguage())} />}
                   style={styles.customTipInput}
-                  accessibilityLabel="Custom tip amount"
                 />
               </Card.Content>
             </Card>
@@ -395,22 +388,22 @@ export default function CartScreen() {
             <Card style={styles.summaryCard}>
               <Card.Content>
                 <Text variant="titleMedium" style={styles.summaryTitle}>
-                  {t('orders.orderSummary')}
+                  {t('orders.orderSummary') || 'Resumo do Pedido'}
                 </Text>
 
                 <View style={styles.summaryRow}>
                   <Text variant="bodyMedium" style={styles.summaryText}>{t('cart.subtotal')}</Text>
-                  <Text variant="bodyMedium" style={styles.summaryText}>R$ {getSubtotal().toFixed(2)}</Text>
+                  <Text variant="bodyMedium" style={styles.summaryText}>{formatCurrency(getSubtotal(), getLanguage())}</Text>
                 </View>
 
                 <View style={styles.summaryRow}>
                   <Text variant="bodyMedium" style={styles.summaryText}>{t('orders.tax')} (10%)</Text>
-                  <Text variant="bodyMedium" style={styles.summaryText}>R$ {getTax().toFixed(2)}</Text>
+                  <Text variant="bodyMedium" style={styles.summaryText}>{formatCurrency(getTax(), getLanguage())}</Text>
                 </View>
 
                 <View style={styles.summaryRow}>
                   <Text variant="bodyMedium" style={styles.summaryText}>{t('orders.tip')}</Text>
-                  <Text variant="bodyMedium" style={styles.summaryText}>R$ {getTip().toFixed(2)}</Text>
+                  <Text variant="bodyMedium" style={styles.summaryText}>{formatCurrency(getTip(), getLanguage())}</Text>
                 </View>
 
                 <Divider style={styles.divider} />
@@ -418,7 +411,7 @@ export default function CartScreen() {
                 <View style={styles.totalRow}>
                   <Text variant="titleLarge" style={styles.totalLabel}>{t('cart.total')}</Text>
                   <Text variant="titleLarge" style={styles.totalAmount}>
-                    R$ {getTotal().toFixed(2)}
+                    {formatCurrency(getTotal(), getLanguage())}
                   </Text>
                 </View>
               </Card.Content>
@@ -446,7 +439,7 @@ export default function CartScreen() {
               {t('cart.total')}
             </Text>
             <Text variant="titleLarge" style={styles.checkoutTotal}>
-              R$ {getTotal().toFixed(2)}
+              {formatCurrency(getTotal(), getLanguage())}
             </Text>
           </View>
           <Button

@@ -17,6 +17,7 @@ import { UserRole } from '@/common/enums';
 import { ReservationGuestsService } from './reservation-guests.service';
 import { InviteGuestDto } from './dto/invite-guest.dto';
 import { RespondInviteDto } from './dto/respond-invite.dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('reservation-guests')
 @Controller('reservation-guests')
@@ -31,7 +32,7 @@ export class ReservationGuestsController {
   async inviteGuest(
     @Param('reservationId') reservationId: string,
     @Body() inviteDto: InviteGuestDto,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.reservationGuestsService.inviteGuest(
       reservationId,
@@ -46,7 +47,7 @@ export class ReservationGuestsController {
   async respondToInvite(
     @Param('guestId') guestId: string,
     @Body() respondDto: RespondInviteDto,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.reservationGuestsService.respondToInvite(
       guestId,
@@ -69,7 +70,7 @@ export class ReservationGuestsController {
   async removeGuest(
     @Param('reservationId') reservationId: string,
     @Param('guestId') guestId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     await this.reservationGuestsService.removeGuest(
       reservationId,
@@ -87,14 +88,14 @@ export class ReservationGuestsController {
   async markArrived(
     @Param('reservationId') reservationId: string,
     @Param('guestId') guestId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.reservationGuestsService.markGuestArrived(reservationId, guestId, req.user.sub);
   }
 
   @Get('my-invites')
   @ApiOperation({ summary: 'Get all pending invites for current user' })
-  async getMyPendingInvites(@Req() req: any) {
+  async getMyPendingInvites(@Req() req: AuthenticatedRequest) {
     return this.reservationGuestsService.getPendingInvites(req.user.sub);
   }
 

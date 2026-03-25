@@ -19,7 +19,7 @@ import { EXPORT } from '@common/constants/limits';
 export interface WebhookPayload {
   event: string;
   timestamp: string;
-  data: any;
+  data: Record<string, unknown>;
   webhook_id: string;
 }
 
@@ -47,7 +47,7 @@ export class WebhookDeliveryService {
   }
 
   /** Trigger a webhook event -- find active subscriptions and enqueue deliveries. */
-  async triggerEvent(restaurantId: string, event: WebhookEvent, data: any) {
+  async triggerEvent(restaurantId: string, event: WebhookEvent, data: Record<string, unknown>) {
     const subscriptions = await this.subscriptionRepository
       .createQueryBuilder('subscription')
       .where('subscription.restaurant_id = :restaurantId', { restaurantId })
@@ -169,10 +169,10 @@ export class WebhookDeliveryService {
 
   /** Handle delivery failure with exponential backoff and subscription deactivation. */
   private async handleDeliveryFailure(
-    delivery: WebhookDelivery, subscription: WebhookSubscription, error: any,
+    delivery: WebhookDelivery, subscription: WebhookSubscription, error: unknown,
   ) {
     delivery.retry_count++;
-    delivery.error_message = error.message;
+    delivery.error_message = error instanceof Error ? error.message : String(error);
 
     if (error instanceof AxiosError) {
       if (error.response?.status) delivery.response_code = error.response.status;
@@ -185,7 +185,7 @@ export class WebhookDeliveryService {
       const delays = [60_000, 300_000, 900_000];
       const delay = delays[delivery.retry_count - 1] || 900_000;
       delivery.next_retry_at = new Date(Date.now() + delay);
-      this.logger.warn(`Delivery ${delivery.id} failed, retry in ${delay / 1000}s: ${error.message}`);
+      this.logger.warn(`Delivery ${delivery.id} failed, retry in ${delay / 1000}s: ${error instanceof Error ? error.message : String(error)}`);
     } else {
       delivery.status = DeliveryStatus.FAILED;
       subscription.failure_count++;

@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, Chip, IconButton, Button } from 'react-native-paper';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Reservation, ReservationStatus } from '../../types';
 import { useColors } from '../../../../shared/theme';
+import { t } from '@/shared/i18n';
+import { formatDateTime } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@/shared/i18n';
 
 interface ReservationCardProps {
   reservation: Reservation;
@@ -24,14 +25,8 @@ const STATUS_COLORS: Record<ReservationStatus, string> = {
   no_show: '#9E9E9E',
 };
 
-const STATUS_LABELS: Record<ReservationStatus, string> = {
-  pending: 'Pendente',
-  confirmed: 'Confirmada',
-  seated: 'Sentado',
-  completed: 'Concluída',
-  cancelled: 'Cancelada',
-  no_show: 'Não Compareceu',
-};
+const getReservationStatusLabel = (status: ReservationStatus): string =>
+  t(`reservations.status.${status}`);
 
 export default function ReservationCard({
   reservation,
@@ -179,7 +174,7 @@ export default function ReservationCard({
           <View style={styles.timeInfo}>
             <IconButton icon="clock-outline" size={16} style={styles.icon} iconColor={colors.textMuted} />
             <Text variant="bodySmall" style={styles.timeText}>
-              {format(new Date(reservation.reservation_time), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+              {formatDateTime(reservation.reservation_time, getLanguage())}
             </Text>
           </View>
           {['pending', 'confirmed'].includes(reservation.status) && (
@@ -192,7 +187,7 @@ export default function ReservationCard({
           style={[styles.statusChip, { backgroundColor: STATUS_COLORS[reservation.status] }]}
           textStyle={styles.chipText}
         >
-          {STATUS_LABELS[reservation.status]}
+          {getReservationStatusLabel(reservation.status)}
         </Chip>
       </View>
 

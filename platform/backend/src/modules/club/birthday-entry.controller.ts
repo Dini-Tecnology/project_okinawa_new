@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/com
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { BirthdayEntryService } from './birthday-entry.service';
 import { RequestBirthdayEntryDto, ApproveBirthdayEntryDto, RejectBirthdayEntryDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Birthday Entries')
 @Controller('birthday-entries')
@@ -11,13 +12,13 @@ export class BirthdayEntryController {
 
   @Post()
   @ApiOperation({ summary: 'Request a birthday entry' })
-  async requestEntry(@Req() req: any, @Body() dto: RequestBirthdayEntryDto) {
+  async requestEntry(@Req() req: AuthenticatedRequest, @Body() dto: RequestBirthdayEntryDto) {
     return this.birthdayService.requestBirthdayEntry(req.user.id, dto);
   }
 
   @Get('me')
   @ApiOperation({ summary: 'Get my birthday entries' })
-  async getMyEntries(@Req() req: any) {
+  async getMyEntries(@Req() req: AuthenticatedRequest) {
     return this.birthdayService.getUserBirthdayEntries(req.user.id);
   }
 
@@ -43,7 +44,7 @@ export class BirthdayEntryController {
   @ApiOperation({ summary: 'Approve a birthday entry (staff)' })
   async approveEntry(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: ApproveBirthdayEntryDto,
   ) {
     return this.birthdayService.approveBirthdayEntry(id, req.user.id, dto);
@@ -53,7 +54,7 @@ export class BirthdayEntryController {
   @ApiOperation({ summary: 'Reject a birthday entry (staff)' })
   async rejectEntry(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: RejectBirthdayEntryDto,
   ) {
     return this.birthdayService.rejectBirthdayEntry(id, req.user.id, dto);

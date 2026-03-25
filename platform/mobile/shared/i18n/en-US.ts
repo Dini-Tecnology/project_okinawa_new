@@ -37,7 +37,6 @@ export const enUS = {
     comingSoon: 'Coming soon',
     featureInDevelopment: 'Feature in development',
     all: 'All',
-    permissionRequired: 'Permission required',
   },
 
   // Auth
@@ -156,14 +155,19 @@ export const enUS = {
       delivered: 'Delivered',
       completed: 'Completed',
       cancelled: 'Cancelled',
-      refunded: 'Refunded',
+      served: 'Served',
+      received: 'Received',
     },
-    card: {
-      items: 'Items',
-      total: 'Total',
-      table: 'Table',
-      timeAgo: '{{minutes}} min ago',
-    },
+    itemsCount: 'Items ({{count}})',
+    moreItems: '+{{count}} items',
+    track: 'Track',
+    cancel: 'Cancel',
+    restaurant: 'Restaurant',
+    start: 'Start',
+    markAs: 'Mark as {{status}}',
+    orderReady: 'Order Ready',
+    waiterNotified: 'The waiter will be notified to pick up the drinks',
+    table: 'Table',
     noOrders: "You haven't placed any orders yet",
   },
 
@@ -192,6 +196,19 @@ export const enUS = {
       cancelled: 'Cancelled',
       no_show: 'No show',
     },
+    guestStatus: {
+      pending: 'Pending',
+      accepted: 'Confirmed',
+      declined: 'Declined',
+      cancelled: 'Cancelled',
+    },
+    guestSummary: {
+      confirmed: 'Confirmed',
+      pending: 'Pending',
+      slots: 'Slots',
+    },
+    guestsLabel: 'Guests ({{count}})',
+    noGuestsAdded: 'No guests added',
     noReservations: "You don't have any reservations yet",
     selectDate: 'Select date',
     selectTime: 'Select time',
@@ -226,7 +243,6 @@ export const enUS = {
     ingredients: 'Ingredients',
     allergens: 'Allergens',
     preparationTime: 'Preparation time',
-    each: 'each',
     available: 'Available',
     unavailable: 'Unavailable',
     outOfStock: 'Out of stock',
@@ -288,6 +304,7 @@ export const enUS = {
     saveCard: 'Save card',
     defaultPayment: 'Default payment',
     processPayment: 'Process payment',
+    paymentConfirmed: 'Payment Confirmed',
     paymentSuccess: 'Payment successful',
     paymentFailed: 'Payment failed',
     paymentPending: 'Payment pending',
@@ -504,7 +521,6 @@ export const enUS = {
     distance: '{{distance}} km',
     deliveryTime: '{{time}} min',
     minimumOrder: 'Minimum order',
-    minOrder: 'Minimum order',
     deliveryFee: 'Delivery fee',
     about: 'About',
     photos: 'Photos',
@@ -1341,6 +1357,17 @@ export const enUS = {
     floorOverview: 'Floor Overview',
     assignTable: 'Assign Table',
     guestManagement: 'Guest Management',
+    reservationsToday: 'Reservations Today',
+    pending: 'Pending',
+    available: 'Available',
+    confirmed: 'Confirmed',
+    reservationConfirmedMsg: 'Reservation confirmed. Customer will be notified.',
+    status: {
+      confirmed: 'Confirmed',
+      pending: 'Pending',
+      seated: 'Seated',
+      cancelled: 'Cancelled',
+    },
   },
 
   // Config Hub
@@ -2001,6 +2028,14 @@ export const enUS = {
       inQueue: 'Drinks in Queue',
       ready: 'Ready',
       today: 'Drinks Today',
+      pending: 'Pending',
+      preparing: 'Preparing',
+    },
+    filter: {
+      all: 'All',
+      pending: 'Pending',
+      preparing: 'Preparing',
+      ready: 'Ready',
     },
     action: {
       start: 'Start Preparing',
@@ -2010,6 +2045,16 @@ export const enUS = {
     },
     confirm: {
       cancelItem: 'Cancel this item? The waiter will be notified.',
+    },
+    alerts: {
+      orderReady: 'Order Ready',
+      waiterNotified: 'The waiter will be notified to pick up the drinks',
+      cancelItemTitle: 'Cancel Item',
+      cancelItemMsg: 'Cancel this item? The waiter will be notified.',
+      cancelSuccess: 'Item cancelled successfully',
+      startError: 'Could not start the order',
+      completeError: 'Could not complete the order',
+      cancelError: 'Could not cancel the item',
     },
     quickAccess: {
       recipes: 'Drink Recipes',
@@ -2184,62 +2229,6 @@ export const enUS = {
     },
   },
 
-  // Cuisine Types (Client App)
-  cuisine: {
-    japanese: 'Japanese',
-    italian: 'Italian',
-    brazilian: 'Brazilian',
-    mexican: 'Mexican',
-    chinese: 'Chinese',
-    indian: 'Indian',
-    sushi: 'Sushi',
-    vegan: 'Vegan',
-    fastFood: 'Fast Food',
-  },
-
-  // Explore Screen (Client App)
-  explore: {
-    searchPlaceholder: 'Search restaurants...',
-    list: 'List',
-    map: 'Map',
-    noRestaurants: 'No restaurants found',
-  },
-
-  // Location (Client App)
-  location: {
-    permissionMessage: 'We need access to your location to show nearby restaurants.',
-  },
-
-  // Loyalty Screen — restaurant-based loyalty programs (Client App)
-  loyaltyScreen: {
-    loadingPrograms: 'Loading loyalty programs...',
-    errorLoad: 'Failed to load loyalty programs',
-    emptyTitle: 'No Loyalty Programs',
-    emptyMessage: 'Start ordering from restaurants to join their loyalty programs and earn rewards!',
-    insufficientPoints: 'Insufficient Points',
-    insufficientPointsMessage: 'You do not have enough points to redeem this reward',
-    redeemTitle: 'Redeem Reward',
-    redeemConfirm: 'Redeem {{name}} for {{points}} points?',
-    redeemSuccess: 'Reward redeemed successfully!',
-    redeemAction: 'Redeem',
-    lockedAction: 'Locked',
-    restaurantFallback: 'Restaurant',
-    pointsAvailable: 'Points Available',
-    tierLabel: '{{name}} Tier',
-    tierBenefits: '{{name}} Tier Benefits',
-    progressTo: 'Progress to {{tier}}',
-    earnPoints: 'Earn {{multiplier}}x points per dollar',
-    exclusiveRewards: 'Exclusive {{tier}} member rewards',
-    priorityBooking: 'Priority reservation booking',
-    availableRewards: 'Available Rewards',
-    pointsRequired: '{{count}} points',
-    statistics: 'Statistics',
-    totalEarned: 'Total Earned',
-    totalRedeemed: 'Total Redeemed',
-    available: 'Available',
-    recentActivity: 'Recent Activity',
-  },
-
   // Service Calls
   calls: {
     callWaiter: {
@@ -2256,24 +2245,6 @@ export const enUS = {
       help: 'Help',
       emergency: 'Emergency',
     },
-  },
-
-  // Legal
-  legal: {
-    privacyPolicy: 'Privacy Policy',
-    termsOfService: 'Terms of Service',
-    lastUpdated: 'Last updated',
-    version: 'Version',
-    loading: 'Loading document...',
-    error: 'Could not load the document. Please try again.',
-  },
-
-  // Maintenance
-  maintenance: {
-    title: 'Under Maintenance',
-    message: 'We are currently performing scheduled maintenance. Please try again shortly.',
-    estimatedEnd: 'Estimated return',
-    retry: 'Check again',
   },
 };
 

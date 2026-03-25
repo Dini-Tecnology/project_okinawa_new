@@ -1,4 +1,6 @@
 import { TabsService } from '../tabs.service';
+import { TabMembersService } from '../tab-members.service';
+import { TabPaymentsService } from '../tab-payments.service';
 import { TabStatus, TabType, TabMemberRole, TabMemberStatus, OrderItemStatus } from '@/common/enums';
 
 // Mock repositories
@@ -27,6 +29,8 @@ describe('TabsService', () => {
   let tabMemberRepository: ReturnType<typeof createMockRepository>;
   let tabItemRepository: ReturnType<typeof createMockRepository>;
   let tabPaymentRepository: ReturnType<typeof createMockRepository>;
+  let tabMembersService: TabMembersService;
+  let tabPaymentsService: TabPaymentsService;
 
   beforeEach(() => {
     tabRepository = createMockRepository();
@@ -34,11 +38,24 @@ describe('TabsService', () => {
     tabItemRepository = createMockRepository();
     tabPaymentRepository = createMockRepository();
 
+    tabMembersService = new TabMembersService(
+      tabRepository as any,
+      tabMemberRepository as any,
+    );
+
+    tabPaymentsService = new TabPaymentsService(
+      tabRepository as any,
+      tabMemberRepository as any,
+      tabPaymentRepository as any,
+    );
+
     service = new TabsService(
       tabRepository as any,
       tabMemberRepository as any,
       tabItemRepository as any,
       tabPaymentRepository as any,
+      tabMembersService,
+      tabPaymentsService,
     );
   });
 

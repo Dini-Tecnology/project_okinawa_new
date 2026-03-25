@@ -131,11 +131,11 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
             <Text variant="titleMedium" style={{ color: colors.foreground, fontWeight: '600' }} numberOfLines={1}>
               {item.name}
             </Text>
-            <Chip mode="flat" compact textStyle={{ color: '#fff', fontSize: 10, fontWeight: '600' }} style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', marginTop: 4 }}>
+            <Chip mode="flat" compact textStyle={{ color: colors.primaryForeground, fontSize: 10, fontWeight: '600' }} style={{ backgroundColor: colors.primary, alignSelf: 'flex-start', marginTop: 4 }}>
               {item.ticketType.toUpperCase()}
             </Chip>
           </View>
-          <Chip mode="flat" compact textStyle={{ color: '#fff', fontSize: 11 }} style={{ backgroundColor: checked ? colors.success : colors.foregroundMuted }}>
+          <Chip mode="flat" compact textStyle={{ color: colors.primaryForeground, fontSize: 11 }} style={{ backgroundColor: checked ? colors.success : colors.foregroundMuted }}>
             {checked ? t('club.promoter.checkedIn') : t('club.promoter.waiting')}
           </Chip>
         </Card.Content>
@@ -213,7 +213,7 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
       <FAB
         icon="plus" label={t('club.promoter.addGuest')}
         onPress={() => { Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setModalVisible(true); }}
-        style={[styles.fab, { backgroundColor: colors.primary }]} color="#fff"
+        style={[styles.fab, { backgroundColor: colors.primary }]} color={colors.primaryForeground}
         accessibilityRole="button"
         accessibilityLabel="Add new guest to list"
       />

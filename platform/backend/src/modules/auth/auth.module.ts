@@ -20,6 +20,8 @@ import { ConfigService } from '@nestjs/config';
 
 // Core Auth
 import { AuthService } from './auth.service';
+import { AuthRegistrationService } from './auth-registration.service';
+import { AuthLoginService } from './auth-login.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PasswordResetService } from './password-reset.service';
@@ -88,30 +90,34 @@ import { BiometricToken } from './entities/biometric-token.entity';
   ],
   providers: [
     // Core Auth
+    AuthRegistrationService,
+    AuthLoginService,
     AuthService,
     PasswordResetService,
     TokenService,
     JwtStrategy,
     PasswordExpiryGuard,
-    
+
     // Phone Auth
     OTPService,
-    
+
     // Social Auth
     SocialAuthService,
-    
+
     // Biometric Auth
     BiometricService,
-    
+
     // MFA
     MfaService,
-    
+
     // Common
     EmailService,
     AuditLogService,
   ],
   exports: [
     AuthService,
+    AuthRegistrationService,
+    AuthLoginService,
     PasswordResetService,
     TokenService,
     JwtStrategy,

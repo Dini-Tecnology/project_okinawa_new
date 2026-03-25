@@ -300,7 +300,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
         positionNumber: {
           fontSize: 18,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
         entryInfo: {
           flex: 1,
@@ -322,7 +322,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
           marginTop: 6,
         },
         kidsBadge: {
-          backgroundColor: '#9333EA20',
+          backgroundColor: `${colors.secondary}20`,
           flexDirection: 'row',
           alignItems: 'center',
           paddingHorizontal: 8,
@@ -332,7 +332,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
         kidsBadgeText: {
           fontSize: 11,
           fontWeight: '600',
-          color: '#9333EA',
+          color: colors.secondary,
           marginLeft: 2,
         },
         barOrdersBadge: {
@@ -385,7 +385,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
         kidsInfoTitle: {
           fontSize: 13,
           fontWeight: '600',
-          color: '#9333EA',
+          color: colors.secondary,
           marginBottom: 4,
         },
         kidsInfoText: {
@@ -430,7 +430,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
         // Modal
         modalOverlay: {
           flex: 1,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          backgroundColor: colors.overlay,
           justifyContent: 'flex-end',
         },
         modalContent: {
@@ -518,7 +518,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
                     <IconButton
                       icon="baby-face-outline"
                       size={12}
-                      iconColor="#9333EA"
+                      iconColor={colors.secondary}
                       accessibilityLabel={t('waitlistMgmt.kidsLabel')}
                     />
                     <Text style={styles.kidsBadgeText}>

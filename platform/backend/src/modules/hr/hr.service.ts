@@ -21,7 +21,7 @@ export class HrService {
   ) {}
 
   async getAttendance(restaurantId: string, startDate?: string, endDate?: string) {
-    const where: any = { restaurant_id: restaurantId };
+    const where: Record<string, unknown> = { restaurant_id: restaurantId };
 
     if (startDate && endDate) {
       where.date = Between(new Date(startDate), new Date(endDate));
@@ -33,8 +33,18 @@ export class HrService {
       order: { date: 'DESC', check_in: 'ASC' },
     });
 
+    interface AttendanceGroupEntry {
+      staff_id: string;
+      staff_name: string;
+      total_hours: number;
+      days_worked: number;
+      late_arrivals: number;
+      early_departures: number;
+      records: Attendance[];
+    }
+
     // Group by user and calculate totals
-    const grouped: any = records.reduce((acc: any, record: any) => {
+    const grouped: Record<string, AttendanceGroupEntry> = records.reduce((acc: Record<string, AttendanceGroupEntry>, record: Attendance) => {
       const userId = record.user_id;
       if (!acc[userId]) {
         acc[userId] = {
@@ -67,7 +77,7 @@ export class HrService {
       where: {
         user_id: userId,
         restaurant_id: restaurantId,
-        date: new Date(today) as any,
+        date: new Date(today) as unknown as Date,
       },
     });
 
@@ -81,7 +91,7 @@ export class HrService {
     const attendance = this.attendanceRepository.create({
       user_id: userId,
       restaurant_id: restaurantId,
-      date: new Date(today) as any,
+      date: new Date(today) as unknown as Date,
       check_in: checkInTime,
       status: AttendanceStatus.PRESENT,
     });
@@ -99,7 +109,7 @@ export class HrService {
       where: {
         user_id: userId,
         restaurant_id: restaurantId,
-        date: new Date(today) as any,
+        date: new Date(today) as unknown as Date,
       },
     });
 
@@ -134,7 +144,7 @@ export class HrService {
     page: number = 1,
     limit: number = 20,
   ) {
-    const where: any = { restaurant_id: restaurantId };
+    const where: Record<string, unknown> = { restaurant_id: restaurantId };
     if (status) {
       where.status = status;
     }
@@ -162,11 +172,11 @@ export class HrService {
     };
   }
 
-  async createLeaveRequest(userId: string, data: any) {
+  async createLeaveRequest(userId: string, data: { restaurant_id: string; leave_type: string; start_date: string; end_date: string; reason?: string }) {
     const leaveRequest = this.leaveRequestRepository.create({
       user_id: userId,
       restaurant_id: data.restaurant_id,
-      leave_type: data.leave_type,
+      leave_type: data.leave_type as any,
       start_date: new Date(data.start_date),
       end_date: new Date(data.end_date),
       reason: data.reason,
@@ -280,7 +290,7 @@ export class HrService {
     const validPage = Math.max(1, page);
     const skip = (validPage - 1) * validLimit;
 
-    const where: any = { restaurant_id: restaurantId };
+    const where: Record<string, unknown> = { restaurant_id: restaurantId };
     if (startDate && endDate) {
       where.date = Between(new Date(startDate), new Date(endDate));
     }
@@ -304,7 +314,7 @@ export class HrService {
     };
   }
 
-  async createShift(data: any) {
+  async createShift(data: Partial<Shift>) {
     const shift = this.shiftRepository.create(data);
     return this.shiftRepository.save(shift);
   }

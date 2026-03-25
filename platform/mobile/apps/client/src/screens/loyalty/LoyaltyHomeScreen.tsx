@@ -293,7 +293,7 @@ export default function LoyaltyHomeScreen() {
         },
         heroLabel: {
           fontSize: 16,
-          color: 'rgba(255,255,255,0.85)',
+          color: colors.glassStrong,
           marginTop: 4,
         },
         tierBadge: {
@@ -303,7 +303,7 @@ export default function LoyaltyHomeScreen() {
           paddingHorizontal: 16,
           paddingVertical: 6,
           borderRadius: 20,
-          backgroundColor: 'rgba(255,255,255,0.2)',
+          backgroundColor: colors.glassBorder,
         },
         tierBadgeText: {
           fontSize: 14,
@@ -518,7 +518,7 @@ export default function LoyaltyHomeScreen() {
             </Text>
             <Text style={styles.heroLabel}>{t('loyalty.home.points')}</Text>
             <View style={styles.tierBadge}>
-              <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 28, height: 28, borderRadius: 8, backgroundColor: colors.glassBorder, alignItems: 'center', justifyContent: 'center' }}>
                 <IconButton icon="crown" size={14} iconColor={colors.primaryForeground} style={{ margin: 0 }} />
               </View>
               <Text style={styles.tierBadgeText}>{tierName}</Text>

@@ -70,9 +70,9 @@ export class CacheService {
     try {
       // Pattern invalidation requires Redis store with keys support
       // For simple in-memory cache, this logs a warning
-      const cacheAny = this.cacheManager as any;
-      if (cacheAny.stores && cacheAny.stores[0]?.opts?.store?.keys) {
-        const keys = await cacheAny.stores[0].opts.store.keys(`${pattern}*`);
+      const cacheWithStores = this.cacheManager as unknown as { stores?: Array<{ opts?: { store?: { keys: (pattern: string) => Promise<string[]> } } }> };
+      if (cacheWithStores.stores && cacheWithStores.stores[0]?.opts?.store?.keys) {
+        const keys = await cacheWithStores.stores[0].opts.store.keys(`${pattern}*`);
         if (keys && keys.length > 0) {
           await Promise.all(keys.map((key: string) => this.cacheManager.del(key)));
           this.logger.debug(`Cache INVALIDATE pattern: ${pattern} (${keys.length} keys)`);

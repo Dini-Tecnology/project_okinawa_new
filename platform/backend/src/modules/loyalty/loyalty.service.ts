@@ -28,7 +28,7 @@ export interface Reward {
   description: string;
   points_cost: number;
   type: 'discount' | 'free_item' | 'upgrade' | 'special';
-  value: any;
+  value: string | number | Record<string, unknown>;
   valid_until?: Date;
   terms?: string;
 }

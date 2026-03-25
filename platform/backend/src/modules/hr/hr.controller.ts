@@ -96,7 +96,7 @@ export class HrController {
   @ApiResponse({ status: 400, description: 'Invalid leave request data' })
   createLeaveRequest(
     @CurrentUser() user: AuthenticatedUser,
-    @Body() data: any,
+    @Body() data: { restaurant_id: string; leave_type: string; start_date: string; end_date: string; reason?: string },
   ) {
     return this.hrService.createLeaveRequest(user.sub, data);
   }
@@ -139,8 +139,8 @@ export class HrController {
   @Roles(UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Create a new shift' })
   @ApiResponse({ status: 201, description: 'Shift created successfully' })
-  createShift(@Body() data: any) {
-    return this.hrService.createShift(data);
+  createShift(@Body() data: { restaurant_id: string; user_id: string; date: string; start_time: string; end_time: string; role?: string }) {
+    return this.hrService.createShift(data as any);
   }
 
   @Patch('shifts/:id')

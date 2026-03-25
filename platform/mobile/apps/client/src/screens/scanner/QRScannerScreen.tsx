@@ -78,10 +78,10 @@ export default function QRScannerScreen() {
       justifyContent: 'space-between',
       paddingTop: 50,
       paddingHorizontal: 10,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: colors.overlay,
     },
     headerTitle: {
-      color: '#fff',
+      color: colors.primaryForeground,
       fontSize: 18,
       fontWeight: '600',
     },
@@ -133,7 +133,7 @@ export default function QRScannerScreen() {
       marginLeft: -20,
     },
     instruction: {
-      color: '#fff',
+      color: colors.primaryForeground,
       marginTop: 24,
       fontSize: 16,
     },
@@ -178,11 +178,11 @@ export default function QRScannerScreen() {
     footer: {
       alignItems: 'center',
       paddingBottom: 50,
-      backgroundColor: 'rgba(0,0,0,0.5)',
+      backgroundColor: colors.overlay,
       paddingTop: 20,
     },
     footerText: {
-      color: '#fff',
+      color: colors.primaryForeground,
       fontSize: 14,
       marginBottom: 16,
     },
@@ -195,7 +195,7 @@ export default function QRScannerScreen() {
       alignItems: 'center',
     },
     typeText: {
-      color: '#fff',
+      color: colors.primaryForeground,
       fontSize: 12,
       marginTop: -8,
     },
@@ -425,7 +425,7 @@ export default function QRScannerScreen() {
         <View style={styles.header}>
           <IconButton
             icon="close"
-            iconColor="#fff"
+            iconColor={colors.primaryForeground}
             size={24}
             onPress={() => navigation.goBack()}
             accessibilityLabel="Close scanner"
@@ -433,7 +433,7 @@ export default function QRScannerScreen() {
           <Text style={styles.headerTitle}>{t('scanner.scanQR')}</Text>
           <IconButton
             icon={flashOn ? 'flash' : 'flash-off'}
-            iconColor="#fff"
+            iconColor={colors.primaryForeground}
             size={24}
             onPress={() => setFlashOn(!flashOn)}
             accessibilityLabel={flashOn ? 'Turn off flash' : 'Turn on flash'}
@@ -515,15 +515,15 @@ export default function QRScannerScreen() {
           <Text style={styles.footerText}>{t('scanner.supportedTypes')}</Text>
           <View style={styles.supportedTypes}>
             <View style={styles.typeItem}>
-              <IconButton icon="table-furniture" size={20} iconColor="#fff" />
+              <IconButton icon="table-furniture" size={20} iconColor={colors.primaryForeground} />
               <Text style={styles.typeText}>Mesas</Text>
             </View>
             <View style={styles.typeItem}>
-              <IconButton icon="silverware-fork-knife" size={20} iconColor="#fff" />
+              <IconButton icon="silverware-fork-knife" size={20} iconColor={colors.primaryForeground} />
               <Text style={styles.typeText}>Cardápios</Text>
             </View>
             <View style={styles.typeItem}>
-              <IconButton icon="account-plus" size={20} iconColor="#fff" />
+              <IconButton icon="account-plus" size={20} iconColor={colors.primaryForeground} />
               <Text style={styles.typeText}>Convites</Text>
             </View>
           </View>

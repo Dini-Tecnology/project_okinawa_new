@@ -770,7 +770,6 @@ export default function TableDetailScreen({
             onPress={() => setActiveSubTab(tab.id)}
             accessibilityRole="tab"
             accessibilityState={{ selected: activeSubTab === tab.id }}
-            accessibilityLabel={t(tab.labelKey)}
           >
             <Text
               style={[
@@ -874,10 +873,10 @@ export default function TableDetailScreen({
             {/* Status summary pills */}
             <View style={styles.statusSummary}>
               {[
-                { label: 'Pendente', count: allOrders.filter((o) => ['pending', 'confirmed'].includes(o.status)).length, color: colors.warning },
-                { label: 'Preparando', count: allOrders.filter((o) => o.status === 'preparing').length, color: colors.info },
-                { label: 'Pronto', count: allOrders.filter((o) => o.status === 'ready').length, color: colors.error },
-                { label: 'Servido', count: allOrders.filter((o) => o.status === 'served').length, color: colors.success },
+                { label: t('orders.status.pending'), count: allOrders.filter((o) => ['pending', 'confirmed'].includes(o.status)).length, color: colors.warning },
+                { label: t('orders.status.preparing'), count: allOrders.filter((o) => o.status === 'preparing').length, color: colors.info },
+                { label: t('orders.status.ready'), count: allOrders.filter((o) => o.status === 'ready').length, color: colors.error },
+                { label: t('orders.status.served'), count: allOrders.filter((o) => o.status === 'served').length, color: colors.success },
               ].map((s, i) => (
                 <View key={i} style={[styles.statusPill, { backgroundColor: s.color + '12' }]}>
                   <Text style={[styles.statusCount, { color: s.color }]}>{s.count}</Text>
@@ -963,11 +962,7 @@ export default function TableDetailScreen({
                   <Text style={styles.orderingForName}>
                     {guests.find((g) => g.id === orderingForGuest)?.name || 'Convidado'}
                   </Text>
-                  <TouchableOpacity
-                    onPress={() => setOrderingForGuest(null)}
-                    accessibilityRole="button"
-                    accessibilityLabel={t('waiter.menu.ordering_for_change')}
-                  >
+                  <TouchableOpacity onPress={() => setOrderingForGuest(null)}>
                     <Text style={styles.orderingForChange}>
                       {t('waiter.menu.ordering_for_change')}
                     </Text>
@@ -1025,7 +1020,6 @@ export default function TableDetailScreen({
                   onPress={() => setMenuCategory(c.cat)}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: menuCategory === c.cat }}
-                  accessibilityLabel={c.cat}
                 >
                   <Text
                     style={[

@@ -24,7 +24,9 @@ export const validationSchema = Joi.object({
     .default('false')
     .when('NODE_ENV', {
       is: 'production',
-      then: Joi.valid('true').required().description('DATABASE_SSL must be true in production'),
+      then: Joi.string().valid(Joi.override, 'true').required().messages({
+        'any.only': 'DATABASE_SSL must be "true" in production',
+      }),
     }),
   DATABASE_SSL_REJECT_UNAUTHORIZED: Joi.string().valid('true', 'false').default('true'),
   DATABASE_LOGGING: Joi.string().valid('true', 'false').default('false'),
@@ -52,7 +54,9 @@ export const validationSchema = Joi.object({
     .default('http://localhost:3000')
     .when('NODE_ENV', {
       is: 'production',
-      then: Joi.string().required().description('CORS_ORIGIN must be set explicitly in production'),
+      then: Joi.string().required().messages({
+        'any.required': 'CORS_ORIGIN must be set explicitly in production',
+      }),
     }),
   CORS_CREDENTIALS: Joi.string().valid('true', 'false').default('true'),
 

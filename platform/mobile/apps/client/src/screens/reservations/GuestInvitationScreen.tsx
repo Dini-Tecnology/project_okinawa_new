@@ -6,7 +6,6 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '../../../../shared/theme';
-import logger from '@okinawa/shared/utils/logger';
 
 interface Guest {
   id: string;
@@ -42,12 +41,8 @@ const STATUS_COLORS = {
   cancelled: '#757575',
 };
 
-const STATUS_LABELS = {
-  pending: 'Pendente',
-  accepted: 'Confirmado',
-  declined: 'Recusado',
-  cancelled: 'Cancelado',
-};
+const getGuestStatusLabel = (status: string, t: (key: string) => string): string =>
+  t(`reservations.guestStatus.${status}`);
 
 export default function GuestInvitationScreen() {
   useScreenTracking('Guest Invitation');
@@ -253,7 +248,7 @@ export default function GuestInvitationScreen() {
       setGuests(guestsData);
       setContacts(contactsData);
     } catch (error) {
-      logger.error('Failed to load data:', error);
+      console.error('Failed to load data:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);
@@ -372,7 +367,7 @@ export default function GuestInvitationScreen() {
         reservation_id: reservationId,
       });
     } catch (error) {
-      logger.error('Failed to share:', error);
+      console.error('Failed to share:', error);
     }
   };
 
@@ -428,19 +423,19 @@ export default function GuestInvitationScreen() {
           <View style={styles.summaryRow}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryNumber}>{confirmedGuests.length}</Text>
-              <Text style={styles.summaryLabel}>Confirmados</Text>
+              <Text style={styles.summaryLabel}>{t('reservations.guestSummary.confirmed')}</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryItem}>
               <Text style={styles.summaryNumber}>{pendingGuests.length}</Text>
-              <Text style={styles.summaryLabel}>Pendentes</Text>
+              <Text style={styles.summaryLabel}>{t('reservations.guestSummary.pending')}</Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryItem}>
               <Text style={[styles.summaryNumber, remainingSlots <= 0 && styles.warningText]}>
                 {remainingSlots}
               </Text>
-              <Text style={styles.summaryLabel}>Vagas</Text>
+              <Text style={styles.summaryLabel}>{t('reservations.guestSummary.slots')}</Text>
             </View>
           </View>
         </Card.Content>
@@ -450,7 +445,7 @@ export default function GuestInvitationScreen() {
       <Card style={styles.card}>
         <Card.Content>
           <Text variant="titleMedium" style={styles.sectionTitle}>
-            Convidados ({guests.length})
+            {t('reservations.guestsLabel', { count: guests.length })}
           </Text>
 
           {guests.map((guest) => (
@@ -477,7 +472,7 @@ export default function GuestInvitationScreen() {
                   style={[styles.statusChip, { backgroundColor: STATUS_COLORS[guest.status] }]}
                   textStyle={styles.statusText}
                 >
-                  {STATUS_LABELS[guest.status]}
+                  {getGuestStatusLabel(guest.status, t)}
                 </Chip>
               </View>
               {!guest.is_host && guest.status === 'pending' && (
@@ -486,8 +481,6 @@ export default function GuestInvitationScreen() {
                   size={20}
                   onPress={() => handleCancelInvite(guest.id)}
                   iconColor={colors.textMuted}
-                  accessibilityLabel={`Cancel invite for ${guest.guest_user?.full_name || guest.guest_name}`}
-                  accessibilityRole="button"
                 />
               )}
             </View>
@@ -516,7 +509,6 @@ export default function GuestInvitationScreen() {
             style={styles.searchInput}
             textColor={colors.foreground}
             placeholderTextColor={colors.textMuted}
-            accessibilityLabel="Search contacts"
           />
 
           {/* Contact List */}
@@ -526,8 +518,6 @@ export default function GuestInvitationScreen() {
               style={styles.contactItem}
               onPress={() => handleInviteContact(contact)}
               disabled={inviting}
-              accessibilityRole="button"
-              accessibilityLabel={`Invite ${contact.name}`}
             >
               <Avatar.Text
                 size={40}
@@ -569,7 +559,6 @@ export default function GuestInvitationScreen() {
                 label="Nome *"
                 style={styles.input}
                 textColor={colors.foreground}
-                accessibilityLabel="Guest name"
               />
               <TextInput
                 value={manualPhone}
@@ -579,7 +568,6 @@ export default function GuestInvitationScreen() {
                 keyboardType="phone-pad"
                 style={styles.input}
                 textColor={colors.foreground}
-                accessibilityLabel="Guest phone number"
               />
               <TextInput
                 value={manualEmail}
@@ -590,7 +578,6 @@ export default function GuestInvitationScreen() {
                 autoCapitalize="none"
                 style={styles.input}
                 textColor={colors.foreground}
-                accessibilityLabel="Guest email address"
               />
               <View style={styles.manualButtons}>
                 <Button
@@ -648,7 +635,7 @@ export default function GuestInvitationScreen() {
         style={styles.doneButton}
         icon="check"
       >
-        Concluído
+        {t('common.done')}
       </Button>
     </ScrollView>
   );

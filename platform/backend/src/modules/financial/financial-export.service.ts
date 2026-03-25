@@ -31,7 +31,7 @@ export class FinancialExportService {
     reportType: 'summary' | 'detailed' | 'transactions',
   ) {
     // Get base data based on report type
-    let reportData: any;
+    let reportData: Record<string, unknown>;
 
     switch (reportType) {
       case 'summary':
@@ -84,17 +84,18 @@ export class FinancialExportService {
   /**
    * Format report data as CSV string.
    */
-  private formatAsCSV(data: any, reportType: string): string {
+  private formatAsCSV(data: Record<string, unknown>, reportType: string): string {
     if (reportType === 'transactions' && data.transactions) {
       const headers = ['Date', 'Type', 'Category', 'Amount', 'Description'];
-      const rows = data.transactions.map((t: any) => [
+      const transactions = data.transactions as Array<{ transaction_date: string; type: string; category: string; amount: number; description?: string }>;
+      const rows = transactions.map((t) => [
         new Date(t.transaction_date).toISOString().split('T')[0],
         t.type,
         t.category,
         t.amount,
         t.description || '',
       ]);
-      return [headers.join(','), ...rows.map((r: string[]) => r.join(','))].join('\n');
+      return [headers.join(','), ...rows.map((r: (string | number)[]) => r.join(','))].join('\n');
     }
 
     // Summary format
@@ -111,7 +112,7 @@ export class FinancialExportService {
    * Format report data for Excel export.
    * Returns structured data that can be processed by Excel libraries.
    */
-  private formatAsExcel(data: any, reportType: string): any {
+  private formatAsExcel(data: Record<string, unknown>, reportType: string): Record<string, unknown> {
     return {
       format: 'excel',
       sheets: [

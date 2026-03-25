@@ -57,13 +57,13 @@ interface StampCardConfig {
 function StatsSkeleton({ colors }: { colors: ReturnType<typeof useColors> }) {
   return (
     <View style={{ marginHorizontal: 16, marginTop: 8 }}>
-      <View style={{ backgroundColor: '#1F2937', borderRadius: 20, padding: 16, overflow: 'hidden', position: 'relative' }}>
+      <View style={{ backgroundColor: colors.premiumCard, borderRadius: 20, padding: 16, overflow: 'hidden', position: 'relative' }}>
         <View style={{ position: 'absolute', right: -32, top: -32, width: 128, height: 128, borderRadius: 64, backgroundColor: `${colors.primary}1A` }} />
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-          <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+          <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.premiumCardGlassLight }} />
           <View style={{ flex: 1, gap: 6 }}>
-            <View style={{ width: '55%', height: 16, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)' }} />
-            <View style={{ width: '35%', height: 10, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+            <View style={{ width: '55%', height: 16, borderRadius: 4, backgroundColor: colors.premiumCardGlass }} />
+            <View style={{ width: '35%', height: 10, borderRadius: 4, backgroundColor: colors.premiumCardGlassLight }} />
           </View>
         </View>
       </View>
@@ -125,7 +125,7 @@ function StatChip({
         colors={gradientColors}
         style={{ width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }}
       >
-        <MaterialCommunityIcons name={iconName as any} size={18} color="#FFFFFF" />
+        <MaterialCommunityIcons name={iconName as any} size={18} color={colors.primaryForeground} />
       </LinearGradient>
       <View style={{ flex: 1 }}>
         <Text style={{ fontSize: 18, fontWeight: '700', color: colors.foreground }}>{value}</Text>
@@ -301,7 +301,7 @@ export default function LoyaltyManagementScreen() {
           marginHorizontal: 16,
           marginTop: 16,
           marginBottom: 12,
-          backgroundColor: '#1F2937',
+          backgroundColor: colors.premiumCard,
           borderRadius: 20,
           padding: 16,
           overflow: 'hidden',
@@ -314,10 +314,10 @@ export default function LoyaltyManagementScreen() {
             <MaterialCommunityIcons name="heart" size={22} color={colors.primary} />
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
+            <Text style={{ color: colors.premiumCardForeground, fontSize: 15, fontWeight: '700' }}>
               {t('loyaltyMgmt.title')}
             </Text>
-            <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 1 }}>
+            <Text style={{ color: colors.premiumCardMuted, fontSize: 11, marginTop: 1 }}>
               {stats?.total_members ?? 0} {t('loyaltyMgmt.members')}
             </Text>
           </View>
@@ -337,14 +337,14 @@ export default function LoyaltyManagementScreen() {
           iconName="calendar-check"
           label={t('loyaltyMgmt.activeThisMonth')}
           value={stats?.active_this_month ?? 0}
-          gradientColors={[colors.success, '#34D399']}
+          gradientColors={[colors.success, colors.successLight]}
           colors={colors}
         />
         <StatChip
           iconName="star-plus"
           label={t('loyaltyMgmt.pointsIssuedToday')}
           value={stats?.points_issued_today ?? 0}
-          gradientColors={[colors.info, '#6366F1']}
+          gradientColors={[colors.info, colors.infoLight]}
           colors={colors}
         />
         <StatChip
@@ -370,8 +370,8 @@ export default function LoyaltyManagementScreen() {
             end={{ x: 1, y: 0 }}
             style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 16 }}
           >
-            <MaterialCommunityIcons name="stamper" size={18} color="#FFFFFF" />
-            <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '600' }}>
+            <MaterialCommunityIcons name="stamper" size={18} color={colors.primaryForeground} />
+            <Text style={{ color: colors.premiumCardForeground, fontSize: 14, fontWeight: '600' }}>
               {t('loyaltyMgmt.giveStamp')}
             </Text>
           </LinearGradient>
@@ -444,7 +444,7 @@ export default function LoyaltyManagementScreen() {
                 end={{ x: 1, y: 0 }}
                 style={{ paddingHorizontal: 16, paddingVertical: 8, borderRadius: 12 }}
               >
-                <Text style={{ fontSize: 12, fontWeight: '600', color: '#FFFFFF' }}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.premiumCardForeground }}>
                   {stampSubmitting ? '...' : t('loyaltyMgmt.giveStamp')}
                 </Text>
               </LinearGradient>

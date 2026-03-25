@@ -93,8 +93,8 @@ export class WaiterStatsService {
     const waiterIds = [
       ...new Set(
         tablesResponse.items
-          .filter((t: any) => t.assigned_waiter_id)
-          .map((t: any) => t.assigned_waiter_id as string),
+          .filter((t: RestaurantTable) => t.assigned_waiter_id)
+          .map((t: RestaurantTable) => t.assigned_waiter_id as string),
       ),
     ];
 

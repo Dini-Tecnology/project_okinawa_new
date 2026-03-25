@@ -32,7 +32,7 @@ The platform is NOT a restaurant-focused tool, but rather centers on creating **
 |-----------|------------|-------------|
 | **Client Mobile App** | React Native / Expo | Customer-facing app for discovery, ordering, reservations, and payments |
 | **Restaurant Mobile App** | React Native / Expo | Staff management app with KDS, floor management, and analytics |
-| **Backend API** | NestJS | Scalable REST API with real-time WebSocket support (26 modules) |
+| **Backend API** | NestJS | Scalable REST API with real-time WebSocket support (35+ modules) |
 | **Preview System** | React / Vite | Interactive web-based prototype for validating flows (62+ screens) |
 
 ### Competitive Differentiation
@@ -258,78 +258,92 @@ The platform dynamically adapts to **11 distinct service types**:
 ### Project Structure
 
 ```
-project_okinawa-1/
-├── backend/                          # NestJS Backend API
-│   ├── src/
-│   │   ├── common/                   # Shared infrastructure
-│   │   │   ├── cache/                # Multi-layer caching (L1/L2/L3)
-│   │   │   ├── decorators/           # Custom decorators (@CurrentUser, @Roles)
-│   │   │   ├── dto/                  # Shared DTOs
-│   │   │   ├── enums/                # Shared enums
-│   │   │   ├── filters/              # Exception filters
-│   │   │   ├── guards/               # Auth guards (JWT, RBAC, CSRF)
-│   │   │   ├── idempotency/          # Idempotent request handling
-│   │   │   ├── interceptors/         # Logging interceptor (DI-injected)
-│   │   │   ├── logging/              # StructuredLoggerService (PII sanitization)
-│   │   │   ├── middleware/            # CSRF middleware, request middleware
-│   │   │   ├── services/             # Shared services
-│   │   │   └── tracing/              # Distributed tracing (NestJS Logger)
-│   │   ├── config/                   # Configuration modules (Swagger, DB, JWT)
-│   │   ├── database/                 # Migrations (TypeORM) and seeds
-│   │   │   └── seeds/                # Database seeder (bcrypt cost 12)
-│   │   ├── worker.ts                 # Isolated worker process
-│   │   └── modules/                  # 26 Feature modules
-│   │       ├── auth/                 # JWT, OAuth, session, token rotation
-│   │       │   └── services/         # Social auth (Apple RSA-SHA256 verification)
-│   │       ├── identity/             # Credentials, MFA, password policy
-│   │       ├── users/                # Profiles, preferences
-│   │       ├── user-roles/           # RBAC implementation
-│   │       ├── restaurants/          # Restaurant CRUD, service config
-│   │       ├── orders/               # Order lifecycle, KDS formatting
-│   │       │   └── helpers/          # OrderCalculator, KdsFormatter, WaiterStats
-│   │       ├── payments/             # Split payments, wallet, transactions
-│   │       ├── reservations/         # Booking, guest management
-│   │       ├── tables/               # Floor plan, table status
-│   │       ├── tabs/                 # Tab management (casual/bar)
-│   │       ├── menu-items/           # Menu management, categories
-│   │       ├── club/                 # Club features, VIP, queue, promoters
-│   │       ├── loyalty/              # Points, tiers, rewards
-│   │       ├── tips/                 # Gratuity distribution
-│   │       ├── reviews/              # Ratings, review moderation
-│   │       ├── favorites/            # User favorites
-│   │       ├── notifications/        # Push notifications (FCM)
-│   │       ├── analytics/            # Business intelligence
-│   │       ├── financial/            # Reports, transactions
-│   │       ├── hr/                   # Staff management, scheduling
-│   │       ├── ai/                   # AI-powered features
-│   │       ├── qr-code/              # QR generation and validation
-│   │       ├── webhooks/             # External integrations
-│   │       ├── events/               # WebSocket event handling
-│   │       ├── i18n/                 # Internationalization (PT/EN)
-│   │       └── health/               # System health checks
-│   ├── test/                         # E2E tests
-│   ├── docker-compose.yml            # Local infrastructure
-│   └── Dockerfile                    # Multi-stage production build
+project_okinawa/
+├── platform/                         # Production platform code
+│   ├── backend/                      # NestJS Backend API
+│   │   ├── src/
+│   │   │   ├── common/               # Shared infrastructure
+│   │   │   │   ├── config/           # Environment & feature configs
+│   │   │   │   ├── constants/        # App-wide constants & limits
+│   │   │   │   ├── decorators/       # Custom decorators (@CurrentUser, @Roles)
+│   │   │   │   ├── dto/              # Shared DTOs (pagination, etc.)
+│   │   │   │   ├── filters/          # Exception filters (Sentry, global)
+│   │   │   │   ├── guards/           # Auth guards (JWT, RBAC, CSRF)
+│   │   │   │   ├── interfaces/       # Shared interfaces
+│   │   │   │   ├── middleware/        # CSRF, maintenance, request middleware
+│   │   │   │   ├── services/         # Shared services (email, etc.)
+│   │   │   │   └── utils/            # Utility functions
+│   │   │   ├── config/               # Configuration modules (Swagger, DB, JWT, Redis, Socket)
+│   │   │   ├── database/             # Migrations (TypeORM) and seeds
+│   │   │   │   └── migrations/       # Ordered migration files
+│   │   │   └── modules/              # 35+ Feature modules
+│   │   │       ├── auth/             # JWT, OAuth, session, token rotation
+│   │   │       ├── identity/         # Credentials, MFA, password policy
+│   │   │       ├── users/            # Profiles, preferences
+│   │   │       ├── user-roles/       # RBAC implementation
+│   │   │       ├── restaurants/      # Restaurant CRUD, service config
+│   │   │       ├── orders/           # Order lifecycle, KDS formatting
+│   │   │       ├── payments/         # Split payments, wallet, transactions
+│   │   │       ├── reservations/     # Booking, guest management
+│   │   │       ├── tables/           # Floor plan, table status
+│   │   │       ├── tabs/             # Tab management (casual/bar, happy hour)
+│   │   │       ├── menu-items/       # Menu management, categories
+│   │   │       ├── menu-customization/ # Customization groups & options
+│   │   │       ├── club/             # Club features, VIP, queue, promoters
+│   │   │       ├── loyalty/          # Points, tiers, rewards
+│   │   │       ├── tips/             # Gratuity distribution
+│   │   │       ├── reviews/          # Ratings, review moderation
+│   │   │       ├── favorites/        # User favorites
+│   │   │       ├── notifications/    # Push notifications (FCM)
+│   │   │       ├── analytics/        # Business intelligence (metrics, aggregation, forecast)
+│   │   │       ├── financial/        # Reports, transactions, export
+│   │   │       ├── hr/               # Staff management, scheduling
+│   │   │       ├── ai/               # AI-powered features
+│   │   │       ├── qr-code/          # QR generation and validation
+│   │   │       ├── webhooks/         # External integrations (delivery, signature)
+│   │   │       ├── events/           # WebSocket event handling
+│   │   │       ├── i18n/             # Internationalization (PT/EN/ES)
+│   │   │       ├── health/           # System health checks, circuit breaker
+│   │   │       ├── service-config/   # Config Hub (JSONB, 11 endpoints, WS)
+│   │   │       ├── approvals/        # Manager approval workflows (WS)
+│   │   │       ├── inventory/        # 3-tier stock inventory
+│   │   │       ├── recipes/          # Drink recipes with seeds
+│   │   │       ├── promotions/       # Loyalty promotions & stamp cards
+│   │   │       ├── restaurant-waitlist/ # Smart waitlist (WS)
+│   │   │       ├── calls/            # Service calls (WS)
+│   │   │       ├── addresses/        # User addresses
+│   │   │       ├── receipts/         # Receipt generation (auto receipt_number)
+│   │   │       ├── geofencing/       # Haversine distance calculations
+│   │   │       └── legal/            # Privacy policy & terms of service
+│   │   ├── test/                     # E2E tests
+│   │   ├── docker-compose.yml        # Local infrastructure
+│   │   └── Dockerfile                # Multi-stage production build
+│   │
+│   ├── mobile/
+│   │   ├── apps/
+│   │   │   ├── client/               # Customer mobile app (37+ screens)
+│   │   │   │   ├── src/screens/      # Native screens
+│   │   │   │   ├── src/navigation/   # Stack + Tab navigators
+│   │   │   │   └── src/__tests__/    # Screen-level tests
+│   │   │   └── restaurant/           # Restaurant staff app (25+ screens)
+│   │   │       ├── src/screens/      # Native screens
+│   │   │       ├── src/navigation/   # Drawer + Stack navigators
+│   │   │       └── src/__tests__/    # Screen-level tests
+│   │   ├── shared/                   # Shared code between apps
+│   │   │   ├── components/           # Reusable UI components (design system)
+│   │   │   ├── hooks/                # useAuth, useOrders, useWebSocket, useI18n, useAsyncState
+│   │   │   ├── services/             # Unified API service (single source of truth)
+│   │   │   ├── contexts/             # RestaurantContext, AuthContext, CartContext
+│   │   │   ├── i18n/                 # Translations (pt-BR, en-US, es-ES)
+│   │   │   ├── screens/              # Shared screens (Maintenance, Legal)
+│   │   │   ├── theme/                # Design tokens (colors, spacing, typography)
+│   │   │   ├── validation/           # Zod schemas
+│   │   │   └── types/                # TypeScript definitions
+│   │   └── eas.json                  # EAS Build configuration
+│   │
+│   └── supabase/                     # Supabase configuration
 │
-├── mobile/
-│   ├── apps/
-│   │   ├── client/                   # Customer mobile app
-│   │   │   ├── src/screens/          # 25+ native screens
-│   │   │   ├── src/navigation/       # Stack + Tab navigators
-│   │   │   └── src/services/         # API clients
-│   │   └── restaurant/               # Restaurant staff app
-│   │       ├── src/screens/          # 24+ native screens
-│   │       └── src/navigation/       # Drawer + Stack navigators
-│   └── shared/                       # Shared code between apps
-│       ├── components/               # 16 reusable UI components
-│       ├── hooks/                    # useAuth, useOrders, useWebSocket, useI18n
-│       ├── services/                 # Unified API service (single source of truth)
-│       ├── contexts/                 # RestaurantContext, AuthContext, CartContext
-│       ├── validation/               # Zod schemas
-│       ├── config/                   # Navigation animations
-│       └── types/                    # TypeScript definitions
-│
-├── src/                              # Web Preview (React + Vite)
+├── src/                              # Web Preview (React + Vite) — reference only
 │   └── components/
 │       └── mobile-preview-v2/        # 62+ preview screens
 │
@@ -341,30 +355,20 @@ project_okinawa-1/
 │   ├── OWASP_CHECKLIST.md            # OWASP Top 10 compliance
 │   ├── PENTEST_REPORT.md             # Penetration testing report
 │   ├── PRODUCTION_CHECKLIST.md       # Production deployment checklist
-│   ├── SCALING_STRATEGY.md           # 10x–100x scaling roadmap
+│   ├── SCALING_STRATEGY.md           # 10x-100x scaling roadmap
 │   ├── DEVELOPMENT_GUIDE.md          # Development workflows and patterns
 │   ├── INSTALLATION_GUIDE.md         # Setup and configuration
-│   ├── QR_CODE_SYSTEM_SPECIFICATION.md # QR code system specification
-│   ├── MULTI_RESTAURANT_STAFF_ARCHITECTURE.md # Multi-restaurant architecture
-│   ├── UX_IMPROVEMENT_PROPOSALS.md   # UX improvements
-│   ├── UX_UI_GUIDE.md               # Design system guide
-│   ├── GTM_STRATEGY.md               # Go-to-market strategy
-│   ├── CHECKLIST.md                  # General checklist
-│   ├── CASUAL_DINING_IMPLEMENTATION.md # Casual dining module spec
-│   ├── SERVICE_TYPES_ENTERTAINMENT.md # Entertainment service types
-│   ├── RESTAURANT_MAPPING_TEMPLATE.md # Mapping template
-│   ├── OUTREACH_SCRIPTS.md           # Outreach scripts
-│   └── USER_GUIDE.md                # End-user guide
+│   └── ...                           # Additional docs
 │
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                    # CI pipeline (blocks on critical vulns)
 │
+├── CHANGELOG.md                      # Version changelog (Keep a Changelog format)
 ├── SECURITY.md                       # Security policy and practices
 ├── CONTRIBUTING.md                   # Contribution guidelines
-├── TESTING.md                        # Testing documentation (850+ tests)
-├── ARCHITECTURE.md                   # High-level architecture overview
-└── ESTRUTURA_PROJETO_COMPLETA.md     # Complete project structure (PT)
+├── TESTING.md                        # Testing documentation
+└── ARCHITECTURE.md                   # High-level architecture overview
 ```
 
 ### Database Schema (31 Tables)
@@ -413,15 +417,13 @@ The platform has undergone three rounds of technical audit with the following re
 
 ```bash
 # Clone the repository
-git clone https://github.com/pedrodini/project-okinawa.git
-cd project_okinawa-1
+git clone https://github.com/dinipedro/project_okinawa.git
+cd project_okinawa
 
-# Install all dependencies
-./install-dependencies-fixed.sh
+# Install backend dependencies
+cd platform/backend && npm install
 
-# Or manually:
-npm install
-cd backend && npm install
+# Install mobile dependencies
 cd ../mobile && npm install
 ```
 
@@ -429,7 +431,7 @@ cd ../mobile && npm install
 
 ```bash
 # Start PostgreSQL and Redis
-cd backend
+cd platform/backend
 docker-compose up -d
 
 # Run database migrations
@@ -443,22 +445,18 @@ npm run seed
 
 ```bash
 # Terminal 1 — Backend API
-cd backend
+cd platform/backend
 npm run start:dev
 # API available at http://localhost:3000/api/v1
 # Swagger docs at http://localhost:3000/docs (disabled in production)
 
 # Terminal 2 — Client Mobile App
-cd mobile/apps/client
-npm start
+cd platform/mobile/apps/client
+npx expo start
 
 # Terminal 3 — Restaurant Mobile App
-cd mobile/apps/restaurant
-npm start
-
-# Terminal 4 — Web Preview
-npm run dev
-# Preview available at http://localhost:5173
+cd platform/mobile/apps/restaurant
+npx expo start
 ```
 
 ### Environment Variables
@@ -549,36 +547,48 @@ Full API documentation available at `/docs` when running the backend (disabled i
 'waiter:called'        // Waiter call notification
 ```
 
-## Backend Modules (26)
+## Backend Modules (35+)
 
 | # | Module | Description |
 |---|--------|-------------|
 | 1 | **Auth** | JWT, OAuth (Google/Apple/Microsoft), token rotation, JTI blacklisting |
 | 2 | **Identity** | Credentials, MFA (TOTP), password policy, password history |
 | 3 | **Users** | Profile management, preferences |
-| 4 | **User Roles** | RBAC implementation (6 tiers, restaurant-scoped) |
+| 4 | **User Roles** | RBAC implementation (7 roles, restaurant-scoped) |
 | 5 | **Restaurants** | Restaurant CRUD, service configuration |
 | 6 | **Orders** | Order lifecycle, KDS integration, waiter stats |
 | 7 | **Payments** | Wallet, transactions, 4-mode split payment |
 | 8 | **Reservations** | Booking, guest management, invitations |
 | 9 | **Tables** | Floor plan, table status, real-time tracking |
-| 10 | **Tabs** | Tab management for casual dining and bars |
+| 10 | **Tabs** | Tab management, happy hour, waiter calls |
 | 11 | **Menu Items** | Menu management, categories, modifiers |
-| 12 | **Club** | Club features, VIP tables, virtual queue, promoters |
-| 13 | **Loyalty** | Points, tiers, rewards, redemption |
-| 14 | **Tips** | Gratuity distribution and management |
-| 15 | **Reviews** | Ratings, review moderation, photos |
-| 16 | **Favorites** | User favorites management |
-| 17 | **Notifications** | Push notifications (FCM), preferences |
-| 18 | **Analytics** | Business intelligence, KPIs |
-| 19 | **Financial** | Reports, transactions, multi-format export |
-| 20 | **HR** | Staff management, scheduling |
-| 21 | **AI** | AI-powered features (pairing, recommendations) |
-| 22 | **QR Code** | QR generation, validation, deep linking |
-| 23 | **Webhooks** | External integrations |
-| 24 | **Events** | WebSocket event handling (Socket.IO) |
-| 25 | **i18n** | Internationalization (PT/EN) |
-| 26 | **Health** | System health checks, readiness probes |
+| 12 | **Menu Customization** | Customization groups with JSONB options |
+| 13 | **Club** | Club features, VIP tables, virtual queue, promoters |
+| 14 | **Loyalty** | Points, tiers, rewards, redemption |
+| 15 | **Promotions** | Stamp cards, promotional campaigns |
+| 16 | **Tips** | Gratuity distribution and management |
+| 17 | **Reviews** | Ratings, review moderation, photos |
+| 18 | **Favorites** | User favorites management |
+| 19 | **Notifications** | Push notifications (FCM), preferences |
+| 20 | **Analytics** | Business intelligence, metrics, aggregation, forecasting |
+| 21 | **Financial** | Reports, transactions, multi-format export |
+| 22 | **HR** | Staff management, scheduling, attendance |
+| 23 | **AI** | AI-powered features (pairing, recommendations) |
+| 24 | **QR Code** | QR generation, validation, deep linking |
+| 25 | **Webhooks** | External integrations, delivery, signatures |
+| 26 | **Events** | WebSocket event handling (Socket.IO) |
+| 27 | **i18n** | Internationalization (PT-BR/EN-US/ES-ES) |
+| 28 | **Health** | System health checks, circuit breaker, readiness probes |
+| 29 | **Service Config** | Config Hub (JSONB, 11 endpoints, WebSocket) |
+| 30 | **Approvals** | Manager approval workflows (WebSocket) |
+| 31 | **Inventory** | 3-tier stock inventory management |
+| 32 | **Recipes** | Drink recipes with seed data |
+| 33 | **Restaurant Waitlist** | Smart waitlist with WebSocket updates |
+| 34 | **Calls** | Service calls (waiter, help) with WebSocket |
+| 35 | **Addresses** | User address management |
+| 36 | **Receipts** | Receipt generation with auto receipt_number |
+| 37 | **Geofencing** | Haversine distance calculations |
+| 38 | **Legal** | Privacy policy and terms of service (i18n) |
 
 ## Testing
 
@@ -598,15 +608,21 @@ The project includes a comprehensive test suite with **850+ tests** achieving **
 | **Total** | **32** | **850+** | **95%+** |
 
 ```bash
-# Run all tests
-cd mobile && npm run test
+# Run backend tests
+cd platform/backend && npm run test
 
-# Run with coverage
-npm run test -- --coverage
+# Run backend tests with coverage
+cd platform/backend && npm run test:cov
+
+# Run mobile tests
+cd platform/mobile && npm run test
+
+# Run mobile tests with coverage
+cd platform/mobile && npm run test -- --coverage
 
 # Run specific app tests
-cd mobile/apps/client && npx vitest run
-cd mobile/apps/restaurant && npx vitest run
+cd platform/mobile/apps/client && npx vitest run
+cd platform/mobile/apps/restaurant && npx vitest run
 ```
 
 See [TESTING.md](TESTING.md) for complete testing documentation.
@@ -683,7 +699,7 @@ A plataforma NÃO é uma ferramenta focada em restaurantes, mas sim centrada em 
 |------------|------------|-----------|
 | **App Mobile Cliente** | React Native / Expo | App para clientes: descoberta, pedidos, reservas, pagamentos |
 | **App Mobile Restaurante** | React Native / Expo | App de gestão para equipe: KDS, salão, analytics |
-| **API Backend** | NestJS | API REST escalável com suporte WebSocket em tempo real (26 módulos) |
+| **API Backend** | NestJS | API REST escalável com suporte WebSocket em tempo real (35+ módulos) |
 | **Sistema de Preview** | React / Vite | Protótipo web interativo para validação de fluxos (62+ telas) |
 
 ### Diferenciação Competitiva

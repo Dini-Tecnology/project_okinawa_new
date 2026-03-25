@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, Chip, IconButton, Button } from 'react-native-paper';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import type { Order, OrderStatus } from '../../types';
 import { useColors } from '../../../../shared/theme';
+import { t } from '@/shared/i18n';
+import { formatCurrency, formatDateTime } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@/shared/i18n';
 
 interface OrderCardProps {
   order: Order;
@@ -24,15 +25,7 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   cancelled: '#EF5350',
 };
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pendente',
-  confirmed: 'Confirmado',
-  preparing: 'Preparando',
-  ready: 'Pronto',
-  delivering: 'Em Entrega',
-  completed: 'Concluído',
-  cancelled: 'Cancelado',
-};
+const getStatusLabel = (status: OrderStatus): string => t(`orders.status.${status}`);
 
 export default function OrderCard({
   order,
@@ -184,17 +177,17 @@ export default function OrderCard({
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <Text variant={compact ? 'titleMedium' : 'titleLarge'} style={{ color: colors.foreground }}>
-            Pedido #{order.order_number || order.id.slice(0, 8)}
+            {t('orders.orderNumber', { number: order.order_number || order.id.slice(0, 8) })}
           </Text>
           <Text variant="bodySmall" style={styles.orderTime}>
-            {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })} - {minutesElapsed} min
+            {formatDateTime(order.created_at, getLanguage())} - {minutesElapsed} min
           </Text>
         </View>
         <Chip
           style={[styles.statusChip, { backgroundColor: STATUS_COLORS[order.status] }]}
           textStyle={styles.chipText}
         >
-          {STATUS_LABELS[order.status]}
+          {getStatusLabel(order.status)}
         </Chip>
       </View>
 
@@ -217,7 +210,7 @@ export default function OrderCard({
           ))}
           {order.items.length > 3 && (
             <Text variant="bodySmall" style={styles.moreItems}>
-              +{order.items.length - 3} itens
+              {t('orders.moreItems', { count: order.items.length - 3 })}
             </Text>
           )}
         </View>
@@ -238,12 +231,12 @@ export default function OrderCard({
             iconColor={colors.textMuted}
           />
           <Text variant="bodySmall" style={styles.orderInfoText}>
-            {order.order_type === 'delivery' ? 'Entrega' : order.order_type === 'pickup' ? 'Retirada' : 'Mesa'}
+            {t(`orders.orderType.${order.order_type === 'delivery' ? 'delivery' : order.order_type === 'pickup' ? 'pickup' : 'dine_in'}`)}
           </Text>
           <Text variant="bodySmall" style={styles.separator}>
             •
           </Text>
-          <Text variant="bodySmall" style={styles.orderInfoText}>R$ {order.total_amount.toFixed(2)}</Text>
+          <Text variant="bodySmall" style={styles.orderInfoText}>{formatCurrency(order.total_amount, getLanguage())}</Text>
         </View>
 
         {showActions && nextStatus && (
@@ -254,10 +247,10 @@ export default function OrderCard({
             style={[styles.actionButton, order.status === 'preparing' && styles.readyButton]}
           >
             {order.status === 'confirmed'
-              ? 'Iniciar'
+              ? t('orders.start')
               : order.status === 'preparing'
-              ? 'Pronto'
-              : `Marcar como ${STATUS_LABELS[nextStatus]}`}
+              ? t('orders.status.ready')
+              : t('orders.markAs', { status: getStatusLabel(nextStatus!) })}
           </Button>
         )}
       </View>

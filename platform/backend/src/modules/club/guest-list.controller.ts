@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { GuestListService } from './guest-list.service';
 import { JoinGuestListDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Guest List')
 @Controller('guest-list')
@@ -11,13 +12,13 @@ export class GuestListController {
 
   @Post()
   @ApiOperation({ summary: 'Join guest list for an event' })
-  async joinGuestList(@Req() req: any, @Body() dto: JoinGuestListDto) {
+  async joinGuestList(@Req() req: AuthenticatedRequest, @Body() dto: JoinGuestListDto) {
     return this.guestListService.joinGuestList(req.user.id, dto);
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Get my guest list entries' })
-  async getMyEntries(@Req() req: any) {
+  async getMyEntries(@Req() req: AuthenticatedRequest) {
     return this.guestListService.getUserGuestListEntries(req.user.id);
   }
 
@@ -35,7 +36,7 @@ export class GuestListController {
 
   @Delete(':id')
   @ApiOperation({ summary: 'Cancel guest list entry' })
-  async cancelEntry(@Param('id') id: string, @Req() req: any) {
+  async cancelEntry(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.guestListService.cancelEntry(id, req.user.id);
   }
 

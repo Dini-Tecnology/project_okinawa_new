@@ -29,7 +29,7 @@ describe('ReservationGuestsController', () => {
 
   it('should invite a guest', async () => {
     mockService.inviteGuest.mockResolvedValue({ id: 'guest-1' });
-    const result = await controller.inviteGuest('reservation-1', {} as any, { user: { sub: 'user-1' } });
+    const result = await controller.inviteGuest('reservation-1', {} as any, { user: { sub: 'user-1' } } as any);
     expect(result).toBeDefined();
   });
 
@@ -41,7 +41,7 @@ describe('ReservationGuestsController', () => {
 
   it('should get my pending invites', async () => {
     mockService.getPendingInvites.mockResolvedValue([{ id: 'invite-1' }]);
-    const result = await controller.getMyPendingInvites({ user: { sub: 'user-1' } });
+    const result = await controller.getMyPendingInvites({ user: { sub: 'user-1' } } as any);
     expect(result).toBeDefined();
   });
 });

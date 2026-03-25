@@ -11,9 +11,10 @@ import {
   IconButton,
   Divider,
 } from 'react-native-paper';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { useI18n } from '@okinawa/shared/hooks/useI18n';
+import { formatCurrency, formatDateTime } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 
 import type { Order, OrderStatus } from '../../types';
 
@@ -26,14 +27,14 @@ interface OrderCardProps {
   canCancel: boolean;
 }
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pendente',
-  confirmed: 'Confirmado',
-  preparing: 'Preparando',
-  ready: 'Pronto',
-  delivering: 'Em Entrega',
-  completed: 'Concluído',
-  cancelled: 'Cancelado',
+const STATUS_KEYS: Record<OrderStatus, string> = {
+  pending: 'orders.status.pending',
+  confirmed: 'orders.status.confirmed',
+  preparing: 'orders.status.preparing',
+  ready: 'orders.status.ready',
+  delivering: 'orders.status.delivering',
+  completed: 'orders.status.completed',
+  cancelled: 'orders.status.cancelled',
 };
 
 const STATUS_ICONS: Record<OrderStatus, string> = {
@@ -55,7 +56,9 @@ const OrderCard = memo<OrderCardProps>(({
   canCancel,
 }) => {
   const colors = useColors();
-  
+  const { t } = useI18n();
+  const locale = getLanguage();
+
   const getStatusColor = useCallback((status: OrderStatus): string => {
     const statusColors: Record<OrderStatus, string> = {
       pending: colors.warning,
@@ -70,7 +73,7 @@ const OrderCard = memo<OrderCardProps>(({
   }, [colors]);
 
   const statusColor = getStatusColor(order.status);
-  const statusLabel = STATUS_LABELS[order.status];
+  const statusLabel = t(STATUS_KEYS[order.status]);
   const statusIcon = STATUS_ICONS[order.status];
 
   const styles = useMemo(() => StyleSheet.create({
@@ -160,21 +163,17 @@ const OrderCard = memo<OrderCardProps>(({
   }), [colors]);
 
   return (
-    <TouchableOpacity
-      onPress={() => onPress(order)}
-      accessibilityRole="button"
-      accessibilityLabel={`View order from ${order.restaurant?.name || 'Restaurant'}, status: ${statusLabel}`}
-    >
+    <TouchableOpacity onPress={() => onPress(order)}>
       <Card style={styles.orderCard}>
         <Card.Content>
           {/* Header */}
           <View style={styles.orderHeader}>
             <View style={styles.orderHeaderLeft}>
               <Text variant="titleMedium" style={{ color: colors.foreground }}>
-                {order.restaurant?.name || 'Restaurante'}
+                {order.restaurant?.name || t('orders.restaurant')}
               </Text>
               <Text variant="bodySmall" style={styles.orderNumber}>
-                Pedido #{order.order_number || order.id.slice(0, 8)}
+                {t('orders.orderNumber', { number: order.order_number || order.id.slice(0, 8) })}
               </Text>
             </View>
             <Chip
@@ -191,7 +190,7 @@ const OrderCard = memo<OrderCardProps>(({
           {/* Items Summary */}
           <View style={styles.itemsSection}>
             <Text variant="bodyMedium" style={styles.sectionTitle}>
-              Itens ({order.items.length})
+              {t('orders.itemsCount', { count: order.items.length })}
             </Text>
             {order.items.slice(0, 3).map((orderItem, index) => (
               <View key={index} style={styles.itemRow}>
@@ -209,7 +208,7 @@ const OrderCard = memo<OrderCardProps>(({
             ))}
             {order.items.length > 3 && (
               <Text variant="bodySmall" style={styles.moreItems}>
-                +{order.items.length - 3} itens
+                {t('orders.moreItems', { count: order.items.length - 3 })}
               </Text>
             )}
           </View>
@@ -221,16 +220,14 @@ const OrderCard = memo<OrderCardProps>(({
             <View style={styles.infoRow}>
               <IconButton icon="calendar" size={16} style={styles.infoIcon} iconColor={colors.mutedForeground} />
               <Text variant="bodySmall" style={{ color: colors.foreground }}>
-                {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', {
-                  locale: ptBR,
-                })}
+                {formatDateTime(order.created_at, locale)}
               </Text>
             </View>
 
             <View style={styles.infoRow}>
               <IconButton icon="cash" size={16} style={styles.infoIcon} iconColor={colors.mutedForeground} />
               <Text variant="bodySmall" style={{ color: colors.foreground }}>
-                R$ {order.total_amount.toFixed(2)}
+                {formatCurrency(order.total_amount, locale)}
               </Text>
             </View>
 
@@ -249,11 +246,7 @@ const OrderCard = memo<OrderCardProps>(({
                   iconColor={colors.mutedForeground}
                 />
                 <Text variant="bodySmall" style={{ color: colors.foreground }}>
-                  {order.order_type === 'delivery'
-                    ? 'Entrega'
-                    : order.order_type === 'pickup'
-                    ? 'Retirada'
-                    : 'No Local'}
+                  {t(`orders.orderType.${order.order_type === 'delivery' ? 'delivery' : order.order_type === 'pickup' ? 'pickup' : 'dine_in'}`)}
                 </Text>
               </View>
             )}
@@ -268,22 +261,18 @@ const OrderCard = memo<OrderCardProps>(({
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => onTrack(order)}
-                    accessibilityRole="button"
-                    accessibilityLabel="Track order"
                   >
                     <IconButton icon="map-marker-path" size={20} iconColor={colors.primary} />
-                    <Text variant="bodySmall" style={{ color: colors.foreground }}>Rastrear</Text>
+                    <Text variant="bodySmall" style={{ color: colors.foreground }}>{t('orders.track')}</Text>
                   </TouchableOpacity>
                 )}
                 {canCancel && (
                   <TouchableOpacity
                     style={[styles.actionButton, styles.cancelButton]}
                     onPress={() => onCancel(order)}
-                    accessibilityRole="button"
-                    accessibilityLabel="Cancel order"
                   >
                     <IconButton icon="close-circle-outline" size={20} iconColor={colors.destructive} />
-                    <Text variant="bodySmall" style={{ color: colors.foreground }}>Cancelar</Text>
+                    <Text variant="bodySmall" style={{ color: colors.foreground }}>{t('orders.cancel')}</Text>
                   </TouchableOpacity>
                 )}
               </View>

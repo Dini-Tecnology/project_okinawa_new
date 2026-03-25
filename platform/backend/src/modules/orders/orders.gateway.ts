@@ -14,6 +14,16 @@ import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.int
 import { getWsCorsConfig } from '@common/config/ws-cors.config';
 import { OrdersService } from './orders.service';
 
+export interface OrderEventPayload {
+  id?: string;
+  restaurant_id: string;
+  user_id?: string;
+  status?: string;
+  items?: Array<{ menu_item_id: string; quantity: number; price: number }>;
+  total_amount?: number;
+  [key: string]: unknown;
+}
+
 @WebSocketGateway({
   namespace: '/orders',
   cors: getWsCorsConfig(),
@@ -51,8 +61,9 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(
         `Orders client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Orders client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Orders client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }
@@ -86,11 +97,11 @@ export class OrdersGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { event: 'left', data: { restaurantId: data.restaurantId } };
   }
 
-  notifyOrderCreated(order: any) {
+  notifyOrderCreated(order: OrderEventPayload) {
     this.server.to(`restaurant:${order.restaurant_id}`).emit('order:created', order);
   }
 
-  notifyOrderUpdated(order: any) {
+  notifyOrderUpdated(order: OrderEventPayload) {
     this.server.to(`restaurant:${order.restaurant_id}`).emit('order:updated', order);
     this.server.to(`user:${order.user_id}`).emit('order:updated', order);
   }

@@ -3,8 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
 import { Tab, TabMember, TabItem, TabPayment } from './entities';
 import { TabStatus, TabType, TabMemberRole, TabMemberStatus, OrderItemStatus } from '@/common/enums';
-import { PaymentSplitStatus } from '@/modules/payments/entities/payment-split.entity';
 import { CreateTabDto, AddTabItemDto, JoinTabDto, ProcessTabPaymentDto } from './dto';
+import { TabMembersService } from './tab-members.service';
+import { TabPaymentsService } from './tab-payments.service';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
@@ -18,6 +19,8 @@ export class TabsService {
     private tabItemRepository: Repository<TabItem>,
     @InjectRepository(TabPayment)
     private tabPaymentRepository: Repository<TabPayment>,
+    private tabMembersService: TabMembersService,
+    private tabPaymentsService: TabPaymentsService,
   ) {}
 
   /**
@@ -81,114 +84,23 @@ export class TabsService {
     return tab;
   }
 
-  /**
-   * Join an existing group tab
-   */
+  // ========== DELEGATION: MEMBERS ==========
+
   async joinTab(userId: string, dto: JoinTabDto): Promise<TabMember> {
-    const tab = await this.tabRepository.findOne({
-      where: { invite_token: dto.invite_token, status: TabStatus.OPEN },
-      relations: ['members'],
-    });
-
-    if (!tab) {
-      throw new NotFoundException('Tab not found or already closed');
-    }
-
-    if (tab.type !== TabType.GROUP) {
-      throw new BadRequestException('Cannot join an individual tab');
-    }
-
-    // Check if already a member
-    const existingMember = tab.members.find(m => m.user_id === userId);
-    if (existingMember) {
-      if (existingMember.status === TabMemberStatus.ACTIVE) {
-        throw new BadRequestException('Already a member of this tab');
-      }
-      // Rejoin if left
-      existingMember.status = TabMemberStatus.ACTIVE;
-      existingMember.left_at = null as unknown as Date;
-      return this.tabMemberRepository.save(existingMember);
-    }
-
-    // Check max members (could be configured per restaurant)
-    const MAX_MEMBERS = 10;
-    const activeMembers = tab.members.filter(m => m.status === TabMemberStatus.ACTIVE);
-    if (activeMembers.length >= MAX_MEMBERS) {
-      throw new BadRequestException('Tab has reached maximum number of members');
-    }
-
-    const member = this.tabMemberRepository.create({
-      tab_id: tab.id,
-      user_id: userId,
-      role: TabMemberRole.MEMBER,
-      status: TabMemberStatus.ACTIVE,
-      credit_contribution: dto.credit_contribution || 0,
-    });
-
-    // Update tab credits
-    if (dto.credit_contribution) {
-      tab.cover_charge_credit = Number(tab.cover_charge_credit) + dto.credit_contribution;
-      await this.tabRepository.save(tab);
-    }
-
-    return this.tabMemberRepository.save(member);
+    return this.tabMembersService.joinTab(userId, dto);
   }
 
-  /**
-   * Leave a tab
-   */
   async leaveTab(tabId: string, userId: string): Promise<void> {
     const tab = await this.findById(tabId);
-    const member = tab.members.find(m => m.user_id === userId);
-
-    if (!member) {
-      throw new NotFoundException('You are not a member of this tab');
-    }
-
-    if (member.role === TabMemberRole.HOST) {
-      throw new BadRequestException('Host cannot leave the tab. Close it instead.');
-    }
-
-    // Check if member has unpaid consumption
-    if (member.amount_consumed > member.amount_paid) {
-      throw new BadRequestException('You must pay your consumption before leaving');
-    }
-
-    member.status = TabMemberStatus.LEFT;
-    member.left_at = new Date();
-    await this.tabMemberRepository.save(member);
+    return this.tabMembersService.leaveTab(tab, userId);
   }
 
-  /**
-   * Remove a member from tab (host only)
-   */
   async removeMember(tabId: string, hostUserId: string, memberUserId: string): Promise<void> {
     const tab = await this.findById(tabId);
-
-    // Verify host
-    const host = tab.members.find(m => m.user_id === hostUserId && m.role === TabMemberRole.HOST);
-    if (!host) {
-      throw new ForbiddenException('Only the host can remove members');
-    }
-
-    const member = tab.members.find(m => m.user_id === memberUserId);
-    if (!member) {
-      throw new NotFoundException('Member not found');
-    }
-
-    if (member.role === TabMemberRole.HOST) {
-      throw new BadRequestException('Cannot remove the host');
-    }
-
-    // Check if member has unpaid consumption
-    if (member.amount_consumed > member.amount_paid) {
-      throw new BadRequestException('Member must pay their consumption before being removed');
-    }
-
-    member.status = TabMemberStatus.REMOVED;
-    member.left_at = new Date();
-    await this.tabMemberRepository.save(member);
+    return this.tabMembersService.removeMember(tab, hostUserId, memberUserId);
   }
+
+  // ========== ITEMS ==========
 
   /**
    * Add item to tab
@@ -293,86 +205,19 @@ export class TabsService {
     return this.tabRepository.save(tab);
   }
 
-  /**
-   * Process payment for tab
-   */
+  // ========== DELEGATION: PAYMENTS ==========
+
   async processPayment(tabId: string, userId: string, dto: ProcessTabPaymentDto): Promise<TabPayment> {
     const tab = await this.findById(tabId);
-
-    if (tab.status === TabStatus.CLOSED) {
-      throw new BadRequestException('Tab is already closed');
-    }
-
-    const payment = this.tabPaymentRepository.create({
-      tab_id: tabId,
-      user_id: userId,
-      amount: dto.amount,
-      tip_amount: dto.tip_amount || 0,
-      payment_method: dto.payment_method,
-      transaction_id: dto.transaction_id,
-      status: PaymentSplitStatus.PAID,
-      payment_details: dto.payment_details,
-    });
-
-    const savedPayment = await this.tabPaymentRepository.save(payment);
-
-    // Update member payment tracking
-    const member = tab.members.find(m => m.user_id === userId);
-    if (member) {
-      member.amount_paid = Number(member.amount_paid) + dto.amount + (dto.tip_amount || 0);
-      await this.tabMemberRepository.save(member);
-    }
-
-    // Update tab totals
-    tab.amount_paid = Number(tab.amount_paid) + dto.amount + (dto.tip_amount || 0);
-    tab.tip_amount = Number(tab.tip_amount) + (dto.tip_amount || 0);
-
-    // Check if fully paid
-    const totalAfterCredits = tab.total_amount - tab.cover_charge_credit - tab.deposit_credit;
-    if (tab.amount_paid >= totalAfterCredits) {
-      tab.status = TabStatus.CLOSED;
-      tab.closed_at = new Date();
-    }
-
-    await this.tabRepository.save(tab);
-
-    return savedPayment;
+    return this.tabPaymentsService.processPayment(tab, userId, dto);
   }
 
-  /**
-   * Get split options for the tab
-   */
   async getSplitOptions(tabId: string): Promise<any> {
     const tab = await this.findById(tabId);
-    const activeMembers = tab.members.filter(m => m.status === TabMemberStatus.ACTIVE);
-    const memberCount = activeMembers.length;
-
-    const totalAfterCredits = Number(tab.total_amount) - Number(tab.cover_charge_credit) - Number(tab.deposit_credit);
-
-    return {
-      total_amount: tab.total_amount,
-      credits: {
-        cover_charge: tab.cover_charge_credit,
-        deposit: tab.deposit_credit,
-        total: Number(tab.cover_charge_credit) + Number(tab.deposit_credit),
-      },
-      amount_after_credits: totalAfterCredits,
-      amount_paid: tab.amount_paid,
-      amount_remaining: totalAfterCredits - Number(tab.amount_paid),
-      split_options: {
-        equal: {
-          per_person: totalAfterCredits / memberCount,
-          members: memberCount,
-        },
-        by_consumption: activeMembers.map(m => ({
-          user_id: m.user_id,
-          amount_consumed: m.amount_consumed,
-          amount_paid: m.amount_paid,
-          amount_due: Math.max(0, Number(m.amount_consumed) - Number(m.amount_paid)),
-        })),
-      },
-    };
+    return this.tabPaymentsService.getSplitOptions(tab);
   }
+
+  // ========== TAB QUERIES ==========
 
   /**
    * Update tab totals

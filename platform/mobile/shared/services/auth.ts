@@ -38,7 +38,7 @@ export const authService = {
   /**
    * Social login (Apple/Google)
    */
-  async socialLogin(provider: 'apple' | 'google', idToken: string, deviceInfo?: any) {
+  async socialLogin(provider: 'apple' | 'google', idToken: string, deviceInfo?: Record<string, string>) {
     try {
       const response = await ApiService.post('/auth/social', {
         provider,
@@ -75,16 +75,17 @@ export const authService = {
       }
 
       return { success: false, error: 'Unknown auth status' };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Social login failed:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   },
 
   /**
    * Phone-based login/registration (after OTP verification)
    */
-  async phoneLogin(phoneNumber: string, otpCode: string, deviceInfo?: any) {
+  async phoneLogin(phoneNumber: string, otpCode: string, deviceInfo?: Record<string, string>) {
     try {
       const response = await ApiService.post('/auth/phone/verify-otp', {
         phone_number: phoneNumber,
@@ -110,9 +111,10 @@ export const authService = {
       }
 
       return { success: false, error: data.message || 'Verification failed' };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Phone login failed:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   },
 
@@ -145,16 +147,17 @@ export const authService = {
       }
 
       return { success: false, error: data.message };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Complete registration failed:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   },
 
   /**
    * Biometric quick login
    */
-  async biometricLogin(biometricToken: string, deviceInfo?: any) {
+  async biometricLogin(biometricToken: string, deviceInfo?: Record<string, string>) {
     try {
       const response = await ApiService.post('/auth/biometric/authenticate', {
         biometric_token: biometricToken,
@@ -176,9 +179,10 @@ export const authService = {
         user: data.user,
         trustLevel: data.trust_level,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Biometric login failed:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: errorMessage };
     }
   },
 
@@ -225,7 +229,7 @@ export const authService = {
   async storeAuthData(data: {
     access_token?: string;
     refresh_token?: string;
-    user?: any;
+    user?: Record<string, unknown>;
     biometric_enrollment_token?: string;
   }) {
     const promises: Promise<void>[] = [];

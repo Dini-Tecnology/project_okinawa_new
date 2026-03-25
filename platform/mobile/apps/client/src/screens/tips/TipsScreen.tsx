@@ -6,8 +6,9 @@ import { format } from 'date-fns';
 import { ptBR as dateFnsPtBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/theme';
-import logger from '@okinawa/shared/utils/logger';
 
 interface Tip {
   id: string;
@@ -45,7 +46,7 @@ export default function TipsScreen() {
       setTips(data.tips || data);
       setTotalTips(data.total || data.reduce((sum: number, tip: Tip) => sum + Number(tip.amount), 0));
     } catch (error) {
-      logger.error(error);
+      console.error(error);
       setTips([]);
       setTotalTips(0);
     } finally {
@@ -172,7 +173,7 @@ export default function TipsScreen() {
                 {t('tips.totalTips')}
               </Text>
               <Text variant="displaySmall" style={styles.summaryAmount}>
-                R$ {totalTips.toFixed(2)}
+                {formatCurrency(totalTips, getLanguage())}
               </Text>
             </View>
           </View>
@@ -206,7 +207,7 @@ export default function TipsScreen() {
                   </Text>
                 </View>
                 <Text variant="titleLarge" style={styles.amount}>
-                  R$ {item.amount.toFixed(2)}
+                  {formatCurrency(item.amount, getLanguage())}
                 </Text>
               </View>
 

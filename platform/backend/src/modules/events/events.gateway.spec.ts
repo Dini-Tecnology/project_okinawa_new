@@ -56,9 +56,9 @@ describe('EventsGateway', () => {
   });
 
   it('should notify new order', () => {
-    gateway.notifyNewOrder('restaurant-1', { id: 'order-1' });
+    gateway.notifyNewOrder('restaurant-1', { order_id: 'order-1', id: 'order-1' });
     expect(mockServer.to).toHaveBeenCalledWith('restaurant:restaurant-1');
-    expect(mockServer.emit).toHaveBeenCalledWith('order:new', { id: 'order-1' });
+    expect(mockServer.emit).toHaveBeenCalledWith('order:new', { order_id: 'order-1', id: 'order-1' });
   });
 
   it('should notify user', async () => {
@@ -70,7 +70,7 @@ describe('EventsGateway', () => {
     });
     await gateway.handleConnection(mockSocket);
 
-    gateway.notifyUser('user-1', { message: 'test' });
+    gateway.notifyUser('user-1', { type: 'test', message: 'test' });
     expect(mockServer.to).toHaveBeenCalled();
   });
 

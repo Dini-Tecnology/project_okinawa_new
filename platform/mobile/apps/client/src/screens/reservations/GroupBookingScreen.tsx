@@ -39,6 +39,8 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
@@ -503,7 +505,7 @@ export default function GroupBookingScreen() {
         <View style={styles.depositCard}>
           <Text style={styles.depositLabel}>{t('groupBooking.priceEstimate')}</Text>
           <Text style={styles.depositAmount}>
-            R$ {estimatedDeposit.toFixed(2)}
+            {formatCurrency(estimatedDeposit, getLanguage())}
           </Text>
           <Text style={styles.sublabel}>{t('groupBooking.deposit')}</Text>
         </View>
@@ -529,7 +531,6 @@ export default function GroupBookingScreen() {
         style={styles.input}
         outlineColor={colors.cardBorder}
         activeOutlineColor={colors.primary}
-        accessibilityLabel="Coordinator name"
       />
 
       <TextInput
@@ -541,7 +542,6 @@ export default function GroupBookingScreen() {
         style={styles.input}
         outlineColor={colors.cardBorder}
         activeOutlineColor={colors.primary}
-        accessibilityLabel="Coordinator phone number"
       />
 
       <TextInput
@@ -554,7 +554,6 @@ export default function GroupBookingScreen() {
         style={styles.input}
         outlineColor={colors.cardBorder}
         activeOutlineColor={colors.primary}
-        accessibilityLabel="Coordinator email address"
       />
     </View>
   );
@@ -608,7 +607,6 @@ export default function GroupBookingScreen() {
         style={styles.input}
         outlineColor={colors.cardBorder}
         activeOutlineColor={colors.primary}
-        accessibilityLabel="Additional notes for the group booking"
       />
 
       {/* Deposit summary */}
@@ -616,7 +614,7 @@ export default function GroupBookingScreen() {
         <View style={styles.depositCard}>
           <Text style={styles.depositLabel}>{t('groupBooking.deposit')}</Text>
           <Text style={styles.depositAmount}>
-            R$ {estimatedDeposit.toFixed(2)}
+            {formatCurrency(estimatedDeposit, getLanguage())}
           </Text>
         </View>
       )}

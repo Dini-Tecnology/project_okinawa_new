@@ -323,7 +323,7 @@ describe('ClubEntriesService', () => {
 
       expect(entryRepository.find).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { user_id: 'user-123', status: [ClubEntryStatus.ACTIVE] },
+          where: { user_id: 'user-123', status: expect.objectContaining({ _type: 'in', _value: [ClubEntryStatus.ACTIVE] }) },
         }),
       );
       expect(result).toHaveLength(2);
@@ -338,7 +338,7 @@ describe('ClubEntriesService', () => {
         expect.objectContaining({
           where: {
             user_id: 'user-123',
-            status: [ClubEntryStatus.ACTIVE, ClubEntryStatus.USED],
+            status: expect.objectContaining({ _type: 'in', _value: [ClubEntryStatus.ACTIVE, ClubEntryStatus.USED] }),
           },
         }),
       );

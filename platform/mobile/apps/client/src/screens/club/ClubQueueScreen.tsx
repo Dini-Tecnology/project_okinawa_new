@@ -320,7 +320,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
         <Text
           variant="bodyMedium"
           style={{
-            color: isCalled ? '#fff' : colors.foregroundSecondary,
+            color: isCalled ? colors.primaryForeground : colors.foregroundSecondary,
             textAlign: 'center',
           }}
         >
@@ -330,7 +330,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
           style={{
             fontSize: 72,
             fontWeight: '800',
-            color: isCalled ? '#fff' : colors.foreground,
+            color: isCalled ? colors.primaryForeground : colors.foreground,
             textAlign: 'center',
             lineHeight: 80,
           }}
@@ -375,7 +375,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
               <Text style={{ fontSize: 48 }}>📱</Text>
               <Text
                 variant="bodySmall"
-                style={{ color: '#333', textAlign: 'center', marginTop: 4 }}
+                style={{ color: colors.foreground, textAlign: 'center', marginTop: 4 }}
               >
                 {queueEntry.qrCode || queueEntry.qrPayload.slice(0, 20)}
               </Text>
@@ -456,9 +456,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,
-    shadowColor: '#000',
+    shadowColor: 'rgba(0, 0, 0, 0.15)',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
+    shadowOpacity: 1,
     shadowRadius: 8,
   },
   infoCard: {

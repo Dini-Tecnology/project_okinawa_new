@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { AiService } from './ai.service';
@@ -7,7 +8,6 @@ import { Order } from '@/modules/orders/entities/order.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { LoyaltyProgram } from '@/modules/loyalty/entities/loyalty-program.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
-import { CircuitBreakerService } from '@common/utils/circuit-breaker.module';
 
 describe('AiService', () => {
   let service: AiService;
@@ -190,11 +190,14 @@ describe('AiService', () => {
     }),
   };
 
-  const mockCircuitBreakerService = {
-    getBreaker: jest.fn().mockReturnValue({
-      fire: jest.fn().mockImplementation((fn) => fn()),
-      isOpen: jest.fn().mockReturnValue(false),
-      execute: jest.fn().mockImplementation((fn) => fn()),
+  // ConfigService mock — no API key set so tests use fallback logic
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      const config: Record<string, string> = {
+        OPENAI_API_KEY: '',
+        OPENAI_MODEL: 'gpt-4-turbo-preview',
+      };
+      return config[key] ?? undefined;
     }),
   };
 
@@ -211,7 +214,7 @@ describe('AiService', () => {
           provide: DataSource,
           useValue: mockDataSource,
         },
-        { provide: CircuitBreakerService, useValue: mockCircuitBreakerService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 

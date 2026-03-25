@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, IconButton, Chip } from 'react-native-paper';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import type { MenuItem } from '../../types';
 
 interface MenuItemCardProps {
@@ -25,7 +27,7 @@ export default function MenuItemCard({ item, onAddToCart }: MenuItemCardProps) {
             )}
           </View>
           <Text variant="titleLarge" style={styles.price}>
-            R$ {item.price.toFixed(2)}
+            {formatCurrency(item.price, getLanguage())}
           </Text>
         </View>
 

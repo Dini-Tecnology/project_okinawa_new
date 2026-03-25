@@ -2,12 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AnalyticsService } from './analytics.service';
 import { AnalyticsMetricsService } from './analytics-metrics.service';
 import { AnalyticsAggregationService } from './analytics-aggregation.service';
+import { AnalyticsPerformanceService } from './analytics-performance.service';
 import { AnalyticsForecastService } from './analytics-forecast.service';
 
 describe('AnalyticsService (facade)', () => {
   let service: AnalyticsService;
   let metricsService: AnalyticsMetricsService;
   let aggregationService: AnalyticsAggregationService;
+  let performanceService: AnalyticsPerformanceService;
   let forecastService: AnalyticsForecastService;
 
   const mockDashboard = {
@@ -76,6 +78,9 @@ describe('AnalyticsService (facade)', () => {
   const mockAggregationService = {
     getSalesAnalytics: jest.fn().mockResolvedValue(mockSales),
     getCustomerAnalytics: jest.fn().mockResolvedValue(mockCustomer),
+  };
+
+  const mockPerformanceService = {
     getRestaurantPerformance: jest.fn().mockResolvedValue(mockPerformance),
   };
 
@@ -89,6 +94,7 @@ describe('AnalyticsService (facade)', () => {
         AnalyticsService,
         { provide: AnalyticsMetricsService, useValue: mockMetricsService },
         { provide: AnalyticsAggregationService, useValue: mockAggregationService },
+        { provide: AnalyticsPerformanceService, useValue: mockPerformanceService },
         { provide: AnalyticsForecastService, useValue: mockForecastService },
       ],
     }).compile();
@@ -96,6 +102,7 @@ describe('AnalyticsService (facade)', () => {
     service = module.get<AnalyticsService>(AnalyticsService);
     metricsService = module.get(AnalyticsMetricsService);
     aggregationService = module.get(AnalyticsAggregationService);
+    performanceService = module.get(AnalyticsPerformanceService);
     forecastService = module.get(AnalyticsForecastService);
 
     jest.clearAllMocks();
@@ -138,9 +145,9 @@ describe('AnalyticsService (facade)', () => {
   });
 
   describe('getRestaurantPerformance', () => {
-    it('should delegate to aggregationService.getRestaurantPerformance', async () => {
+    it('should delegate to performanceService.getRestaurantPerformance', async () => {
       await service.getRestaurantPerformance('r1');
-      expect(mockAggregationService.getRestaurantPerformance).toHaveBeenCalledWith('r1');
+      expect(mockPerformanceService.getRestaurantPerformance).toHaveBeenCalledWith('r1');
     });
   });
 

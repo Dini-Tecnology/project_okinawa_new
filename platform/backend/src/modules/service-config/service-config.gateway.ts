@@ -47,8 +47,9 @@ export class ServiceConfigGateway implements OnGatewayConnection, OnGatewayDisco
       this.logger.log(
         `ServiceConfig client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`ServiceConfig client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`ServiceConfig client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }

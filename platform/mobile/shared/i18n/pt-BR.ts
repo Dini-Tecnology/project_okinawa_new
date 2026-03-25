@@ -37,7 +37,6 @@ export const ptBR = {
     comingSoon: 'Em breve',
     featureInDevelopment: 'Funcionalidade em desenvolvimento',
     all: 'Todos',
-    permissionRequired: 'Permissão necessária',
   },
 
   // Auth
@@ -156,14 +155,19 @@ export const ptBR = {
       delivered: 'Entregue',
       completed: 'Concluído',
       cancelled: 'Cancelado',
-      refunded: 'Reembolsado',
+      served: 'Servido',
+      received: 'Recebido',
     },
-    card: {
-      items: 'Itens',
-      total: 'Total',
-      table: 'Mesa',
-      timeAgo: '{{minutes}} min atrás',
-    },
+    itemsCount: 'Itens ({{count}})',
+    moreItems: '+{{count}} itens',
+    track: 'Rastrear',
+    cancel: 'Cancelar',
+    restaurant: 'Restaurante',
+    start: 'Iniciar',
+    markAs: 'Marcar como {{status}}',
+    orderReady: 'Pedido Pronto',
+    waiterNotified: 'O garçom será notificado para retirar as bebidas',
+    table: 'Mesa',
     noOrders: 'Você ainda não fez nenhum pedido',
   },
 
@@ -193,6 +197,19 @@ export const ptBR = {
       cancelled: 'Cancelada',
       no_show: 'Não compareceu',
     },
+    guestStatus: {
+      pending: 'Pendente',
+      accepted: 'Confirmado',
+      declined: 'Recusado',
+      cancelled: 'Cancelado',
+    },
+    guestSummary: {
+      confirmed: 'Confirmados',
+      pending: 'Pendentes',
+      slots: 'Vagas',
+    },
+    guestsLabel: 'Convidados ({{count}})',
+    noGuestsAdded: 'Nenhum convidado adicionado',
     noReservations: 'Você ainda não tem reservas',
     selectDate: 'Selecione a data',
     selectTime: 'Selecione o horário',
@@ -221,7 +238,6 @@ export const ptBR = {
     ingredients: 'Ingredientes',
     allergens: 'Alérgenos',
     preparationTime: 'Tempo de preparo',
-    each: 'cada',
     available: 'Disponível',
     unavailable: 'Indisponível',
     outOfStock: 'Esgotado',
@@ -283,6 +299,7 @@ export const ptBR = {
     saveCard: 'Salvar cartão',
     defaultPayment: 'Pagamento padrão',
     processPayment: 'Processar pagamento',
+    paymentConfirmed: 'Pagamento Confirmado',
     paymentSuccess: 'Pagamento realizado com sucesso',
     paymentFailed: 'Falha no pagamento',
     paymentPending: 'Pagamento pendente',
@@ -499,7 +516,6 @@ export const ptBR = {
     distance: '{{distance}} km',
     deliveryTime: '{{time}} min',
     minimumOrder: 'Pedido mínimo',
-    minOrder: 'Pedido mínimo',
     deliveryFee: 'Taxa de entrega',
     about: 'Sobre',
     photos: 'Fotos',
@@ -1336,6 +1352,17 @@ export const ptBR = {
     floorOverview: 'Visão do Salão',
     assignTable: 'Atribuir Mesa',
     guestManagement: 'Gestão de Clientes',
+    reservationsToday: 'Reservas Hoje',
+    pending: 'Pendentes',
+    available: 'Disponíveis',
+    confirmed: 'Confirmado',
+    reservationConfirmedMsg: 'Reserva confirmada. Cliente será notificado.',
+    status: {
+      confirmed: 'Confirmada',
+      pending: 'Pendente',
+      seated: 'Acomodados',
+      cancelled: 'Cancelada',
+    },
   },
 
   // Config Hub
@@ -1996,6 +2023,14 @@ export const ptBR = {
       inQueue: 'Drinks na Fila',
       ready: 'Prontos',
       today: 'Drinks Hoje',
+      pending: 'Pendentes',
+      preparing: 'Preparando',
+    },
+    filter: {
+      all: 'Todos',
+      pending: 'Pendentes',
+      preparing: 'Preparando',
+      ready: 'Prontos',
     },
     action: {
       start: 'Iniciar Preparo',
@@ -2005,6 +2040,16 @@ export const ptBR = {
     },
     confirm: {
       cancelItem: 'Deseja cancelar este item? O garcom sera notificado.',
+    },
+    alerts: {
+      orderReady: 'Pedido Pronto',
+      waiterNotified: 'O garçom será notificado para retirar as bebidas',
+      cancelItemTitle: 'Cancelar Item',
+      cancelItemMsg: 'Deseja cancelar este item? O garçom será notificado.',
+      cancelSuccess: 'Item cancelado com sucesso',
+      startError: 'Não foi possível iniciar o pedido',
+      completeError: 'Não foi possível completar o pedido',
+      cancelError: 'Não foi possível cancelar o item',
     },
     quickAccess: {
       recipes: 'Receitas de Drinks',
@@ -2179,62 +2224,6 @@ export const ptBR = {
     },
   },
 
-  // Cuisine Types (Client App)
-  cuisine: {
-    japanese: 'Japonesa',
-    italian: 'Italiana',
-    brazilian: 'Brasileira',
-    mexican: 'Mexicana',
-    chinese: 'Chinesa',
-    indian: 'Indiana',
-    sushi: 'Sushi',
-    vegan: 'Vegana',
-    fastFood: 'Fast Food',
-  },
-
-  // Explore Screen (Client App)
-  explore: {
-    searchPlaceholder: 'Buscar restaurantes...',
-    list: 'Lista',
-    map: 'Mapa',
-    noRestaurants: 'Nenhum restaurante encontrado',
-  },
-
-  // Location (Client App)
-  location: {
-    permissionMessage: 'Precisamos de acesso à sua localização para mostrar restaurantes próximos.',
-  },
-
-  // Loyalty Screen — restaurant-based loyalty programs (Client App)
-  loyaltyScreen: {
-    loadingPrograms: 'Carregando programas de fidelidade...',
-    errorLoad: 'Falha ao carregar programas de fidelidade',
-    emptyTitle: 'Nenhum Programa de Fidelidade',
-    emptyMessage: 'Comece a pedir em restaurantes para participar de programas de fidelidade e ganhar recompensas!',
-    insufficientPoints: 'Pontos Insuficientes',
-    insufficientPointsMessage: 'Você não tem pontos suficientes para resgatar esta recompensa',
-    redeemTitle: 'Resgatar Recompensa',
-    redeemConfirm: 'Resgatar {{name}} por {{points}} pontos?',
-    redeemSuccess: 'Recompensa resgatada com sucesso!',
-    redeemAction: 'Resgatar',
-    lockedAction: 'Bloqueado',
-    restaurantFallback: 'Restaurante',
-    pointsAvailable: 'Pontos Disponíveis',
-    tierLabel: 'Nível {{name}}',
-    tierBenefits: 'Benefícios do Nível {{name}}',
-    progressTo: 'Progresso para {{tier}}',
-    earnPoints: 'Ganhe {{multiplier}}x pontos por real gasto',
-    exclusiveRewards: 'Recompensas exclusivas para membros {{tier}}',
-    priorityBooking: 'Reserva prioritária',
-    availableRewards: 'Recompensas Disponíveis',
-    pointsRequired: '{{count}} pontos',
-    statistics: 'Estatísticas',
-    totalEarned: 'Total Ganho',
-    totalRedeemed: 'Total Resgatado',
-    available: 'Disponível',
-    recentActivity: 'Atividade Recente',
-  },
-
   // Service Calls
   calls: {
     callWaiter: {
@@ -2251,24 +2240,6 @@ export const ptBR = {
       help: 'Ajuda',
       emergency: 'Emergência',
     },
-  },
-
-  // Legal
-  legal: {
-    privacyPolicy: 'Politica de Privacidade',
-    termsOfService: 'Termos de Serviço',
-    lastUpdated: 'Ultima atualização',
-    version: 'Versão',
-    loading: 'Carregando documento...',
-    error: 'Não foi possivel carregar o documento. Tente novamente.',
-  },
-
-  // Maintenance
-  maintenance: {
-    title: 'Em Manutenção',
-    message: 'Estamos realizando uma manutenção programada. Por favor, tente novamente em breve.',
-    estimatedEnd: 'Previsão de retorno',
-    retry: 'Verificar novamente',
   },
 };
 

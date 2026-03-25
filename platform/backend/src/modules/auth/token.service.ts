@@ -9,6 +9,16 @@ import {
   AuditLogService,
 } from '@/modules/identity';
 
+interface JwtDecodedPayload {
+  sub: string;
+  email: string;
+  roles?: string[];
+  restaurant_id?: string;
+  jti?: string;
+  exp?: number;
+  iat?: number;
+}
+
 @Injectable()
 export class TokenService {
   constructor(
@@ -71,7 +81,7 @@ export class TokenService {
 
   async refreshToken(refreshToken: string, ipAddress?: string) {
     // Decode token to get JTI for blacklist check
-    const decodedPayload = this.jwtService.decode(refreshToken) as any;
+    const decodedPayload = this.jwtService.decode(refreshToken) as JwtDecodedPayload | null;
     if (!decodedPayload?.jti) {
       throw new UnauthorizedException('Invalid token format');
     }
@@ -136,7 +146,7 @@ export class TokenService {
     ipAddress?: string,
   ) {
     // Blacklist the access token using JTI
-    const accessTokenPayload = this.jwtService.decode(accessToken) as any;
+    const accessTokenPayload = this.jwtService.decode(accessToken) as JwtDecodedPayload | null;
     if (accessTokenPayload?.exp && accessTokenPayload?.jti) {
       const expiresAt = new Date(accessTokenPayload.exp * 1000);
       await this.tokenBlacklistService.blacklistToken(
@@ -151,7 +161,7 @@ export class TokenService {
 
     // Blacklist the refresh token if provided using JTI
     if (refreshToken) {
-      const refreshTokenPayload = this.jwtService.decode(refreshToken) as any;
+      const refreshTokenPayload = this.jwtService.decode(refreshToken) as JwtDecodedPayload | null;
       if (refreshTokenPayload?.exp && refreshTokenPayload?.jti) {
         const expiresAt = new Date(refreshTokenPayload.exp * 1000);
         await this.tokenBlacklistService.blacklistToken(
@@ -167,7 +177,7 @@ export class TokenService {
   }
 
   async isTokenBlacklisted(token: string): Promise<boolean> {
-    const payload = this.jwtService.decode(token) as any;
+    const payload = this.jwtService.decode(token) as JwtDecodedPayload | null;
     if (!payload?.jti) {
       return false; // Tokens without JTI cannot be in blacklist
     }

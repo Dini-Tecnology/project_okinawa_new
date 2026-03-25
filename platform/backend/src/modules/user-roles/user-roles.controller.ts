@@ -33,6 +33,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('user-roles')
 @Controller('user-roles')
@@ -55,7 +56,7 @@ export class UserRolesController {
     description: 'List of restaurants with user roles',
     type: [UserRestaurantRoleResponseDto],
   })
-  getMyRestaurants(@Req() req: any) {
+  getMyRestaurants(@Req() req: AuthenticatedRequest) {
     return this.userRolesService.getMyRestaurants(req.user.sub);
   }
 
@@ -66,7 +67,7 @@ export class UserRolesController {
   })
   @ApiParam({ name: 'restaurantId', description: 'Restaurant ID' })
   getMyRolesInRestaurant(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Param('restaurantId') restaurantId: string,
   ) {
     return this.userRolesService.getUserRolesInRestaurant(req.user.sub, restaurantId);

@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { VipTableTabsService } from './vip-table-tabs.service';
 import { AddVipTabItemDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('VIP Table Tabs')
 @Controller('table-tabs')
@@ -37,7 +38,7 @@ export class VipTableTabsController {
   @ApiOperation({ summary: 'Add item to tab' })
   async addItem(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: AddVipTabItemDto,
   ) {
     return this.tabsService.addItem(id, req.user.id, dto);

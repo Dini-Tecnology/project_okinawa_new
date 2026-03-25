@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { TabsService } from './tabs.service';
+import { TabMembersService } from './tab-members.service';
+import { TabPaymentsService } from './tab-payments.service';
 import { TabsController } from './tabs.controller';
 import { TabsGateway } from './tabs.gateway';
 import { Tab, TabMember, TabItem, TabPayment, HappyHourSchedule, WaiterCall } from './entities';
@@ -42,7 +44,14 @@ import { HappyHourController } from './happy-hour.controller';
     NotificationsModule,
   ],
   controllers: [TabsController, WaiterCallsController, HappyHourController],
-  providers: [TabsService, TabsGateway, WaiterCallsService, HappyHourService],
-  exports: [TabsService, WaiterCallsService, HappyHourService],
+  providers: [
+    TabMembersService,
+    TabPaymentsService,
+    TabsService,
+    TabsGateway,
+    WaiterCallsService,
+    HappyHourService,
+  ],
+  exports: [TabsService, TabMembersService, TabPaymentsService, WaiterCallsService, HappyHourService],
 })
 export class TabsModule {}

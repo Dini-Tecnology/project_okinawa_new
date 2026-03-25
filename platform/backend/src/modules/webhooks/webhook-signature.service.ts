@@ -13,7 +13,7 @@ export class WebhookSignatureService {
   /**
    * Generate HMAC-SHA256 signature for a webhook payload.
    */
-  generateSignature(payload: any, secret: string): string {
+  generateSignature(payload: Record<string, unknown>, secret: string): string {
     const payloadString = JSON.stringify(payload);
     return crypto
       .createHmac('sha256', secret)
@@ -24,7 +24,7 @@ export class WebhookSignatureService {
   /**
    * Verify that a received signature matches the expected HMAC for the payload.
    */
-  verifySignature(payload: any, secret: string, receivedSignature: string): boolean {
+  verifySignature(payload: Record<string, unknown>, secret: string, receivedSignature: string): boolean {
     const expectedSignature = this.generateSignature(payload, secret);
     return crypto.timingSafeEqual(
       Buffer.from(expectedSignature, 'hex'),

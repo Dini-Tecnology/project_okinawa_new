@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AnalyticsMetricsService } from './analytics-metrics.service';
 import { AnalyticsAggregationService } from './analytics-aggregation.service';
+import { AnalyticsPerformanceService } from './analytics-performance.service';
 import { AnalyticsForecastService } from './analytics-forecast.service';
 
 // Re-export interfaces so existing consumers are not broken
@@ -54,6 +55,7 @@ export class AnalyticsService {
   constructor(
     private readonly metricsService: AnalyticsMetricsService,
     private readonly aggregationService: AnalyticsAggregationService,
+    private readonly performanceService: AnalyticsPerformanceService,
     private readonly forecastService: AnalyticsForecastService,
   ) {}
 
@@ -78,7 +80,7 @@ export class AnalyticsService {
   }
 
   getRestaurantPerformance(restaurantId: string): Promise<RestaurantPerformance> {
-    return this.aggregationService.getRestaurantPerformance(restaurantId);
+    return this.performanceService.getRestaurantPerformance(restaurantId);
   }
 
   // ────────── Forecast delegates ──────────

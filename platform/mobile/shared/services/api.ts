@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { secureStorage } from './secure-storage';
 import logger from '../utils/logger';
 
@@ -81,7 +81,7 @@ class ApiService {
           error.config?.url || 'unknown',
           error
         );
-        const originalRequest = error.config as any;
+        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
         if (error.response?.status === 401 && !originalRequest._retry) {
           if (this.refreshing) {
@@ -140,7 +140,7 @@ class ApiService {
             originalRequest.headers.Authorization = `Bearer ${access_token}`;
             return this.api(originalRequest);
           } catch (refreshError) {
-            this.processQueue(refreshError);
+            this.processQueue(refreshError instanceof Error ? refreshError : new Error(String(refreshError)));
             this.refreshing = false;
 
             // Clear tokens and redirect to login
@@ -155,7 +155,7 @@ class ApiService {
     );
   }
 
-  private processQueue(error: any) {
+  private processQueue(error: Error | null) {
     this.failedQueue.forEach((promise) => {
       if (error) {
         promise.reject(error);
@@ -253,10 +253,10 @@ class ApiService {
     name: string;
     description?: string;
     cuisine_type?: string;
-    address?: any;
+    address?: { street: string; city: string; state: string; zip: string; country?: string };
     phone?: string;
     email?: string;
-    opening_hours?: any;
+    opening_hours?: Record<string, { open: string; close: string; closed?: boolean }>;
   }) {
     const response = await this.api.post('/restaurants', data);
     return response.data;
@@ -267,7 +267,7 @@ class ApiService {
     return response.data;
   }
 
-  async updateRestaurant(data: any) {
+  async updateRestaurant(data: Record<string, unknown>) {
     const response = await this.api.patch('/restaurants/my-restaurant', data);
     return response.data;
   }
@@ -279,7 +279,7 @@ class ApiService {
   async createOrder(data: {
     restaurant_id: string;
     items: Array<{ menu_item_id: string; quantity: number; special_instructions?: string }>;
-    delivery_address?: any;
+    delivery_address?: { street: string; city: string; state: string; zip: string; complement?: string };
     order_type: 'dine_in' | 'pickup' | 'delivery';
     table_id?: string;
   }) {
@@ -483,12 +483,12 @@ class ApiService {
     return response.data;
   }
 
-  async createMenuItem(data: any) {
+  async createMenuItem(data: Record<string, unknown>) {
     const response = await this.api.post('/menu-items', data);
     return response.data;
   }
 
-  async updateMenuItem(id: string, data: any) {
+  async updateMenuItem(id: string, data: Record<string, unknown>) {
     const response = await this.api.patch(`/menu-items/${id}`, data);
     return response.data;
   }
@@ -1071,7 +1071,7 @@ class ApiService {
     split_id: string;
     amount: number;
     payment_method: string;
-    payment_details?: any;
+    payment_details?: Record<string, unknown>;
     notes?: string;
   }) {
     const response = await this.api.post('/payment-splits/process-payment', data);
@@ -1543,7 +1543,7 @@ class ApiService {
     image_url?: string;
     preparation_time?: number;
     allergens?: string[];
-    dietary_info?: any;
+    dietary_info?: Record<string, boolean>;
   }) {
     const response = await this.api.post('/menu-items', data);
     return response.data;
@@ -1594,7 +1594,7 @@ class ApiService {
   async registerPushToken(data: {
     token: string;
     platform: string;
-    device_info?: any;
+    device_info?: Record<string, string>;
   }) {
     const response = await this.api.post('/notifications/register-token', data);
     return response.data;
@@ -1660,7 +1660,7 @@ class ApiService {
     return response.data;
   }
 
-  async updateServiceConfig(restaurant_id: string, config: any) {
+  async updateServiceConfig(restaurant_id: string, config: Record<string, unknown>) {
     const response = await this.api.patch(`/restaurants/${restaurant_id}/service-config`, config);
     return response.data;
   }
@@ -1959,8 +1959,8 @@ class ApiService {
    * Returns the interceptor ID for later removal.
    */
   addResponseInterceptor(
-    onFulfilled: (response: any) => any,
-    onRejected: (error: any) => any,
+    onFulfilled: (response: AxiosResponse) => AxiosResponse | Promise<AxiosResponse>,
+    onRejected: (error: AxiosError) => AxiosError | Promise<AxiosError>,
   ): number {
     return this.api.interceptors.response.use(onFulfilled, onRejected);
   }

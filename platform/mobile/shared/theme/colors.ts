@@ -177,6 +177,14 @@ export const lightTheme = {
   tableOccupied: colorPalette.error.main,
   tableReserved: colorPalette.info.main,
   tableCleaning: colorPalette.warning.main,
+
+  // Premium Dark Card (always dark, for elevated feature headers)
+  premiumCard: colorPalette.neutral[800],
+  premiumCardForeground: colorPalette.neutral[0],
+  premiumCardMuted: 'rgba(255, 255, 255, 0.6)',
+  premiumCardBorder: 'rgba(255, 255, 255, 0.2)',
+  premiumCardGlass: 'rgba(255, 255, 255, 0.15)',
+  premiumCardGlassLight: 'rgba(255, 255, 255, 0.1)',
 };
 
 // Semantic Dark Theme Tokens
@@ -268,6 +276,14 @@ export const darkTheme = {
   tableOccupied: colorPalette.error.main,
   tableReserved: colorPalette.info.main,
   tableCleaning: colorPalette.warning.main,
+
+  // Premium Dark Card (always dark, for elevated feature headers)
+  premiumCard: colorPalette.neutral[800],
+  premiumCardForeground: colorPalette.neutral[0],
+  premiumCardMuted: 'rgba(255, 255, 255, 0.6)',
+  premiumCardBorder: 'rgba(255, 255, 255, 0.2)',
+  premiumCardGlass: 'rgba(255, 255, 255, 0.15)',
+  premiumCardGlassLight: 'rgba(255, 255, 255, 0.1)',
 };
 
 // Gradients

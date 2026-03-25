@@ -13,6 +13,7 @@ import { TableSession, SessionStatus } from '../tables/entities/table-session.en
 import { QrScanLog, ScanResult } from '../tables/entities/qr-scan-log.entity';
 import { BatchGenerateQRDto } from './dto/batch-generate-qr.dto';
 import { StartSessionDto, EndSessionDto } from './dto/table-session.dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('qr-code')
 @Controller('qr-code')
@@ -114,7 +115,7 @@ export class QrCodeController {
       color_secondary?: string;
       include_logo?: boolean;
     },
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     const { tableId, restaurantId, style, color_primary, color_secondary, include_logo } = body;
 
@@ -176,7 +177,7 @@ export class QrCodeController {
   @Post('batch-generate')
   @Roles(UserRole.OWNER, UserRole.MANAGER)
   @ApiOperation({ summary: 'Batch generate QR codes for multiple tables' })
-  async batchGenerateQR(@Body() dto: BatchGenerateQRDto, @Req() req: any) {
+  async batchGenerateQR(@Body() dto: BatchGenerateQRDto, @Req() req: AuthenticatedRequest) {
     const results = await this.qrCodeService.batchGenerateTableQR(
       dto.restaurant_id,
       dto.tables.map((t) => ({ tableId: t.table_id, tableNumber: t.table_number || '' })),
@@ -248,8 +249,8 @@ export class QrCodeController {
   @Roles(UserRole.CUSTOMER, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
   @ApiOperation({ summary: 'Validate scanned QR code URL with HMAC verification' })
   async validateScan(
-    @Body() body: { url: string; device_info?: any },
-    @Req() req: any,
+    @Body() body: { url: string; device_info?: Record<string, string> },
+    @Req() req: AuthenticatedRequest,
   ) {
     const validation = this.qrCodeService.validateSecureQRCode(body.url);
 
@@ -262,7 +263,7 @@ export class QrCodeController {
         scan_result: validation.valid ? ScanResult.SUCCESS : ScanResult.INVALID,
         device_info: body.device_info,
         ip_address: req.ip,
-      } as any);
+      } as DeepPartial<QrScanLog>);
       await this.scanLogRepository.save(scanLog);
     }
 
@@ -307,7 +308,7 @@ export class QrCodeController {
   @Post('session/start')
   @Roles(UserRole.CUSTOMER)
   @ApiOperation({ summary: 'Start a table session after scanning QR code' })
-  async startSession(@Body() dto: StartSessionDto, @Req() req: any) {
+  async startSession(@Body() dto: StartSessionDto, @Req() req: AuthenticatedRequest) {
     // Check for existing active session
     const existingSession = await this.sessionRepository.findOne({
       where: {
@@ -318,7 +319,7 @@ export class QrCodeController {
 
     if (existingSession) {
       // Check if user can join existing session
-      if ((dto as any).join_existing) {
+      if ((dto as StartSessionDto & { join_existing?: boolean }).join_existing) {
         // Add user to existing session
         const guests = existingSession.guest_user_ids || [];
         if (!guests.includes(req.user.id) && existingSession.primary_user_id !== req.user.id) {
@@ -365,7 +366,7 @@ export class QrCodeController {
   @Post('session/end')
   @Roles(UserRole.CUSTOMER, UserRole.WAITER, UserRole.MANAGER)
   @ApiOperation({ summary: 'End a table session' })
-  async endSession(@Body() dto: EndSessionDto, @Req() req: any) {
+  async endSession(@Body() dto: EndSessionDto, @Req() req: AuthenticatedRequest) {
     const session = await this.sessionRepository.findOne({
       where: { id: dto.session_id },
     });
@@ -377,7 +378,7 @@ export class QrCodeController {
     // Verify user can end session
     const canEnd =
       session.primary_user_id === req.user.id ||
-      [UserRole.WAITER, UserRole.MANAGER, UserRole.OWNER].includes(req.user.role);
+      req.user.roles?.some((r: string) => [UserRole.WAITER, UserRole.MANAGER, UserRole.OWNER].includes(r as UserRole));
 
     if (!canEnd) {
       throw new HttpException('You cannot end this session', HttpStatus.FORBIDDEN);
@@ -385,8 +386,8 @@ export class QrCodeController {
 
     session.status = SessionStatus.COMPLETED;
     session.ended_at = new Date();
-    session.total_amount = (dto as any).total_amount;
-    session.notes = (dto as any).notes;
+    session.total_amount = (dto as EndSessionDto & { total_amount?: number; notes?: string }).total_amount ?? 0;
+    session.notes = (dto as EndSessionDto & { total_amount?: number; notes?: string }).notes ?? '';
 
     await this.sessionRepository.save(session);
 

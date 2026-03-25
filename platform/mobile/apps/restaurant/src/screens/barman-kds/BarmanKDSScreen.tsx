@@ -21,6 +21,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
 import { useColors } from '@/shared/theme';
+import { t } from '@/shared/i18n';
 
 interface DrinkItem {
   id: string;
@@ -253,18 +254,18 @@ export default function BarmanKDSScreen() {
       await loadOrders();
     } catch (error) {
       console.error('Failed to start order:', error);
-      Alert.alert('Erro', 'Não foi possível iniciar o pedido');
+      Alert.alert(t('common.error'), t('barman.alerts.startError'));
     }
   };
 
   const handleCompleteOrder = async (orderId: string) => {
     try {
       await ApiService.updateOrderStatus(orderId, { status: 'ready' });
-      Alert.alert('Pedido Pronto', 'O garçom será notificado para retirar as bebidas');
+      Alert.alert(t('barman.alerts.orderReady'), t('barman.alerts.waiterNotified'));
       await loadOrders();
     } catch (error) {
       console.error('Failed to complete order:', error);
-      Alert.alert('Erro', 'Não foi possível completar o pedido');
+      Alert.alert(t('common.error'), t('barman.alerts.completeError'));
     }
   };
 
@@ -274,12 +275,12 @@ export default function BarmanKDSScreen() {
    */
   const handleCancelItem = (orderId: string, itemId: string) => {
     Alert.alert(
-      'Cancelar Item',
-      'Deseja cancelar este item? O garçom será notificado.',
+      t('barman.alerts.cancelItemTitle'),
+      t('barman.alerts.cancelItemMsg'),
       [
-        { text: 'Não', style: 'cancel' },
+        { text: t('common.no'), style: 'cancel' },
         {
-          text: 'Sim',
+          text: t('common.yes'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -294,10 +295,10 @@ export default function BarmanKDSScreen() {
                     : order
                 )
               );
-              Alert.alert('Sucesso', 'Item cancelado com sucesso');
+              Alert.alert(t('common.success'), t('barman.alerts.cancelSuccess'));
             } catch (error) {
               console.error('Failed to cancel item:', error);
-              Alert.alert('Erro', 'Não foi possível cancelar o item');
+              Alert.alert(t('common.error'), t('barman.alerts.cancelError'));
             }
           },
         },
@@ -343,7 +344,7 @@ export default function BarmanKDSScreen() {
             {pendingCount}
           </Text>
           <Text variant="bodySmall" style={styles.statLabel}>
-            Pendentes
+            {t('barman.stats.pending')}
           </Text>
         </View>
 
@@ -353,7 +354,7 @@ export default function BarmanKDSScreen() {
             {preparingCount}
           </Text>
           <Text variant="bodySmall" style={styles.statLabel}>
-            Preparando
+            {t('barman.stats.preparing')}
           </Text>
         </View>
 
@@ -363,7 +364,7 @@ export default function BarmanKDSScreen() {
             {readyCount}
           </Text>
           <Text variant="bodySmall" style={styles.statLabel}>
-            Prontos
+            {t('barman.stats.ready')}
           </Text>
         </View>
       </View>
@@ -373,10 +374,10 @@ export default function BarmanKDSScreen() {
         value={filter}
         onValueChange={(value) => setFilter(value as any)}
         buttons={[
-          { value: 'all', label: 'Todos', icon: 'view-grid' },
-          { value: 'pending', label: 'Pendentes', icon: 'clock-outline' },
-          { value: 'preparing', label: 'Preparando', icon: 'beaker' },
-          { value: 'ready', label: 'Prontos', icon: 'check' },
+          { value: 'all', label: t('barman.filter.all'), icon: 'view-grid' },
+          { value: 'pending', label: t('barman.filter.pending'), icon: 'clock-outline' },
+          { value: 'preparing', label: t('barman.filter.preparing'), icon: 'beaker' },
+          { value: 'ready', label: t('barman.filter.ready'), icon: 'check' },
         ]}
         style={styles.segmentedButtons}
       />
@@ -466,8 +467,6 @@ export default function BarmanKDSScreen() {
                               size={20}
                               iconColor={colors.error}
                               onPress={() => handleCancelItem(order.id, item.id)}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Cancel item ${item.name}`}
                             />
                           )}
                         </View>
@@ -503,8 +502,6 @@ export default function BarmanKDSScreen() {
                       onPress={() => handleStartOrder(order.id)}
                       style={styles.startButton}
                       icon="play"
-                      accessibilityRole="button"
-                      accessibilityLabel={`Start preparing order ${order.order_number}`}
                     >
                       Iniciar Preparo
                     </Button>
@@ -516,10 +513,8 @@ export default function BarmanKDSScreen() {
                       onPress={() => handleCompleteOrder(order.id)}
                       style={styles.completeButton}
                       icon="check"
-                      accessibilityRole="button"
-                      accessibilityLabel={`Mark order ${order.order_number} as ready`}
                     >
-                      Marcar como Pronto
+                      {t('barman.action.complete')}
                     </Button>
                   )}
 
@@ -527,7 +522,7 @@ export default function BarmanKDSScreen() {
                     <View style={styles.readyStatus}>
                       <Icon name="check-circle" size={24} color={colors.success} />
                       <Text variant="titleMedium" style={styles.readyText}>
-                        Pronto para Retirada
+                        {t('barman.action.readyStatus')}
                       </Text>
                     </View>
                   )}

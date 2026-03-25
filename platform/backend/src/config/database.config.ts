@@ -1,16 +1,19 @@
 import { DataSource } from 'typeorm';
 import { config as dotenvConfig } from 'dotenv';
 import { join } from 'path';
+import { Logger } from '@nestjs/common';
 
 dotenvConfig();
+
+const logger = new Logger('DatabaseConfig');
 
 // Validate required environment variables for migrations
 const requiredEnvVars = ['DATABASE_HOST', 'DATABASE_USER', 'DATABASE_PASSWORD', 'DATABASE_NAME'];
 const missingVars = requiredEnvVars.filter((v) => !process.env[v]);
 
 if (missingVars.length > 0 && process.env.NODE_ENV !== 'test') {
-  console.warn(
-    `⚠️  Missing required database environment variables: ${missingVars.join(', ')}. ` +
+  logger.warn(
+    `Missing required database environment variables: ${missingVars.join(', ')}. ` +
     `Please configure your .env file based on .env.example`,
   );
 }

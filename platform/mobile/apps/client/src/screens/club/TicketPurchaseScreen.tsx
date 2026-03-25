@@ -27,7 +27,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { useMutation } from '@tanstack/react-query';
-import { t } from '@okinawa/shared/i18n';
+import { t, getLanguage } from '@okinawa/shared/i18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
 import { ApiService } from '@okinawa/shared/services/api';
@@ -147,15 +148,13 @@ function QrCodeDisplay({
             variant="titleMedium"
             style={{ color: colors.primary, fontWeight: '700' }}
           >
-            R$ {result.totalAmount.toFixed(2)}
+            {formatCurrency(result.totalAmount, getLanguage())}
           </Text>
         </View>
 
         {/* Done button: gradient */}
         <Pressable
           onPress={onDone}
-          accessibilityRole="button"
-          accessibilityLabel="Done"
           style={({ pressed }) => [{
             marginTop: 12,
             opacity: pressed ? 0.9 : 1,
@@ -357,9 +356,7 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
                   alignItems: 'center',
                   gap: 8,
                 }}
-                accessibilityRole="button"
                 accessibilityLabel={getTicketLabel(tt.value)}
-                accessibilityState={{ selected: isSelected }}
               >
                 <View style={{
                   width: 40,
@@ -446,7 +443,7 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
               {t('club.ticket.quantity')}
             </Text>
             <Text variant="bodyMedium" style={{ color: colors.foreground }}>
-              {quantity}x R$ {pricePerTicket.toFixed(2)}
+              {quantity}x {formatCurrency(pricePerTicket, getLanguage())}
             </Text>
           </View>
 
@@ -461,7 +458,7 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
               variant="titleLarge"
               style={{ color: colors.primary, fontWeight: '700' }}
             >
-              R$ {totalPrice.toFixed(2)}
+              {formatCurrency(totalPrice, getLanguage())}
             </Text>
           </View>
         </Card.Content>
@@ -471,9 +468,6 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
       <Pressable
         onPress={handlePurchase}
         disabled={purchaseMutation.isPending}
-        accessibilityRole="button"
-        accessibilityLabel="Purchase tickets"
-        accessibilityState={{ disabled: purchaseMutation.isPending }}
         style={({ pressed }) => [{
           marginTop: 4,
           opacity: purchaseMutation.isPending ? 0.5 : pressed ? 0.9 : 1,

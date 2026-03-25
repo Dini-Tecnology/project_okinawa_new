@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RestaurantsController } from './restaurants.controller';
 import { RestaurantsService } from './restaurants.service';
+import { RestaurantConfigService } from './restaurant-config.service';
+import { RestaurantSetupService } from './restaurant-setup.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
@@ -17,8 +19,14 @@ describe('RestaurantsController', () => {
     create: jest.fn(),
     update: jest.fn(),
     softDelete: jest.fn(),
+  };
+
+  const mockRestaurantConfigService = {
     getServiceConfig: jest.fn(),
     updateServiceConfig: jest.fn(),
+  };
+
+  const mockRestaurantSetupService = {
     getSetupProgress: jest.fn(),
     updateSetupProgress: jest.fn(),
   };
@@ -34,7 +42,11 @@ describe('RestaurantsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RestaurantsController],
-      providers: [{ provide: RestaurantsService, useValue: mockRestaurantsService }],
+      providers: [
+        { provide: RestaurantsService, useValue: mockRestaurantsService },
+        { provide: RestaurantConfigService, useValue: mockRestaurantConfigService },
+        { provide: RestaurantSetupService, useValue: mockRestaurantSetupService },
+      ],
     })
       .overrideGuard(require('@/modules/auth/guards/jwt-auth.guard').JwtAuthGuard)
       .useValue({ canActivate: () => true })
@@ -130,12 +142,12 @@ describe('RestaurantsController', () => {
         delivery_enabled: false,
       };
 
-      mockRestaurantsService.getServiceConfig.mockResolvedValue(serviceConfig);
+      mockRestaurantConfigService.getServiceConfig.mockResolvedValue(serviceConfig);
 
       const result = await controller.getServiceConfig('restaurant-1');
 
       expect(result).toEqual(serviceConfig);
-      expect(mockRestaurantsService.getServiceConfig).toHaveBeenCalledWith('restaurant-1');
+      expect(mockRestaurantConfigService.getServiceConfig).toHaveBeenCalledWith('restaurant-1');
     });
   });
 
@@ -150,12 +162,12 @@ describe('RestaurantsController', () => {
         takeout_enabled: true,
       };
 
-      mockRestaurantsService.updateServiceConfig.mockResolvedValue(updatedConfig);
+      mockRestaurantConfigService.updateServiceConfig.mockResolvedValue(updatedConfig);
 
       const result = await controller.updateServiceConfig('restaurant-1', updateDto);
 
       expect(result).toEqual(updatedConfig);
-      expect(mockRestaurantsService.updateServiceConfig).toHaveBeenCalledWith(
+      expect(mockRestaurantConfigService.updateServiceConfig).toHaveBeenCalledWith(
         'restaurant-1',
         updateDto,
       );
@@ -171,12 +183,12 @@ describe('RestaurantsController', () => {
         staff: false,
       };
 
-      mockRestaurantsService.getSetupProgress.mockResolvedValue(setupProgress);
+      mockRestaurantSetupService.getSetupProgress.mockResolvedValue(setupProgress);
 
       const result = await controller.getSetupProgress('restaurant-1');
 
       expect(result).toEqual(setupProgress);
-      expect(mockRestaurantsService.getSetupProgress).toHaveBeenCalledWith('restaurant-1');
+      expect(mockRestaurantSetupService.getSetupProgress).toHaveBeenCalledWith('restaurant-1');
     });
   });
 
@@ -193,12 +205,12 @@ describe('RestaurantsController', () => {
         staff: false,
       };
 
-      mockRestaurantsService.updateSetupProgress.mockResolvedValue(updatedProgress);
+      mockRestaurantSetupService.updateSetupProgress.mockResolvedValue(updatedProgress);
 
       const result = await controller.updateSetupProgress('restaurant-1', updateDto);
 
       expect(result).toEqual(updatedProgress);
-      expect(mockRestaurantsService.updateSetupProgress).toHaveBeenCalledWith(
+      expect(mockRestaurantSetupService.updateSetupProgress).toHaveBeenCalledWith(
         'restaurant-1',
         updateDto,
       );

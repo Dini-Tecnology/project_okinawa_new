@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { PromoterService } from './promoter.service';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 // DTOs
 class RegisterPromoterDto {
@@ -49,7 +50,7 @@ export class PromoterController {
   @ApiOperation({ summary: 'Register a new promoter' })
   async registerPromoter(
     @Param('restaurantId') restaurantId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: RegisterPromoterDto
   ) {
     return this.promoterService.registerPromoter(restaurantId, {
@@ -143,7 +144,7 @@ export class PromoterController {
   @ApiOperation({ summary: 'Process payment to promoter' })
   async processPayment(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: ProcessPaymentDto
   ) {
     return this.promoterService.processPayment(id, {

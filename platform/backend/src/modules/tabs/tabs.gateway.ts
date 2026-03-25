@@ -13,6 +13,27 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
 import { getWsCorsConfig } from '@common/config/ws-cors.config';
 
+export interface TabItemPayload {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  [key: string]: unknown;
+}
+
+export interface TabMemberPayload {
+  userId: string;
+  name: string;
+  [key: string]: unknown;
+}
+
+export interface TabPaymentPayload {
+  userId: string;
+  amount: number;
+  method: string;
+  [key: string]: unknown;
+}
+
 @WebSocketGateway({
   namespace: '/tabs',
   cors: getWsCorsConfig(),
@@ -47,8 +68,9 @@ export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(
         `Tab client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Tab client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Tab client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }
@@ -85,7 +107,7 @@ export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify all members of a tab about an update
    */
-  notifyTabUpdate(tabId: string, eventType: string, data: any) {
+  notifyTabUpdate(tabId: string, eventType: string, data: Record<string, unknown>) {
     this.server.to(`tab:${tabId}`).emit('tabUpdate', {
       type: eventType,
       data,
@@ -96,14 +118,14 @@ export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify about new item added
    */
-  notifyItemAdded(tabId: string, item: any) {
+  notifyItemAdded(tabId: string, item: TabItemPayload) {
     this.notifyTabUpdate(tabId, 'item_added', item);
   }
 
   /**
    * Notify about member joined
    */
-  notifyMemberJoined(tabId: string, member: any) {
+  notifyMemberJoined(tabId: string, member: TabMemberPayload) {
     this.notifyTabUpdate(tabId, 'member_joined', member);
   }
 
@@ -117,7 +139,7 @@ export class TabsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify about payment made
    */
-  notifyPaymentMade(tabId: string, payment: any) {
+  notifyPaymentMade(tabId: string, payment: TabPaymentPayload) {
     this.notifyTabUpdate(tabId, 'payment_made', payment);
   }
 

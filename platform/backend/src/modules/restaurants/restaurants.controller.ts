@@ -1,6 +1,8 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { RestaurantsService } from './restaurants.service';
+import { RestaurantConfigService } from './restaurant-config.service';
+import { RestaurantSetupService } from './restaurant-setup.service';
 import { CreateRestaurantDto } from './dto/create-restaurant.dto';
 import { FilterRestaurantDto } from './dto/filter-restaurant.dto';
 import { UpdateServiceConfigDto } from './dto/update-service-config.dto';
@@ -14,7 +16,11 @@ import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interfa
 @ApiTags('restaurants')
 @Controller('restaurants')
 export class RestaurantsController {
-  constructor(private readonly restaurantsService: RestaurantsService) {}
+  constructor(
+    private readonly restaurantsService: RestaurantsService,
+    private readonly restaurantConfigService: RestaurantConfigService,
+    private readonly restaurantSetupService: RestaurantSetupService,
+  ) {}
 
   @Public()
   @Get()
@@ -93,7 +99,7 @@ export class RestaurantsController {
   @ApiResponse({ status: 200, description: 'Returns restaurant service configuration' })
   @ApiResponse({ status: 403, description: 'Forbidden - must be owner or manager' })
   getServiceConfig(@Param('id') id: string) {
-    return this.restaurantsService.getServiceConfig(id);
+    return this.restaurantConfigService.getServiceConfig(id);
   }
 
   @Patch(':id/service-config')
@@ -105,7 +111,7 @@ export class RestaurantsController {
     @Param('id') id: string,
     @Body() updateConfigDto: UpdateServiceConfigDto,
   ) {
-    return this.restaurantsService.updateServiceConfig(id, updateConfigDto);
+    return this.restaurantConfigService.updateServiceConfig(id, updateConfigDto);
   }
 
   // ========== SETUP PROGRESS ENDPOINTS ==========
@@ -117,7 +123,7 @@ export class RestaurantsController {
   @ApiResponse({ status: 200, description: 'Returns setup progress' })
   @ApiResponse({ status: 403, description: 'Forbidden - must be owner or manager' })
   getSetupProgress(@Param('id') id: string) {
-    return this.restaurantsService.getSetupProgress(id);
+    return this.restaurantSetupService.getSetupProgress(id);
   }
 
   @Patch(':id/setup-progress')
@@ -129,7 +135,7 @@ export class RestaurantsController {
     @Param('id') id: string,
     @Body() updateProgressDto: UpdateSetupProgressDto,
   ) {
-    return this.restaurantsService.updateSetupProgress(id, updateProgressDto);
+    return this.restaurantSetupService.updateSetupProgress(id, updateProgressDto);
   }
 
   // ========== GEOFENCING ENDPOINTS ==========

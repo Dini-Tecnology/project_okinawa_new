@@ -1,3 +1,5 @@
+import { Request } from 'express';
+
 /**
  * Represents the authenticated user extracted from JWT payload.
  * Core fields (sub, email, roles) are always present from the JWT strategy.
@@ -16,6 +18,14 @@ export interface AuthenticatedUser {
  * Helper to create a mock AuthenticatedUser for tests.
  * Provides sensible defaults for all required fields.
  */
+/**
+ * Express Request with authenticated user attached by JWT guard.
+ * Use this instead of `req: any` in controller method parameters.
+ */
+export interface AuthenticatedRequest extends Request {
+  user: AuthenticatedUser;
+}
+
 export function mockAuthenticatedUser(
   overrides: Partial<AuthenticatedUser> = {},
 ): AuthenticatedUser {

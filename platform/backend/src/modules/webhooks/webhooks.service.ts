@@ -47,7 +47,7 @@ export class WebhooksService {
 
   // ────────── Delivery delegates ──────────
 
-  triggerEvent(restaurantId: string, event: WebhookEvent, data: any) {
+  triggerEvent(restaurantId: string, event: WebhookEvent, data: Record<string, unknown>) {
     return this.deliveryService.triggerEvent(restaurantId, event, data);
   }
 
@@ -66,11 +66,11 @@ export class WebhooksService {
 
   // ────────── Signature delegates ──────────
 
-  generateSignature(payload: any, secret: string) {
+  generateSignature(payload: Record<string, unknown>, secret: string) {
     return this.signatureService.generateSignature(payload, secret);
   }
 
-  verifySignature(payload: any, secret: string, receivedSignature: string) {
+  verifySignature(payload: Record<string, unknown>, secret: string, receivedSignature: string) {
     return this.signatureService.verifySignature(payload, secret, receivedSignature);
   }
 }

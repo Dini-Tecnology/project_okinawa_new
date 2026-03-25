@@ -34,6 +34,8 @@ import {
 import { useRoute, useNavigation } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
@@ -410,11 +412,11 @@ export default function PartialOrderScreen() {
                 {item.menu_item?.name || item.menu_item_id.slice(0, 8)}
               </Text>
               <Text style={styles.itemPrice}>
-                {item.quantity}x R$ {Number(item.unit_price).toFixed(2)}
+                {item.quantity}x {formatCurrency(Number(item.unit_price), getLanguage())}
               </Text>
             </View>
             <Text style={styles.itemQuantity}>
-              R$ {Number(item.total_price).toFixed(2)}
+              {formatCurrency(Number(item.total_price), getLanguage())}
             </Text>
           </View>
         ))}
@@ -433,7 +435,7 @@ export default function PartialOrderScreen() {
               <View style={styles.itemInfo}>
                 <Text style={styles.itemName}>{ni.menuItem.name}</Text>
                 <Text style={styles.itemPrice}>
-                  R$ {ni.menuItem.price.toFixed(2)}
+                  {formatCurrency(ni.menuItem.price, getLanguage())}
                 </Text>
               </View>
               <View style={styles.quantityControls}>
@@ -442,8 +444,6 @@ export default function PartialOrderScreen() {
                   size={24}
                   iconColor={colors.error}
                   onPress={() => updateNewItemQuantity(ni.menu_item_id, -1)}
-                  accessibilityLabel={`Decrease quantity of ${ni.menuItem.name}`}
-                  accessibilityRole="button"
                 />
                 <Text style={styles.itemQuantity}>{ni.quantity}</Text>
                 <IconButton
@@ -451,16 +451,12 @@ export default function PartialOrderScreen() {
                   size={24}
                   iconColor={colors.primary}
                   onPress={() => updateNewItemQuantity(ni.menu_item_id, 1)}
-                  accessibilityLabel={`Increase quantity of ${ni.menuItem.name}`}
-                  accessibilityRole="button"
                 />
                 <IconButton
                   icon="trash-can-outline"
                   size={20}
                   iconColor={colors.error}
                   onPress={() => removeNewItem(ni.menu_item_id)}
-                  accessibilityLabel={`Remove ${ni.menuItem.name} from new items`}
-                  accessibilityRole="button"
                 />
               </View>
             </View>
@@ -491,12 +487,10 @@ export default function PartialOrderScreen() {
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => addNewItem(item)}
-                accessibilityRole="button"
-                accessibilityLabel={`Add ${item.name} to order`}
               >
                 <Text style={styles.menuItemName}>{item.name}</Text>
                 <Text style={styles.menuItemPrice}>
-                  R$ {Number(item.price).toFixed(2)}
+                  {formatCurrency(Number(item.price), getLanguage())}
                 </Text>
                 <IconButton icon="plus" size={20} iconColor={colors.primary} />
               </TouchableOpacity>
@@ -510,14 +504,14 @@ export default function PartialOrderScreen() {
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>{t('partialOrder.confirmed')}</Text>
           <Text style={styles.totalValue}>
-            R$ {confirmedSubtotal.toFixed(2)}
+            {formatCurrency(confirmedSubtotal, getLanguage())}
           </Text>
         </View>
         {newItemsSubtotal > 0 && (
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>{t('partialOrder.newItems')}</Text>
             <Text style={styles.totalValue}>
-              + R$ {newItemsSubtotal.toFixed(2)}
+              + {formatCurrency(newItemsSubtotal, getLanguage())}
             </Text>
           </View>
         )}
@@ -525,7 +519,7 @@ export default function PartialOrderScreen() {
         <View style={styles.totalRow}>
           <Text style={styles.grandTotalLabel}>{t('partialOrder.runningTotal')}</Text>
           <Text style={styles.grandTotalValue}>
-            R$ {grandTotal.toFixed(2)}
+            {formatCurrency(grandTotal, getLanguage())}
           </Text>
         </View>
       </View>

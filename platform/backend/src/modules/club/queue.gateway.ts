@@ -13,6 +13,29 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
 import { getWsCorsConfig } from '@common/config/ws-cors.config';
 
+export interface QueueEntryPayload {
+  id: string;
+  userId: string;
+  partySize: number;
+  position: number;
+  status: string;
+  estimatedWaitMinutes?: number;
+  [key: string]: unknown;
+}
+
+export interface QueuePositionPayload {
+  position: number;
+  estimatedWaitMinutes: number;
+  [key: string]: unknown;
+}
+
+export interface QueueStatsPayload {
+  totalWaiting: number;
+  avgWaitMinutes: number;
+  tablesAvailable: number;
+  [key: string]: unknown;
+}
+
 @WebSocketGateway({
   namespace: '/queue',
   cors: getWsCorsConfig(),
@@ -47,8 +70,9 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(
         `Queue client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Queue client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Queue client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }
@@ -97,7 +121,7 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify all users in queue about position updates
    */
-  notifyQueueUpdate(restaurantId: string, queue: any[]) {
+  notifyQueueUpdate(restaurantId: string, queue: QueueEntryPayload[]) {
     this.server.to(`queue:${restaurantId}`).emit('queueUpdate', {
       type: 'queue_updated',
       queue,
@@ -108,7 +132,7 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify specific user about their position change
    */
-  notifyPositionUpdate(restaurantId: string, userId: string, data: any) {
+  notifyPositionUpdate(restaurantId: string, userId: string, data: QueuePositionPayload) {
     this.server.to(`queue:${restaurantId}:user:${userId}`).emit('positionUpdate', {
       type: 'position_changed',
       data,
@@ -130,7 +154,7 @@ export class QueueGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Notify staff about queue stats update
    */
-  notifyStatsUpdate(restaurantId: string, stats: any) {
+  notifyStatsUpdate(restaurantId: string, stats: QueueStatsPayload) {
     this.server.to(`queue:${restaurantId}`).emit('statsUpdate', {
       type: 'stats_updated',
       stats,

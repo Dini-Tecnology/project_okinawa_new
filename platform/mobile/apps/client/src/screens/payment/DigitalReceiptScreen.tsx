@@ -16,7 +16,9 @@ import * as Sharing from 'expo-sharing';
 import { useColors } from '@okinawa/shared/theme';
 import { typography } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
-import logger from '@okinawa/shared/utils/logger';
+import { t } from '@okinawa/shared/i18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 
 interface ReceiptItem {
   id: string;
@@ -96,11 +98,11 @@ export const DigitalReceiptScreen: React.FC<DigitalReceiptScreenProps> = ({
   const shareReceipt = async () => {
     try {
       await Share.share({
-        message: `Comprovante de Pagamento\n${receipt.restaurantName}\n${receipt.date} ${receipt.time}\nTotal: R$ ${receipt.total.toFixed(2)}\nNº ${receipt.id}`,
-        title: 'Compartilhar Comprovante',
+        message: `${t('payment.paymentConfirmed')}\n${receipt.restaurantName}\n${receipt.date} ${receipt.time}\nTotal: ${formatCurrency(receipt.total, getLanguage())}\nNo. ${receipt.id}`,
+        title: t('payment.paymentConfirmed'),
       });
     } catch (error) {
-      logger.error('Error sharing:', error);
+      console.error('Error sharing:', error);
     }
   };
 
@@ -123,14 +125,14 @@ Comprovante: ${receipt.id}
 ----------------------------------------
 ITENS:
 ${receipt.items.map(item => 
-  `${item.quantity}x ${item.name.padEnd(20)} R$ ${item.total.toFixed(2)}`
+  `${item.quantity}x ${item.name.padEnd(20)} ${formatCurrency(item.total, getLanguage())}`
 ).join('\n')}
 
 ----------------------------------------
-Subtotal:        R$ ${receipt.subtotal.toFixed(2)}
-Taxa de Serviço: R$ ${receipt.serviceFee.toFixed(2)}
-${receipt.discount > 0 ? `Desconto:        -R$ ${receipt.discount.toFixed(2)}\n` : ''}${receipt.tipAmount ? `Gorjeta:         R$ ${receipt.tipAmount.toFixed(2)}\n` : ''}----------------------------------------
-TOTAL:           R$ ${receipt.total.toFixed(2)}
+Subtotal:        ${formatCurrency(receipt.subtotal, getLanguage())}
+${t('payment.processPayment')}: ${formatCurrency(receipt.serviceFee, getLanguage())}
+${receipt.discount > 0 ? `${t('orders.discount')}:        -${formatCurrency(receipt.discount, getLanguage())}\n` : ''}${receipt.tipAmount ? `${t('orders.tip')}:         ${formatCurrency(receipt.tipAmount, getLanguage())}\n` : ''}----------------------------------------
+TOTAL:           ${formatCurrency(receipt.total, getLanguage())}
 
 Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.cardLastDigits})` : ''}
 
@@ -163,7 +165,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
         );
       }
     } catch (error) {
-      logger.error('Error downloading receipt:', error);
+      console.error('Error downloading receipt:', error);
       Alert.alert('Erro', 'Não foi possível baixar o comprovante');
     }
   };
@@ -441,21 +443,13 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          accessibilityRole="button"
-          accessibilityLabel="Close receipt"
-        >
+        <TouchableOpacity onPress={() => navigation.goBack()}>
           <Ionicons name="close" size={24} color={colors.foreground} />
         </TouchableOpacity>
         <Text style={styles.title}>
           Comprovante Digital
         </Text>
-        <TouchableOpacity
-          onPress={shareReceipt}
-          accessibilityRole="button"
-          accessibilityLabel="Share receipt"
-        >
+        <TouchableOpacity onPress={shareReceipt}>
           <Ionicons name="share-outline" size={24} color={colors.primary} />
         </TouchableOpacity>
       </View>
@@ -467,7 +461,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
             <Ionicons name="checkmark" size={32} color={colors.primaryForeground} />
           </View>
           <Text style={styles.successTitle}>
-            Pagamento Confirmado
+            {t('payment.paymentConfirmed')}
           </Text>
           <Text style={styles.successSubtitle}>
             {receipt.date} às {receipt.time}
@@ -519,7 +513,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
                   </Text>
                 </View>
                 <Text style={styles.itemPrice}>
-                  R$ {item.total.toFixed(2)}
+                  {formatCurrency(item.total, getLanguage())}
                 </Text>
               </View>
             ))}
@@ -532,7 +526,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Subtotal</Text>
               <Text style={styles.totalValue}>
-                R$ {receipt.subtotal.toFixed(2)}
+                {formatCurrency(receipt.subtotal, getLanguage())}
               </Text>
             </View>
             <View style={styles.totalRow}>
@@ -540,14 +534,14 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
                 Taxa de serviço (10%)
               </Text>
               <Text style={styles.totalValue}>
-                R$ {receipt.serviceFee.toFixed(2)}
+                {formatCurrency(receipt.serviceFee, getLanguage())}
               </Text>
             </View>
             {receipt.tipAmount && receipt.tipAmount > 0 && (
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Gorjeta</Text>
                 <Text style={styles.totalValue}>
-                  R$ {receipt.tipAmount.toFixed(2)}
+                  {formatCurrency(receipt.tipAmount, getLanguage())}
                 </Text>
               </View>
             )}
@@ -555,7 +549,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
               <View style={styles.totalRow}>
                 <Text style={[styles.totalLabel, { color: colors.success }]}>Desconto</Text>
                 <Text style={[styles.totalValue, { color: colors.success }]}>
-                  -R$ {receipt.discount.toFixed(2)}
+                  -{formatCurrency(receipt.discount, getLanguage())}
                 </Text>
               </View>
             )}
@@ -563,7 +557,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
             <View style={styles.grandTotalRow}>
               <Text style={styles.grandTotalLabel}>Total</Text>
               <Text style={styles.grandTotalValue}>
-                R$ {(receipt.total + (receipt.tipAmount || 0)).toFixed(2)}
+                {formatCurrency(receipt.total + (receipt.tipAmount || 0), getLanguage())}
               </Text>
             </View>
           </View>
@@ -579,7 +573,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
                     Dividido entre {receipt.splitInfo.totalParticipants} pessoas
                   </Text>
                   <Text style={styles.splitValue}>
-                    Sua parte: R$ {receipt.splitInfo.yourShare.toFixed(2)}
+                    {t('payment.payYourShare')}: {formatCurrency(receipt.splitInfo.yourShare, getLanguage())}
                   </Text>
                 </View>
               </View>
@@ -626,20 +620,16 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
           <TouchableOpacity
             style={styles.actionButton}
             onPress={downloadReceipt}
-            accessibilityRole="button"
-            accessibilityLabel="Download receipt as PDF"
           >
             <Ionicons name="download-outline" size={20} color={colors.foreground} />
             <Text style={styles.actionButtonText}>
               Baixar PDF
             </Text>
           </TouchableOpacity>
-
+          
           <TouchableOpacity
             style={styles.actionButton}
             onPress={shareReceipt}
-            accessibilityRole="button"
-            accessibilityLabel="Send receipt by email"
           >
             <Ionicons name="mail-outline" size={20} color={colors.foreground} />
             <Text style={styles.actionButtonText}>
@@ -656,8 +646,6 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
         <TouchableOpacity
           style={styles.doneButton}
           onPress={() => navigation.navigate('Home')}
-          accessibilityRole="button"
-          accessibilityLabel="Go back to home"
         >
           <Text style={styles.doneButtonText}>Voltar ao Início</Text>
         </TouchableOpacity>

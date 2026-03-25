@@ -396,7 +396,7 @@ export class ReviewsService {
   /**
    * Simple sentiment analysis (placeholder for AI integration)
    */
-  private analyzeSentiment(text: string): { sentiment: string; details: any } {
+  private analyzeSentiment(text: string): { sentiment: string; details: Record<string, unknown> } {
     // This is a placeholder. In production, integrate with AI module or external service
     const lowerText = text.toLowerCase();
 

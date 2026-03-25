@@ -57,7 +57,7 @@ export class ApprovalsService {
     status?: ApprovalStatus,
     date?: string,
   ): Promise<Approval[]> {
-    const where: any = { restaurant_id: restaurantId };
+    const where: Record<string, unknown> = { restaurant_id: restaurantId };
 
     if (status) {
       where.status = status;

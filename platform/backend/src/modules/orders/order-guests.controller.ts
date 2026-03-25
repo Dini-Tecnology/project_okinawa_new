@@ -18,6 +18,7 @@ import { Roles } from '@/common/decorators/roles.decorator';
 import { UserRole } from '@/common/enums';
 import { OrderGuestsService } from './order-guests.service';
 import { AddOrderGuestDto } from './dto/add-order-guest.dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('order-guests')
 @Controller('order-guests')
@@ -32,7 +33,7 @@ export class OrderGuestsController {
   async addGuest(
     @Param('orderId') orderId: string,
     @Body() addGuestDto: AddOrderGuestDto,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.orderGuestsService.addGuest(orderId, req.user.sub, addGuestDto);
   }
@@ -51,7 +52,7 @@ export class OrderGuestsController {
   async removeGuest(
     @Param('orderId') orderId: string,
     @Param('guestId') guestId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     await this.orderGuestsService.removeGuest(orderId, guestId, req.user.sub);
     return { message: 'Guest removed successfully' };
@@ -60,7 +61,7 @@ export class OrderGuestsController {
   @Post('orders/:orderId/leave')
   @ApiOperation({ summary: 'Leave an order (as guest)' })
   @ApiParam({ name: 'orderId', description: 'Order ID' })
-  async leaveOrder(@Param('orderId') orderId: string, @Req() req: any) {
+  async leaveOrder(@Param('orderId') orderId: string, @Req() req: AuthenticatedRequest) {
     await this.orderGuestsService.leaveOrder(orderId, req.user.sub);
     return { message: 'Left order successfully' };
   }
@@ -70,7 +71,7 @@ export class OrderGuestsController {
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number (default: 1)' })
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Items per page (default: 10, max: 50)' })
   async getOrdersAsGuest(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Query('page', new ParseIntPipe({ optional: true })) page?: number,
     @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
   ) {
@@ -86,7 +87,7 @@ export class OrderGuestsController {
     @Param('orderId') orderId: string,
     @Param('guestId') guestId: string,
     @Body('amount_paid') amountPaid: number,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.orderGuestsService.updateGuestPayment(orderId, guestId, amountPaid, req.user.sub);
   }

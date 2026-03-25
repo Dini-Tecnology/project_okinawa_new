@@ -13,6 +13,16 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthenticatedSocket } from '@common/interfaces/authenticated-socket.interface';
 import { getWsCorsConfig } from '@common/config/ws-cors.config';
 
+export interface ReservationEventPayload {
+  id?: string;
+  restaurant_id: string;
+  user_id?: string;
+  status?: string;
+  party_size?: number;
+  reservation_time?: string;
+  [key: string]: unknown;
+}
+
 @WebSocketGateway({
   namespace: '/reservations',
   cors: getWsCorsConfig(),
@@ -47,8 +57,9 @@ export class ReservationsGateway implements OnGatewayConnection, OnGatewayDiscon
       this.logger.log(
         `Reservations client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Reservations client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Reservations client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }
@@ -82,11 +93,11 @@ export class ReservationsGateway implements OnGatewayConnection, OnGatewayDiscon
     return { event: 'left', data: { restaurantId: data.restaurantId } };
   }
 
-  notifyReservationCreated(reservation: any) {
+  notifyReservationCreated(reservation: ReservationEventPayload) {
     this.server.to(`restaurant:${reservation.restaurant_id}`).emit('reservation:created', reservation);
   }
 
-  notifyReservationUpdated(reservation: any) {
+  notifyReservationUpdated(reservation: ReservationEventPayload) {
     this.server.to(`restaurant:${reservation.restaurant_id}`).emit('reservation:updated', reservation);
     this.server.to(`user:${reservation.user_id}`).emit('reservation:updated', reservation);
   }

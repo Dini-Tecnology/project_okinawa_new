@@ -100,7 +100,7 @@ function TableCard({
     table.status === 'available'
       ? colors.success
       : table.status === 'reserved'
-      ? '#F59E0B'
+      ? colors.warning
       : table.status === 'occupied'
       ? colors.primary
       : colors.foregroundMuted;
@@ -151,7 +151,7 @@ function TableCard({
             </View>
             <Chip
               mode="flat"
-              textStyle={{ color: '#fff', fontSize: 10, fontWeight: '600' }}
+              textStyle={{ color: colors.primaryForeground, fontSize: 10, fontWeight: '600' }}
               style={{ backgroundColor: statusColor }}
               compact
             >
@@ -297,7 +297,7 @@ function TableDetailModal({
                 onPress={() => onOpenTab(table.reservationId!)}
                 disabled={isActioning}
                 style={[styles.modalBtn, { backgroundColor: colors.success }]}
-                labelStyle={{ color: '#fff' }}
+                labelStyle={{ color: colors.primaryForeground }}
                 accessibilityRole="button"
                 accessibilityLabel={`Open tab for table ${table.tableNumber}`}
               >
@@ -515,7 +515,7 @@ export default function VipTableManagementScreen({ route }: VipTableManagementSc
           </Text>
         </View>
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: '#F59E0B' }]} />
+          <View style={[styles.legendDot, { backgroundColor: colors.warning }]} />
           <Text variant="bodySmall" style={{ color: colors.foregroundMuted }}>
             {t('club.vip.status.reserved')}
           </Text>

@@ -147,11 +147,11 @@ function SkeletonCard({ colors }: { colors: any }) {
         backgroundColor: colors.card,
       }}
     >
-      <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.backgroundTertiary }} />
+      <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.premiumCard }} />
       <View style={{ flex: 1, marginLeft: 12, gap: 6 }}>
-        <View style={{ width: '60%', height: 14, borderRadius: 6, backgroundColor: colors.backgroundTertiary }} />
-        <View style={{ width: '85%', height: 10, borderRadius: 4, backgroundColor: colors.backgroundTertiary }} />
-        <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.backgroundTertiary, marginTop: 4 }} />
+        <View style={{ width: '60%', height: 14, borderRadius: 6, backgroundColor: colors.premiumCard }} />
+        <View style={{ width: '85%', height: 10, borderRadius: 4, backgroundColor: colors.premiumCard }} />
+        <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.premiumCard, marginTop: 4 }} />
       </View>
     </View>
   );
@@ -233,7 +233,7 @@ export default function ConfigHubScreen() {
         <View style={{ marginHorizontal: spacing.screenHorizontal, marginTop: spacing[4], marginBottom: spacing[4] }}>
           <View
             style={{
-              backgroundColor: '#1F2937',
+              backgroundColor: colors.premiumCard,
               borderRadius: 20,
               padding: 16,
               overflow: 'hidden',
@@ -242,13 +242,13 @@ export default function ConfigHubScreen() {
           >
             <View style={{ position: 'absolute', right: -32, top: -32, width: 128, height: 128, borderRadius: 64, backgroundColor: `${colors.primary}1A` }} />
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+              <View style={{ width: 44, height: 44, borderRadius: 12, backgroundColor: colors.premiumCardGlassLight }} />
               <View style={{ flex: 1, gap: 6 }}>
-                <View style={{ width: '55%', height: 16, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.15)' }} />
-                <View style={{ width: '35%', height: 10, borderRadius: 4, backgroundColor: 'rgba(255,255,255,0.1)' }} />
+                <View style={{ width: '55%', height: 16, borderRadius: 4, backgroundColor: colors.premiumCardGlass }} />
+                <View style={{ width: '35%', height: 10, borderRadius: 4, backgroundColor: colors.premiumCardGlassLight }} />
               </View>
             </View>
-            <View style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 3, marginTop: 14 }} />
+            <View style={{ height: 6, backgroundColor: colors.premiumCardGlass, borderRadius: 3, marginTop: 14 }} />
           </View>
         </View>
         {Array.from({ length: 6 }).map((_, i) => (
@@ -276,7 +276,7 @@ export default function ConfigHubScreen() {
           marginHorizontal: spacing.screenHorizontal,
           marginTop: spacing[4],
           marginBottom: spacing[4],
-          backgroundColor: '#1F2937',
+          backgroundColor: colors.premiumCard,
           borderRadius: 20,
           padding: 16,
           overflow: 'hidden',
@@ -310,10 +310,10 @@ export default function ConfigHubScreen() {
               <MaterialCommunityIcons name="cog" size={22} color={colors.primary} />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ color: '#FFFFFF', fontSize: 15, fontWeight: '700' }}>
+              <Text style={{ color: colors.premiumCardForeground, fontSize: 15, fontWeight: '700' }}>
                 {t('config.hub.title')}
               </Text>
-              <Text style={{ color: 'rgba(255,255,255,0.6)', fontSize: 11, marginTop: 1 }}>
+              <Text style={{ color: colors.premiumCardMuted, fontSize: 11, marginTop: 1 }}>
                 {t('config.hub.setupCompletion', {
                   percentage: Math.round(completionPercentage),
                 })}
@@ -323,7 +323,7 @@ export default function ConfigHubScreen() {
 
           {/* Progress bar with gradient fill */}
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <View style={{ flex: 1, height: 6, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: 3, overflow: 'hidden' }}>
+            <View style={{ flex: 1, height: 6, backgroundColor: colors.premiumCardBorder, borderRadius: 3, overflow: 'hidden' }}>
               <LinearGradient
                 colors={[colors.primary, colors.accent]}
                 start={{ x: 0, y: 0 }}
@@ -335,7 +335,7 @@ export default function ConfigHubScreen() {
                 }}
               />
             </View>
-            <Text style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '700', minWidth: 36, textAlign: 'right' }}>
+            <Text style={{ color: colors.premiumCardForeground, fontSize: 12, fontWeight: '700', minWidth: 36, textAlign: 'right' }}>
               {Math.round(completionPercentage)}%
             </Text>
           </View>
@@ -369,7 +369,7 @@ export default function ConfigHubScreen() {
               width: 40,
               height: 40,
               borderRadius: 12,
-              backgroundColor: colors.backgroundTertiary,
+              backgroundColor: colors.premiumCard,
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -400,7 +400,7 @@ export default function ConfigHubScreen() {
             </Text>
             {/* Micro progress bar per domain */}
             {section.domain && completion?.domains?.[section.domain] != null && (
-              <View style={{ marginTop: 6, height: 3, borderRadius: 1.5, backgroundColor: colors.backgroundTertiary, overflow: 'hidden' }}>
+              <View style={{ marginTop: 6, height: 3, borderRadius: 1.5, backgroundColor: colors.premiumCard, overflow: 'hidden' }}>
                 <View
                   style={{
                     height: '100%',

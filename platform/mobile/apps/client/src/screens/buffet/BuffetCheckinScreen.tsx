@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import { Text, Card, Button, Divider } from 'react-native-paper';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@okinawa/shared/theme/spacing';
 import { typography } from '@okinawa/shared/theme/typography';
@@ -113,9 +115,6 @@ export default function BuffetCheckinScreen({
                   ]}
                   onPress={handleDecrement}
                   disabled={covers <= 1}
-                  accessibilityRole="button"
-                  accessibilityLabel="Decrease number of covers"
-                  accessibilityState={{ disabled: covers <= 1 }}
                 >
                   <Text style={[typography.h2, { color: colors.foreground }]}>-</Text>
                 </TouchableOpacity>
@@ -134,9 +133,6 @@ export default function BuffetCheckinScreen({
                   ]}
                   onPress={handleIncrement}
                   disabled={covers >= 20}
-                  accessibilityRole="button"
-                  accessibilityLabel="Increase number of covers"
-                  accessibilityState={{ disabled: covers >= 20 }}
                 >
                   <Text style={[typography.h2, { color: colors.foreground }]}>+</Text>
                 </TouchableOpacity>
@@ -152,7 +148,7 @@ export default function BuffetCheckinScreen({
                   {t('buffet.perPerson')}
                 </Text>
                 <Text style={[typography.priceMedium, { color: colors.foreground }]}>
-                  R$ {pricePerPerson.toFixed(2)}
+                  {formatCurrency(pricePerPerson, getLanguage())}
                 </Text>
               </View>
 
@@ -163,7 +159,7 @@ export default function BuffetCheckinScreen({
                   {t('common.total') ?? 'Total'}
                 </Text>
                 <Text style={[typography.priceDisplay, { color: colors.primary }]}>
-                  R$ {totalPrice.toFixed(2)}
+                  {formatCurrency(totalPrice, getLanguage())}
                 </Text>
               </View>
             </Card.Content>
@@ -210,7 +206,7 @@ export default function BuffetCheckinScreen({
                   {t('floorFlow.tableNumber', { number: tableAssignment })}
                 </Text>
                 <Text style={[typography.bodySmall, { color: colors.foregroundSecondary }]}>
-                  {covers} {t('buffet.covers')} - R$ {totalPrice.toFixed(2)}
+                  {covers} {t('buffet.covers')} - {formatCurrency(totalPrice, getLanguage())}
                 </Text>
               </Card.Content>
             </Card>

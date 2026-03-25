@@ -29,10 +29,11 @@ import * as Haptics from 'expo-haptics';
 
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -205,7 +206,7 @@ export default function SplitPaymentScreen() {
       setGuests(guestsData);
       setSplits(splitsData);
     } catch (err: any) {
-      logger.error('Error loading split data:', err);
+      console.error('Error loading split data:', err);
       setError(t('split.errorCreate'));
     } finally {
       setLoading(false);
@@ -754,7 +755,7 @@ export default function SplitPaymentScreen() {
                   {t('split.total')}
                 </Text>
                 <Text variant="headlineLarge" style={styles.totalAmount}>
-                  R$ {order.total_amount.toFixed(2)}
+                  {formatCurrency(order.total_amount, getLanguage())}
                 </Text>
               </View>
               <View style={styles.paidInfo}>
@@ -762,7 +763,7 @@ export default function SplitPaymentScreen() {
                   {t('split.totalPaid')}
                 </Text>
                 <Text variant="titleLarge" style={styles.paidAmount}>
-                  R$ {totalPaid.toFixed(2)}
+                  {formatCurrency(totalPaid, getLanguage())}
                 </Text>
               </View>
             </View>
@@ -870,7 +871,7 @@ export default function SplitPaymentScreen() {
                   </View>
                   <View style={styles.guestAmount}>
                     <Text variant="titleMedium" style={styles.amountText}>
-                      R$ {(amounts[guest.id] || 0).toFixed(2)}
+                      {formatCurrency(amounts[guest.id] || 0, getLanguage())}
                     </Text>
                   </View>
                 </View>
@@ -921,7 +922,7 @@ export default function SplitPaymentScreen() {
                               )}
                             </View>
                             <Text variant="bodySmall" style={styles.itemPrice}>
-                              R$ {item.total_price.toFixed(2)}
+                              {formatCurrency(item.total_price, getLanguage())}
                             </Text>
                           </View>
                         </View>
@@ -945,9 +946,8 @@ export default function SplitPaymentScreen() {
                       }
                       keyboardType="decimal-pad"
                       mode="outlined"
-                      left={<TextInput.Affix text="R$" />}
+                      left={<TextInput.Affix text={getCurrencySymbol(getLanguage())} />}
                       style={styles.amountInput}
-                      accessibilityLabel={`Fixed payment amount for ${guest.guest_name}`}
                     />
                   </View>
                 )}
@@ -1003,7 +1003,7 @@ export default function SplitPaymentScreen() {
                 {t('payment.payingFor')}: {selectedGuest.guest_name}
               </Text>
               <Text variant="headlineSmall" style={styles.paymentAmount}>
-                R$ {(amounts[selectedGuest.id] || 0).toFixed(2)}
+                {formatCurrency(amounts[selectedGuest.id] || 0, getLanguage())}
               </Text>
             </View>
           )}

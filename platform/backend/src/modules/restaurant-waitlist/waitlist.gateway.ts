@@ -61,8 +61,9 @@ export class WaitlistGateway implements OnGatewayConnection, OnGatewayDisconnect
       this.logger.log(
         `Waitlist client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Waitlist client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Waitlist client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }

@@ -145,7 +145,7 @@ function QueueEntryCard({
           <Text
             variant="titleMedium"
             style={{
-              color: isCalled ? '#fff' : colors.foreground,
+              color: isCalled ? colors.primaryForeground : colors.foreground,
               fontWeight: '800',
             }}
           >
@@ -184,7 +184,7 @@ function QueueEntryCard({
               onPress={() => onAdmit(entry.id)}
               disabled={isActioning}
               style={[styles.actionBtn, { backgroundColor: colors.success }]}
-              labelStyle={{ color: '#fff', fontSize: 11 }}
+              labelStyle={{ color: colors.primaryForeground, fontSize: 11 }}
               accessibilityRole="button"
               accessibilityLabel={`Admit ${entry.customerName}`}
             >

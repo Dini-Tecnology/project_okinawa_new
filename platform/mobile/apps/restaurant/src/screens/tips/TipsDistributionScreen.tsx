@@ -5,6 +5,8 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/theme';
 
 interface StaffTips {
@@ -103,7 +105,7 @@ export default function TipsDistributionScreen() {
             {t('tips.totalTips')}
           </Text>
           <Text variant="displayMedium" style={styles.totalAmount}>
-            R$ {totalTips.toFixed(2)}
+            {formatCurrency(totalTips, getLanguage())}
           </Text>
           <Text variant="bodyMedium" style={styles.subtitle}>
             {t('tips.period')}: {format(new Date(), 'dd/MM/yyyy', { locale: ptBR })}
@@ -121,9 +123,6 @@ export default function TipsDistributionScreen() {
               selected={distributionMethod === 'equal'}
               onPress={() => setDistributionMethod('equal')}
               style={styles.methodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('tips.equal')}
-              accessibilityState={{ selected: distributionMethod === 'equal' }}
             >
               {t('tips.equal')}
             </Chip>
@@ -131,9 +130,6 @@ export default function TipsDistributionScreen() {
               selected={distributionMethod === 'role'}
               onPress={() => setDistributionMethod('role')}
               style={styles.methodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('tips.byRole')}
-              accessibilityState={{ selected: distributionMethod === 'role' }}
             >
               {t('tips.byRole')}
             </Chip>
@@ -141,21 +137,12 @@ export default function TipsDistributionScreen() {
               selected={distributionMethod === 'manual'}
               onPress={() => setDistributionMethod('manual')}
               style={styles.methodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('tips.manual')}
-              accessibilityState={{ selected: distributionMethod === 'manual' }}
             >
               {t('tips.manual')}
             </Chip>
           </View>
           {distributionMethod !== 'manual' && (
-            <Button
-              mode="outlined"
-              onPress={calculateDistribution}
-              style={styles.calculateButton}
-              accessibilityRole="button"
-              accessibilityLabel={t('tips.calculateDistribution')}
-            >
+            <Button mode="outlined" onPress={calculateDistribution} style={styles.calculateButton}>
               {t('tips.calculateDistribution')}
             </Button>
           )}
@@ -185,7 +172,6 @@ export default function TipsDistributionScreen() {
                     keyboardType="decimal-pad"
                     style={styles.manualInput}
                     dense
-                    accessibilityLabel={`${t('tips.totalTips')} ${person.staff_name}`}
                   />
                 ) : (
                   <View style={styles.amountContainer}>
@@ -195,7 +181,7 @@ export default function TipsDistributionScreen() {
                       </Text>
                     )}
                     <Text variant="titleLarge" style={styles.amount}>
-                      R$ {person.amount.toFixed(2)}
+                      {formatCurrency(person.amount, getLanguage())}
                     </Text>
                   </View>
                 )}
@@ -210,7 +196,7 @@ export default function TipsDistributionScreen() {
           <View style={styles.summaryRow}>
             <Text variant="titleMedium">{t('tips.totalDistributed')}:</Text>
             <Text variant="titleLarge" style={styles.distributedAmount}>
-              R$ {totalDistributed.toFixed(2)}
+              {formatCurrency(totalDistributed, getLanguage())}
             </Text>
           </View>
           {Math.abs(remaining) > 0.01 && (
@@ -219,7 +205,7 @@ export default function TipsDistributionScreen() {
                 {t('tips.remaining')}:
               </Text>
               <Text variant="bodyLarge" style={[styles.remainingAmount, remaining < 0 && styles.negative]}>
-                R$ {remaining.toFixed(2)}
+                {formatCurrency(remaining, getLanguage())}
               </Text>
             </View>
           )}
@@ -234,8 +220,6 @@ export default function TipsDistributionScreen() {
           disabled={distributing || Math.abs(remaining) > 0.01}
           style={styles.distributeButton}
           icon="cash-multiple"
-          accessibilityRole="button"
-          accessibilityLabel={t('tips.confirmDistribution')}
         >
           {t('tips.confirmDistribution')}
         </Button>

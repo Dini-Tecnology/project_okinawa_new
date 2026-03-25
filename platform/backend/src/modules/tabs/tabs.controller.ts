@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { TabsService } from './tabs.service';
 import { CreateTabDto, AddTabItemDto, JoinTabDto, ProcessTabPaymentDto } from './dto';
 import { TabStatus } from '@/common/enums';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Tabs')
 @Controller('tabs')
@@ -13,13 +14,13 @@ export class TabsController {
   @Post()
   @ApiOperation({ summary: 'Create a new tab' })
   @ApiResponse({ status: 201, description: 'Tab created successfully' })
-  async createTab(@Req() req: any, @Body() dto: CreateTabDto) {
+  async createTab(@Req() req: AuthenticatedRequest, @Body() dto: CreateTabDto) {
     return this.tabsService.createTab(req.user.id, dto);
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Get my open tabs' })
-  async getMyTabs(@Req() req: any) {
+  async getMyTabs(@Req() req: AuthenticatedRequest) {
     return this.tabsService.findUserTabs(req.user.id);
   }
 
@@ -31,13 +32,13 @@ export class TabsController {
 
   @Post(':id/join')
   @ApiOperation({ summary: 'Join an existing group tab' })
-  async joinTab(@Req() req: any, @Body() dto: JoinTabDto) {
+  async joinTab(@Req() req: AuthenticatedRequest, @Body() dto: JoinTabDto) {
     return this.tabsService.joinTab(req.user.id, dto);
   }
 
   @Post(':id/leave')
   @ApiOperation({ summary: 'Leave a tab' })
-  async leaveTab(@Param('id') id: string, @Req() req: any) {
+  async leaveTab(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.tabsService.leaveTab(id, req.user.id);
   }
 
@@ -46,7 +47,7 @@ export class TabsController {
   async removeMember(
     @Param('id') id: string,
     @Param('userId') userId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.tabsService.removeMember(id, req.user.id, userId);
   }
@@ -55,7 +56,7 @@ export class TabsController {
   @ApiOperation({ summary: 'Add item to tab' })
   async addItem(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: AddTabItemDto,
   ) {
     return this.tabsService.addItem(id, req.user.id, dto);
@@ -63,13 +64,13 @@ export class TabsController {
 
   @Post(':id/repeat-round')
   @ApiOperation({ summary: 'Repeat last round of drinks' })
-  async repeatRound(@Param('id') id: string, @Req() req: any) {
+  async repeatRound(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.tabsService.repeatRound(id, req.user.id);
   }
 
   @Post(':id/close')
   @ApiOperation({ summary: 'Request to close the tab' })
-  async requestClose(@Param('id') id: string, @Req() req: any) {
+  async requestClose(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.tabsService.requestClose(id, req.user.id);
   }
 
@@ -83,7 +84,7 @@ export class TabsController {
   @ApiOperation({ summary: 'Process a payment for the tab' })
   async processPayment(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: ProcessTabPaymentDto,
   ) {
     return this.tabsService.processPayment(id, req.user.id, dto);

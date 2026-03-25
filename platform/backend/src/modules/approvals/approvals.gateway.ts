@@ -48,8 +48,9 @@ export class ApprovalsGateway implements OnGatewayConnection, OnGatewayDisconnec
       this.logger.log(
         `Approval client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Approval client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Approval client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }

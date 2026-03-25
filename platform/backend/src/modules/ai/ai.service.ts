@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, ForbiddenException, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThan, Between } from 'typeorm';
+import axios, { AxiosError } from 'axios';
 import { Review } from '@/modules/reviews/entities/review.entity';
 import { Order } from '@/modules/orders/entities/order.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { LoyaltyProgram } from '@/modules/loyalty/entities/loyalty-program.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
-import { CircuitBreakerService } from '@common/utils/circuit-breaker.module';
-import { CircuitBreaker } from '@common/utils/circuit-breaker';
 
 export interface SentimentAnalysis {
   review_id: string;
@@ -46,10 +46,24 @@ export interface DemandForecast {
   recommended_staff: number;
 }
 
+/** Shape returned by the OpenAI-powered sentiment analysis */
+interface OpenAISentimentResponse {
+  sentiment: 'positive' | 'negative' | 'neutral';
+  score: number;
+  keywords: string[];
+  aspects: {
+    food: number;
+    service: number;
+    ambiance: number;
+    value: number;
+  };
+}
+
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
-  private readonly aiCircuitBreaker: CircuitBreaker;
+  private readonly openaiApiKey: string | undefined;
+  private readonly openaiModel: string;
 
   constructor(
     @InjectRepository(Review)
@@ -62,13 +76,62 @@ export class AiService {
     private loyaltyRepository: Repository<LoyaltyProgram>,
     @InjectRepository(Restaurant)
     private restaurantRepository: Repository<Restaurant>,
-    private circuitBreakerService: CircuitBreakerService,
+    private configService: ConfigService,
   ) {
-    this.aiCircuitBreaker = this.circuitBreakerService.getBreaker('openai', {
-      failureThreshold: 3,
-      resetTimeout: 45_000, // 45s — OpenAI outages can be brief
-      halfOpenMax: 1,
-    });
+    this.openaiApiKey = this.configService.get<string>('OPENAI_API_KEY') || undefined;
+    this.openaiModel = this.configService.get<string>('OPENAI_MODEL') || 'gpt-4-turbo-preview';
+
+    if (this.openaiApiKey) {
+      this.logger.log('OpenAI API key detected — AI-powered analysis enabled');
+    } else {
+      this.logger.warn(
+        'OPENAI_API_KEY not set — falling back to rule-based analysis',
+      );
+    }
+  }
+
+  /**
+   * Returns true when a real OpenAI API key is configured.
+   */
+  private get isOpenAIAvailable(): boolean {
+    return !!this.openaiApiKey;
+  }
+
+  /**
+   * Make a chat completion request to the OpenAI API.
+   * Handles timeout, rate-limit, and generic errors gracefully.
+   */
+  private async callOpenAI<T>(
+    systemPrompt: string,
+    userPrompt: string,
+  ): Promise<T> {
+    const response = await axios.post(
+      'https://api.openai.com/v1/chat/completions',
+      {
+        model: this.openaiModel,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
+        ],
+        temperature: 0.3,
+        max_tokens: 1024,
+        response_format: { type: 'json_object' },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${this.openaiApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 15_000, // 15 second timeout
+      },
+    );
+
+    const content = response.data.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('Empty response from OpenAI');
+    }
+
+    return JSON.parse(content) as T;
   }
 
   /**
@@ -94,12 +157,71 @@ export class AiService {
   }
 
   /**
+   * Rule-based fallback sentiment analysis.
+   * Used when OpenAI is unavailable or when the API call fails.
+   */
+  private buildFallbackSentiment(
+    review: Review,
+    reviewId: string,
+  ): SentimentAnalysis {
+    const rating = review.rating;
+    let sentiment: 'positive' | 'negative' | 'neutral';
+    let score: number;
+
+    if (rating >= 4) {
+      sentiment = 'positive';
+      score = 60 + (rating - 4) * 20;
+    } else if (rating <= 2) {
+      sentiment = 'negative';
+      score = rating * 20;
+    } else {
+      sentiment = 'neutral';
+      score = 50;
+    }
+
+    const keywords: string[] = [];
+    if (review.comment) {
+      const words = review.comment.toLowerCase().split(/\s+/);
+      const positiveWords = [
+        'excellent',
+        'great',
+        'amazing',
+        'delicious',
+        'wonderful',
+      ];
+      const negativeWords = ['bad', 'terrible', 'poor', 'awful', 'horrible'];
+
+      words.forEach((word) => {
+        if (positiveWords.includes(word) || negativeWords.includes(word)) {
+          keywords.push(word);
+        }
+      });
+    }
+
+    return {
+      review_id: reviewId,
+      sentiment,
+      score,
+      keywords: keywords.slice(0, 5),
+      aspects: {
+        food: review.food_rating ? (review.food_rating / 5) * 100 : score,
+        service: review.service_rating
+          ? (review.service_rating / 5) * 100
+          : score,
+        ambiance: review.ambiance_rating
+          ? (review.ambiance_rating / 5) * 100
+          : score,
+        value: review.value_rating ? (review.value_rating / 5) * 100 : score,
+      },
+    };
+  }
+
+  /**
    * Analyze sentiment of a review.
    *
-   * Currently uses rule-based heuristics. When a real NLP/OpenAI integration
-   * is added, the external call should go inside the circuit-breaker `execute`
-   * callback. The fallback returns the same rule-based result so the
-   * application degrades gracefully.
+   * When OPENAI_API_KEY is configured, uses OpenAI chat completions for
+   * NLP-powered analysis. Falls back to rule-based heuristics when the
+   * key is absent or the API call fails (timeout, rate-limit, etc.).
    */
   async analyzeSentiment(reviewId: string): Promise<SentimentAnalysis> {
     const review = await this.reviewRepository.findOne({
@@ -110,74 +232,66 @@ export class AiService {
       throw new Error('Review not found');
     }
 
-    // Rule-based fallback (used when circuit is open or AI call fails)
-    const buildFallback = (): SentimentAnalysis => {
-      const rating = review.rating;
-      let sentiment: 'positive' | 'negative' | 'neutral';
-      let score: number;
+    // If OpenAI is not available, return rule-based result immediately
+    if (!this.isOpenAIAvailable) {
+      return this.buildFallbackSentiment(review, reviewId);
+    }
 
-      if (rating >= 4) {
-        sentiment = 'positive';
-        score = 60 + (rating - 4) * 20;
-      } else if (rating <= 2) {
-        sentiment = 'negative';
-        score = rating * 20;
-      } else {
-        sentiment = 'neutral';
-        score = 50;
-      }
+    try {
+      const systemPrompt = `You are a restaurant review sentiment analyzer. Analyze the review and return a JSON object with:
+- "sentiment": one of "positive", "negative", "neutral"
+- "score": number 0–100 (0 = most negative, 100 = most positive)
+- "keywords": array of up to 5 notable keywords from the review
+- "aspects": object with "food", "service", "ambiance", "value" each scored 0–100
 
-      const keywords: string[] = [];
-      if (review.comment) {
-        const words = review.comment.toLowerCase().split(/\s+/);
-        const positiveWords = [
-          'excellent',
-          'great',
-          'amazing',
-          'delicious',
-          'wonderful',
-        ];
-        const negativeWords = ['bad', 'terrible', 'poor', 'awful', 'horrible'];
+Context: The review has a numeric rating of ${review.rating}/5.${review.food_rating ? ` Food rating: ${review.food_rating}/5.` : ''}${review.service_rating ? ` Service rating: ${review.service_rating}/5.` : ''}${review.ambiance_rating ? ` Ambiance rating: ${review.ambiance_rating}/5.` : ''}${review.value_rating ? ` Value rating: ${review.value_rating}/5.` : ''}`;
 
-        words.forEach((word) => {
-          if (positiveWords.includes(word) || negativeWords.includes(word)) {
-            keywords.push(word);
-          }
-        });
-      }
+      const userPrompt = review.comment
+        ? `Review text: "${review.comment}"`
+        : `No text provided. Rating: ${review.rating}/5.`;
+
+      const aiResult = await this.callOpenAI<OpenAISentimentResponse>(
+        systemPrompt,
+        userPrompt,
+      );
 
       return {
         review_id: reviewId,
-        sentiment,
-        score,
-        keywords: keywords.slice(0, 5),
+        sentiment: aiResult.sentiment,
+        score: Math.max(0, Math.min(100, aiResult.score)),
+        keywords: (aiResult.keywords || []).slice(0, 5),
         aspects: {
-          food: review.food_rating ? (review.food_rating / 5) * 100 : score,
-          service: review.service_rating
-            ? (review.service_rating / 5) * 100
-            : score,
-          ambiance: review.ambiance_rating
-            ? (review.ambiance_rating / 5) * 100
-            : score,
-          value: review.value_rating ? (review.value_rating / 5) * 100 : score,
+          food: Math.max(0, Math.min(100, aiResult.aspects?.food ?? 50)),
+          service: Math.max(0, Math.min(100, aiResult.aspects?.service ?? 50)),
+          ambiance: Math.max(0, Math.min(100, aiResult.aspects?.ambiance ?? 50)),
+          value: Math.max(0, Math.min(100, aiResult.aspects?.value ?? 50)),
         },
       };
-    };
-
-    return this.aiCircuitBreaker.execute<SentimentAnalysis>(
-      async () => {
-        // TODO: Replace with real OpenAI / NLP call:
-        //   const result = await openai.chat.completions.create({ ... });
-        // For now, fall through to rule-based analysis.
-        return buildFallback();
-      },
-      () => {
-        this.logger.warn(
-          `OpenAI circuit open — returning rule-based sentiment for review ${reviewId}`,
+    } catch (error) {
+      // Log the error and degrade gracefully to rule-based analysis
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 429) {
+          this.logger.warn(
+            `OpenAI rate limit hit — falling back to rule-based sentiment for review ${reviewId}`,
+          );
+        } else if (error.code === 'ECONNABORTED') {
+          this.logger.warn(
+            `OpenAI request timed out — falling back to rule-based sentiment for review ${reviewId}`,
+          );
+        } else {
+          this.logger.error(
+            `OpenAI API error (${error.response?.status ?? error.code}) — falling back to rule-based sentiment for review ${reviewId}`,
+          );
+        }
+      } else {
+        this.logger.error(
+          `Unexpected error during OpenAI call — falling back to rule-based sentiment for review ${reviewId}`,
+          error instanceof Error ? error.stack : String(error),
         );
-        return buildFallback();
-      },
-    );
+      }
+
+      return this.buildFallbackSentiment(review, reviewId);
+    }
   }
 
   /**

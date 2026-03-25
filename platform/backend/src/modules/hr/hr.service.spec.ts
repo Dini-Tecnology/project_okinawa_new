@@ -43,7 +43,7 @@ describe('HrService', () => {
     start_time: '09:00:00',
     end_time: '17:00:00',
     date: new Date(),
-    role: 'waiter',
+    role: 'waiter' as any,
   };
 
   const mockAttendanceRepository = {
@@ -297,8 +297,9 @@ describe('HrService', () => {
     it('should create a leave request', async () => {
       const createData = {
         restaurant_id: 'restaurant-1',
-        start_date: new Date(),
-        end_date: new Date(),
+        leave_type: 'vacation',
+        start_date: new Date().toISOString(),
+        end_date: new Date().toISOString(),
         reason: 'Vacation',
       };
 

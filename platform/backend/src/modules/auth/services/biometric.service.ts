@@ -37,7 +37,7 @@ export class BiometricService {
     userId: string,
     enrollmentToken: string,
     biometricType: BiometricAuthType,
-    deviceInfo?: any,
+    deviceInfo?: Record<string, string>,
     publicKey?: string,
     ipAddress?: string,
     userAgent?: string,
@@ -101,7 +101,7 @@ export class BiometricService {
    */
   async authenticate(
     biometricToken: string,
-    deviceInfo?: any,
+    deviceInfo?: Record<string, string>,
     signature?: string,
     ipAddress?: string,
     userAgent?: string,
@@ -110,7 +110,7 @@ export class BiometricService {
     refreshToken: string;
     expiresIn: number;
     trustLevel: 'high' | 'medium' | 'low';
-    user: any;
+    user: Record<string, unknown>;
   }> {
     // Find token
     const tokenHash = this.hashToken(biometricToken);

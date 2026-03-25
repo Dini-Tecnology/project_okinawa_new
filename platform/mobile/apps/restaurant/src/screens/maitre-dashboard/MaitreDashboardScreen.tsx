@@ -27,6 +27,7 @@ import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColors } from '@/shared/theme';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
+import { t } from '@/shared/i18n';
 import ApiService from '../../../../../../shared/services/api';
 
 interface Reservation {
@@ -285,7 +286,7 @@ export default function MaitreDashboardScreen() {
         r.id === reservationId ? { ...r, status: 'confirmed' } : r
       )
     );
-    Alert.alert('Confirmado', 'Reserva confirmada. Cliente será notificado.');
+    Alert.alert(t('maitreDashboard.confirmed'), t('maitreDashboard.reservationConfirmedMsg'));
   };
 
   const handleCancelReservation = (reservationId: string) => {
@@ -372,20 +373,8 @@ export default function MaitreDashboardScreen() {
     }
   }, [colors]);
 
-  const getReservationStatusLabel = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'Confirmada';
-      case 'pending':
-        return 'Pendente';
-      case 'seated':
-        return 'Acomodados';
-      case 'cancelled':
-        return 'Cancelada';
-      default:
-        return status;
-    }
-  };
+  const getReservationStatusLabel = (status: string) =>
+    t(`maitreDashboard.status.${status}`) || status;
 
   /**
    * Gets table status color using semantic tokens
@@ -424,7 +413,7 @@ export default function MaitreDashboardScreen() {
               {todayReservations.length}
             </Text>
             <Text variant="bodySmall" style={styles.statLabel}>
-              Reservas Hoje
+              {t('maitreDashboard.reservationsToday')}
             </Text>
           </Card.Content>
         </Card>
@@ -436,7 +425,7 @@ export default function MaitreDashboardScreen() {
               {pendingReservations.length}
             </Text>
             <Text variant="bodySmall" style={styles.statLabel}>
-              Pendentes
+              {t('maitreDashboard.pending')}
             </Text>
           </Card.Content>
         </Card>
@@ -519,8 +508,6 @@ export default function MaitreDashboardScreen() {
                           onPress={() => handleConfirmReservation(reservation.id)}
                           style={styles.confirmButton}
                           icon="check"
-                          accessibilityRole="button"
-                          accessibilityLabel={`Confirm reservation for ${reservation.customer_name}`}
                         >
                           Confirmar
                         </Button>
@@ -529,8 +516,6 @@ export default function MaitreDashboardScreen() {
                           onPress={() => handleCancelReservation(reservation.id)}
                           textColor={colors.error}
                           icon="close"
-                          accessibilityRole="button"
-                          accessibilityLabel={`Cancel reservation for ${reservation.customer_name}`}
                         >
                           Cancelar
                         </Button>
@@ -603,8 +588,6 @@ export default function MaitreDashboardScreen() {
                         onPress={() => handleAssignTable(reservation.id)}
                         style={styles.seatButton}
                         icon="table-furniture"
-                        accessibilityRole="button"
-                        accessibilityLabel={`Seat guests for ${reservation.customer_name}`}
                       >
                         Acomodar Clientes
                       </Button>
@@ -634,8 +617,6 @@ export default function MaitreDashboardScreen() {
                       navigation.navigate('FloorPlan' as never);
                     }
                   }}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Table ${table.number}, ${table.capacity} seats, ${table.status}`}
                 >
                   <View
                     style={[
@@ -695,8 +676,6 @@ export default function MaitreDashboardScreen() {
         label="Nova Reserva"
         style={styles.fab}
         onPress={() => navigation.navigate('Reservations' as never)}
-        accessibilityRole="button"
-        accessibilityLabel="Add new reservation"
       />
     </View>
   );

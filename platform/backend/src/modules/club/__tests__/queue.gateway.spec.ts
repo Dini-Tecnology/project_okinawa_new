@@ -211,8 +211,8 @@ describe('QueueGateway', () => {
   describe('notify methods', () => {
     it('should emit queueUpdate to queue room via notifyQueueUpdate', () => {
       const queue = [
-        { id: 'entry-1', position: 1 },
-        { id: 'entry-2', position: 2 },
+        { id: 'entry-1', position: 1, userId: 'u1', partySize: 2, status: 'waiting' },
+        { id: 'entry-2', position: 2, userId: 'u2', partySize: 3, status: 'waiting' },
       ];
 
       gateway.notifyQueueUpdate('restaurant-1', queue);
@@ -226,7 +226,7 @@ describe('QueueGateway', () => {
     });
 
     it('should emit positionUpdate to specific user room via notifyPositionUpdate', () => {
-      const data = { position: 3, estimatedWait: 10 };
+      const data = { position: 3, estimatedWaitMinutes: 10 };
 
       gateway.notifyPositionUpdate('restaurant-1', 'user-1', data);
 
@@ -254,7 +254,7 @@ describe('QueueGateway', () => {
     });
 
     it('should emit statsUpdate to queue room via notifyStatsUpdate', () => {
-      const stats = { totalInQueue: 10, avgWait: 15 };
+      const stats = { totalWaiting: 10, avgWaitMinutes: 15, tablesAvailable: 5 };
 
       gateway.notifyStatsUpdate('restaurant-1', stats);
 

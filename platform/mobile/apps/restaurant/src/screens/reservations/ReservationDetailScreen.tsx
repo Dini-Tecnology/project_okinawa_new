@@ -15,14 +15,16 @@ type RouteParams = {
   };
 };
 
-const STATUS_COLORS: Record<ReservationStatus, string> = {
-  pending: '#FFA726',
-  confirmed: '#42A5F5',
-  seated: '#00C853',
-  completed: '#66BB6A',
-  cancelled: '#EF5350',
-  no_show: '#9E9E9E',
-};
+function getStatusColors(colors: ReturnType<typeof useColors>): Record<ReservationStatus, string> {
+  return {
+    pending: colors.warning,
+    confirmed: colors.info,
+    seated: colors.success,
+    completed: colors.successLight,
+    cancelled: colors.error,
+    no_show: colors.foregroundMuted,
+  };
+}
 
 export default function ReservationDetailScreen() {
   const { t } = useI18n();
@@ -92,7 +94,7 @@ export default function ReservationDetailScreen() {
           <View style={styles.header}>
             <Text variant="headlineMedium">{reservation.customer_name}</Text>
             <Chip
-              style={[styles.statusChip, { backgroundColor: STATUS_COLORS[reservation.status] }]}
+              style={[styles.statusChip, { backgroundColor: getStatusColors(colors)[reservation.status] }]}
               textStyle={styles.chipText}
             >
               {getStatusLabel(reservation.status)}
@@ -185,7 +187,7 @@ export default function ReservationDetailScreen() {
               mode="outlined"
               onPress={() => handleStatusChange('no_show')}
               style={styles.actionButton}
-              textColor="#9E9E9E"
+              textColor={colors.foregroundMuted}
               icon="account-off"
               accessibilityRole="button"
               accessibilityLabel={t('reservations.markNoShow')}
@@ -196,7 +198,7 @@ export default function ReservationDetailScreen() {
               mode="outlined"
               onPress={() => handleStatusChange('cancelled')}
               style={styles.cancelButton}
-              textColor="#d32f2f"
+              textColor={colors.error}
               icon="close-circle"
               accessibilityRole="button"
               accessibilityLabel={t('reservations.cancelReservation')}
@@ -241,7 +243,7 @@ export default function ReservationDetailScreen() {
       alignSelf: 'flex-start',
     },
     chipText: {
-      color: '#fff',
+      color: colors.primaryForeground,
       fontSize: 12,
     },
     info: {

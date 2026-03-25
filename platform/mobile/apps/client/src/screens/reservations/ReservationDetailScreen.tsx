@@ -8,7 +8,6 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '../../../../shared/theme';
-import logger from '@okinawa/shared/utils/logger';
 
 interface Guest {
   id: string;
@@ -302,7 +301,7 @@ export default function ReservationDetailScreen() {
       const data = await ApiService.getReservation(reservationId);
       setReservation(data);
     } catch (error) {
-      logger.error('Failed to load reservation:', error);
+      console.error('Failed to load reservation:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);
@@ -591,14 +590,14 @@ export default function ReservationDetailScreen() {
                       {guest.guest_phone || guest.guest_email}
                     </Text>
                   </View>
-                  <Chip compact style={styles.pendingChip} textStyle={{ color: '#F57C00', fontSize: 10 }}>Pendente</Chip>
+                  <Chip compact style={styles.pendingChip} textStyle={{ color: '#F57C00', fontSize: 10 }}>{t('reservations.status.pending')}</Chip>
                 </View>
               ))}
             </>
           )}
 
           {confirmedGuests.length === 0 && pendingGuests.length === 0 && (
-            <Text style={styles.emptyGuests}>Nenhum convidado adicionado</Text>
+            <Text style={styles.emptyGuests}>{t('reservations.noGuestsAdded')}</Text>
           )}
         </Card.Content>
       </Card>

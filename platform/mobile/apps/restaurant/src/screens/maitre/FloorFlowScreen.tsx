@@ -59,13 +59,15 @@ const TABLE_MARGIN = 6;
 const COLUMNS = 4;
 const TABLE_SIZE = (SCREEN_WIDTH - 32 - TABLE_MARGIN * 2 * COLUMNS) / COLUMNS;
 
-const STATUS_COLORS: Record<TableStatus, string> = {
-  free: '#10B981',
-  occupied: '#F59E0B',
-  billing: '#EA580C',
-  reserved: '#3B82F6',
-  dirty: '#9CA3AF',
-};
+function getStatusColors(colors: any): Record<TableStatus, string> {
+  return {
+    free: colors.tableAvailable,
+    occupied: colors.warning,
+    billing: colors.primary,
+    reserved: colors.tableReserved,
+    dirty: colors.foregroundMuted,
+  };
+}
 
 const STATUS_ICONS: Record<TableStatus, string> = {
   free: 'check-circle',
@@ -132,7 +134,8 @@ function TableDetailModal({
 }) {
   if (!table) return null;
 
-  const statusColor = STATUS_COLORS[table.status];
+  const statusColorMap = getStatusColors(colors);
+  const statusColor = statusColorMap[table.status];
 
   return (
     <Modal
@@ -141,7 +144,7 @@ function TableDetailModal({
       animationType="fade"
       onRequestClose={onClose}
     >
-      <Pressable style={modalStyles.overlay} onPress={onClose}>
+      <Pressable style={[modalStyles.overlay, { backgroundColor: colors.overlay }]} onPress={onClose}>
         <Pressable style={[modalStyles.content, { backgroundColor: colors.card }]} onPress={() => {}}>
           {/* Header */}
           <View style={modalStyles.header}>
@@ -241,7 +244,6 @@ function DetailRow({
 const modalStyles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -334,6 +336,8 @@ export default function FloorFlowScreen() {
     return counts;
   }, [tables]);
 
+  const statusColorMap = useMemo(() => getStatusColors(colors), [colors]);
+  const statusKeys = useMemo(() => Object.keys(statusColorMap) as TableStatus[], [statusColorMap]);
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   // ============================================
@@ -401,9 +405,9 @@ export default function FloorFlowScreen() {
 
       {/* Status Summary */}
       <View style={styles.summaryRow}>
-        {(Object.keys(STATUS_COLORS) as TableStatus[]).map((status) => (
+        {statusKeys.map((status) => (
           <View key={status} style={styles.summaryItem}>
-            <View style={[styles.summaryDot, { backgroundColor: STATUS_COLORS[status] }]} />
+            <View style={[styles.summaryDot, { backgroundColor: statusColorMap[status] }]} />
             <Text variant="bodySmall" style={styles.summaryCount}>
               {statusCounts[status]}
             </Text>
@@ -424,7 +428,7 @@ export default function FloorFlowScreen() {
       >
         <View style={styles.grid}>
           {tables.map((table) => {
-            const statusColor = STATUS_COLORS[table.status];
+            const statusColor = statusColorMap[table.status];
             return (
               <TouchableOpacity
                 key={table.id}
@@ -471,9 +475,9 @@ export default function FloorFlowScreen() {
           {t('floorFlow.legend')}
         </Text>
         <View style={styles.legendItems}>
-          {(Object.keys(STATUS_COLORS) as TableStatus[]).map((status) => (
+          {statusKeys.map((status) => (
             <View key={status} style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: STATUS_COLORS[status] }]} />
+              <View style={[styles.legendDot, { backgroundColor: statusColorMap[status] }]} />
               <Text variant="bodySmall" style={styles.legendText}>
                 {t(`floorFlow.${status}`)}
               </Text>

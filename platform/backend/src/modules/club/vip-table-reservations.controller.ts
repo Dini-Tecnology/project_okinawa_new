@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, Req } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { VipTableReservationsService } from './vip-table-reservations.service';
 import { CreateVipTableReservationDto, InviteVipTableGuestDto, RespondToVipInviteDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('VIP Table Reservations')
 @Controller('table-reservations')
@@ -11,13 +12,13 @@ export class VipTableReservationsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a VIP table reservation' })
-  async createReservation(@Req() req: any, @Body() dto: CreateVipTableReservationDto) {
+  async createReservation(@Req() req: AuthenticatedRequest, @Body() dto: CreateVipTableReservationDto) {
     return this.reservationsService.createReservation(req.user.id, dto);
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Get my VIP table reservations' })
-  async getMyReservations(@Req() req: any) {
+  async getMyReservations(@Req() req: AuthenticatedRequest) {
     return this.reservationsService.getUserReservations(req.user.id);
   }
 
@@ -29,7 +30,7 @@ export class VipTableReservationsController {
 
   @Put(':id/confirm')
   @ApiOperation({ summary: 'Confirm a pending reservation' })
-  async confirmReservation(@Param('id') id: string, @Req() req: any) {
+  async confirmReservation(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.reservationsService.confirmReservation(id, req.user.id);
   }
 
@@ -37,7 +38,7 @@ export class VipTableReservationsController {
   @ApiOperation({ summary: 'Cancel a reservation' })
   async cancelReservation(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body('reason') reason?: string,
   ) {
     return this.reservationsService.cancelReservation(id, req.user.id, reason);
@@ -47,7 +48,7 @@ export class VipTableReservationsController {
   @ApiOperation({ summary: 'Invite a guest to VIP table' })
   async inviteGuest(
     @Param('id') id: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Body() dto: InviteVipTableGuestDto,
   ) {
     return this.reservationsService.inviteGuest(id, req.user.id, dto);
@@ -55,7 +56,7 @@ export class VipTableReservationsController {
 
   @Post('invites/respond')
   @ApiOperation({ summary: 'Respond to a VIP table invite' })
-  async respondToInvite(@Req() req: any, @Body() dto: RespondToVipInviteDto) {
+  async respondToInvite(@Req() req: AuthenticatedRequest, @Body() dto: RespondToVipInviteDto) {
     return this.reservationsService.respondToInvite(req.user.id, dto);
   }
 
@@ -70,7 +71,7 @@ export class VipTableReservationsController {
   async removeGuest(
     @Param('id') id: string,
     @Param('guestId') guestId: string,
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
   ) {
     return this.reservationsService.removeGuest(id, req.user.id, guestId);
   }

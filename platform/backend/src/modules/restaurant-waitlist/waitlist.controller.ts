@@ -24,6 +24,7 @@ import {
   AddBarOrderDto,
   UpdateWaitlistEntryDto,
 } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Restaurant Waitlist')
 @Controller('restaurant/waitlist')
@@ -39,7 +40,7 @@ export class WaitlistController {
    */
   @Post()
   @ApiOperation({ summary: 'Join the restaurant waitlist' })
-  async joinWaitlist(@Req() req: any, @Body() dto: JoinWaitlistDto) {
+  async joinWaitlist(@Req() req: AuthenticatedRequest, @Body() dto: JoinWaitlistDto) {
     const userId = req.user?.id || null;
     const result = await this.waitlistService.joinWaitlist(dto, userId);
 
@@ -67,7 +68,7 @@ export class WaitlistController {
   @ApiOperation({ summary: 'Get my current waitlist position' })
   @ApiQuery({ name: 'restaurant_id', required: true })
   async getMyPosition(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Query('restaurant_id') restaurantId: string,
   ) {
     return this.waitlistService.getMyPosition(req.user.id, restaurantId);
@@ -199,7 +200,7 @@ export class WaitlistController {
   @Patch(':id/cancel')
   @ApiOperation({ summary: 'Cancel own waitlist spot' })
   @ApiParam({ name: 'id', description: 'Waitlist entry ID' })
-  async cancelEntry(@Req() req: any, @Param('id') id: string) {
+  async cancelEntry(@Req() req: AuthenticatedRequest, @Param('id') id: string) {
     const userId = req.user?.id || null;
     const entry = await this.waitlistService.cancelEntry(id, userId);
 

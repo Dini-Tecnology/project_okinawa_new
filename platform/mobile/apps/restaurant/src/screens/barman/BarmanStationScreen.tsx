@@ -743,9 +743,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
             activeTab === tab.key ? styles.tabButtonActive : styles.tabButtonInactive,
           ]}
           onPress={() => setActiveTab(tab.key)}
-          accessibilityRole="tab"
-          accessibilityLabel={tab.label}
-          accessibilityState={{ selected: activeTab === tab.key }}
         >
           <Icon
             name={tab.icon}
@@ -810,8 +807,8 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
         onValueChange={(value) => setOrderFilter(value as any)}
         buttons={[
           { value: 'all', label: t('common.all'), icon: 'view-grid' },
-          { value: 'pending', label: 'Pendentes', icon: 'clock-outline' },
-          { value: 'preparing', label: 'Preparando', icon: 'beaker' },
+          { value: 'pending', label: t('barman.filter.pending'), icon: 'clock-outline' },
+          { value: 'preparing', label: t('barman.filter.preparing'), icon: 'beaker' },
           { value: 'ready', label: t('barman.stats.ready'), icon: 'check' },
         ]}
         style={styles.segmentedButtons}
@@ -907,8 +904,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
                               size={18}
                               iconColor={colors.error}
                               onPress={() => handleCancelItem(order.id, item.id)}
-                              accessibilityRole="button"
-                              accessibilityLabel={`Cancel item ${item.name}`}
                             />
                           )}
                         </View>
@@ -940,8 +935,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
                         onPress={() => handleStartOrder(order.id)}
                         style={styles.startButton}
                         icon="play"
-                        accessibilityRole="button"
-                        accessibilityLabel={`Start preparing order ${order.order_number}`}
                       >
                         {t('barman.action.start')}
                       </Button>
@@ -952,8 +945,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
                         onPress={() => handleCompleteOrder(order.id)}
                         style={styles.completeButton}
                         icon="check"
-                        accessibilityRole="button"
-                        accessibilityLabel={`Mark order ${order.order_number} as ready`}
                       >
                         {t('barman.action.complete')}
                       </Button>
@@ -978,8 +969,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
           <TouchableOpacity
             style={styles.quickAccessCard}
             onPress={() => setActiveTab('recipes')}
-            accessibilityRole="button"
-            accessibilityLabel="Open recipes tab"
           >
             <Icon name="book-open-variant" size={28} color={colors.primary} />
             <Text variant="titleSmall" style={styles.quickAccessTitle}>
@@ -993,8 +982,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
           <TouchableOpacity
             style={styles.quickAccessCard}
             onPress={() => setActiveTab('stock')}
-            accessibilityRole="button"
-            accessibilityLabel="Open stock tab"
           >
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
               <Icon name="package-variant" size={28} color={colors.warning} />
@@ -1026,9 +1013,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
         onPress={() =>
           navigation.navigate('RecipeDetail', { recipe: item })
         }
-        accessibilityRole="button"
-        accessibilityLabel={`View recipe for ${item.name}`}
-        accessibilityHint="Opens recipe detail screen"
       >
         <View style={styles.recipeCardContent}>
           {item.image_url ? (
@@ -1036,7 +1020,6 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
               source={{ uri: item.image_url }}
               style={styles.recipeImage}
               resizeMode="cover"
-              accessibilityLabel={`Photo of ${item.name}`}
             />
           ) : (
             <View style={styles.recipeImagePlaceholder}>

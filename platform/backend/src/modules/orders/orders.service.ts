@@ -17,7 +17,6 @@ import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.entity';
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { AddItemsToOrderDto } from './dto/add-items-to-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus } from '@common/enums';
@@ -25,9 +24,6 @@ import { EventsGateway } from '@/modules/events/events.gateway';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
 import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 import { OrderCalculatorHelper } from './helpers';
-import { KdsService } from './kds.service';
-import { WaiterStatsService } from './waiter-stats.service';
-import { OrderAdditionsService } from './order-additions.service';
 
 @Injectable()
 export class OrdersService {
@@ -48,10 +44,6 @@ export class OrdersService {
     private loyaltyService: LoyaltyService,
     private dataSource: DataSource,
     private orderCalculator: OrderCalculatorHelper,
-    private kdsService: KdsService,
-    private waiterStatsService: WaiterStatsService,
-    @Inject(forwardRef(() => OrderAdditionsService))
-    private orderAdditionsService: OrderAdditionsService,
   ) {}
 
   async create(userId: string, createOrderDto: CreateOrderDto) {
@@ -302,40 +294,5 @@ export class OrdersService {
     }
 
     return updatedOrder;
-  }
-
-  // ========== DELEGATION: KDS ==========
-
-  async getKdsOrders(params: { type?: string; status?: string; restaurant_id?: string }) {
-    return this.kdsService.getKdsOrders(params);
-  }
-
-  // ========== DELEGATION: WAITER / MAITRE ==========
-
-  async getWaiterTables(waiterId: string) {
-    return this.waiterStatsService.getWaiterTables(waiterId);
-  }
-
-  async getWaiterStats(waiterId: string, params: { start_date?: string; end_date?: string }) {
-    return this.waiterStatsService.getWaiterStats(waiterId, params);
-  }
-
-  async getMaitreOverview(restaurantId: string) {
-    return this.waiterStatsService.getMaitreOverview(restaurantId);
-  }
-
-  // ========== DELEGATION: PARTIAL ORDER ADDITIONS (EPIC 17) ==========
-
-  async openOrderForAdditions(orderId: string, userId?: string, roles?: UserRoleEnum[]) {
-    return this.orderAdditionsService.openOrderForAdditions(orderId, userId, roles);
-  }
-
-  async addItemsToExistingOrder(
-    orderId: string,
-    addItemsDto: AddItemsToOrderDto,
-    userId: string,
-    roles?: UserRoleEnum[],
-  ) {
-    return this.orderAdditionsService.addItemsToExistingOrder(orderId, addItemsDto, userId, roles);
   }
 }

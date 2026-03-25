@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
+import { AuthRegistrationService } from './auth-registration.service';
+import { AuthLoginService } from './auth-login.service';
 import { PasswordResetService } from './password-reset.service';
 import { TokenService } from './token.service';
 import { Profile } from '../users/entities/profile.entity';
@@ -110,6 +112,8 @@ describe('AuthService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
+        AuthRegistrationService,
+        AuthLoginService,
         {
           provide: getRepositoryToken(Profile),
           useValue: mockProfileRepository,

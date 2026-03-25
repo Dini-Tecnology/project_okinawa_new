@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, Chip, Divider, IconButton } from 'react-native-paper';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { useI18n } from '@okinawa/shared/hooks/useI18n';
+import { formatCurrency, formatDateTime } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import type { Order, OrderStatus } from '../../types';
 
 interface OrderCardProps {
@@ -17,12 +18,9 @@ const STATUS_COLORS: Record<OrderStatus, string> = {
   delivering: '#29B6F6', completed: '#66BB6A', cancelled: '#EF5350',
 };
 
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  pending: 'Pendente', confirmed: 'Confirmado', preparing: 'Preparando', ready: 'Pronto',
-  delivering: 'Em Entrega', completed: 'Concluído', cancelled: 'Cancelado',
-};
-
 export default function OrderCard({ order, onPress, onTrack, onCancel }: OrderCardProps) {
+  const { t } = useI18n();
+  const locale = getLanguage();
   const canTrack = ['confirmed', 'preparing', 'ready', 'delivering'].includes(order.status);
   const canCancel = ['pending', 'confirmed'].includes(order.status);
 
@@ -32,23 +30,23 @@ export default function OrderCard({ order, onPress, onTrack, onCancel }: OrderCa
         <Card.Content>
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <Text variant="titleMedium">{order.restaurant?.name || 'Restaurante'}</Text>
+              <Text variant="titleMedium">{order.restaurant?.name || t('orders.restaurant')}</Text>
               <Text variant="bodySmall" style={styles.orderNumber}>
-                Pedido #{order.order_number || order.id.slice(0, 8)}
+                {t('orders.orderNumber', { number: order.order_number || order.id.slice(0, 8) })}
               </Text>
             </View>
             <Chip
               style={[styles.statusChip, { backgroundColor: STATUS_COLORS[order.status] }]}
               textStyle={styles.chipText}
             >
-              {STATUS_LABELS[order.status]}
+              {t(`orders.status.${order.status}`)}
             </Chip>
           </View>
 
           <Divider style={styles.divider} />
 
           <View style={styles.items}>
-            <Text variant="bodyMedium" style={styles.itemsLabel}>Itens ({order.items.length})</Text>
+            <Text variant="bodyMedium" style={styles.itemsLabel}>{t('orders.itemsCount', { count: order.items.length })}</Text>
             {order.items.slice(0, 3).map((item, index) => (
               <View key={index} style={styles.itemRow}>
                 <Text variant="bodySmall" style={styles.quantity}>{item.quantity}x</Text>
@@ -59,7 +57,7 @@ export default function OrderCard({ order, onPress, onTrack, onCancel }: OrderCa
             ))}
             {order.items.length > 3 && (
               <Text variant="bodySmall" style={styles.moreItems}>
-                +{order.items.length - 3} itens
+                {t('orders.moreItems', { count: order.items.length - 3 })}
               </Text>
             )}
           </View>
@@ -71,12 +69,12 @@ export default function OrderCard({ order, onPress, onTrack, onCancel }: OrderCa
               <View style={styles.infoRow}>
                 <IconButton icon="calendar" size={16} style={styles.icon} />
                 <Text variant="bodySmall">
-                  {format(new Date(order.created_at), 'dd/MM/yyyy HH:mm', { locale: ptBR })}
+                  {formatDateTime(order.created_at, locale)}
                 </Text>
               </View>
               <View style={styles.infoRow}>
                 <IconButton icon="cash" size={16} style={styles.icon} />
-                <Text variant="bodySmall">R$ {order.total_amount.toFixed(2)}</Text>
+                <Text variant="bodySmall">{formatCurrency(order.total_amount, locale)}</Text>
               </View>
             </View>
           </View>
@@ -88,13 +86,13 @@ export default function OrderCard({ order, onPress, onTrack, onCancel }: OrderCa
                 {canTrack && onTrack && (
                   <TouchableOpacity style={styles.actionButton} onPress={onTrack}>
                     <IconButton icon="map-marker-path" size={20} />
-                    <Text variant="bodySmall">Rastrear</Text>
+                    <Text variant="bodySmall">{t('orders.track')}</Text>
                   </TouchableOpacity>
                 )}
                 {canCancel && onCancel && (
                   <TouchableOpacity style={styles.actionButton} onPress={onCancel}>
                     <IconButton icon="close-circle-outline" size={20} />
-                    <Text variant="bodySmall">Cancelar</Text>
+                    <Text variant="bodySmall">{t('orders.cancel')}</Text>
                   </TouchableOpacity>
                 )}
               </View>

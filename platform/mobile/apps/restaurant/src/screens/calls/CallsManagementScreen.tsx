@@ -30,6 +30,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { useAuth } from '@/shared/hooks/useAuth';
+import { useRoute, RouteProp } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { io, Socket } from 'socket.io-client';
 import * as Haptics from 'expo-haptics';
@@ -239,9 +241,6 @@ function TabSelector({
             },
           ]}
           onPress={() => onTabChange(tab.id)}
-          accessibilityRole="tab"
-          accessibilityLabel={tab.label}
-          accessibilityState={{ selected: activeTab === tab.id }}
         >
           <Text
             style={{
@@ -262,24 +261,34 @@ function TabSelector({
 // COMPONENT
 // ============================================
 
+type CallsManagementRouteParams = {
+  CallsManagement: { restaurantId?: string };
+};
+
 export default function CallsManagementScreen() {
   const { t } = useI18n();
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
   const socketRef = useRef<Socket | null>(null);
+  const { user } = useAuth();
+  const route = useRoute<RouteProp<CallsManagementRouteParams, 'CallsManagement'>>();
 
   const [activeTab, setActiveTab] = useState<Tab>('pending');
   const [refreshing, setRefreshing] = useState(false);
 
-  // TODO: Get restaurantId from auth context or route params
-  const restaurantId = 'current'; // Placeholder, to be replaced by real context
+  // Derive restaurantId from route params first, then from user's assigned restaurant
+  const restaurantId = useMemo(() => {
+    return route.params?.restaurantId ?? user?.roles?.[0]?.restaurant_id ?? '';
+  }, [route.params?.restaurantId, user]);
 
   // ============================================
   // WEBSOCKET
   // ============================================
 
   useEffect(() => {
+    if (!restaurantId) return;
+
     const apiBaseUrl = ApiService.getBaseUrl?.() || '';
     const socket = io(`${apiBaseUrl}/calls`, {
       transports: ['websocket'],
@@ -287,25 +296,31 @@ export default function CallsManagementScreen() {
 
     socketRef.current = socket;
 
-    socket.on('connect', () => {
+    const onConnect = () => {
       socket.emit('joinRestaurant', { restaurantId });
-    });
+    };
 
-    socket.on('call:new', () => {
-      // Haptic feedback on new call
+    const onNewCall = () => {
       if (Platform.OS !== 'web') {
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       }
       queryClient.invalidateQueries({ queryKey: ['service-calls'] });
       queryClient.invalidateQueries({ queryKey: ['service-calls-stats'] });
-    });
+    };
 
-    socket.on('call:updated', () => {
+    const onCallUpdated = () => {
       queryClient.invalidateQueries({ queryKey: ['service-calls'] });
       queryClient.invalidateQueries({ queryKey: ['service-calls-stats'] });
-    });
+    };
+
+    socket.on('connect', onConnect);
+    socket.on('call:new', onNewCall);
+    socket.on('call:updated', onCallUpdated);
 
     return () => {
+      socket.off('connect', onConnect);
+      socket.off('call:new', onNewCall);
+      socket.off('call:updated', onCallUpdated);
       socket.emit('leaveRestaurant', { restaurantId });
       socket.disconnect();
       socketRef.current = null;
@@ -596,8 +611,6 @@ export default function CallsManagementScreen() {
           onPress={() => refetch()}
           style={{ marginTop: 16, borderRadius: 16 }}
           buttonColor={colors.primary}
-          accessibilityRole="button"
-          accessibilityLabel="Retry loading calls"
         >
           {t('common.retry')}
         </Button>
@@ -769,8 +782,6 @@ function TouchableButton({
     <Pressable
       onPress={onPress}
       disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={label}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

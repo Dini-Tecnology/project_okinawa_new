@@ -48,8 +48,9 @@ export class CallsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.log(
         `Calls client connected: ${client.id} (user: ${client.user.email})`,
       );
-    } catch (error: any) {
-      this.logger.error(`Calls client ${client.id} auth error: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Calls client ${client.id} auth error: ${message}`);
       client.disconnect();
     }
   }

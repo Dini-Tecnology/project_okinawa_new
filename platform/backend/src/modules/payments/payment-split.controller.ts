@@ -13,7 +13,7 @@ import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { RolesGuard } from '@/modules/auth/guards/roles.guard';
 import { Roles } from '@/common/decorators/roles.decorator';
 import { CurrentUser } from '@/common/decorators/current-user.decorator';
-import { AuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
+import { AuthenticatedUser, AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 import { UserRole } from '@/common/enums';
 import { PaymentSplitService } from './payment-split.service';
 import { CalculateSplitDto } from './dto/calculate-split.dto';
@@ -86,7 +86,7 @@ export class PaymentSplitController {
   @Roles(UserRole.CUSTOMER, UserRole.OWNER, UserRole.MANAGER, UserRole.WAITER)
   @ApiOperation({ summary: 'Get all payment splits for current user' })
   @ApiResponse({ status: 200, description: 'Returns user payment splits' })
-  async getMySplits(@Req() req: any) {
+  async getMySplits(@Req() req: AuthenticatedRequest) {
     return this.paymentSplitService.getGuestSplits(req.user.sub);
   }
 

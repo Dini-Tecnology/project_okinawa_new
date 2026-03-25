@@ -33,7 +33,6 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -77,12 +76,12 @@ interface Order {
   };
 }
 
-const ORDER_STATUSES = [
-  { key: 'pending', icon: 'clock-outline', label: 'Recebido' },
-  { key: 'confirmed', icon: 'check-circle-outline', label: 'Confirmado' },
-  { key: 'preparing', icon: 'pot-steam', label: 'Preparando' },
-  { key: 'ready', icon: 'bell-ring', label: 'Pronto' },
-  { key: 'delivered', icon: 'check-all', label: 'Entregue' },
+const ORDER_STATUS_KEYS = [
+  { key: 'pending', icon: 'clock-outline', labelKey: 'orders.status.received' },
+  { key: 'confirmed', icon: 'check-circle-outline', labelKey: 'orders.status.confirmed' },
+  { key: 'preparing', icon: 'pot-steam', labelKey: 'orders.status.preparing' },
+  { key: 'ready', icon: 'bell-ring', labelKey: 'orders.status.ready' },
+  { key: 'delivered', icon: 'check-all', labelKey: 'orders.status.delivered' },
 ];
 
 export default function OrderStatusScreen() {
@@ -370,7 +369,7 @@ export default function OrderStatusScreen() {
       const orderData = await ApiService.getOrder(orderId);
       setOrder(orderData);
     } catch (error: any) {
-      logger.error('Error loading order:', error);
+      console.error('Error loading order:', error);
       Alert.alert(t('common.error'), t('errors.generic'));
     } finally {
       setLoading(false);
@@ -395,7 +394,7 @@ export default function OrderStatusScreen() {
   };
 
   const getStatusIndex = (status: string) => {
-    return ORDER_STATUSES.findIndex((s) => s.key === status);
+    return ORDER_STATUS_KEYS.findIndex((s) => s.key === status);
   };
 
   const getItemStatusIcon = (status: string) => {
@@ -434,7 +433,7 @@ export default function OrderStatusScreen() {
     if (!order) return 0;
     const currentIndex = getStatusIndex(order.status);
     if (currentIndex === -1) return 0;
-    return (currentIndex + 1) / ORDER_STATUSES.length;
+    return (currentIndex + 1) / ORDER_STATUS_KEYS.length;
   };
 
   if (loading) {
@@ -531,7 +530,7 @@ export default function OrderStatusScreen() {
                 />
 
                 <View style={styles.statusTimeline}>
-                  {ORDER_STATUSES.map((status, index) => {
+                  {ORDER_STATUS_KEYS.map((status, index) => {
                     const isActive = index <= currentStatusIndex;
                     const isCurrent = index === currentStatusIndex;
 
@@ -560,9 +559,9 @@ export default function OrderStatusScreen() {
                             isActive && styles.activeStatusLabel,
                           ]}
                         >
-                          {status.label}
+                          {t(status.labelKey)}
                         </Text>
-                        {index < ORDER_STATUSES.length - 1 && (
+                        {index < ORDER_STATUS_KEYS.length - 1 && (
                           <View
                             style={[
                               styles.statusLine,

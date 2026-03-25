@@ -13,6 +13,7 @@
  */
 
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { WorkerModule } from './worker.module';
 import { StructuredLoggerService } from './common/logging';
 import { initializeSentry } from './config/sentry.config';
@@ -59,6 +60,7 @@ async function bootstrapWorker() {
 }
 
 bootstrapWorker().catch((err) => {
-  console.error('Worker failed to start:', err);
+  const fallbackLogger = new Logger('WorkerBootstrap');
+  fallbackLogger.error('Worker failed to start:', err);
   process.exit(1);
 });

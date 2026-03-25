@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/com
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ClubEntriesService } from './club-entries.service';
 import { PurchaseClubEntryDto, ValidateClubEntryDto, CheckInDto, CheckOutDto } from './dto';
+import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
 
 @ApiTags('Club Entries')
 @Controller('club-entries')
@@ -11,14 +12,14 @@ export class ClubEntriesController {
 
   @Post()
   @ApiOperation({ summary: 'Purchase entry ticket(s)' })
-  async purchaseEntry(@Req() req: any, @Body() dto: PurchaseClubEntryDto) {
+  async purchaseEntry(@Req() req: AuthenticatedRequest, @Body() dto: PurchaseClubEntryDto) {
     return this.entriesService.purchaseEntry(req.user.id, dto);
   }
 
   @Get('my')
   @ApiOperation({ summary: 'Get my entries' })
   async getMyEntries(
-    @Req() req: any,
+    @Req() req: AuthenticatedRequest,
     @Query('includeUsed') includeUsed?: boolean,
   ) {
     return this.entriesService.getUserEntries(req.user.id, includeUsed);
@@ -38,13 +39,13 @@ export class ClubEntriesController {
 
   @Put(':id/cancel')
   @ApiOperation({ summary: 'Cancel an entry' })
-  async cancelEntry(@Param('id') id: string, @Req() req: any) {
+  async cancelEntry(@Param('id') id: string, @Req() req: AuthenticatedRequest) {
     return this.entriesService.cancelEntry(id, req.user.id);
   }
 
   @Post('check-in')
   @ApiOperation({ summary: 'Check in to venue' })
-  async checkIn(@Req() req: any, @Body() dto: CheckInDto) {
+  async checkIn(@Req() req: AuthenticatedRequest, @Body() dto: CheckInDto) {
     return this.entriesService.checkIn(req.user.id, dto);
   }
 

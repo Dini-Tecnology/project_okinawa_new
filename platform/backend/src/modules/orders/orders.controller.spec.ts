@@ -1,6 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
+import { KdsService } from './kds.service';
+import { WaiterStatsService } from './waiter-stats.service';
+import { OrderAdditionsService } from './order-additions.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -19,10 +22,21 @@ describe('OrdersController', () => {
     findOne: jest.fn(),
     update: jest.fn(),
     updateStatus: jest.fn(),
+  };
+
+  const mockKdsService = {
     getKdsOrders: jest.fn(),
+  };
+
+  const mockWaiterStatsService = {
     getWaiterTables: jest.fn(),
     getWaiterStats: jest.fn(),
     getMaitreOverview: jest.fn(),
+  };
+
+  const mockOrderAdditionsService = {
+    openOrderForAdditions: jest.fn(),
+    addItemsToExistingOrder: jest.fn(),
   };
 
   const mockOrder = {
@@ -38,7 +52,12 @@ describe('OrdersController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
-      providers: [{ provide: OrdersService, useValue: mockOrdersService }],
+      providers: [
+        { provide: OrdersService, useValue: mockOrdersService },
+        { provide: KdsService, useValue: mockKdsService },
+        { provide: WaiterStatsService, useValue: mockWaiterStatsService },
+        { provide: OrderAdditionsService, useValue: mockOrderAdditionsService },
+      ],
     }).compile();
 
     controller = module.get<OrdersController>(OrdersController);
@@ -147,12 +166,12 @@ describe('OrdersController', () => {
         };
 
         const kdsOrders = [mockOrder];
-        mockOrdersService.getKdsOrders.mockResolvedValue(kdsOrders);
+        mockKdsService.getKdsOrders.mockResolvedValue(kdsOrders);
 
         const result = await controller.getKitchenOrders(query);
 
         expect(result).toEqual(kdsOrders);
-        expect(mockOrdersService.getKdsOrders).toHaveBeenCalledWith({
+        expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({
           ...query,
           type: 'kitchen',
         });
@@ -166,12 +185,12 @@ describe('OrdersController', () => {
         };
 
         const kdsOrders = [mockOrder];
-        mockOrdersService.getKdsOrders.mockResolvedValue(kdsOrders);
+        mockKdsService.getKdsOrders.mockResolvedValue(kdsOrders);
 
         const result = await controller.getBarOrders(query);
 
         expect(result).toEqual(kdsOrders);
-        expect(mockOrdersService.getKdsOrders).toHaveBeenCalledWith({
+        expect(mockKdsService.getKdsOrders).toHaveBeenCalledWith({
           ...query,
           type: 'bar',
         });
@@ -191,12 +210,12 @@ describe('OrdersController', () => {
           },
         ];
 
-        mockOrdersService.getWaiterTables.mockResolvedValue(tables);
+        mockWaiterStatsService.getWaiterTables.mockResolvedValue(tables);
 
         const result = await controller.getWaiterTables(user);
 
         expect(result).toEqual(tables);
-        expect(mockOrdersService.getWaiterTables).toHaveBeenCalledWith('waiter-1');
+        expect(mockWaiterStatsService.getWaiterTables).toHaveBeenCalledWith('waiter-1');
       });
     });
 
@@ -215,12 +234,12 @@ describe('OrdersController', () => {
           average_ticket: 200,
         };
 
-        mockOrdersService.getWaiterStats.mockResolvedValue(stats);
+        mockWaiterStatsService.getWaiterStats.mockResolvedValue(stats);
 
         const result = await controller.getWaiterStats(user, query);
 
         expect(result).toEqual(stats);
-        expect(mockOrdersService.getWaiterStats).toHaveBeenCalledWith('waiter-1', query);
+        expect(mockWaiterStatsService.getWaiterStats).toHaveBeenCalledWith('waiter-1', query);
       });
     });
   });
@@ -235,12 +254,12 @@ describe('OrdersController', () => {
           total_revenue_today: 10000,
         };
 
-        mockOrdersService.getMaitreOverview.mockResolvedValue(overview);
+        mockWaiterStatsService.getMaitreOverview.mockResolvedValue(overview);
 
         const result = await controller.getMaitreOverview('restaurant-1');
 
         expect(result).toEqual(overview);
-        expect(mockOrdersService.getMaitreOverview).toHaveBeenCalledWith('restaurant-1');
+        expect(mockWaiterStatsService.getMaitreOverview).toHaveBeenCalledWith('restaurant-1');
       });
     });
   });

@@ -24,6 +24,8 @@ import { format, subDays, subMonths, subYears } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
+import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/theme';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 
@@ -166,9 +168,6 @@ export default function FinancialReportScreen() {
               selected={period === 'week'}
               onPress={() => setPeriod('week')}
               style={styles.periodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('financial.week')}
-              accessibilityState={{ selected: period === 'week' }}
             >
               {t('financial.week')}
             </Chip>
@@ -176,9 +175,6 @@ export default function FinancialReportScreen() {
               selected={period === 'month'}
               onPress={() => setPeriod('month')}
               style={styles.periodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('financial.month')}
-              accessibilityState={{ selected: period === 'month' }}
             >
               {t('financial.month')}
             </Chip>
@@ -186,9 +182,6 @@ export default function FinancialReportScreen() {
               selected={period === 'year'}
               onPress={() => setPeriod('year')}
               style={styles.periodChip}
-              accessibilityRole="button"
-              accessibilityLabel={t('financial.year')}
-              accessibilityState={{ selected: period === 'year' }}
             >
               {t('financial.year')}
             </Chip>
@@ -223,14 +216,14 @@ export default function FinancialReportScreen() {
                 {t('financial.total')}
               </Text>
               <Text variant="headlineSmall" style={styles.revenueValue}>
-                R$ 10,120.00
+                {formatCurrency(10120, getLanguage())}
               </Text>
             </View>
             <View style={styles.summaryItem}>
               <Text variant="labelMedium" style={styles.summaryLabel}>
                 {t('financial.dailyAverage')}
               </Text>
-              <Text variant="titleLarge" style={styles.text}>R$ 1,445.71</Text>
+              <Text variant="titleLarge" style={styles.text}>{formatCurrency(1445.71, getLanguage())}</Text>
             </View>
           </View>
         </Card.Content>
@@ -264,7 +257,7 @@ export default function FinancialReportScreen() {
                 {t('financial.total')}
               </Text>
               <Text variant="headlineSmall" style={styles.expenseValue}>
-                R$ 10,500.00
+                {formatCurrency(10500, getLanguage())}
               </Text>
             </View>
           </View>
@@ -279,7 +272,7 @@ export default function FinancialReportScreen() {
           </Text>
           <View style={styles.profitContainer}>
             <Text variant="displaySmall" style={styles.profitValue}>
-              R$ -380.00
+              -{formatCurrency(380, getLanguage())}
             </Text>
             <Chip style={styles.negativeChip} textStyle={styles.chipText}>
               -3.6%
@@ -293,15 +286,13 @@ export default function FinancialReportScreen() {
 
       {/* Export Actions */}
       <View style={styles.actions}>
-        <Button
-          mode="contained"
-          onPress={showExportOptions}
-          icon="download"
+        <Button 
+          mode="contained" 
+          onPress={showExportOptions} 
+          icon="download" 
           style={styles.exportButton}
           loading={exporting}
           disabled={exporting}
-          accessibilityRole="button"
-          accessibilityLabel={t('financial.exportPdf')}
         >
           {exporting ? 'Exportando...' : t('financial.exportPdf')}
         </Button>
