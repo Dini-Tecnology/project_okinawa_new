@@ -252,6 +252,23 @@ class AnalyticsService {
   private disabled = false;
   private userId: string | null = null;
   private userProperties: Record<string, any> = {};
+  private readyPromise: Promise<void>;
+  private resolveReady!: () => void;
+
+  constructor() {
+    this.readyPromise = new Promise<void>((resolve) => {
+      this.resolveReady = resolve;
+    });
+  }
+
+  /**
+   * Wait until consent status has been loaded from storage.
+   * All public tracking methods call this to avoid a race condition
+   * where events fire before consent is determined.
+   */
+  private async waitForReady(): Promise<void> {
+    await this.readyPromise;
+  }
 
   /**
    * Initialize analytics.
@@ -267,6 +284,7 @@ class AnalyticsService {
 
     if (!ANALYTICS_CONFIG.enabled) {
       console.log('[Analytics] Disabled in this environment');
+      this.resolveReady();
       return;
     }
 
@@ -275,6 +293,9 @@ class AnalyticsService {
     if (_consentStatus === 'pending') {
       await loadConsentStatus();
     }
+
+    // Consent status is now determined — unblock tracking methods
+    this.resolveReady();
 
     if (_consentStatus !== 'granted') {
       console.log(
@@ -321,6 +342,7 @@ class AnalyticsService {
    * Set the current user ID for analytics
    */
   async setUserId(userId: string | null): Promise<void> {
+    await this.waitForReady();
     if (!this.checkEnabled()) return;
     
     this.userId = userId;
@@ -335,6 +357,7 @@ class AnalyticsService {
    * Set a user property
    */
   async setUserProperty(name: string, value: string): Promise<void> {
+    await this.waitForReady();
     if (!this.checkEnabled()) return;
     
     this.userProperties[name] = value;
@@ -349,6 +372,7 @@ class AnalyticsService {
    * Set multiple user properties
    */
   async setUserProperties(properties: Record<string, string>): Promise<void> {
+    await this.waitForReady();
     if (!this.checkEnabled()) return;
     
     for (const [name, value] of Object.entries(properties)) {
@@ -360,6 +384,7 @@ class AnalyticsService {
    * Log an analytics event
    */
   async logEvent(eventName: string, params?: Record<string, any>): Promise<void> {
+    await this.waitForReady();
     if (!this.checkEnabled()) return;
     
     const eventParams = {
@@ -505,6 +530,7 @@ class AnalyticsService {
    * Reset analytics (for logout)
    */
   async reset(): Promise<void> {
+    await this.waitForReady();
     this.userId = null;
     this.userProperties = {};
     // await analytics().resetAnalyticsData();

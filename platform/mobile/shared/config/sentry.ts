@@ -48,24 +48,67 @@ export function initSentry() {
     // Max breadcrumbs to keep in memory
     maxBreadcrumbs: 100,
 
-    // BeforeSend hook to filter sensitive data
+    // BeforeSend hook to filter sensitive data (PII / credentials)
     beforeSend(event, hint) {
-      // Remove sensitive headers
+      // ---- Sensitive headers ----
+      const sensitiveHeaders = [
+        'Authorization',
+        'authorization',
+        'Cookie',
+        'cookie',
+        'X-API-Key',
+        'x-api-key',
+        'X-Auth-Token',
+        'x-auth-token',
+        'X-Refresh-Token',
+        'x-refresh-token',
+      ];
+
       if (event.request?.headers) {
-        delete event.request.headers['Authorization'];
-        delete event.request.headers['authorization'];
-        delete event.request.headers['Cookie'];
-        delete event.request.headers['cookie'];
+        for (const header of sensitiveHeaders) {
+          delete event.request.headers[header];
+        }
       }
 
-      // Remove password from event data
-      if (event.extra) {
-        if (typeof event.extra === 'object') {
-          const sanitized = { ...event.extra };
-          if ('password' in sanitized) delete sanitized.password;
-          if ('token' in sanitized) delete sanitized.token;
-          event.extra = sanitized;
+      // ---- Sensitive fields in request body ----
+      const sensitiveBodyFields = [
+        'password',
+        'token',
+        'email',
+        'phone',
+        'cpf',
+        'card_number',
+      ];
+
+      if (event.request?.data) {
+        try {
+          const body =
+            typeof event.request.data === 'string'
+              ? JSON.parse(event.request.data)
+              : { ...event.request.data };
+
+          for (const field of sensitiveBodyFields) {
+            if (field in body) {
+              body[field] = '[REDACTED]';
+            }
+          }
+
+          event.request.data =
+            typeof event.request.data === 'string'
+              ? JSON.stringify(body)
+              : body;
+        } catch {
+          // Body is not JSON — leave as-is
         }
+      }
+
+      // ---- Sensitive fields in event.extra ----
+      if (event.extra && typeof event.extra === 'object') {
+        const sanitized = { ...event.extra };
+        for (const field of sensitiveBodyFields) {
+          if (field in sanitized) delete sanitized[field];
+        }
+        event.extra = sanitized;
       }
 
       return event;

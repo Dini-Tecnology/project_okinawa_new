@@ -54,6 +54,7 @@ import { LegalModule } from './modules/legal/legal.module';
 import { FraudDetectionModule } from './modules/fraud-detection/fraud-detection.module';
 import { IncidentResponseModule } from './modules/incident-response/incident-response.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -163,6 +164,9 @@ import { MetricsModule } from './modules/metrics/metrics.module';
 
     // Prometheus Metrics
     MetricsModule,
+
+    // Admin Panel (operational support)
+    AdminModule,
   ],
 })
 export class AppModule {}

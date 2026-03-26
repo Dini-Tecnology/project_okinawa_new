@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThanOrEqual, IsNull } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
 import * as crypto from 'crypto';
 import { Profile } from './entities/profile.entity';
 import { UserRole as UserRoleEntity } from '@/modules/user-roles/entities/user-role.entity';
@@ -95,24 +96,80 @@ export class UsersService {
   async deleteAccount(id: string) {
     const profile = await this.findOne(id);
 
-    // LGPD Art. 12 — Immediate PII anonymization ("right to be forgotten")
-    const anonId = crypto.randomUUID().replace(/-/g, '').substring(0, 16);
-    profile.email = `deleted_${anonId}@anonymized.local`;
-    profile.full_name = null;
-    profile.phone = null;
-    profile.avatar_url = null;
-    profile.default_address = null;
-    profile.dietary_restrictions = null;
-    profile.favorite_cuisines = null;
-    profile.preferences = null;
-    profile.marketing_consent = false;
+    // LGPD — Schedule deletion with 30-day grace period instead of immediate anonymization
+    profile.deletion_requested_at = new Date();
+    profile.deletion_scheduled_for = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     profile.is_active = false;
-    profile.deleted_at = new Date();
 
     await this.profileRepository.save(profile);
-    this.logger.log(`Account ${id} anonymized per LGPD deletion request`);
+    this.logger.log(`Account ${id} scheduled for deletion on ${profile.deletion_scheduled_for.toISOString()}`);
 
-    return { message: 'Account deleted and personal data anonymized.' };
+    return {
+      message: 'Deletion scheduled. Your account will be permanently deleted in 30 days. Contact support to cancel.',
+    };
+  }
+
+  /**
+   * Daily cron job at 4 AM — processes accounts whose 30-day grace period has elapsed.
+   * Performs LGPD Art. 12 PII anonymization ("right to be forgotten").
+   */
+  @Cron('0 4 * * *')
+  async processPendingDeletions(): Promise<void> {
+    const now = new Date();
+
+    const pendingProfiles = await this.profileRepository.find({
+      where: {
+        deletion_scheduled_for: LessThanOrEqual(now),
+        is_active: false,
+        deleted_at: IsNull(),
+      },
+    });
+
+    for (const profile of pendingProfiles) {
+      const anonId = crypto.randomUUID().replace(/-/g, '').substring(0, 16);
+      profile.email = `deleted_${anonId}@anonymized.local`;
+      profile.full_name = null;
+      profile.phone = null;
+      profile.avatar_url = null;
+      profile.default_address = null;
+      profile.dietary_restrictions = null;
+      profile.favorite_cuisines = null;
+      profile.preferences = null;
+      profile.marketing_consent = false;
+      profile.deleted_at = new Date();
+
+      await this.profileRepository.save(profile);
+      this.logger.log(`Account ${profile.id} anonymized after 30-day grace period`);
+    }
+
+    if (pendingProfiles.length > 0) {
+      this.logger.log(`Processed ${pendingProfiles.length} pending account deletion(s)`);
+    }
+  }
+
+  async cancelDeletion(userId: string) {
+    const profile = await this.profileRepository.findOne({ where: { id: userId } });
+
+    if (!profile) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (!profile.deletion_requested_at) {
+      throw new BadRequestException('No pending deletion request for this account.');
+    }
+
+    if (profile.deleted_at) {
+      throw new BadRequestException('Account has already been permanently deleted.');
+    }
+
+    profile.deletion_requested_at = null;
+    profile.deletion_scheduled_for = null;
+    profile.is_active = true;
+
+    await this.profileRepository.save(profile);
+    this.logger.log(`Account ${userId} deletion cancelled — account reactivated`);
+
+    return { message: 'Account deletion cancelled. Your account has been reactivated.' };
   }
 
   async findByEmail(email: string) {

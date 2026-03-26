@@ -50,6 +50,12 @@ export class Profile {
   @Column({ default: true })
   is_active: boolean;
 
+  @Column({ type: 'timestamp', nullable: true })
+  deletion_requested_at: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  deletion_scheduled_for: Date | null;
+
   @CreateDateColumn()
   created_at: Date;
 

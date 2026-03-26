@@ -84,15 +84,18 @@ class PushNotificationService {
         return null;
       }
 
-      // Get Expo push token
-      // Read projectId from app config (set via eas.json or app.json extra.eas.projectId)
-      let projectId = 'your-project-id';
+      // Get Expo push token — projectId from app config (eas.json / app.json extra.eas.projectId)
+      let projectId: string | undefined;
       try {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const Constants = require('expo-constants').default;
-        projectId = Constants.expoConfig?.extra?.eas?.projectId || projectId;
+        projectId = Constants.expoConfig?.extra?.eas?.projectId;
       } catch {
         // expo-constants not available
+      }
+      if (!projectId || projectId === 'your-project-id') {
+        logger.error('Push notifications: EAS projectId not configured. Set extra.eas.projectId in app.json.');
+        return null;
       }
       const tokenData = await Notifications.getExpoPushTokenAsync({
         projectId,

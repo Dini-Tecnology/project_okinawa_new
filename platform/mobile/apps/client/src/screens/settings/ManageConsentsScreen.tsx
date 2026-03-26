@@ -136,6 +136,36 @@ export default function ManageConsentsScreen() {
         );
       })}
 
+      {/* Export Data Section */}
+      <View style={styles.exportSection}>
+        <Text style={[styles.exportTitle, { color: colors.text }]}>
+          Exportar Meus Dados
+        </Text>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
+          Solicite uma cópia de todos os seus dados pessoais, conforme previsto pela LGPD.
+        </Text>
+        <Button
+          mode="outlined"
+          style={styles.exportButton}
+          onPress={async () => {
+            try {
+              const res = await ApiService.get('/users/me/export/download');
+              const downloadUrl = res.data?.url || res.data?.download_url || '';
+              Alert.alert(
+                'Exportar Dados',
+                `Seu arquivo estará disponível por 72h.\n\n${downloadUrl || 'A exportação foi solicitada com sucesso.'}`,
+              );
+            } catch {
+              Alert.alert(t('common.error'), t('common.genericError'));
+            }
+          }}
+        >
+          Exportar Meus Dados
+        </Button>
+      </View>
+
+      <Divider style={{ marginVertical: 16 }} />
+
       <View style={styles.footer}>
         <Text style={[styles.footerText, { color: colors.textSecondary }]}>
           Para revogar os Termos de Uso ou Política de Privacidade, é necessário excluir sua conta.
@@ -183,7 +213,10 @@ const styles = StyleSheet.create({
   label: { fontSize: 16, fontWeight: '600' },
   description: { fontSize: 13, marginTop: 2, lineHeight: 18 },
   required: { fontSize: 11, fontWeight: '600', marginTop: 4 },
-  footer: { marginTop: 32, marginBottom: 40 },
+  exportSection: { marginTop: 32 },
+  exportTitle: { fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  exportButton: { marginTop: 12 },
+  footer: { marginBottom: 40 },
   footerText: { fontSize: 13, lineHeight: 18, marginBottom: 16 },
   deleteButton: { borderColor: '#ef4444' },
 });

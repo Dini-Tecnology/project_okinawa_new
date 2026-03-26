@@ -18,10 +18,26 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
 } from 'react-native';
-import { Text, Button, ActivityIndicator, Divider } from 'react-native-paper';
+import { Text, Button, ActivityIndicator, Divider, Banner } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@okinawa/shared/services/api';
+
+const FALLBACK_TERMS: LegalDocument = {
+  title: 'Termos de Uso',
+  content:
+    'Termos de Uso v1.1.0 — Versão offline. Conecte-se à internet para ver a versão completa.',
+  version: '1.1.0',
+  lastUpdated: '',
+};
+
+const FALLBACK_PRIVACY: LegalDocument = {
+  title: 'Política de Privacidade',
+  content:
+    'Política de Privacidade v1.1.0 — Versão offline. Conecte-se à internet para ver a versão completa.',
+  version: '1.1.0',
+  lastUpdated: '',
+};
 
 interface ReConsentScreenProps {
   navigation?: any;
@@ -54,24 +70,40 @@ export const ReConsentScreen: React.FC<ReConsentScreenProps> = ({
   const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
   const [acceptingConsent, setAcceptingConsent] = useState(false);
 
-  // Fetch both legal documents
+  // Fetch both legal documents with offline fallback
   const {
     data: termsDoc,
     isLoading: termsLoading,
+    isError: termsError,
+    refetch: refetchTerms,
   } = useQuery<LegalDocument>({
     queryKey: ['legal', 'terms-of-service', 'reconsent'],
     queryFn: () => ApiService.getTermsOfService(),
+    retry: 2,
   });
 
   const {
     data: privacyDoc,
     isLoading: privacyLoading,
+    isError: privacyError,
+    refetch: refetchPrivacy,
   } = useQuery<LegalDocument>({
     queryKey: ['legal', 'privacy-policy', 'reconsent'],
     queryFn: () => ApiService.getPrivacyPolicy(),
+    retry: 2,
   });
 
   const isLoading = termsLoading || privacyLoading;
+  const isOffline = termsError || privacyError;
+
+  // Use fallback documents when API fails
+  const resolvedTerms = termsDoc ?? (termsError ? FALLBACK_TERMS : undefined);
+  const resolvedPrivacy = privacyDoc ?? (privacyError ? FALLBACK_PRIVACY : undefined);
+
+  const handleRetry = useCallback(() => {
+    if (termsError) refetchTerms();
+    if (privacyError) refetchPrivacy();
+  }, [termsError, privacyError, refetchTerms, refetchPrivacy]);
 
   // Track scroll position to enable the accept button only when the user scrolled to the bottom
   const handleScroll = useCallback(
@@ -159,8 +191,35 @@ export const ReConsentScreen: React.FC<ReConsentScreenProps> = ({
     );
   }
 
+  // If both queries failed and we have no data at all, show error with retry
+  if (isOffline && !resolvedTerms && !resolvedPrivacy) {
+    return (
+      <View style={styles.centeredContainer}>
+        <Text style={styles.headerTitle}>Erro de conexão</Text>
+        <Text style={[styles.loadingText, { marginBottom: 16 }]}>
+          Não foi possível carregar os documentos legais. Verifique sua conexão.
+        </Text>
+        <Button mode="contained" onPress={handleRetry}>
+          Tentar Novamente
+        </Button>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
+      {/* Offline banner */}
+      {isOffline && (
+        <Banner
+          visible
+          actions={[{ label: 'Tentar Novamente', onPress: handleRetry }]}
+          icon="wifi-off"
+          style={styles.offlineBanner}
+        >
+          Você está visualizando uma versão offline dos documentos.
+        </Banner>
+      )}
+
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Updated Terms</Text>
@@ -178,36 +237,40 @@ export const ReConsentScreen: React.FC<ReConsentScreenProps> = ({
         scrollEventThrottle={100}
       >
         {/* Terms of Service */}
-        {termsDoc && (
+        {resolvedTerms && (
           <>
-            <Text style={styles.sectionTitle}>{termsDoc.title}</Text>
+            <Text style={styles.sectionTitle}>{resolvedTerms.title}</Text>
             <View style={styles.metaRow}>
               <Text style={styles.metaText}>
-                Version: {termsDoc.version}
+                Version: {resolvedTerms.version}
               </Text>
-              <Text style={styles.metaText}>
-                Updated: {termsDoc.lastUpdated}
-              </Text>
+              {resolvedTerms.lastUpdated ? (
+                <Text style={styles.metaText}>
+                  Updated: {resolvedTerms.lastUpdated}
+                </Text>
+              ) : null}
             </View>
-            <Text style={styles.content}>{termsDoc.content}</Text>
+            <Text style={styles.content}>{resolvedTerms.content}</Text>
           </>
         )}
 
         <Divider style={styles.divider} />
 
         {/* Privacy Policy */}
-        {privacyDoc && (
+        {resolvedPrivacy && (
           <>
-            <Text style={styles.sectionTitle}>{privacyDoc.title}</Text>
+            <Text style={styles.sectionTitle}>{resolvedPrivacy.title}</Text>
             <View style={styles.metaRow}>
               <Text style={styles.metaText}>
-                Version: {privacyDoc.version}
+                Version: {resolvedPrivacy.version}
               </Text>
-              <Text style={styles.metaText}>
-                Updated: {privacyDoc.lastUpdated}
-              </Text>
+              {resolvedPrivacy.lastUpdated ? (
+                <Text style={styles.metaText}>
+                  Updated: {resolvedPrivacy.lastUpdated}
+                </Text>
+              ) : null}
             </View>
-            <Text style={styles.content}>{privacyDoc.content}</Text>
+            <Text style={styles.content}>{resolvedPrivacy.content}</Text>
           </>
         )}
 
@@ -341,6 +404,9 @@ const createStyles = (colors: any) =>
     },
     declineButton: {
       borderRadius: 8,
+    },
+    offlineBanner: {
+      backgroundColor: colors.warning ?? '#FFF3CD',
     },
   });
 

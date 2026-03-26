@@ -15,13 +15,15 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.okinawa.client",
+      "bundleIdentifier": "com.noowe.client",
       "minimumOsVersion": "14.0",
       "associatedDomains": ["applinks:noowebr.com", "applinks:*.noowebr.com"],
       "infoPlist": {
         "NSCameraUsageDescription": "Permite escanear QR codes de mesas e produtos",
+        "NSPhotoLibraryUsageDescription": "Permite upload de fotos de perfil",
         "NSLocationWhenInUseUsageDescription": "Permite encontrar restaurantes próximos",
-        "NSLocationAlwaysUsageDescription": "Permite notificações baseadas em localização"
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Permite notificações baseadas em localização mesmo com o app em segundo plano",
+        "NSFaceIDUsageDescription": "Permite login rápido com biometria"
       }
     },
     "android": {
@@ -29,7 +31,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FF6B35"
       },
-      "package": "com.okinawa.client",
+      "package": "com.noowe.client",
       "minSdkVersion": 24,
       "intentFilters": [
         {

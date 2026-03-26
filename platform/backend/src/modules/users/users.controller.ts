@@ -41,10 +41,18 @@ export class UsersController {
   }
 
   @Delete('me')
-  @ApiOperation({ summary: 'Delete current user account' })
-  @ApiResponse({ status: 200, description: 'Account deleted successfully' })
+  @ApiOperation({ summary: 'Schedule current user account for deletion (30-day grace period)' })
+  @ApiResponse({ status: 200, description: 'Account deletion scheduled' })
   deleteAccount(@CurrentUser() user: AuthenticatedUser) {
     return this.usersService.deleteAccount(user.sub);
+  }
+
+  @Post('me/cancel-deletion')
+  @ApiOperation({ summary: 'Cancel pending account deletion and reactivate account' })
+  @ApiResponse({ status: 200, description: 'Account deletion cancelled' })
+  @ApiResponse({ status: 400, description: 'No pending deletion request' })
+  cancelDeletion(@CurrentUser() user: AuthenticatedUser) {
+    return this.usersService.cancelDeletion(user.sub);
   }
 
   // ========== LGPD CONSENT ENDPOINTS ==========

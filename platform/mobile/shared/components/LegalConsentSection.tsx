@@ -25,9 +25,10 @@ import { Text, Switch } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
+import { ENV } from '@okinawa/shared/config/env';
 
-const TERMS_URL = 'https://noowe.com.br/termos';
-const PRIVACY_URL = 'https://noowe.com.br/privacidade';
+const TERMS_URL = ENV.TERMS_OF_SERVICE_URL;
+const PRIVACY_URL = ENV.PRIVACY_POLICY_URL;
 
 export interface LegalConsentProps {
   /** Whether the user accepted Terms + Privacy (required) */
