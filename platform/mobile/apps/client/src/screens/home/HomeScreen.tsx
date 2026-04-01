@@ -145,11 +145,11 @@ export default function HomeScreen() {
   };
 
   const handleRestaurantPress = (restaurantId: string) => {
-    navigation.navigate('RestaurantDetail' as never, { restaurantId } as never);
+    navigation.navigate('Restaurant' as never, { restaurantId } as never);
   };
 
   const handleOrderPress = (orderId: string) => {
-    navigation.navigate('OrderDetail' as never, { orderId } as never);
+    navigation.navigate('OrderStatus' as never, { orderId } as never);
   };
 
   const getStatusColor = useCallback((status: string): string => {

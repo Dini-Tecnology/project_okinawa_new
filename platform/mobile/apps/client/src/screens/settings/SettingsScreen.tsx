@@ -12,6 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiService from '@/shared/services/api';
+import { authService } from '@/shared/services/auth';
 import { useI18n, SupportedLanguage } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
@@ -142,7 +143,7 @@ export default function SettingsScreen() {
                         t('common.success'),
                         t('success.deleted')
                       );
-                      navigation.navigate('Auth' as never);
+                      await authService.logout();
                     } catch (error) {
                       Alert.alert(t('common.error'), t('errors.generic'));
                     }

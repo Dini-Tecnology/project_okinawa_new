@@ -241,10 +241,10 @@ export default function OnboardingScreen() {
         dietary: selectedDietary,
         onboardingCompleted: true,
       }));
-      navigation.navigate('Auth' as never);
+      navigation.goBack();
     } catch (error) {
       logger.error('Error saving preferences:', error);
-      navigation.navigate('Auth' as never);
+      navigation.goBack();
     }
   };
 

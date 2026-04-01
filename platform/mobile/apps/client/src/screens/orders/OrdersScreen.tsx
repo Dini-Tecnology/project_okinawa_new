@@ -121,11 +121,11 @@ export default function OrdersScreen() {
   }, [orders, filter]);
 
   const handleOrderPress = useCallback((order: Order) => {
-    navigation.navigate('OrderDetail', { orderId: order.id });
+    navigation.navigate('OrderStatus', { orderId: order.id });
   }, [navigation]);
 
   const handleTrackOrder = useCallback((order: Order) => {
-    navigation.navigate('OrderTracking', { orderId: order.id });
+    navigation.navigate('OrderStatus', { orderId: order.id });
   }, [navigation]);
 
   const handleCancelOrder = useCallback(async (order: Order) => {

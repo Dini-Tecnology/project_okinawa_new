@@ -107,6 +107,10 @@ import BuffetCheckinScreen from '../screens/buffet/BuffetCheckinScreen';
 import BirthdayBookingScreen from '../screens/club/BirthdayBookingScreen';
 import WaitlistBarScreen from '../screens/waitlist/WaitlistBarScreen';
 import EntryChoiceScreen from '../screens/waitlist/EntryChoiceScreen';
+import DigitalReceiptScreen from '../screens/payment/DigitalReceiptScreen';
+import SupportScreen from '../screens/support/SupportScreen';
+import OnboardingScreen from '../screens/onboarding/OnboardingScreen';
+import PaymentScreen from '../screens/payment/PaymentScreen';
 
 // ============================================
 // LEGAL SCREENS (Privacy Policy & Terms of Service)
@@ -596,6 +600,41 @@ function MainStack() {
       <Stack.Screen
         name="CallWaiter"
         component={CallWaiterScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Digital Receipt */}
+      <Stack.Screen
+        name="DigitalReceipt"
+        component={DigitalReceiptScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Support */}
+      <Stack.Screen
+        name="Support"
+        component={SupportScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Onboarding */}
+      <Stack.Screen
+        name="Onboarding"
+        component={OnboardingScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* PaymentMethods alias */}
+      <Stack.Screen
+        name="PaymentMethods"
+        component={PaymentScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* LoyaltyHistory alias */}
+      <Stack.Screen
+        name="LoyaltyHistory"
+        component={LoyaltyDetailScreen}
         options={{ headerShown: false }}
       />
 

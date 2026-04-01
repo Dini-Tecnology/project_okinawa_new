@@ -327,7 +327,7 @@ export default function ExploreScreen() {
   };
 
   const handleRestaurantPress = (restaurant: Restaurant) => {
-    navigation.navigate('RestaurantDetail', { restaurantId: restaurant.id });
+    navigation.navigate('Restaurant', { restaurantId: restaurant.id });
   };
 
   const centerOnUser = () => {

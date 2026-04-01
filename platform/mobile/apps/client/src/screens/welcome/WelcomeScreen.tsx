@@ -34,7 +34,7 @@ export default function WelcomeScreen() {
   };
 
   const handleSignIn = () => {
-    navigation.navigate('Auth' as never);
+    navigation.navigate('Login' as never);
   };
 
   const styles = StyleSheet.create({

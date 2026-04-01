@@ -353,7 +353,7 @@ export default function QRScannerScreen() {
         }
         break;
       case 'menu':
-        navigation.navigate('RestaurantDetail', {
+        navigation.navigate('Restaurant', {
           restaurantId: scanResult.data.restaurantId,
         });
         break;
