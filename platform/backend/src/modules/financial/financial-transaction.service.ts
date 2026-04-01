@@ -178,4 +178,77 @@ export class FinancialTransactionService {
 
     return this.transactionRepo.save(transaction);
   }
+
+  /**
+   * Find COGS transactions for a restaurant in a period, with metadata type filter.
+   * Used by MarginTrackerService.
+   */
+  async findCogsTransactions(
+    restaurantId: string,
+    since: Date,
+  ): Promise<FinancialTransaction[]> {
+    return this.transactionRepo
+      .createQueryBuilder('t')
+      .where('t.restaurant_id = :restaurantId', { restaurantId })
+      .andWhere('t.type = :type', { type: TransactionType.EXPENSE })
+      .andWhere('t.category = :category', { category: TransactionCategory.SUPPLIES })
+      .andWhere('t.transaction_date >= :since', { since })
+      .andWhere("t.metadata->>'type' = :metaType", { metaType: 'cogs' })
+      .getMany();
+  }
+
+  /**
+   * Find sale transactions for a restaurant in a period.
+   * Used by MarginTrackerService.
+   */
+  async findSaleTransactions(
+    restaurantId: string,
+    since: Date,
+    categories: TransactionCategory[],
+  ): Promise<FinancialTransaction[]> {
+    return this.transactionRepo
+      .createQueryBuilder('t')
+      .where('t.restaurant_id = :restaurantId', { restaurantId })
+      .andWhere('t.type = :type', { type: TransactionType.SALE })
+      .andWhere('t.category IN (:...categories)', { categories })
+      .andWhere('t.transaction_date >= :since', { since })
+      .getMany();
+  }
+
+  /**
+   * Get aggregated COGS total for a restaurant in a period.
+   * Used by MarginTrackerService.getFoodCost().
+   */
+  async sumCogsAmount(restaurantId: string, since: Date): Promise<number> {
+    const result = await this.transactionRepo
+      .createQueryBuilder('t')
+      .select('COALESCE(SUM(t.amount), 0)', 'total')
+      .where('t.restaurant_id = :restaurantId', { restaurantId })
+      .andWhere('t.type = :type', { type: TransactionType.EXPENSE })
+      .andWhere('t.category = :category', { category: TransactionCategory.SUPPLIES })
+      .andWhere('t.transaction_date >= :since', { since })
+      .andWhere("t.metadata->>'type' = :metaType", { metaType: 'cogs' })
+      .getRawOne();
+    return Number(result?.total || 0);
+  }
+
+  /**
+   * Get aggregated sale revenue for a restaurant in a period.
+   * Used by MarginTrackerService.getFoodCost().
+   */
+  async sumSaleRevenue(
+    restaurantId: string,
+    since: Date,
+    categories: TransactionCategory[],
+  ): Promise<number> {
+    const result = await this.transactionRepo
+      .createQueryBuilder('t')
+      .select('COALESCE(SUM(t.amount), 0)', 'total')
+      .where('t.restaurant_id = :restaurantId', { restaurantId })
+      .andWhere('t.type = :type', { type: TransactionType.SALE })
+      .andWhere('t.category IN (:...categories)', { categories })
+      .andWhere('t.transaction_date >= :since', { since })
+      .getRawOne();
+    return Number(result?.total || 0);
+  }
 }

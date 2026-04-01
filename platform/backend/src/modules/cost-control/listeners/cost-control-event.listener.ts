@@ -1,10 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { CogsService } from '../services/cogs.service';
 import { RecipeService } from '../services/recipe.service';
-import { Order } from '../../orders/entities/order.entity';
+import { OrdersService } from '../../orders/orders.service';
 
 /**
  * CostControlEventListener — Transmission belts for cost control:
@@ -19,8 +17,7 @@ export class CostControlEventListener {
   constructor(
     private readonly cogsService: CogsService,
     private readonly recipeService: RecipeService,
-    @InjectRepository(Order)
-    private readonly orderRepo: Repository<Order>,
+    private readonly ordersService: OrdersService,
   ) {}
 
   @OnEvent('order.payment.confirmed', { async: true })
@@ -29,10 +26,7 @@ export class CostControlEventListener {
     restaurantId: string;
   }): Promise<void> {
     try {
-      const order = await this.orderRepo.findOne({
-        where: { id: payload.orderId },
-        relations: ['items', 'items.menu_item'],
-      });
+      const order = await this.ordersService.findOne(payload.orderId);
 
       if (!order?.items?.length) {
         this.logger.debug(`No items found for order ${payload.orderId} — skipping COGS`);

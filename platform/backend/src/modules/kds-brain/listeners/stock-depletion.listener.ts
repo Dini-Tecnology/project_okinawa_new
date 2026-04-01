@@ -1,9 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { ItemAvailabilityService } from '../services/item-availability.service';
-import { RecipeIngredient } from '../../cost-control/entities/recipe-ingredient.entity';
+import { RecipeService } from '../../cost-control/services/recipe.service';
 
 /**
  * StockDepletionListener — Auto-86 when stock reaches zero.
@@ -18,8 +16,7 @@ export class StockDepletionListener {
 
   constructor(
     private readonly itemAvailabilityService: ItemAvailabilityService,
-    @InjectRepository(RecipeIngredient)
-    private readonly recipeIngredientRepo: Repository<RecipeIngredient>,
+    private readonly recipeService: RecipeService,
   ) {}
 
   @OnEvent('stock.item.depleted', { async: true })
@@ -29,11 +26,10 @@ export class StockDepletionListener {
     restaurantId: string;
   }): Promise<void> {
     try {
-      // Find all recipes that use this ingredient
-      const recipeIngredients = await this.recipeIngredientRepo.find({
-        where: { ingredient_id: payload.ingredientId },
-        relations: ['recipe'],
-      });
+      // Find all recipes that use this ingredient (via RecipeService)
+      const recipeIngredients = await this.recipeService.findRecipeIngredientsByIngredientId(
+        payload.ingredientId,
+      );
 
       if (!recipeIngredients.length) {
         this.logger.debug(

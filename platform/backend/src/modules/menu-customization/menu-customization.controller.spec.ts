@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
 import { MenuCustomizationController } from './menu-customization.controller';
 import { MenuCustomizationService } from './menu-customization.service';
-import { CustomizationOption } from './entities/customization-group.entity';
+import { CustomizationOption } from '../menu-items/entities/menu-item-customization-group.entity';
 
 describe('MenuCustomizationController', () => {
   let controller: MenuCustomizationController;

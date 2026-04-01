@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { MenuCustomizationService } from './menu-customization.service';
-import { CustomizationGroup, CustomizationOption } from './entities/customization-group.entity';
+import { MenuItemCustomizationGroup as CustomizationGroup, CustomizationOption } from '../menu-items/entities/menu-item-customization-group.entity';
 
 describe('MenuCustomizationService', () => {
   let service: MenuCustomizationService;

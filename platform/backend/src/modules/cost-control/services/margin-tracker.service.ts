@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Recipe } from '../entities/recipe.entity';
 import { MenuItem } from '../../menu-items/entities/menu-item.entity';
-import { FinancialTransaction, TransactionCategory, TransactionType } from '../../financial/entities/financial-transaction.entity';
+import { TransactionCategory } from '../../financial/entities/financial-transaction.entity';
+import { FinancialTransactionService } from '../../financial/financial-transaction.service';
 
 export interface MarginItem {
   menu_item_id: string;
@@ -43,8 +44,7 @@ export class MarginTrackerService {
     private readonly recipeRepo: Repository<Recipe>,
     @InjectRepository(MenuItem)
     private readonly menuItemRepo: Repository<MenuItem>,
-    @InjectRepository(FinancialTransaction)
-    private readonly transactionRepo: Repository<FinancialTransaction>,
+    private readonly financialTransactionService: FinancialTransactionService,
   ) {}
 
   /**
@@ -67,26 +67,18 @@ export class MarginTrackerService {
     });
     const recipeMap = new Map(recipes.map((r) => [r.menu_item_id, r]));
 
-    // Get COGS transactions for the period (metadata.type = 'cogs')
-    const cogsTransactions = await this.transactionRepo
-      .createQueryBuilder('t')
-      .where('t.restaurant_id = :restaurantId', { restaurantId })
-      .andWhere('t.type = :type', { type: TransactionType.EXPENSE })
-      .andWhere('t.category = :category', { category: TransactionCategory.SUPPLIES })
-      .andWhere('t.transaction_date >= :since', { since })
-      .andWhere("t.metadata->>'type' = :metaType", { metaType: 'cogs' })
-      .getMany();
+    // Get COGS transactions for the period (via FinancialTransactionService)
+    const cogsTransactions = await this.financialTransactionService.findCogsTransactions(
+      restaurantId,
+      since,
+    );
 
-    // Get sale transactions for the period
-    const saleTransactions = await this.transactionRepo
-      .createQueryBuilder('t')
-      .where('t.restaurant_id = :restaurantId', { restaurantId })
-      .andWhere('t.type = :type', { type: TransactionType.SALE })
-      .andWhere('t.category IN (:...categories)', {
-        categories: [TransactionCategory.FOOD_SALES, TransactionCategory.BEVERAGE_SALES],
-      })
-      .andWhere('t.transaction_date >= :since', { since })
-      .getMany();
+    // Get sale transactions for the period (via FinancialTransactionService)
+    const saleTransactions = await this.financialTransactionService.findSaleTransactions(
+      restaurantId,
+      since,
+      [TransactionCategory.FOOD_SALES, TransactionCategory.BEVERAGE_SALES],
+    );
 
     // Aggregate COGS by menu_item_id
     const cogsMap = new Map<string, { totalCogs: number; unitsSold: number }>();
@@ -199,31 +191,15 @@ export class MarginTrackerService {
     const since = new Date();
     since.setDate(since.getDate() - periodDays);
 
-    // Total COGS
-    const cogsResult = await this.transactionRepo
-      .createQueryBuilder('t')
-      .select('COALESCE(SUM(t.amount), 0)', 'total')
-      .where('t.restaurant_id = :restaurantId', { restaurantId })
-      .andWhere('t.type = :type', { type: TransactionType.EXPENSE })
-      .andWhere('t.category = :category', { category: TransactionCategory.SUPPLIES })
-      .andWhere('t.transaction_date >= :since', { since })
-      .andWhere("t.metadata->>'type' = :metaType", { metaType: 'cogs' })
-      .getRawOne();
+    // Total COGS (via FinancialTransactionService)
+    const totalCogs = await this.financialTransactionService.sumCogsAmount(restaurantId, since);
 
-    // Total food revenue
-    const revenueResult = await this.transactionRepo
-      .createQueryBuilder('t')
-      .select('COALESCE(SUM(t.amount), 0)', 'total')
-      .where('t.restaurant_id = :restaurantId', { restaurantId })
-      .andWhere('t.type = :type', { type: TransactionType.SALE })
-      .andWhere('t.category IN (:...categories)', {
-        categories: [TransactionCategory.FOOD_SALES, TransactionCategory.BEVERAGE_SALES],
-      })
-      .andWhere('t.transaction_date >= :since', { since })
-      .getRawOne();
-
-    const totalCogs = Number(cogsResult?.total || 0);
-    const totalFoodRevenue = Number(revenueResult?.total || 0);
+    // Total food revenue (via FinancialTransactionService)
+    const totalFoodRevenue = await this.financialTransactionService.sumSaleRevenue(
+      restaurantId,
+      since,
+      [TransactionCategory.FOOD_SALES, TransactionCategory.BEVERAGE_SALES],
+    );
     const foodCostPct = totalFoodRevenue > 0
       ? Math.round((totalCogs / totalFoodRevenue) * 10000) / 100
       : 0;

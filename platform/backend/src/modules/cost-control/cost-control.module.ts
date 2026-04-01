@@ -7,7 +7,6 @@ import { RecipeIngredient } from './entities/recipe-ingredient.entity';
 import { Supplier } from './entities/supplier.entity';
 import { IngredientSupplier } from './entities/ingredient-supplier.entity';
 import { MenuItem } from '../menu-items/entities/menu-item.entity';
-import { FinancialTransaction } from '../financial/entities/financial-transaction.entity';
 import { IngredientService } from './services/ingredient.service';
 import { RecipeService } from './services/recipe.service';
 import { CogsService } from './services/cogs.service';
@@ -16,7 +15,7 @@ import { SupplierService } from './services/supplier.service';
 import { CostControlController } from './controllers/cost-control.controller';
 import { CostControlEventListener } from './listeners/cost-control-event.listener';
 import { FinancialModule } from '../financial/financial.module';
-import { Order } from '../orders/entities/order.entity';
+import { OrdersModule } from '../orders/orders.module';
 
 @Module({
   imports: [
@@ -28,10 +27,9 @@ import { Order } from '../orders/entities/order.entity';
       Supplier,
       IngredientSupplier,
       MenuItem,
-      FinancialTransaction,
-      Order,
     ]),
     FinancialModule,
+    OrdersModule,
   ],
   controllers: [CostControlController],
   providers: [

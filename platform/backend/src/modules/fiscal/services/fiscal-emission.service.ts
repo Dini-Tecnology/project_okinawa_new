@@ -10,6 +10,7 @@ import { Repository } from 'typeorm';
 import { FiscalDocument } from '../entities/fiscal-document.entity';
 import { FiscalConfig } from '../entities/fiscal-config.entity';
 import { Order } from '../../orders/entities/order.entity';
+import { OrdersService } from '../../orders/orders.service';
 import {
   FiscalAdapter,
   EmitNfceParams,
@@ -58,8 +59,7 @@ export class FiscalEmissionService {
     @InjectRepository(FiscalConfig)
     private readonly fiscalConfigRepo: Repository<FiscalConfig>,
 
-    @InjectRepository(Order)
-    private readonly orderRepo: Repository<Order>,
+    private readonly ordersService: OrdersService,
 
     private readonly fiscalEvents: FiscalEventService,
   ) {}
@@ -71,12 +71,11 @@ export class FiscalEmissionService {
   async emitForOrder(orderId: string): Promise<FiscalDocument | null> {
     this.logger.log(`Emitting NFC-e for order ${orderId}`);
 
-    // 1. Load order with items
-    const order = await this.orderRepo.findOne({
-      where: { id: orderId },
-      relations: ['items'],
-    });
-    if (!order) {
+    // 1. Load order with items (via OrdersService)
+    let order: Order;
+    try {
+      order = await this.ordersService.findOne(orderId);
+    } catch {
       throw new NotFoundException(FISCAL_MESSAGES.ORDER_NOT_FOUND);
     }
 

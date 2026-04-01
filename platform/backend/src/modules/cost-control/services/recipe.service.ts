@@ -182,4 +182,16 @@ export class RecipeService {
       relations: ['ingredients', 'ingredients.ingredient'],
     });
   }
+
+  /**
+   * Find all recipe ingredients that use a given ingredient ID.
+   * Returns RecipeIngredients with their parent recipe loaded.
+   * Used by StockDepletionListener to find affected menu items.
+   */
+  async findRecipeIngredientsByIngredientId(ingredientId: string): Promise<RecipeIngredient[]> {
+    return this.recipeIngredientRepo.find({
+      where: { ingredient_id: ingredientId },
+      relations: ['recipe'],
+    });
+  }
 }

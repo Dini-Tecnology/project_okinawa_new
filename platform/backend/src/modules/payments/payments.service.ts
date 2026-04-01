@@ -10,7 +10,7 @@ import { CreatePaymentMethodDto } from './dto/create-payment-method.dto';
 import { UpdatePaymentMethodDto } from './dto/update-payment-method.dto';
 import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { WalletType, TransactionType } from '@common/enums';
-import { Order } from '@/modules/orders/entities/order.entity';
+import { OrdersService } from '@/modules/orders/orders.service';
 import { CashbackService } from '@/modules/loyalty/cashback.service';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import {
@@ -33,8 +33,7 @@ export class PaymentsService {
     private transactionRepository: Repository<WalletTransaction>,
     @InjectRepository(PaymentMethod)
     private paymentMethodRepository: Repository<PaymentMethod>,
-    @InjectRepository(Order)
-    private orderRepository: Repository<Order>,
+    private ordersService: OrdersService,
     private dataSource: DataSource,
     private cashbackService: CashbackService,
     private eventsGateway: EventsGateway,
@@ -323,11 +322,21 @@ export class PaymentsService {
 
     try {
       // Verify order exists and belongs to user
-      const order = await this.orderRepository.findOne({
-        where: { id: processDto.order_id, user_id: userId },
-      });
+      let order;
+      try {
+        order = await this.ordersService.findOne(processDto.order_id);
+      } catch {
+        this.logger.warn({
+          message: 'Payment failed - order not found',
+          correlationId: paymentCorrelationId,
+          userId,
+          orderId: processDto.order_id,
+          duration: Date.now() - startTime,
+        });
+        throw new NotFoundException('Order not found');
+      }
 
-      if (!order) {
+      if (order.user_id !== userId) {
         this.logger.warn({
           message: 'Payment failed - order not found',
           correlationId: paymentCorrelationId,
@@ -522,12 +531,8 @@ export class PaymentsService {
     await queryRunner.startTransaction();
 
     try {
-      // 1. Find order and verify it exists
-      const order = await this.orderRepository.findOne({ where: { id: orderId } });
-
-      if (!order) {
-        throw new NotFoundException('Order not found');
-      }
+      // 1. Find order and verify it exists (via OrdersService)
+      const order = await this.ordersService.findOne(orderId);
 
       const orderTotal = Math.round(Number(order.total_amount) * 100) / 100;
       const refundAmount = amount

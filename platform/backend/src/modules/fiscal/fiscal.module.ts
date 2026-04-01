@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // Entities
 import { FiscalDocument } from './entities/fiscal-document.entity';
 import { FiscalConfig } from './entities/fiscal-config.entity';
-import { Order } from '../orders/entities/order.entity';
 import { Restaurant } from '../restaurants/entities/restaurant.entity';
 
 // Adapters
@@ -25,6 +24,7 @@ import { FiscalController } from './controllers/fiscal.controller';
 import { FiscalWebhookController } from './controllers/fiscal-webhook.controller';
 import { EventsModule } from '../events/events.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { OrdersModule } from '../orders/orders.module';
 
 /**
  * FiscalModule -- NFC-e emission with adapter pattern.
@@ -37,7 +37,8 @@ import { NotificationsModule } from '../notifications/notifications.module';
  */
 @Module({
   imports: [
-    TypeOrmModule.forFeature([FiscalDocument, FiscalConfig, Order, Restaurant]),
+    TypeOrmModule.forFeature([FiscalDocument, FiscalConfig, Restaurant]),
+    OrdersModule,
     EventsModule,
     NotificationsModule,
   ],
