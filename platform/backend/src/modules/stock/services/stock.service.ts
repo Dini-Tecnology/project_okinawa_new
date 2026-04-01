@@ -114,6 +114,10 @@ export class StockService {
    * Auto-deduct stock for an order item.
    * Finds the Recipe for the menu item, then for each RecipeIngredient,
    * subtracts (ingredient_quantity x order_item_quantity) from stock.
+   *
+   * Idempotency: if a StockMovement with reference_type='order_item' and
+   * reference_id=referenceId already exists, the deduction is skipped to
+   * prevent double-deduction on retries.
    */
   async deductForOrder(
     menuItemId: string,
@@ -122,6 +126,23 @@ export class StockService {
     referenceId?: string,
   ): Promise<void> {
     try {
+      // Idempotency check: skip if stock was already deducted for this order item
+      if (referenceId) {
+        const existingMovement = await this.movementRepo.findOne({
+          where: {
+            reference_type: 'order_item',
+            reference_id: referenceId,
+          },
+        });
+
+        if (existingMovement) {
+          this.logger.debug(
+            `Stock deduction already processed for order item ${referenceId} — skipping`,
+          );
+          return;
+        }
+      }
+
       const recipe = await this.recipeService.findByMenuItem(menuItemId);
 
       if (!recipe || !recipe.ingredients?.length) {

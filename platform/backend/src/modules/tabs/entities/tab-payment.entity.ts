@@ -51,6 +51,9 @@ export class TabPayment {
   @Column({ type: 'jsonb', nullable: true })
   payment_details: Record<string, any>;
 
+  @Column({ type: 'varchar', length: 255, nullable: true, unique: true })
+  idempotency_key: string | null;
+
   @CreateDateColumn()
   created_at: Date;
 

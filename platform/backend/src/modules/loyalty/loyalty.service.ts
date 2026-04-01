@@ -229,6 +229,7 @@ export class LoyaltyService {
       is_active: true,
       rewards_claimed: [],
       available_rewards: [],
+      awarded_order_ids: [],
     });
 
     return this.loyaltyRepository.save(profile);
@@ -325,13 +326,26 @@ export class LoyaltyService {
           is_active: true,
           rewards_claimed: [],
           available_rewards: [],
+          awarded_order_ids: [],
         });
         profile = await manager.save(LoyaltyProgram, profile);
       }
 
+      // Idempotency check: skip if points were already awarded for this order
+      const alreadyAwarded = (profile.awarded_order_ids || []).includes(orderId);
+      if (alreadyAwarded) {
+        return {
+          points_earned: 0,
+          total_points: profile.points,
+          tier: profile.tier,
+          tier_upgraded: false,
+          already_awarded: true,
+        };
+      }
+
       const oldTier = profile.tier;
 
-      // Atomic update using increment operations
+      // Atomic update using increment operations + record the awarded order ID
       await manager
         .createQueryBuilder()
         .update(LoyaltyProgram)
@@ -340,6 +354,7 @@ export class LoyaltyService {
           total_visits: () => `total_visits + 1`,
           total_spent: () => `total_spent + ${orderAmount}`,
           last_visit: new Date(),
+          awarded_order_ids: () => `array_append(awarded_order_ids, '${orderId}')`,
         })
         .where('id = :id', { id: profile.id })
         .execute();

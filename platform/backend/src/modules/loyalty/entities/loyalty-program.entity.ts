@@ -56,6 +56,10 @@ export class LoyaltyProgram {
   @Column({ type: 'jsonb', nullable: true })
   available_rewards: Record<string, any>[];
 
+  /** Order IDs that have already been awarded points — used for idempotency */
+  @Column({ type: 'text', array: true, default: '{}' })
+  awarded_order_ids: string[];
+
   @Column({ default: true })
   is_active: boolean;
 

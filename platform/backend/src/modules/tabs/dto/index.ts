@@ -276,6 +276,11 @@ export class ProcessTabPaymentDto {
   @IsOptional()
   @IsArray()
   item_ids?: string[];
+
+  @ApiPropertyOptional({ description: 'Idempotency key to prevent duplicate payments' })
+  @IsOptional()
+  @IsString()
+  idempotency_key?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════

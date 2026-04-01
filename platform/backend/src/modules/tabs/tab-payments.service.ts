@@ -25,6 +25,18 @@ export class TabPaymentsService {
       throw new BadRequestException('Tab is already closed');
     }
 
+    // Idempotency check: if an idempotency_key is provided, return the
+    // existing payment instead of creating a duplicate.
+    if (dto.idempotency_key) {
+      const existing = await this.tabPaymentRepository.findOne({
+        where: { idempotency_key: dto.idempotency_key },
+      });
+
+      if (existing) {
+        return existing;
+      }
+    }
+
     const payment = this.tabPaymentRepository.create({
       tab_id: tab.id,
       user_id: userId,
@@ -34,6 +46,7 @@ export class TabPaymentsService {
       transaction_id: dto.transaction_id,
       status: PaymentSplitStatus.PAID,
       payment_details: dto.payment_details,
+      idempotency_key: dto.idempotency_key || null,
     });
 
     const savedPayment = await this.tabPaymentRepository.save(payment);
