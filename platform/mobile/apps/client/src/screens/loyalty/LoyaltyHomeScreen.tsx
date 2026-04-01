@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Pressable,
   Dimensions,
+  Alert,
 } from 'react-native';
 import {
   Text,
@@ -692,7 +693,11 @@ export default function LoyaltyHomeScreen() {
 
         <TouchableOpacity
           style={styles.quickAction}
-          onPress={() => {}}
+          onPress={() => Alert.alert(
+            t('loyalty.home.programRules'),
+            t('loyalty.home.programRulesDescription'),
+            [{ text: t('common.ok') }],
+          )}
           accessibilityLabel={t('loyalty.home.programRules')}
           accessibilityRole="button"
         >

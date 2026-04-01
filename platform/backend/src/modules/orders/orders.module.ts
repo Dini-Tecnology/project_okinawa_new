@@ -30,6 +30,7 @@ import {
 } from './helpers';
 import { StockModule } from '@/modules/stock/stock.module';
 import { CustomerCrmModule } from '@/modules/customer-crm/customer-crm.module';
+import { PromotionsModule } from '@/modules/promotions/promotions.module';
 
 @Module({
   imports: [
@@ -50,6 +51,7 @@ import { CustomerCrmModule } from '@/modules/customer-crm/customer-crm.module';
     TablesModule,
     StockModule,
     CustomerCrmModule,
+    PromotionsModule,
   ],
   controllers: [OrdersController, OrderGuestsController],
   providers: [

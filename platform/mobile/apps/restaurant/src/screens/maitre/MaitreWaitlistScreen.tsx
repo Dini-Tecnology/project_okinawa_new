@@ -713,7 +713,8 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
           style={styles.modalOverlay}
           onPress={() => setCallModalVisible(false)}
         >
-          <Pressable style={styles.modalContent} onPress={() => {}}>
+          {/* Prevent backdrop touch from dismissing when tapping modal content */}
+          <Pressable style={styles.modalContent} onPress={() => {/* intentional: stops event propagation */}}>
             <Text style={styles.modalTitle}>
               {t('waitlistMgmt.callGuest')}
             </Text>

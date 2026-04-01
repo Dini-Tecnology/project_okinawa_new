@@ -101,4 +101,11 @@ export class CreateOrderDto {
   @Min(0, { message: 'Tip amount cannot be negative' })
   @Max(10000, { message: 'Tip amount cannot exceed 10000' })
   tip_amount?: number;
+
+  @ApiProperty({ required: false, description: 'Promotion/coupon code to apply', maxLength: 20 })
+  @IsOptional()
+  @IsString({ message: 'Promotion code must be a string' })
+  @MaxLength(20, { message: 'Promotion code cannot exceed 20 characters' })
+  @Transform(({ value }) => value?.trim().toUpperCase())
+  promotion_code?: string;
 }

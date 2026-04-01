@@ -145,7 +145,7 @@ function TableDetailModal({
       onRequestClose={onClose}
     >
       <Pressable style={[modalStyles.overlay, { backgroundColor: colors.overlay }]} onPress={onClose} accessibilityLabel="Close table details overlay">
-        <Pressable style={[modalStyles.content, { backgroundColor: colors.card }]} onPress={() => {}} accessibilityLabel="Table detail panel">
+        <Pressable style={[modalStyles.content, { backgroundColor: colors.card }]} onPress={onClose} accessibilityLabel="Table detail panel">
           {/* Header */}
           <View style={modalStyles.header}>
             <View style={[modalStyles.statusDot, { backgroundColor: statusColor }]} />

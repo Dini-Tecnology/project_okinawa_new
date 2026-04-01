@@ -27,6 +27,7 @@ import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/paginatio
 import { OrderCalculatorHelper } from './helpers';
 import { StockService } from '@/modules/stock/services/stock.service';
 import { CustomerCrmService } from '@/modules/customer-crm/services/customer-crm.service';
+import { PromotionsService } from '@/modules/promotions/promotions.service';
 
 @Injectable()
 export class OrdersService {
@@ -51,6 +52,7 @@ export class OrdersService {
     private orderCalculator: OrderCalculatorHelper,
     private stockService: StockService,
     private customerCrmService: CustomerCrmService,
+    private promotionsService: PromotionsService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -123,8 +125,36 @@ export class OrdersService {
         }
       }
 
+      // Apply promotion discount if promotion code provided
+      let discountAmount = 0;
+      let promotionMetadata: Record<string, unknown> | undefined;
+      if (createOrderDto.promotion_code) {
+        try {
+          const promoResult = await this.promotionsService.validate({
+            code: createOrderDto.promotion_code,
+            restaurantId: createOrderDto.restaurant_id,
+            userId,
+            orderValue: subtotal,
+          });
+          if (promoResult.valid && promoResult.discount?.value && promoResult.discount.value > 0) {
+            discountAmount = promoResult.discount.value;
+            promotionMetadata = {
+              promotion_code: createOrderDto.promotion_code,
+              promotion_discount_type: promoResult.discount.type,
+              promotion_discount_amount: discountAmount,
+            };
+          }
+        } catch (err) {
+          this.logger.debug(
+            `Promotion code invalid: ${err instanceof Error ? err.message : 'unknown'}`,
+          );
+          // Don't block order creation if promo fails
+        }
+      }
+
+      const discountedSubtotal = Math.max(0, subtotal - discountAmount);
       const { taxAmount, totalAmount } = this.orderCalculator.calculateTotals(
-        subtotal,
+        discountedSubtotal,
         createOrderDto.tip_amount || 0,
       );
 
@@ -137,9 +167,11 @@ export class OrdersService {
         tax_amount: taxAmount,
         tip_amount: createOrderDto.tip_amount || 0,
         total_amount: totalAmount,
+        discount_amount: discountAmount > 0 ? discountAmount : undefined,
         special_instructions: createOrderDto.special_instructions,
         status: OrderStatus.PENDING,
         items: orderItems,
+        ...(promotionMetadata ? { metadata: promotionMetadata } : {}),
       });
 
       const savedOrder = await queryRunner.manager.save(order);
