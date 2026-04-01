@@ -118,24 +118,46 @@ export class TablesService {
   }
 
   async updateStatus(id: string, updateStatusDto: UpdateTableStatusDto) {
-    const table = await this.findOne(id);
-    const oldStatus = table.status;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    table.status = updateStatusDto.status;
-    const updatedTable = await this.tableRepository.save(table);
-
-    // Emit WebSocket event for real-time update
-    this.eventsGateway.server
-      .to(`restaurant:${table.restaurant_id}`)
-      .emit('table:status_changed', {
-        table_id: table.id,
-        table_number: table.table_number,
-        old_status: oldStatus,
-        new_status: updateStatusDto.status,
-        updated_at: new Date(),
+    try {
+      // Lock the table row to prevent concurrent status updates (e.g. double-booking)
+      const table = await queryRunner.manager.findOne(RestaurantTable, {
+        where: { id },
+        lock: { mode: 'pessimistic_write' },
       });
 
-    return updatedTable;
+      if (!table) {
+        throw new NotFoundException('Table not found');
+      }
+
+      const oldStatus = table.status;
+
+      table.status = updateStatusDto.status;
+      const updatedTable = await queryRunner.manager.save(RestaurantTable, table);
+
+      await queryRunner.commitTransaction();
+
+      // Emit WebSocket event for real-time update (outside transaction)
+      this.eventsGateway.server
+        .to(`restaurant:${table.restaurant_id}`)
+        .emit('table:status_changed', {
+          table_id: table.id,
+          table_number: table.table_number,
+          old_status: oldStatus,
+          new_status: updateStatusDto.status,
+          updated_at: new Date(),
+        });
+
+      return updatedTable;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async remove(id: string) {

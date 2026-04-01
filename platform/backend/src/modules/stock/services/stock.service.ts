@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, DataSource } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StockItem } from '../entities/stock-item.entity';
 import { StockMovement, StockMovementType } from '../entities/stock-movement.entity';
@@ -28,6 +28,7 @@ export class StockService {
     private readonly recipeService: RecipeService,
     private readonly eventsGateway: EventsGateway,
     private readonly eventEmitter: EventEmitter2,
+    private readonly dataSource: DataSource,
   ) {}
 
   /**
@@ -59,6 +60,8 @@ export class StockService {
 
   /**
    * Manual stock adjustment (positive or negative delta).
+   * Wrapped in a transaction with pessimistic lock on the stock item to prevent
+   * divergence between current_quantity and the sum of movements.
    */
   async adjustStock(
     ingredientId: string,
@@ -67,53 +70,72 @@ export class StockService {
     reason?: string,
     userId?: string,
   ): Promise<StockItem> {
-    let stockItem = await this.stockRepo.findOne({
-      where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
-      relations: ['ingredient'],
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!stockItem) {
-      throw new NotFoundException(
-        `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+    try {
+      // Lock the stock item row before reading quantity
+      let stockItem = await queryRunner.manager.findOne(StockItem, {
+        where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
+        relations: ['ingredient'],
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(
+          `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+        );
+      }
+
+      const previousQty = Number(stockItem.current_quantity);
+      stockItem.current_quantity = Math.max(0, previousQty + quantityDelta);
+      stockItem = await queryRunner.manager.save(StockItem, stockItem);
+
+      // Create movement record within the same transaction
+      const movementType: StockMovementType =
+        quantityDelta >= 0 ? 'adjustment_positive' : 'adjustment_negative';
+
+      const movement = queryRunner.manager.create(StockMovement, {
+        stock_item_id: stockItem.id,
+        restaurant_id: restaurantId,
+        ingredient_id: ingredientId,
+        type: movementType,
+        quantity: quantityDelta,
+        quantity_before: previousQty,
+        quantity_after: Number(stockItem.current_quantity),
+        notes: reason || null,
+        created_by: userId || null,
+      });
+      await queryRunner.manager.save(StockMovement, movement);
+
+      await queryRunner.commitTransaction();
+
+      this.logger.log(
+        `Stock adjusted: ingredient=${ingredientId}, delta=${quantityDelta}, ` +
+          `${previousQty} -> ${stockItem.current_quantity}` +
+          (reason ? `, reason: ${reason}` : ''),
       );
+
+      // Check low stock alert (outside transaction — read-only side effect)
+      this.checkAndEmitLowStock(stockItem, restaurantId);
+
+      return stockItem;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const previousQty = Number(stockItem.current_quantity);
-    stockItem.current_quantity = Math.max(0, previousQty + quantityDelta);
-    stockItem = await this.stockRepo.save(stockItem);
-
-    // Create movement record
-    const movementType: StockMovementType =
-      quantityDelta >= 0 ? 'adjustment_positive' : 'adjustment_negative';
-
-    await this.createMovement({
-      stock_item_id: stockItem.id,
-      restaurant_id: restaurantId,
-      ingredient_id: ingredientId,
-      type: movementType,
-      quantity: quantityDelta,
-      quantity_before: previousQty,
-      quantity_after: Number(stockItem.current_quantity),
-      notes: reason || null,
-      created_by: userId || null,
-    });
-
-    this.logger.log(
-      `Stock adjusted: ingredient=${ingredientId}, delta=${quantityDelta}, ` +
-        `${previousQty} -> ${stockItem.current_quantity}` +
-        (reason ? `, reason: ${reason}` : ''),
-    );
-
-    // Check low stock alert
-    this.checkAndEmitLowStock(stockItem, restaurantId);
-
-    return stockItem;
   }
 
   /**
    * Auto-deduct stock for an order item.
    * Finds the Recipe for the menu item, then for each RecipeIngredient,
    * subtracts (ingredient_quantity x order_item_quantity) from stock.
+   *
+   * Each ingredient deduction locks the StockItem row (pessimistic_write)
+   * to prevent divergence between current_quantity and movement records.
    *
    * Idempotency: if a StockMovement with reference_type='order_item' and
    * reference_id=referenceId already exists, the deduction is skipped to
@@ -154,55 +176,73 @@ export class StockService {
 
       for (const ri of recipe.ingredients) {
         const deduction = Number(ri.quantity) * orderItemQuantity;
-        const stockItem = await this.stockRepo.findOne({
-          where: {
-            ingredient_id: ri.ingredient_id,
-            restaurant_id: restaurantId,
-          },
-          relations: ['ingredient'],
-        });
 
-        if (!stockItem) {
-          this.logger.debug(
-            `No stock record for ingredient ${ri.ingredient_id} — skipping`,
-          );
-          continue;
-        }
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
 
-        const previousQty = Number(stockItem.current_quantity);
-        stockItem.current_quantity = Math.max(0, previousQty - deduction);
-        await this.stockRepo.save(stockItem);
-
-        // Create movement record for sale consumption
-        await this.createMovement({
-          stock_item_id: stockItem.id,
-          restaurant_id: restaurantId,
-          ingredient_id: ri.ingredient_id,
-          type: 'sale_consumption',
-          quantity: -deduction,
-          quantity_before: previousQty,
-          quantity_after: Number(stockItem.current_quantity),
-          reference_id: referenceId || null,
-          reference_type: referenceId ? 'order_item' : null,
-        });
-
-        this.logger.debug(
-          `Stock deducted: ingredient=${ri.ingredient_id}, qty=${deduction}, ` +
-            `${previousQty} -> ${stockItem.current_quantity}`,
-        );
-
-        // Auto-86: if stock depleted, emit event to mark affected menu items unavailable
-        if (Number(stockItem.current_quantity) <= 0) {
-          this.eventEmitter.emit('stock.item.depleted', {
-            ingredientId: ri.ingredient_id,
-            ingredientName: stockItem.ingredient?.name || 'Unknown',
-            restaurantId,
+        try {
+          // Lock the stock item row before reading quantity
+          const stockItem = await queryRunner.manager.findOne(StockItem, {
+            where: {
+              ingredient_id: ri.ingredient_id,
+              restaurant_id: restaurantId,
+            },
+            relations: ['ingredient'],
+            lock: { mode: 'pessimistic_write' },
           });
-          this.logger.warn(
-            `Stock DEPLETED for ingredient ${stockItem.ingredient?.name || ri.ingredient_id} — auto-86 triggered`,
+
+          if (!stockItem) {
+            this.logger.debug(
+              `No stock record for ingredient ${ri.ingredient_id} — skipping`,
+            );
+            await queryRunner.commitTransaction();
+            continue;
+          }
+
+          const previousQty = Number(stockItem.current_quantity);
+          stockItem.current_quantity = Math.max(0, previousQty - deduction);
+          await queryRunner.manager.save(StockItem, stockItem);
+
+          // Create movement record for sale consumption within the same transaction
+          const movement = queryRunner.manager.create(StockMovement, {
+            stock_item_id: stockItem.id,
+            restaurant_id: restaurantId,
+            ingredient_id: ri.ingredient_id,
+            type: 'sale_consumption' as StockMovementType,
+            quantity: -deduction,
+            quantity_before: previousQty,
+            quantity_after: Number(stockItem.current_quantity),
+            reference_id: referenceId || null,
+            reference_type: referenceId ? 'order_item' : null,
+          });
+          await queryRunner.manager.save(StockMovement, movement);
+
+          await queryRunner.commitTransaction();
+
+          this.logger.debug(
+            `Stock deducted: ingredient=${ri.ingredient_id}, qty=${deduction}, ` +
+              `${previousQty} -> ${stockItem.current_quantity}`,
           );
-        } else {
-          this.checkAndEmitLowStock(stockItem, restaurantId);
+
+          // Auto-86: if stock depleted, emit event to mark affected menu items unavailable
+          if (Number(stockItem.current_quantity) <= 0) {
+            this.eventEmitter.emit('stock.item.depleted', {
+              ingredientId: ri.ingredient_id,
+              ingredientName: stockItem.ingredient?.name || 'Unknown',
+              restaurantId,
+            });
+            this.logger.warn(
+              `Stock DEPLETED for ingredient ${stockItem.ingredient?.name || ri.ingredient_id} — auto-86 triggered`,
+            );
+          } else {
+            this.checkAndEmitLowStock(stockItem, restaurantId);
+          }
+        } catch (ingredientError) {
+          await queryRunner.rollbackTransaction();
+          throw ingredientError;
+        } finally {
+          await queryRunner.release();
         }
       }
     } catch (error) {
@@ -216,6 +256,7 @@ export class StockService {
 
   /**
    * Receive stock from a purchase — add quantity and update price/date.
+   * Wrapped in a transaction with pessimistic lock on the stock item.
    */
   async receiveStock(
     ingredientId: string,
@@ -225,58 +266,75 @@ export class StockService {
     supplier?: string,
     userId?: string,
   ): Promise<StockItem> {
-    let stockItem = await this.stockRepo.findOne({
-      where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
-      relations: ['ingredient'],
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const previousQty = stockItem ? Number(stockItem.current_quantity) : 0;
-
-    if (!stockItem) {
-      // Auto-create stock record if ingredient exists but stock doesn't
-      stockItem = this.stockRepo.create({
-        ingredient_id: ingredientId,
-        restaurant_id: restaurantId,
-        current_quantity: 0,
-        unit: 'un', // will be overridden if ingredient has unit
+    try {
+      // Try to lock the existing stock item
+      let stockItem = await queryRunner.manager.findOne(StockItem, {
+        where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
+        relations: ['ingredient'],
+        lock: { mode: 'pessimistic_write' },
       });
+
+      const previousQty = stockItem ? Number(stockItem.current_quantity) : 0;
+
+      if (!stockItem) {
+        // Auto-create stock record if ingredient exists but stock doesn't
+        stockItem = queryRunner.manager.create(StockItem, {
+          ingredient_id: ingredientId,
+          restaurant_id: restaurantId,
+          current_quantity: 0,
+          unit: 'un', // will be overridden if ingredient has unit
+        });
+      }
+
+      stockItem.current_quantity =
+        Number(stockItem.current_quantity) + quantity;
+
+      if (price !== undefined) {
+        stockItem.last_purchase_price = price;
+      }
+      stockItem.last_purchase_date = new Date();
+
+      stockItem = await queryRunner.manager.save(StockItem, stockItem);
+
+      // Create movement record for purchase within the same transaction
+      const movement = queryRunner.manager.create(StockMovement, {
+        stock_item_id: stockItem.id,
+        restaurant_id: restaurantId,
+        ingredient_id: ingredientId,
+        type: 'purchase_manual' as StockMovementType,
+        quantity: quantity,
+        quantity_before: previousQty,
+        quantity_after: Number(stockItem.current_quantity),
+        unit_cost: price || null,
+        notes: supplier ? `Supplier: ${supplier}` : null,
+        created_by: userId || null,
+      });
+      await queryRunner.manager.save(StockMovement, movement);
+
+      await queryRunner.commitTransaction();
+
+      this.logger.log(
+        `Stock received: ingredient=${ingredientId}, qty=${quantity}` +
+          (price ? `, price=${price}` : '') +
+          (supplier ? `, supplier=${supplier}` : ''),
+      );
+
+      return stockItem;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    stockItem.current_quantity =
-      Number(stockItem.current_quantity) + quantity;
-
-    if (price !== undefined) {
-      stockItem.last_purchase_price = price;
-    }
-    stockItem.last_purchase_date = new Date();
-
-    stockItem = await this.stockRepo.save(stockItem);
-
-    // Create movement record for purchase
-    await this.createMovement({
-      stock_item_id: stockItem.id,
-      restaurant_id: restaurantId,
-      ingredient_id: ingredientId,
-      type: 'purchase_manual',
-      quantity: quantity,
-      quantity_before: previousQty,
-      quantity_after: Number(stockItem.current_quantity),
-      unit_cost: price || null,
-      notes: supplier ? `Supplier: ${supplier}` : null,
-      created_by: userId || null,
-    });
-
-    this.logger.log(
-      `Stock received: ingredient=${ingredientId}, qty=${quantity}` +
-        (price ? `, price=${price}` : '') +
-        (supplier ? `, supplier=${supplier}` : ''),
-    );
-
-    return stockItem;
   }
 
   /**
    * Register waste/loss — deduct quantity and create movement.
+   * Wrapped in a transaction with pessimistic lock on the stock item.
    */
   async registerWaste(
     ingredientId: string,
@@ -285,44 +343,60 @@ export class StockService {
     reason: string,
     userId?: string,
   ): Promise<StockItem> {
-    const stockItem = await this.stockRepo.findOne({
-      where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
-      relations: ['ingredient'],
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!stockItem) {
-      throw new NotFoundException(
-        `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+    try {
+      const stockItem = await queryRunner.manager.findOne(StockItem, {
+        where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
+        relations: ['ingredient'],
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(
+          `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+        );
+      }
+
+      const previousQty = Number(stockItem.current_quantity);
+      stockItem.current_quantity = Math.max(0, previousQty - quantity);
+      await queryRunner.manager.save(StockItem, stockItem);
+
+      const movement = queryRunner.manager.create(StockMovement, {
+        stock_item_id: stockItem.id,
+        restaurant_id: restaurantId,
+        ingredient_id: ingredientId,
+        type: 'waste' as StockMovementType,
+        quantity: -quantity,
+        quantity_before: previousQty,
+        quantity_after: Number(stockItem.current_quantity),
+        notes: reason,
+        created_by: userId || null,
+      });
+      await queryRunner.manager.save(StockMovement, movement);
+
+      await queryRunner.commitTransaction();
+
+      this.logger.log(
+        `Waste registered: ingredient=${ingredientId}, qty=${quantity}, reason=${reason}`,
       );
+
+      this.checkAndEmitLowStock(stockItem, restaurantId);
+
+      return stockItem;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const previousQty = Number(stockItem.current_quantity);
-    stockItem.current_quantity = Math.max(0, previousQty - quantity);
-    await this.stockRepo.save(stockItem);
-
-    await this.createMovement({
-      stock_item_id: stockItem.id,
-      restaurant_id: restaurantId,
-      ingredient_id: ingredientId,
-      type: 'waste',
-      quantity: -quantity,
-      quantity_before: previousQty,
-      quantity_after: Number(stockItem.current_quantity),
-      notes: reason,
-      created_by: userId || null,
-    });
-
-    this.logger.log(
-      `Waste registered: ingredient=${ingredientId}, qty=${quantity}, reason=${reason}`,
-    );
-
-    this.checkAndEmitLowStock(stockItem, restaurantId);
-
-    return stockItem;
   }
 
   /**
    * Register internal use — deduct quantity and create movement.
+   * Wrapped in a transaction with pessimistic lock on the stock item.
    */
   async registerInternalUse(
     ingredientId: string,
@@ -331,40 +405,55 @@ export class StockService {
     reason: string,
     userId?: string,
   ): Promise<StockItem> {
-    const stockItem = await this.stockRepo.findOne({
-      where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
-      relations: ['ingredient'],
-    });
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    if (!stockItem) {
-      throw new NotFoundException(
-        `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+    try {
+      const stockItem = await queryRunner.manager.findOne(StockItem, {
+        where: { ingredient_id: ingredientId, restaurant_id: restaurantId },
+        relations: ['ingredient'],
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!stockItem) {
+        throw new NotFoundException(
+          `Stock item not found for ingredient ${ingredientId} in restaurant ${restaurantId}`,
+        );
+      }
+
+      const previousQty = Number(stockItem.current_quantity);
+      stockItem.current_quantity = Math.max(0, previousQty - quantity);
+      await queryRunner.manager.save(StockItem, stockItem);
+
+      const movement = queryRunner.manager.create(StockMovement, {
+        stock_item_id: stockItem.id,
+        restaurant_id: restaurantId,
+        ingredient_id: ingredientId,
+        type: 'internal_use' as StockMovementType,
+        quantity: -quantity,
+        quantity_before: previousQty,
+        quantity_after: Number(stockItem.current_quantity),
+        notes: reason,
+        created_by: userId || null,
+      });
+      await queryRunner.manager.save(StockMovement, movement);
+
+      await queryRunner.commitTransaction();
+
+      this.logger.log(
+        `Internal use registered: ingredient=${ingredientId}, qty=${quantity}, reason=${reason}`,
       );
+
+      this.checkAndEmitLowStock(stockItem, restaurantId);
+
+      return stockItem;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    const previousQty = Number(stockItem.current_quantity);
-    stockItem.current_quantity = Math.max(0, previousQty - quantity);
-    await this.stockRepo.save(stockItem);
-
-    await this.createMovement({
-      stock_item_id: stockItem.id,
-      restaurant_id: restaurantId,
-      ingredient_id: ingredientId,
-      type: 'internal_use',
-      quantity: -quantity,
-      quantity_before: previousQty,
-      quantity_after: Number(stockItem.current_quantity),
-      notes: reason,
-      created_by: userId || null,
-    });
-
-    this.logger.log(
-      `Internal use registered: ingredient=${ingredientId}, qty=${quantity}, reason=${reason}`,
-    );
-
-    this.checkAndEmitLowStock(stockItem, restaurantId);
-
-    return stockItem;
   }
 
   /**
