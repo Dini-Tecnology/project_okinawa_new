@@ -256,7 +256,7 @@ export default function StaffScreen({ navigation }: any) {
         )}
         <IconButton
           icon="account-details"
-          onPress={() => navigation.navigate('StaffDetails', { staffId: item.id })}
+          onPress={() => navigation.navigate('StaffDetail', { staffId: item.id })}
           iconColor={colors.foregroundSecondary}
           accessibilityRole="button"
           accessibilityLabel={`View details for ${item.profile.full_name}`}

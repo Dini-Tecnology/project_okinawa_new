@@ -138,6 +138,7 @@ import KdsBrainConfigScreen from '../screens/kds-settings/KdsBrainConfigScreen';
 // EPIC 12 — Service Calls Management
 // ============================================
 import CallsManagementScreen from '../screens/calls/CallsManagementScreen';
+import QRScannerScreen from '../screens/scanner/QRScannerScreen';
 
 // ============================================
 // FINANCIAL BRAIN SPRINT 1 — Tap to Pay & Cash Register
@@ -625,6 +626,44 @@ function MainStack() {
       <Stack.Screen
         name="MaitreWaitlist"
         component={MaitreWaitlistScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Reservation Creation (reuses ReservationDetailScreen in create mode) */}
+      <Stack.Screen
+        name="CreateReservation"
+        component={ReservationDetailScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Menu Item Edit & Create (reuses MenuItemDetailScreen) */}
+      <Stack.Screen
+        name="EditMenuItem"
+        component={MenuItemDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateMenuItem"
+        component={MenuItemDetailScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Staff Schedule & Add Staff (reuses StaffDetailScreen) */}
+      <Stack.Screen
+        name="StaffSchedule"
+        component={StaffDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddStaff"
+        component={StaffDetailScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* QR Scanner */}
+      <Stack.Screen
+        name="QRScanner"
+        component={QRScannerScreen}
         options={{ headerShown: false }}
       />
 

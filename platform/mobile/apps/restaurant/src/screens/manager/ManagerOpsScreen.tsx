@@ -347,7 +347,7 @@ export default function ManagerOpsScreen({ navigation }: any) {
 
       {pendingApprovals.length > 0 && (
         <TouchableOpacity
-          onPress={() => navigation.navigate('ManagerApprovals')}
+          onPress={() => navigation.navigate('Approvals')}
           style={[styles.alertBanner, styles.alertBannerOrange]}
           accessibilityRole="button"
           accessibilityLabel={t('manager.ops.alertPendingApprovals', { count: pendingApprovals.length })}
@@ -445,7 +445,7 @@ export default function ManagerOpsScreen({ navigation }: any) {
           )}
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate('ManagerApprovals')}
+          onPress={() => navigation.navigate('Approvals')}
           accessibilityRole="button"
           accessibilityLabel="View all pending approvals"
         >
