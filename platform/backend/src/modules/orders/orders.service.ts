@@ -482,17 +482,38 @@ export class OrdersService {
       );
     }
 
-    // Mark order as completed with cash payment metadata
-    order.status = OrderStatus.COMPLETED;
-    order.completed_at = new Date();
-    order.metadata = {
-      ...(order.metadata || {}),
-      payment_method: 'cash',
-      cash_confirmed_by: staffUserId,
-      cash_confirmed_at: new Date().toISOString(),
-    };
+    // Critical: update order status inside a transaction to guarantee atomicity
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const savedOrder = await this.orderRepository.save(order);
+    let savedOrder: Order;
+    try {
+      order.status = OrderStatus.COMPLETED;
+      order.completed_at = new Date();
+      order.metadata = {
+        ...(order.metadata || {}),
+        payment_method: 'cash',
+        cash_confirmed_by: staffUserId,
+        cash_confirmed_at: new Date().toISOString(),
+      };
+
+      savedOrder = await queryRunner.manager.save(order);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      const err = error as Error;
+      this.logger.error(
+        `Failed to commit cash payment for order ${orderId}: ${err.message}`,
+        err.stack,
+      );
+      throw new InternalServerErrorException('Failed to confirm cash payment');
+    } finally {
+      await queryRunner.release();
+    }
+
+    // --- Best-effort downstream operations (post-payment cascade) ---
+    // Each operation is independent; failures are logged with enough context for manual retry.
 
     // Post-payment cascade: loyalty points
     try {
@@ -503,11 +524,14 @@ export class OrdersService {
         order.id,
       );
     } catch (error) {
-      const err = error as Error;
-      this.logger.error(
-        `Failed to award loyalty points for cash order ${order.id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.warn({
+        message: 'Post-payment cascade failed: loyalty points',
+        orderId: order.id,
+        userId: order.user_id,
+        restaurantId: order.restaurant_id,
+        error: error instanceof Error ? error.message : 'Unknown',
+        retryable: true,
+      });
     }
 
     // Post-payment cascade: stock deduction
@@ -522,11 +546,14 @@ export class OrdersService {
         }
       }
     } catch (error) {
-      const err = error as Error;
-      this.logger.error(
-        `Failed to deduct stock for cash order ${order.id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.warn({
+        message: 'Post-payment cascade failed: stock deduction',
+        orderId: order.id,
+        userId: order.user_id,
+        restaurantId: order.restaurant_id,
+        error: error instanceof Error ? error.message : 'Unknown',
+        retryable: true,
+      });
     }
 
     // Post-payment cascade: CRM visit
@@ -537,11 +564,14 @@ export class OrdersService {
         Number(order.total_amount),
       );
     } catch (error) {
-      const err = error as Error;
-      this.logger.error(
-        `Failed to record CRM visit for cash order ${order.id}: ${err.message}`,
-        err.stack,
-      );
+      this.logger.warn({
+        message: 'Post-payment cascade failed: CRM visit',
+        orderId: order.id,
+        userId: order.user_id,
+        restaurantId: order.restaurant_id,
+        error: error instanceof Error ? error.message : 'Unknown',
+        retryable: true,
+      });
     }
 
     // Emit event for COGS recording + NFC-e emission (via EventEmitter2)
@@ -555,11 +585,15 @@ export class OrdersService {
       try {
         await this.tableRepository.update(order.table_id, { status: TableStatus.AVAILABLE });
       } catch (error) {
-        const err = error as Error;
-        this.logger.error(
-          `Failed to free table ${order.table_id} after cash order ${order.id}: ${err.message}`,
-          err.stack,
-        );
+        this.logger.warn({
+          message: 'Post-payment cascade failed: free table',
+          orderId: order.id,
+          tableId: order.table_id,
+          userId: order.user_id,
+          restaurantId: order.restaurant_id,
+          error: error instanceof Error ? error.message : 'Unknown',
+          retryable: true,
+        });
       }
     }
 
