@@ -116,7 +116,7 @@ function OrderItemCard({
         serveText: {
           fontSize: 10,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
       }),
     [colors, statusBorder, statusBg, status, hasApp],

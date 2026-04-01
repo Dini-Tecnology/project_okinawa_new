@@ -164,7 +164,7 @@ function LiveEventCard({ event, onAction, onDismiss }: LiveEventCardProps) {
           fontWeight: '700',
           color:
             event.urgency === 'critical'
-              ? '#FFFFFF'
+              ? colors.primaryForeground
               : eventColor,
         },
       }),

@@ -61,14 +61,14 @@ export default function StockAlertBanner({ restaurantId, onPress }: StockAlertBa
         <View style={styles.badges}>
           {stats.critical > 0 && (
             <View style={[styles.badge, { backgroundColor: colors.error }]}>
-              <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>
+              <Text style={[styles.badgeText, { color: colors.primaryForeground }]}>
                 {t('stock.alertCritical', { count: String(stats.critical) })}
               </Text>
             </View>
           )}
           {stats.low > 0 && (
             <View style={[styles.badge, { backgroundColor: colors.warning }]}>
-              <Text style={[styles.badgeText, { color: '#FFFFFF' }]}>
+              <Text style={[styles.badgeText, { color: colors.primaryForeground }]}>
                 {t('stock.alertLow', { count: String(stats.low) })}
               </Text>
             </View>

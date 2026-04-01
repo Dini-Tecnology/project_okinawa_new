@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"import.*zod\\\\|import.*Zod\\\\|z\\\\.object\\\\|z\\\\.string\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps --include=*.tsx -l)",
+      "Bash(grep -r \"rgba\\\\|rgb\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps --include=*Screen.tsx)",
+      "Bash(grep -r fontSize: /Users/pedrodini/project_okinawa-2/platform/mobile/apps --include=*Screen.tsx)",
+      "Bash(grep -r fontSizes*:s*[0-9] /Users/pedrodini/project_okinawa-2/platform/mobile/apps --include=*Screen.tsx)",
+      "Bash(grep -r \"padding:\\\\s*[0-9]\\\\|margin:\\\\s*[0-9]\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps --include=*Screen.tsx)",
+      "Bash(__NEW_LINE_4299ff6d470fd6a4__ echo:*)",
+      "Bash(__NEW_LINE_4299ff6d470fd6a4__ done:*)",
+      "Bash(node /tmp/wrap-screens-v2.mjs)",
+      "Bash(git checkout:*)",
+      "Bash(grep -n \"^    </View>$\" platform/mobile/apps/restaurant/src/screens/drink-recipes/DrinkRecipesScreen.tsx)",
+      "Bash(grep -n \"^}$\\\\|^};$\" platform/mobile/apps/restaurant/src/screens/stock/StockScreen.tsx)",
+      "Bash(perl -pi -e 's/fontSize: 11\\(?=[^0-9]\\)/fontSize: 12/g' apps/restaurant/src/screens/reviews/RestaurantReviewsScreen.tsx)",
+      "Bash(find apps/restaurant/src/screens apps/client/src/screens -name '*.tsx' -exec perl -pi -e 's/fontSize: 11\\(?=[^0-9]\\)/fontSize: 12/g' {} +)",
+      "Bash(git reset:*)",
+      "Bash(git restore:*)",
+      "Bash(node /tmp/fix-hex-colors.js)",
+      "Bash(node -e \":*)",
+      "Bash(grep -c \"''#[0-9a-fA-F]\\\\{3,8\\\\}''\" apps/client/src/screens/loyalty/LoyaltyScreen.tsx)",
+      "Bash(grep \"''#[0-9a-fA-F]\\\\{3,8\\\\}''\" apps/client/src/screens/loyalty/LoyaltyScreen.tsx)",
+      "Bash(node /tmp/fix-module-colors.js)",
+      "Bash(grep -rn 'placeholder=\"\"\"\"[^\"\"\"\"]*\"\"\"\"' apps/*/src/screens/ shared/screens/ --include=\"*.tsx\")",
+      "Bash(grep -rn 'label=\"\"\"\"[^\"\"\"\"]*\"\"\"\"' apps/*/src/screens/ shared/screens/ --include=\"*.tsx\")",
+      "Bash(grep -rn \"fontSize: 11\\\\b\\\\|fontSize: 13\\\\b\\\\|fontSize: 15\\\\b\\\\|fontSize: 17\\\\b\\\\|fontSize: 19\\\\b\\\\|fontSize: 21\\\\b\\\\|fontSize: 22\\\\b\\\\|fontSize: 23\\\\b\\\\|fontSize: 25\\\\b\\\\|fontSize: 26\\\\b\\\\|fontSize: 9\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rn \"padding: 15\\\\b\\\\|margin: 15\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rn \"padding: 3\\\\b\\\\|margin: 3\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)"
+    ]
+  }
+}

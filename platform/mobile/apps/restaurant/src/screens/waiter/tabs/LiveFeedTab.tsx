@@ -108,7 +108,7 @@ export default function LiveFeedTab({
         urgencyButtonText: {
           fontSize: 10,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
         reconnectBanner: {
           flexDirection: 'row',

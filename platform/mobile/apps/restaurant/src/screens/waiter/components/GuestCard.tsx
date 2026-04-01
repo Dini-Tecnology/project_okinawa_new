@@ -127,7 +127,7 @@ function GuestCard({ guest, allOrders, onOrder, onCharge }: GuestCardProps) {
         actionText: {
           fontSize: 8,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
       }),
     [colors, guest.paid, guest.hasApp],

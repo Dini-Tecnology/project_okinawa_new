@@ -160,7 +160,7 @@ export default function ChargeTab({ tables }: ChargeTabProps) {
         chargeBtnText: {
           fontSize: 10,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
       }),
     [colors],

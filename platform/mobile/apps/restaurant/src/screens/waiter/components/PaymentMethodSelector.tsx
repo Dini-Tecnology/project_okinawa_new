@@ -227,7 +227,7 @@ export default function PaymentMethodSelector({
         confirmBtnText: {
           fontSize: 14,
           fontWeight: '600',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
         changeMethodBtn: {
           width: '100%',
@@ -292,7 +292,7 @@ export default function PaymentMethodSelector({
         nextText: {
           fontSize: 12,
           fontWeight: '600',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
       }),
     [colors],

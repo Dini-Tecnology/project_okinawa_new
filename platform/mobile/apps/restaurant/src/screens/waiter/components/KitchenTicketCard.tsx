@@ -120,7 +120,7 @@ function KitchenTicketCard({ dish, isPickedUp, onPickup }: KitchenTicketCardProp
         pickupText: {
           fontSize: 12,
           fontWeight: '700',
-          color: '#FFFFFF',
+          color: colors.primaryForeground,
         },
         servedRow: {
           flexDirection: 'row',
