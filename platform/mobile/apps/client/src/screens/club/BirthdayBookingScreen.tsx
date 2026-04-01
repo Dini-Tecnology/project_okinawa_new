@@ -338,7 +338,8 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
       setBookingResult(data);
     },
     onError: (error: Error) => {
-      Alert.alert(t('common.error'), error.message || t('common.error'));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common.error'), error.message || t('club.birthday.bookingError') || t('common.error'));
     },
   });
 

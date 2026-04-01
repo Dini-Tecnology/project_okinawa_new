@@ -670,37 +670,38 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
       </View>
 
       {/* Entry list */}
-      {filteredEntries.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <IconButton
-            icon="account-group-outline"
-            size={64}
-            iconColor={colors.foregroundMuted}
-            accessibilityLabel={t('waitlistMgmt.emptyQueue')}
+      <FlatList
+        data={filteredEntries}
+        renderItem={renderEntry}
+        keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
-          <Text style={styles.emptyText}>{t('waitlistMgmt.emptyQueue')}</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredEntries}
-          renderItem={renderEntry}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              colors={[colors.primary]}
-              tintColor={colors.primary}
-            />
-          }
-          getItemLayout={(_, index) => ({
-            length: ITEM_HEIGHT,
-            offset: ITEM_HEIGHT * index,
-            index,
-          })}
-          contentContainerStyle={{ paddingTop: 8, paddingBottom: 24 }}
-        />
-      )}
+        }
+        getItemLayout={(_, index) => ({
+          length: ITEM_HEIGHT,
+          offset: ITEM_HEIGHT * index,
+          index,
+        })}
+        contentContainerStyle={{ paddingTop: 8, paddingBottom: 24 }}
+        ListEmptyComponent={
+          !loading ? (
+            <View style={styles.emptyContainer}>
+              <IconButton
+                icon="account-group-outline"
+                size={64}
+                iconColor={colors.foregroundMuted}
+                accessibilityLabel={t('waitlistMgmt.emptyQueue')}
+              />
+              <Text style={styles.emptyText}>{t('waitlistMgmt.emptyQueue')}</Text>
+            </View>
+          ) : null
+        }
+      />
 
       {/* Call Guest Modal (Bottom Sheet) */}
       <Modal

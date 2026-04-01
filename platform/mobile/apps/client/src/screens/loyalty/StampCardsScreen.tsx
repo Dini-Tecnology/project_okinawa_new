@@ -371,21 +371,6 @@ export default function StampCardsScreen() {
     </View>
   );
 
-  if (stampCards.length === 0) {
-    return (
-      <View style={[styles.container, styles.emptyContainer]}>
-        <IconButton
-          icon="cards-outline"
-          size={64}
-          iconColor={colors.foregroundMuted}
-        />
-        <Text style={styles.emptyText}>
-          {t('loyalty.detail.emptyMessage')}
-        </Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -406,6 +391,18 @@ export default function StampCardsScreen() {
             colors={[colors.primary]}
             tintColor={colors.primary}
           />
+        }
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <IconButton
+              icon="cards-outline"
+              size={64}
+              iconColor={colors.foregroundMuted}
+            />
+            <Text style={styles.emptyText}>
+              {t('loyalty.detail.emptyMessage')}
+            </Text>
+          </View>
         }
       />
     </View>

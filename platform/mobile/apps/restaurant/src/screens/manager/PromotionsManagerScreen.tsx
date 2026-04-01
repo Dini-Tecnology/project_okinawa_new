@@ -953,33 +953,34 @@ export default function PromotionsManagerScreen() {
       </View>
 
       {/* Promotions List */}
-      {filteredPromotions.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <IconButton
-            icon="tag-off-outline"
-            size={64}
-            iconColor={colors.foregroundMuted}
+      <FlatList
+        data={filteredPromotions}
+        renderItem={renderPromoCard}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={{ paddingTop: 4, paddingBottom: 80 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
-          <Text style={styles.emptyText}>
-            {t('promotions.noPromotions')}
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredPromotions}
-          renderItem={renderPromoCard}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingTop: 4, paddingBottom: 80 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={handleRefresh}
-              colors={[colors.primary]}
-              tintColor={colors.primary}
-            />
-          }
-        />
-      )}
+        }
+        ListEmptyComponent={
+          !loading ? (
+            <View style={styles.emptyContainer}>
+              <IconButton
+                icon="tag-off-outline"
+                size={64}
+                iconColor={colors.foregroundMuted}
+              />
+              <Text style={styles.emptyText}>
+                {t('promotions.noPromotions')}
+              </Text>
+            </View>
+          ) : null
+        }
+      />
 
       {/* FAB to create */}
       <FAB

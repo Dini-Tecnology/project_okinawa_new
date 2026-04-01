@@ -32,6 +32,7 @@ import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
 import { ApiService } from '@okinawa/shared/services/api';
+import * as Haptics from 'expo-haptics';
 
 // ============================================
 // TYPES
@@ -259,10 +260,12 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
       return response.data as PurchaseResult;
     },
     onSuccess: (data) => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setPurchaseResult(data);
     },
     onError: (error: Error) => {
-      Alert.alert(t('common.error'), error.message || t('common.error'));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common.error'), error.message || t('club.ticket.purchaseError') || t('common.error'));
     },
   });
 

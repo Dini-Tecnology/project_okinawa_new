@@ -15,6 +15,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Pressable,
+  Alert,
 } from 'react-native';
 import {
   Text,
@@ -188,10 +189,21 @@ export default function CallWaiterScreen({ route }: CallWaiterScreenProps) {
     mutationFn: (payload: CallPayload) => ApiService.post<{ id: string }>('/calls', payload),
     onSuccess: (data: any) => {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(
+        t('common.success'),
+        t('calls.callWaiter.success') || 'Garçom chamado!',
+      );
       setShowSuccess(true);
       if (data?.id) {
         setActiveCallId(data.id);
       }
+    },
+    onError: (error: Error) => {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        t('common.error'),
+        error.message || t('calls.callWaiter.errorMsg') || 'Não foi possível chamar o garçom. Tente novamente.',
+      );
     },
   });
 

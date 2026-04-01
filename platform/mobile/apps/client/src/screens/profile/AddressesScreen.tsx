@@ -284,67 +284,68 @@ export default function AddressesScreen() {
         </Text>
       </View>
 
-      {addresses.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <IconButton icon="map-marker-off" size={80} iconColor={colors.foregroundMuted} />
-          <Text variant="headlineSmall" style={styles.emptyTitle}>
-            {t('addresses.emptyTitle')}
-          </Text>
-          <Text variant="bodyMedium" style={styles.emptyMessage}>
-            {t('addresses.emptyMessage')}
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={addresses}
-          keyExtractor={(item) => item.id}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-          }
-          contentContainerStyle={styles.listContent}
-          renderItem={({ item: address }) => (
-            <TouchableOpacity
-              style={[styles.addressCard, address.is_default && styles.addressCardDefault]}
-              onLongPress={() => handleLongPress(address)}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityLabel={`${t(`addresses.labels.${address.label}`)} address: ${address.street}, ${address.number}${address.is_default ? ', default' : ''}`}
-              accessibilityHint="Long press for options"
-            >
-              <View style={styles.addressTop}>
-                <View style={styles.addressLabelRow}>
-                  <IconButton
-                    icon={LABEL_ICONS[address.label] || 'map-marker'}
-                    size={20}
-                    iconColor={colors.primary}
-                    style={{ margin: 0 }}
-                  />
-                  <Text variant="titleMedium" style={styles.addressLabel}>
-                    {t(`addresses.labels.${address.label}`)}
-                  </Text>
-                </View>
-                {address.is_default && (
-                  <Chip
-                    compact
-                    style={styles.defaultChip}
-                    textStyle={styles.defaultChipText}
-                  >
-                    {t('addresses.defaultBadge')}
-                  </Chip>
-                )}
+      <FlatList
+        data={addresses}
+        keyExtractor={(item) => item.id}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        }
+        contentContainerStyle={styles.listContent}
+        renderItem={({ item: address }) => (
+          <TouchableOpacity
+            style={[styles.addressCard, address.is_default && styles.addressCardDefault]}
+            onLongPress={() => handleLongPress(address)}
+            activeOpacity={0.7}
+            accessibilityRole="button"
+            accessibilityLabel={`${t(`addresses.labels.${address.label}`)} address: ${address.street}, ${address.number}${address.is_default ? ', default' : ''}`}
+            accessibilityHint="Long press for options"
+          >
+            <View style={styles.addressTop}>
+              <View style={styles.addressLabelRow}>
+                <IconButton
+                  icon={LABEL_ICONS[address.label] || 'map-marker'}
+                  size={20}
+                  iconColor={colors.primary}
+                  style={{ margin: 0 }}
+                />
+                <Text variant="titleMedium" style={styles.addressLabel}>
+                  {t(`addresses.labels.${address.label}`)}
+                </Text>
               </View>
-              <Text variant="bodyMedium" style={styles.addressText}>
-                {getFullAddress(address)}
-              </Text>
-            </TouchableOpacity>
-          )}
-          ListFooterComponent={
+              {address.is_default && (
+                <Chip
+                  compact
+                  style={styles.defaultChip}
+                  textStyle={styles.defaultChipText}
+                >
+                  {t('addresses.defaultBadge')}
+                </Chip>
+              )}
+            </View>
+            <Text variant="bodyMedium" style={styles.addressText}>
+              {getFullAddress(address)}
+            </Text>
+          </TouchableOpacity>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <IconButton icon="map-marker-off" size={80} iconColor={colors.foregroundMuted} />
+            <Text variant="headlineSmall" style={styles.emptyTitle}>
+              {t('addresses.emptyTitle')}
+            </Text>
+            <Text variant="bodyMedium" style={styles.emptyMessage}>
+              {t('addresses.emptyMessage')}
+            </Text>
+          </View>
+        }
+        ListFooterComponent={
+          addresses.length > 0 ? (
             <Text variant="bodySmall" style={styles.tipText}>
               {t('addresses.tip')}
             </Text>
-          }
-        />
-      )}
+          ) : null
+        }
+      />
 
       {/* FAB */}
       <FAB

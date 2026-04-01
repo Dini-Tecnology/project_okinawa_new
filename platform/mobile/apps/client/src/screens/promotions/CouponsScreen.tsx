@@ -318,28 +318,27 @@ export default function CouponsScreen() {
       </View>
 
       {/* Coupon List */}
-      {filteredCoupons.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <IconButton icon="ticket-percent-outline" size={80} iconColor={colors.foregroundMuted} />
-          <Text variant="headlineSmall" style={styles.emptyTitle}>
-            {t('coupons.emptyTitle')}
-          </Text>
-          <Text variant="bodyMedium" style={styles.emptyMessage}>
-            {t('coupons.emptyMessage')}
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={filteredCoupons}
-          keyExtractor={(item) => item.id}
-          renderItem={renderCoupon}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-          }
-          contentContainerStyle={styles.listContent}
-          ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
-        />
-      )}
+      <FlatList
+        data={filteredCoupons}
+        keyExtractor={(item) => item.id}
+        renderItem={renderCoupon}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        }
+        contentContainerStyle={styles.listContent}
+        ItemSeparatorComponent={() => <View style={{ height: 12 }} />}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <IconButton icon="ticket-percent-outline" size={80} iconColor={colors.foregroundMuted} />
+            <Text variant="headlineSmall" style={styles.emptyTitle}>
+              {t('coupons.emptyTitle')}
+            </Text>
+            <Text variant="bodyMedium" style={styles.emptyMessage}>
+              {t('coupons.emptyMessage')}
+            </Text>
+          </View>
+        }
+      />
     </View>
   );
 }

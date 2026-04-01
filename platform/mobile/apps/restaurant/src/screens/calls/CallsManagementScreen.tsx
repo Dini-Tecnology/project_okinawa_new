@@ -721,41 +721,40 @@ export default function CallsManagementScreen() {
       />
 
       {/* Calls List */}
-      {calls.length === 0 ? (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
-          <IconButton
-            icon={
-              activeTab === 'pending'
-                ? 'bell-check-outline'
-                : activeTab === 'acknowledged'
-                  ? 'check-circle-outline'
-                  : 'check-all'
-            }
-            size={80}
-            iconColor={colors.foregroundMuted}
+      <FlatList
+        data={calls}
+        keyExtractor={(item) => item.id}
+        renderItem={renderCallCard}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
           />
-          <Text variant="headlineSmall" style={{ marginTop: 16, color: colors.foreground, textAlign: 'center' }}>
-            {activeTab === 'resolved'
-              ? t('calls.empty.resolved')
-              : t('calls.empty.pending')}
-          </Text>
-        </View>
-      ) : (
-        <FlatList
-          data={calls}
-          keyExtractor={(item) => item.id}
-          renderItem={renderCallCard}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={colors.primary}
+        }
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
+            <IconButton
+              icon={
+                activeTab === 'pending'
+                  ? 'bell-check-outline'
+                  : activeTab === 'acknowledged'
+                    ? 'check-circle-outline'
+                    : 'check-all'
+              }
+              size={80}
+              iconColor={colors.foregroundMuted}
             />
-          }
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
+            <Text variant="headlineSmall" style={{ marginTop: 16, color: colors.foreground, textAlign: 'center' }}>
+              {activeTab === 'resolved'
+                ? t('calls.empty.resolved')
+                : t('calls.empty.pending')}
+            </Text>
+          </View>
+        }
+      />
     </View>
   );
 }

@@ -431,6 +431,17 @@ export default function NotificationsScreen() {
         }
         contentContainerStyle={styles.listContent}
         ItemSeparatorComponent={() => <Divider style={styles.divider} />}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <IconButton icon="bell-outline" size={80} iconColor={colors.foregroundMuted} />
+            <Text variant="headlineSmall" style={styles.emptyTitle}>
+              {t('notifications.emptyTitle')}
+            </Text>
+            <Text variant="bodyMedium" style={styles.emptyMessage}>
+              {t('notifications.emptyMessage')}
+            </Text>
+          </View>
+        }
       />
     </View>
   );
