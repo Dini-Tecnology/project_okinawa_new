@@ -13,6 +13,7 @@
 
 import React, { useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -302,6 +303,7 @@ export default function ChefViewScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('kds.chef_title')}</Text>
@@ -329,6 +331,7 @@ export default function ChefViewScreen() {
           </View>
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -397,6 +400,7 @@ export default function ChefViewScreen() {
   // ── Main render ──────────────────────────────────────────────────
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -476,5 +480,6 @@ export default function ChefViewScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }

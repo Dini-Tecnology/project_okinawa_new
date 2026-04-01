@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -256,6 +257,7 @@ export default function FoodTruckScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -327,6 +329,7 @@ export default function FoodTruckScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }
 

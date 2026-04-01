@@ -14,6 +14,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -250,6 +251,7 @@ export default function RestaurantReviewsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <ScrollView style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         <View style={{ marginHorizontal: 16, marginTop: 16, marginBottom: 8 }}>
           <View style={{ backgroundColor: '#1F2937', borderRadius: 20, padding: 16, overflow: 'hidden', position: 'relative' }}>
@@ -267,21 +269,25 @@ export default function RestaurantReviewsScreen() {
         <ReviewSkeleton colors={colors} />
         <ReviewSkeleton colors={colors} />
       </ScrollView>
+      </ScreenContainer>
     );
   }
 
   if (error) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
         <Text variant="bodyLarge" style={{ color: colors.foregroundSecondary, marginBottom: 16, textAlign: 'center' }}>{t('common.error')}</Text>
         <TouchableOpacity onPress={loadData} accessibilityRole="button" accessibilityLabel={t('common.retry')}>
           <Text variant="labelLarge" style={{ color: colors.primary, fontWeight: '600' }}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -585,5 +591,6 @@ export default function RestaurantReviewsScreen() {
         {t('reviews.newReviewReceived') || 'Nova avaliacao recebida!'}
       </Snackbar>
     </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }

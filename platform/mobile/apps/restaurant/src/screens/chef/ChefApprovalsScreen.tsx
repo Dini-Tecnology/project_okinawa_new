@@ -9,6 +9,7 @@
 
 import React, { useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -167,13 +168,16 @@ export default function ChefApprovalsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.center}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <FlatList
         data={reservations}
@@ -194,6 +198,7 @@ export default function ChefApprovalsScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }
 

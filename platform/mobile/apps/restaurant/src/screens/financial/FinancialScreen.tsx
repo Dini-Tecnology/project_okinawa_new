@@ -20,6 +20,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { io, Socket } from 'socket.io-client';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface FinancialSummary {
   total_revenue: number;
@@ -259,6 +260,7 @@ export default function FinancialScreen() {
     : null;
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -541,5 +543,6 @@ export default function FinancialScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }

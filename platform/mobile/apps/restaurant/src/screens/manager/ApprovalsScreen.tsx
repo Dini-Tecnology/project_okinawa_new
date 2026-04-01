@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -427,13 +428,16 @@ export default function ApprovalsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -629,5 +633,6 @@ export default function ApprovalsScreen() {
 
       <View style={{ height: 32 }} />
     </ScrollView>
+    </ScreenContainer>
   );
 }

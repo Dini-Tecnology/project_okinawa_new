@@ -12,6 +12,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -475,6 +476,7 @@ export default function KdsAnalyticsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('kds.analytics.title')}</Text>
@@ -487,6 +489,7 @@ export default function KdsAnalyticsScreen() {
           <SkeletonBlock width="100%" height={120} borderRadius={12} />
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -498,6 +501,7 @@ export default function KdsAnalyticsScreen() {
   // ── Render ──────────────────────────────────────────────────────
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -665,5 +669,6 @@ export default function KdsAnalyticsScreen() {
         )}
       </ScrollView>
     </View>
+    </ScreenContainer>
   );
 }

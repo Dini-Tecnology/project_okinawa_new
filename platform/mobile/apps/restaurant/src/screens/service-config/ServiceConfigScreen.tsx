@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, Switch, ActivityIndicator } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -261,6 +262,7 @@ export default function ServiceConfigScreen() {
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Service Charge Section */}
@@ -659,5 +661,6 @@ export default function ServiceConfigScreen() {
         </Button>
       </View>
     </View>
+    </ScreenContainer>
   );
 }

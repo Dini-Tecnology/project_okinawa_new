@@ -28,6 +28,7 @@ import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatt
 import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/theme';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // CONSTANTS
@@ -156,6 +157,7 @@ export default function FinancialReportScreen() {
   // ============================================
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       {/* Period Selection Card */}
       <Card style={styles.card}>
@@ -305,6 +307,7 @@ export default function FinancialReportScreen() {
         </Button>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }
 

@@ -10,6 +10,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl, Alert } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -361,6 +362,7 @@ export default function BarmanKDSScreen() {
   const readyCount = orders.filter((o) => o.status === 'ready').length;
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header Stats */}
       <View style={styles.header}>
@@ -575,5 +577,6 @@ export default function BarmanKDSScreen() {
         )}
       </ScrollView>
     </View>
+    </ScreenContainer>
   );
 }

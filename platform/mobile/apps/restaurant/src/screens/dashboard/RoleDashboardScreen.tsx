@@ -13,6 +13,7 @@
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -463,6 +464,7 @@ export default function RoleDashboardScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <ScrollView style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         <LinearGradient
           colors={[colors.primary, colors.accent]}
@@ -484,11 +486,13 @@ export default function RoleDashboardScreen() {
           ))}
         </View>
       </ScrollView>
+      </ScreenContainer>
     );
   }
 
   if (error) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
         <Text variant="bodyLarge" style={{ color: colors.foregroundSecondary, marginBottom: 16, textAlign: 'center' }}>
           {t('common.error')}
@@ -499,10 +503,12 @@ export default function RoleDashboardScreen() {
           </Text>
         </TouchableOpacity>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}
       refreshControl={
@@ -624,5 +630,6 @@ export default function RoleDashboardScreen() {
         ))}
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

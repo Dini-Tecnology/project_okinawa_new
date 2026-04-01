@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -505,12 +506,14 @@ export default function CashRegisterScreen() {
   // Loading state
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.centered}>
         <ActivityIndicator animating size="large" color={colors.primary} />
         <Text style={{ color: colors.mutedForeground, marginTop: 12 }}>
           {t('common.loading')}
         </Text>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -795,6 +798,7 @@ export default function CashRegisterScreen() {
   );
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Tab selector */}
       <SegmentedButtons
@@ -1006,5 +1010,6 @@ export default function CashRegisterScreen() {
         </Modal>
       </Portal>
     </View>
+    </ScreenContainer>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -185,6 +186,7 @@ export default function StockScreen({ navigation }: { navigation: any }) {
   // Skeleton loading
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -193,6 +195,7 @@ export default function StockScreen({ navigation }: { navigation: any }) {
           </Text>
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -569,6 +572,7 @@ export default function StockScreen({ navigation }: { navigation: any }) {
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderStatsHeader()}
       {renderFilterTabs()}
@@ -602,6 +606,7 @@ export default function StockScreen({ navigation }: { navigation: any }) {
 
       {renderUpdateModal()}
     </View>
+    </ScreenContainer>
   );
 }
 

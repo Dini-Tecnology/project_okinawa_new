@@ -24,6 +24,7 @@ import {
   getLanguageOptions,
   type SupportedLanguage,
 } from '@/shared/i18n';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // CURRENCY OPTIONS
@@ -159,6 +160,7 @@ export default function ConfigLanguageScreen() {
   );
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       {/* App Language */}
       <View style={styles.section}>
@@ -242,5 +244,6 @@ export default function ConfigLanguageScreen() {
         </Text>
       </TouchableOpacity>
     </ScrollView>
+    </ScreenContainer>
   );
 }

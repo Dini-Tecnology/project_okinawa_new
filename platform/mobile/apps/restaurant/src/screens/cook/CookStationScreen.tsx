@@ -20,6 +20,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -901,6 +902,7 @@ export default function CookStationScreen() {
   // ============================================
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -981,5 +983,6 @@ export default function CookStationScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }

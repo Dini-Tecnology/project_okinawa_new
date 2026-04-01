@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -146,21 +147,25 @@ export default function StockItemDetailScreen({ navigation, route }: Props) {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!item) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={[styles.emptyText, { color: colors.foregroundSecondary }]}>
           {t('stock.emptyTitle')}
         </Text>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -168,6 +173,7 @@ export default function StockItemDetailScreen({ navigation, route }: Props) {
   const progressWidth = Math.min(item.level_pct, 100);
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header with status */}
@@ -414,6 +420,7 @@ export default function StockItemDetailScreen({ navigation, route }: Props) {
         </KeyboardAvoidingView>
       </Modal>
     </View>
+    </ScreenContainer>
   );
 }
 

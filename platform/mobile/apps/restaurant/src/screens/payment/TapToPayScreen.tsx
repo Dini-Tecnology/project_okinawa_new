@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   Animated,
@@ -333,11 +334,13 @@ export default function TapToPayScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {state === 'ready' && renderReadyState()}
       {state === 'reading' && renderReadingState()}
       {state === 'success' && renderSuccessState()}
       {state === 'failed' && renderFailedState()}
     </View>
+    </ScreenContainer>
   );
 }

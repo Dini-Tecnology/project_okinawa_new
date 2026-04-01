@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -313,13 +314,16 @@ export default function ManagerOpsScreen({ navigation }: any) {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -540,5 +544,6 @@ export default function ManagerOpsScreen({ navigation }: any) {
 
       <View style={{ height: 32 }} />
     </ScrollView>
+    </ScreenContainer>
   );
 }

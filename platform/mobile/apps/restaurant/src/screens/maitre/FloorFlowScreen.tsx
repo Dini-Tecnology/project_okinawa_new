@@ -10,6 +10,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -349,6 +350,7 @@ export default function FloorFlowScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text variant="headlineSmall" style={styles.headerTitle}>
@@ -357,11 +359,13 @@ export default function FloorFlowScreen() {
         </View>
         <FloorSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (isError) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle-outline" size={64} iconColor={colors.foregroundMuted} accessibilityLabel="Error loading floor plan" />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -377,6 +381,7 @@ export default function FloorFlowScreen() {
           {t('common.retry')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -395,6 +400,7 @@ export default function FloorFlowScreen() {
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -499,6 +505,7 @@ export default function FloorFlowScreen() {
         t={t}
       />
     </View>
+    </ScreenContainer>
   );
 }
 

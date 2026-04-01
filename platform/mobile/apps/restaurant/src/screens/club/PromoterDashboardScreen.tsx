@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -186,6 +187,7 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text variant="headlineMedium" style={{ color: colors.foreground, fontWeight: '700' }}>
@@ -194,10 +196,12 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
         </View>
         <DashboardSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={{ color: colors.foreground, fontWeight: '700' }}>
@@ -235,6 +239,7 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
         </Modal>
       </Portal>
     </View>
+    </ScreenContainer>
   );
 }
 

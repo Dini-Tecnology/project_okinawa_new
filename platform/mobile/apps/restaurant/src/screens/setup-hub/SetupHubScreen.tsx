@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -350,6 +351,7 @@ export default function SetupHubScreen() {
   const isSetupComplete = completedRequired === totalRequired;
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       {/* Header Card */}
       <Card style={styles.headerCard}>
@@ -582,5 +584,6 @@ export default function SetupHubScreen() {
         </Button>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

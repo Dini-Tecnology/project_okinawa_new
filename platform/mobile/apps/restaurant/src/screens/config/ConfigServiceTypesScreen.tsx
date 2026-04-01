@@ -22,6 +22,7 @@ import { useRestaurantConfig } from './hooks/useRestaurantConfig';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
 import type { ServiceTypeOption } from './types/config.types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // SERVICE TYPE OPTIONS
@@ -179,13 +180,16 @@ export default function ConfigServiceTypesScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       {/* Primary Type */}
       <View style={styles.section}>
@@ -255,5 +259,6 @@ export default function ConfigServiceTypesScreen() {
         </Text>
       </TouchableOpacity>
     </ScrollView>
+    </ScreenContainer>
   );
 }

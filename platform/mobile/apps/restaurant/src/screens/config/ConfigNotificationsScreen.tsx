@@ -19,6 +19,7 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import { useRestaurantConfig } from './hooks/useRestaurantConfig';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // NOTIFICATION OPTIONS
@@ -126,13 +127,16 @@ export default function ConfigNotificationsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('config.notifications.title')}</Text>
@@ -161,5 +165,6 @@ export default function ConfigNotificationsScreen() {
         </Text>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -470,12 +471,14 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
   // Skeleton loading
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.loadingContainer}>
         <View style={styles.skeletonCard} />
         <View style={styles.skeletonCard} />
         <View style={styles.skeletonCard} />
         <View style={styles.skeletonCard} />
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -629,6 +632,7 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Stats header */}
       <View style={styles.statsHeader}>
@@ -765,5 +769,6 @@ export default function MaitreWaitlistScreen({ route }: MaitreWaitlistScreenProp
         </Pressable>
       </Modal>
     </View>
+    </ScreenContainer>
   );
 }

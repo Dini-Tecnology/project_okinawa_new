@@ -10,6 +10,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -255,15 +256,18 @@ export default function BillsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   // ────────── Render ──────────
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <ScrollView
         refreshControl={
@@ -541,6 +545,7 @@ export default function BillsScreen() {
         </KeyboardAvoidingView>
       </Modal>
     </View>
+    </ScreenContainer>
   );
 }
 

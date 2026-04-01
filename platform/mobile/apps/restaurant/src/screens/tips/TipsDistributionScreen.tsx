@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface StaffTips {
   staff_id: string;
@@ -189,6 +190,7 @@ export default function TipsDistributionScreen() {
   const remaining = totalTips - totalDistributed;
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
@@ -334,5 +336,6 @@ export default function TipsDistributionScreen() {
         </Button>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

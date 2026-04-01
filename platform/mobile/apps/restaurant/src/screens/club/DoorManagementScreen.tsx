@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -419,6 +420,7 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         <LinearGradient
           colors={[colors.primary, colors.accent]}
@@ -436,10 +438,12 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
         </LinearGradient>
         <DoorSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
       {/* Gradient Header */}
       <LinearGradient
@@ -524,5 +528,6 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
         showsVerticalScrollIndicator={false}
       />
     </View>
+    </ScreenContainer>
   );
 }

@@ -14,6 +14,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { loginSchema, validateForm } from '@/shared/validation/schemas';
 import Haptic from '@/shared/utils/haptics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 export default function LoginScreen({ navigation }: any) {
   const { t } = useI18n();
@@ -87,6 +88,7 @@ export default function LoginScreen({ navigation }: any) {
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <Text variant="headlineLarge" style={styles.title}>
         Okinawa Restaurant
@@ -134,5 +136,6 @@ export default function LoginScreen({ navigation }: any) {
         {t('auth.login')}
       </Button>
     </View>
+    </ScreenContainer>
   );
 }

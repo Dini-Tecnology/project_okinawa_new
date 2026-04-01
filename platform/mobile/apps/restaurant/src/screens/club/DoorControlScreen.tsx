@@ -10,6 +10,7 @@
 
 import React, { useState, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -357,6 +358,7 @@ export default function DoorControlScreen({ route }: DoorControlScreenProps) {
   }, []);
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -470,6 +472,7 @@ export default function DoorControlScreen({ route }: DoorControlScreenProps) {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }
 

@@ -12,6 +12,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -184,16 +185,19 @@ export default function FiscalSetupScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.centered, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={[styles.loadingText, { color: colors.foregroundSecondary }]}>
           {t('common.loading')}
         </Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: colors.background }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -466,6 +470,7 @@ export default function FiscalSetupScreen() {
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }
 

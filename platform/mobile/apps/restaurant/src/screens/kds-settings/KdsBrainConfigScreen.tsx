@@ -13,6 +13,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -210,6 +211,7 @@ export default function KdsBrainConfigScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('kds.config.title')}</Text>
@@ -220,12 +222,14 @@ export default function KdsBrainConfigScreen() {
           ))}
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
   // ── Render ──────────────────────────────────────────────────────
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('kds.config.title')}</Text>
@@ -345,5 +349,6 @@ export default function KdsBrainConfigScreen() {
         </Button>
       </ScrollView>
     </View>
+    </ScreenContainer>
   );
 }

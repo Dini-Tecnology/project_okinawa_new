@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import ApiService from '@okinawa/shared/services/api';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type QRCodeType = 'table' | 'menu' | 'order' | 'unknown';
 
@@ -279,14 +280,17 @@ export default function QRScannerScreen() {
 
   if (!permission) {
     return (
+      <ScreenContainer>
       <View style={styles.permissionContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!permission.granted) {
     return (
+      <ScreenContainer>
       <View style={styles.permissionContainer}>
         <IconButton icon="camera-off" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="headlineSmall" style={styles.permissionTitle}>
@@ -311,10 +315,12 @@ export default function QRScannerScreen() {
           {t('scanner.openSettings')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <CameraView
         style={styles.camera}
@@ -419,5 +425,6 @@ export default function QRScannerScreen() {
         </View>
       </CameraView>
     </View>
+    </ScreenContainer>
   );
 }

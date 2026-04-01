@@ -16,6 +16,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -414,6 +415,7 @@ export default function StationSettingsScreen() {
   // ============================================
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -543,5 +545,6 @@ export default function StationSettingsScreen() {
         </Modal>
       </Portal>
     </View>
+    </ScreenContainer>
   );
 }

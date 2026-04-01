@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -184,14 +185,17 @@ export default function QRCodeBatchScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando mesas...</Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header Stats */}
       <Card style={styles.statsCard}>
@@ -349,6 +353,7 @@ export default function QRCodeBatchScreen() {
         )}
       </View>
     </View>
+    </ScreenContainer>
   );
 }
 

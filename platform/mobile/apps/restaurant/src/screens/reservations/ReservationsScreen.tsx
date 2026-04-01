@@ -5,6 +5,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { format } from 'date-fns';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Reservation {
   id: string;
@@ -296,6 +297,7 @@ export default function ReservationsScreen({ navigation }: any) {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Searchbar
         placeholder={t('common.search')}
@@ -392,5 +394,6 @@ export default function ReservationsScreen({ navigation }: any) {
         accessibilityLabel={t('reservations.createReservation')}
       />
     </View>
+    </ScreenContainer>
   );
 }

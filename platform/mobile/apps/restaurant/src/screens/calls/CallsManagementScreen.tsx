@@ -10,6 +10,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -572,6 +573,7 @@ export default function CallsManagementScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         <LinearGradient
           colors={[colors.primary, colors.accent]}
@@ -597,11 +599,13 @@ export default function CallsManagementScreen() {
         </LinearGradient>
         <CallSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (isError) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40, backgroundColor: colors.background }}>
         <IconButton
           icon="alert-circle-outline"
@@ -620,6 +624,7 @@ export default function CallsManagementScreen() {
           {t('common.retry')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -630,6 +635,7 @@ export default function CallsManagementScreen() {
   ];
 
   return (
+    <ScreenContainer>
     <View style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
       {/* Gradient Header */}
       <LinearGradient
@@ -756,6 +762,7 @@ export default function CallsManagementScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }
 

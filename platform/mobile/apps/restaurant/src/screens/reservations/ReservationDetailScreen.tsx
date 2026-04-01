@@ -8,6 +8,7 @@ import ApiService from '@/shared/services/api';
 import type { Reservation, ReservationStatus } from '../../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {
   ReservationDetail: {
@@ -149,22 +150,27 @@ export default function ReservationDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!reservation) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.foregroundMuted} />
         <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('reservations.reservationNotFound')}</Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
@@ -286,5 +292,6 @@ export default function ReservationDetailScreen() {
         )}
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

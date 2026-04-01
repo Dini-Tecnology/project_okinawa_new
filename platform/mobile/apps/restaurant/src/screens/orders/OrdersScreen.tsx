@@ -9,6 +9,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { Order, OrderStatus } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type FilterType = 'all' | 'active' | 'completed' | 'cancelled';
 
@@ -343,6 +344,7 @@ export default function OrdersScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.header}>
         <Searchbar
@@ -423,5 +425,6 @@ export default function OrdersScreen() {
         )}
       </Menu>
     </View>
+    </ScreenContainer>
   );
 }

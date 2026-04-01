@@ -10,6 +10,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -370,6 +371,7 @@ export default function ClubQueueManagementScreen({ route }: ClubQueueManagement
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text
@@ -381,10 +383,12 @@ export default function ClubQueueManagementScreen({ route }: ClubQueueManagement
         </View>
         <QueueSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -484,6 +488,7 @@ export default function ClubQueueManagementScreen({ route }: ClubQueueManagement
         showsVerticalScrollIndicator={false}
       />
     </View>
+    </ScreenContainer>
   );
 }
 

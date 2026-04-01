@@ -15,6 +15,7 @@ import ApiService from '@/shared/services/api';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useI18n } from '@/shared/hooks/useI18n';
 import type { User } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {
   StaffDetail: {
@@ -194,14 +195,17 @@ export default function StaffDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!staff) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.mutedForeground} />
         <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('staff.notFound')}</Text>
@@ -215,10 +219,12 @@ export default function StaffDetailScreen() {
           {t('common.back')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
@@ -322,5 +328,6 @@ export default function StaffDetailScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }

@@ -14,6 +14,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -263,27 +264,32 @@ export default function LoyaltyManagementScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <ScrollView style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         <StatsSkeleton colors={colors} />
         <View style={{ height: 16 }} />
         <CardSkeleton colors={colors} />
         <CardSkeleton colors={colors} />
       </ScrollView>
+      </ScreenContainer>
     );
   }
 
   if (error) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
         <Text variant="bodyLarge" style={{ color: colors.foregroundSecondary, marginBottom: 16, textAlign: 'center' }}>{t('common.error')}</Text>
         <TouchableOpacity onPress={loadData} accessibilityRole="button" accessibilityLabel={t('common.retry')}>
           <Text variant="labelLarge" style={{ color: colors.primary, fontWeight: '600' }}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}
       refreshControl={
@@ -563,5 +569,6 @@ export default function LoyaltyManagementScreen() {
         </View>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

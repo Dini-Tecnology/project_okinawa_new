@@ -8,6 +8,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import type { Order, OrderStatus } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 export default function KDSScreen() {
   const { t } = useI18n();
@@ -321,6 +322,7 @@ export default function KDSScreen() {
   const filteredOrders = getFilteredOrders();
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text variant="headlineLarge" style={styles.headerTitle}>{t('kds.title')}</Text>
@@ -373,5 +375,6 @@ export default function KDSScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }

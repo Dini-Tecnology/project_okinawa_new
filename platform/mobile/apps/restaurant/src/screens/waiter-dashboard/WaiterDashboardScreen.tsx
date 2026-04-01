@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl, TouchableOpacity } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -293,6 +294,7 @@ export default function WaiterDashboardScreen() {
   const occupiedTables = myTables.filter((t) => t.status === 'occupied');
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Stats Header */}
       {stats && (
@@ -556,5 +558,6 @@ export default function WaiterDashboardScreen() {
         accessibilityLabel="Novo Pedido"
       />
     </View>
+    </ScreenContainer>
   );
 }

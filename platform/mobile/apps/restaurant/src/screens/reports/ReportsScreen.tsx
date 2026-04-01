@@ -14,6 +14,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -283,6 +284,7 @@ export default function ReportsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <ScrollView style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         {/* Skeleton header */}
         <View style={{ marginHorizontal: 16, marginTop: 16, marginBottom: 8 }}>
@@ -309,17 +311,20 @@ export default function ReportsScreen() {
         <SectionSkeleton colors={colors} />
         <SectionSkeleton colors={colors} />
       </ScrollView>
+      </ScreenContainer>
     );
   }
 
   if (error) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background, padding: 24 }}>
         <Text variant="bodyLarge" style={{ color: colors.foregroundSecondary, marginBottom: 16, textAlign: 'center' }}>{t('common.error')}</Text>
         <TouchableOpacity onPress={loadData} accessibilityLabel={t('common.retry')}>
           <Text variant="labelLarge" style={{ color: colors.primary, fontWeight: '600' }}>{t('common.retry')}</Text>
         </TouchableOpacity>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -339,6 +344,7 @@ export default function ReportsScreen() {
     : '--';
 
   return (
+    <ScreenContainer>
     <View style={{ flex: 1 }}>
       <ScrollView
         style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}
@@ -700,5 +706,6 @@ export default function ReportsScreen() {
         </View>
       )}
     </View>
+    </ScreenContainer>
   );
 }

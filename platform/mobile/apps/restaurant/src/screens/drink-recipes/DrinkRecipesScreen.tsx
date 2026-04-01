@@ -17,6 +17,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   FlatList,
   StyleSheet,
@@ -302,6 +303,7 @@ export default function DrinkRecipesScreen({ navigation }: { navigation: any }) 
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Search */}
       <View style={styles.searchContainer}>
@@ -358,5 +360,6 @@ export default function DrinkRecipesScreen({ navigation }: { navigation: any }) 
         }
       />
     </View>
+    </ScreenContainer>
   );
 }

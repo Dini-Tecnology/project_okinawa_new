@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -131,16 +132,19 @@ export default function CasualDiningConfigScreen({ route }: CasualDiningConfigSc
 
   if (isLoading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text variant="headlineMedium" style={{ color: colors.foreground, fontWeight: '700' }}>{t('casualDining.config.title')}</Text>
         </View>
         <View style={styles.loadingContainer}><ActivityIndicator size="large" color={colors.primary} /></View>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <View style={styles.headerRow}>
@@ -196,6 +200,7 @@ export default function CasualDiningConfigScreen({ route }: CasualDiningConfigSc
         {t('casualDining.config.saved')}
       </Snackbar>
     </View>
+    </ScreenContainer>
   );
 }
 

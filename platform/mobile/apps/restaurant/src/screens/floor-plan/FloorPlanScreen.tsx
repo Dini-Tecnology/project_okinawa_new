@@ -4,6 +4,7 @@ import { Text, Card, Chip, FAB, Portal, Modal, Button, TextInput } from 'react-n
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 /**
  * Table interface defines the structure of restaurant tables
@@ -244,6 +245,7 @@ export default function FloorPlanScreen({ navigation }: any) {
   };
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Status Legend */}
       <View style={styles.legend}>
@@ -438,5 +440,6 @@ export default function FloorPlanScreen({ navigation }: any) {
         accessibilityLabel="Refresh floor plan"
       />
     </View>
+    </ScreenContainer>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -912,6 +913,7 @@ export default function PromotionsManagerScreen() {
   );
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -998,5 +1000,6 @@ export default function PromotionsManagerScreen() {
       {/* Create Modal */}
       {renderCreateModal()}
     </View>
+    </ScreenContainer>
   );
 }

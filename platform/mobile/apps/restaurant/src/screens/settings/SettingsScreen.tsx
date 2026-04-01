@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { authService } from '@/shared/services/auth';
 import { useI18n, SupportedLanguage } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
@@ -60,6 +61,7 @@ export default function SettingsScreen() {
   }), [colors]);
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <List.Section>
         <List.Subheader style={styles.subheader}>{t('notifications.title')}</List.Subheader>
@@ -155,5 +157,6 @@ export default function SettingsScreen() {
         </Dialog>
       </Portal>
     </ScrollView>
+    </ScreenContainer>
   );
 }

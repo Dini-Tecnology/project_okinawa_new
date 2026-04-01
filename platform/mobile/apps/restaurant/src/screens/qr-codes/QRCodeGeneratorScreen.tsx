@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -206,16 +207,19 @@ export default function QRCodeGeneratorScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando...</Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   const selectedConfig = styleConfigs.find((s) => s.id === selectedStyle);
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.scrollContent}
@@ -374,6 +378,7 @@ export default function QRCodeGeneratorScreen() {
         Gerar em Lote para Todas as Mesas
       </Button>
     </ScrollView>
+    </ScreenContainer>
   );
 }
 

@@ -15,6 +15,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { Order, OrderStatus } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {
   OrderDetail: {
@@ -248,14 +249,17 @@ export default function OrderDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.mutedForeground} />
         <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('errors.notFound')}</Text>
@@ -269,6 +273,7 @@ export default function OrderDetailScreen() {
           {t('common.back')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -288,6 +293,7 @@ export default function OrderDetailScreen() {
   const nextStatus = getNextStatus(order.status);
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
@@ -475,5 +481,6 @@ export default function OrderDetailScreen() {
         </View>
       )}
     </ScrollView>
+    </ScreenContainer>
   );
 }

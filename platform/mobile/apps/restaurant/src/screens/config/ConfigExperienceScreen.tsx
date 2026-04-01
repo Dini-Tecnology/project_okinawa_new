@@ -22,6 +22,7 @@ import { useRestaurantConfig } from './hooks/useRestaurantConfig';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
 import type { ExperienceFlags } from './types/config.types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // EXPERIENCE FLAG OPTIONS
@@ -130,13 +131,16 @@ export default function ConfigExperienceScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('config.experience.title')}</Text>
@@ -162,5 +166,6 @@ export default function ConfigExperienceScreen() {
         </Text>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

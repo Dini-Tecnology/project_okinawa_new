@@ -5,6 +5,7 @@ import { Text, Card, Button, FAB, Chip, Searchbar, Avatar, IconButton } from 're
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface StaffMember {
   id: string;
@@ -273,6 +274,7 @@ export default function StaffScreen({ navigation }: any) {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Searchbar
         placeholder={t('staff.searchStaff')}
@@ -331,5 +333,6 @@ export default function StaffScreen({ navigation }: any) {
         accessibilityLabel="Add new staff member"
       />
     </View>
+    </ScreenContainer>
   );
 }

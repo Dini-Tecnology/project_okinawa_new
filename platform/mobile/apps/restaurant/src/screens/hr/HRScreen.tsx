@@ -4,6 +4,7 @@ import { Text, Card, SegmentedButtons, DataTable, Button, Chip } from 'react-nat
 import ApiService from '@/shared/services/api';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { useColors } from '@/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface HRSummary {
   total_staff: number;
@@ -214,6 +215,7 @@ export default function HRScreen({ navigation }: any) {
   }), [colors]);
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -348,5 +350,6 @@ export default function HRScreen({ navigation }: any) {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }

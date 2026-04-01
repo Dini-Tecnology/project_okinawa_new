@@ -13,6 +13,7 @@
 
 import React, { useMemo, useEffect, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -300,15 +301,18 @@ export default function ConfigProfileScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   const dayLabels = DAY_LABELS[language] || DAY_LABELS['en-US'];
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       {/* Basic Info */}
       <View style={styles.section}>
@@ -448,5 +452,6 @@ export default function ConfigProfileScreen() {
         </Text>
       </View>
     </ScrollView>
+    </ScreenContainer>
   );
 }

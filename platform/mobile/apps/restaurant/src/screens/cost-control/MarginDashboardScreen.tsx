@@ -9,6 +9,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -179,6 +180,7 @@ export default function MarginDashboardScreen() {
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -464,6 +466,7 @@ export default function MarginDashboardScreen() {
         )}
       </ScrollView>
     </View>
+    </ScreenContainer>
   );
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -126,15 +127,18 @@ export default function DailyReportScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.backgroundSecondary }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   const isPositiveChange = (reportData?.weekOverWeekChange || 0) >= 0;
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}
       refreshControl={
@@ -509,5 +513,6 @@ export default function DailyReportScreen() {
         </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
+    </ScreenContainer>
   );
 }

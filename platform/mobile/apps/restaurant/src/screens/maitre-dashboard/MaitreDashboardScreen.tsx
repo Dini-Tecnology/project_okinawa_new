@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -403,6 +404,7 @@ export default function MaitreDashboardScreen() {
   const availableTables = tables.filter((t) => t.status === 'available');
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Stats Header */}
       <View style={styles.statsContainer}>
@@ -684,5 +686,6 @@ export default function MaitreDashboardScreen() {
         accessibilityLabel="Create new reservation"
       />
     </View>
+    </ScreenContainer>
   );
 }

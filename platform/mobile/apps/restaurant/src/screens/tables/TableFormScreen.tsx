@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -144,14 +145,17 @@ export default function TableFormScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.centerContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Carregando...</Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
@@ -266,6 +270,7 @@ export default function TableFormScreen() {
         </Button>
       </ScrollView>
     </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }
 

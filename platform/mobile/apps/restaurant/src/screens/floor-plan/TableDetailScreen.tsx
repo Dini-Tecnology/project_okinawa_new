@@ -14,6 +14,7 @@ import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type TableStatus = 'available' | 'occupied' | 'reserved' | 'cleaning';
 
@@ -229,14 +230,17 @@ export default function TableDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!table) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.emptyContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.mutedForeground} />
         <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('tables.tableNotFound')}</Text>
@@ -250,10 +254,12 @@ export default function TableDetailScreen() {
           {t('common.back')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       <Card style={styles.card}>
         <Card.Content>
@@ -483,5 +489,6 @@ export default function TableDetailScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }

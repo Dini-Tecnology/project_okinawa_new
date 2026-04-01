@@ -14,6 +14,7 @@ import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { format } from 'date-fns';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface TipSummary {
   total_tips: number;
@@ -243,6 +244,7 @@ export default function TipsScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <SegmentedButtons
         value={period}
@@ -356,5 +358,6 @@ export default function TipsScreen() {
         }
       />
     </View>
+    </ScreenContainer>
   );
 }

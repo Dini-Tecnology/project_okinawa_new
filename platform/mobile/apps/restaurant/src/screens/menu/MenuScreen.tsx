@@ -5,6 +5,7 @@ import { Text, Card, Button, FAB, Chip, Searchbar, IconButton } from 'react-nati
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface MenuItem {
   id: string;
@@ -264,6 +265,7 @@ export default function MenuScreen({ navigation }: any) {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Searchbar
         placeholder={t('common.search')}
@@ -322,5 +324,6 @@ export default function MenuScreen({ navigation }: any) {
         accessibilityLabel={t('menu.editItem')}
       />
     </View>
+    </ScreenContainer>
   );
 }

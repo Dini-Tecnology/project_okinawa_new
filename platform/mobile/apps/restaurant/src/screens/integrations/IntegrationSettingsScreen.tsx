@@ -10,6 +10,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -391,6 +392,7 @@ export default function IntegrationSettingsScreen() {
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text variant="headlineMedium" style={styles.headerTitle}>
@@ -561,5 +563,6 @@ export default function IntegrationSettingsScreen() {
         </Modal>
       </Portal>
     </View>
+    </ScreenContainer>
   );
 }

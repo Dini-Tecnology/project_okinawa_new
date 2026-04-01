@@ -8,6 +8,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import type { DashboardStats, RevenueData } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -176,13 +177,16 @@ export default function DashboardScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -312,5 +316,6 @@ export default function DashboardScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }

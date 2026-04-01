@@ -9,6 +9,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -427,6 +428,7 @@ export default function RecipeScreen() {
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Searchbar
         placeholder={t('common.search')}
@@ -571,6 +573,7 @@ export default function RecipeScreen() {
         </Modal>
       </Portal>
     </View>
+    </ScreenContainer>
   );
 }
 

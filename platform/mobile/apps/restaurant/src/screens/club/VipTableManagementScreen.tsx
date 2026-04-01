@@ -10,6 +10,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -488,13 +489,16 @@ export default function VipTableManagementScreen({ route }: VipTableManagementSc
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -571,6 +575,7 @@ export default function VipTableManagementScreen({ route }: VipTableManagementSc
         isActioning={isActioning}
       />
     </View>
+    </ScreenContainer>
   );
 }
 

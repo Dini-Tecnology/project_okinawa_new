@@ -11,6 +11,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Chip,
@@ -111,18 +112,21 @@ export default function ForecastScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, styles.center]}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text variant="bodyMedium" style={styles.loadingText}>
           {t('common.loading')}
         </Text>
       </View>
+      </ScreenContainer>
     );
   }
 
   // ────────── Render ──────────
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -332,6 +336,7 @@ export default function ForecastScreen() {
 
       <View style={{ height: 32 }} />
     </ScrollView>
+    </ScreenContainer>
   );
 }
 

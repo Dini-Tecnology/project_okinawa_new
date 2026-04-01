@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -277,6 +278,7 @@ export default function ChefTableScreen() {
 
   if (!session) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: elegantBg }]}>
         <View style={styles.emptyContainer}>
           <Text style={[typography.h2, { color: elegantFg }]}>
@@ -287,10 +289,12 @@ export default function ChefTableScreen() {
           </Text>
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: elegantBg }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -341,6 +345,7 @@ export default function ChefTableScreen() {
         </View>
       )}
     </View>
+    </ScreenContainer>
   );
 }
 

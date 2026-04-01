@@ -11,6 +11,7 @@
 
 import React, { useMemo, useEffect, useCallback, useState } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -221,13 +222,16 @@ export default function ConfigPaymentsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       {/* Payment Methods */}
       <View style={styles.section}>
@@ -333,5 +337,6 @@ export default function ConfigPaymentsScreen() {
         </Text>
       </TouchableOpacity>
     </ScrollView>
+    </ScreenContainer>
   );
 }

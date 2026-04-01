@@ -9,6 +9,7 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   Text,
   ScrollView,
@@ -715,6 +716,7 @@ function TableDetailScreen({
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Toast */}
       {orderSentToast && (
@@ -1285,6 +1287,7 @@ function TableDetailScreen({
         </View>
       )}
     </View>
+    </ScreenContainer>
   );
 }
 

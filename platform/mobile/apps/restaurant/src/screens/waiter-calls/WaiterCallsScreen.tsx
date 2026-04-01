@@ -10,6 +10,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -266,6 +267,7 @@ export default function WaiterCallsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text variant="headlineSmall" style={styles.headerTitle}>
@@ -274,11 +276,13 @@ export default function WaiterCallsScreen() {
         </View>
         <CallSkeleton colors={colors} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (isError) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle-outline" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -294,10 +298,12 @@ export default function WaiterCallsScreen() {
           {t('common.retry')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -356,6 +362,7 @@ export default function WaiterCallsScreen() {
         />
       )}
     </View>
+    </ScreenContainer>
   );
 }
 

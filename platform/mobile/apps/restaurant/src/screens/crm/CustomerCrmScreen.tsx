@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -602,6 +603,7 @@ export default function CustomerCrmScreen() {
   };
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderTotalBanner()}
       {renderSegmentCards()}
@@ -632,6 +634,7 @@ export default function CustomerCrmScreen() {
 
       {renderCustomerDetailModal()}
     </View>
+    </ScreenContainer>
   );
 }
 

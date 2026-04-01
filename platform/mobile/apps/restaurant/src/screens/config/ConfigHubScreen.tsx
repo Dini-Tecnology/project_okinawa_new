@@ -13,6 +13,7 @@
 
 import React, { useMemo } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   TouchableOpacity,
@@ -228,6 +229,7 @@ export default function ConfigHubScreen() {
   // Loading skeleton
   if (isLoading) {
     return (
+      <ScreenContainer>
       <ScrollView style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}>
         {/* Skeleton header */}
         <View style={{ marginHorizontal: spacing.screenHorizontal, marginTop: spacing[4], marginBottom: spacing[4] }}>
@@ -255,10 +257,12 @@ export default function ConfigHubScreen() {
           <SkeletonCard key={i} colors={colors} />
         ))}
       </ScrollView>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.backgroundSecondary }}
       refreshControl={
@@ -430,5 +434,6 @@ export default function ConfigHubScreen() {
       {/* Bottom spacing */}
       <View style={{ height: spacing[10] }} />
     </ScrollView>
+    </ScreenContainer>
   );
 }

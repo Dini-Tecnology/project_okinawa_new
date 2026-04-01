@@ -15,6 +15,7 @@
 
 import React, { useMemo, useState } from 'react';
 import {
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -254,12 +255,14 @@ export default function RecipeDetailScreen({ route }: { route: any }) {
 
   if (!recipe) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
         <Icon name="alert-circle-outline" size={48} color={colors.foregroundMuted} />
         <Text variant="bodyLarge" style={{ color: colors.mutedForeground, marginTop: 12 }}>
           {t('recipes.empty')}
         </Text>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -292,6 +295,7 @@ export default function RecipeDetailScreen({ route }: { route: any }) {
   const diffColors = getDifficultyColor(recipe.difficulty);
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Image */}
@@ -488,5 +492,6 @@ export default function RecipeDetailScreen({ route }: { route: any }) {
         )}
       </ScrollView>
     </View>
+    </ScreenContainer>
   );
 }

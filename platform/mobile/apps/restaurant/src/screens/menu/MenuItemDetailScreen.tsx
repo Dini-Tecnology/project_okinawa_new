@@ -13,6 +13,7 @@ import ApiService from '@/shared/services/api';
 import type { MenuItem } from '../../types';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {
   MenuItemDetail: {
@@ -303,14 +304,17 @@ export default function MenuItemDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+      </ScreenContainer>
     );
   }
 
   if (!item) {
     return (
+      <ScreenContainer hasKeyboard>
       <View style={styles.emptyContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.mutedForeground} />
         <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('menu.itemNotFound')}</Text>
@@ -324,10 +328,12 @@ export default function MenuItemDetailScreen() {
           {t('common.back')}
         </Button>
       </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       {item.image_url && !editing && (
         <Image source={{ uri: item.image_url }} style={styles.image} accessibilityLabel={`Photo of ${item.name}`} />
@@ -535,5 +541,6 @@ export default function MenuItemDetailScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+    </ScreenContainer>
   );
 }
