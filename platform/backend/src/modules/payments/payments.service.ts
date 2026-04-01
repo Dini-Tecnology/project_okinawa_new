@@ -453,8 +453,8 @@ export class PaymentsService {
       }
 
       // FIX-9: Push notification placeholder — payment received
-      this.logger.log(
-        `TODO: Push notification to restaurant ${order.restaurant_id} — payment received R$${processDto.amount.toFixed(2)} for order #${order.id.substring(0, 8)}`,
+      this.logger.debug(
+        `[PUSH_PENDING] Notification to user ${order.user_id} — requires FCM integration`,
       );
 
       const duration = Date.now() - startTime;

@@ -172,8 +172,8 @@ export class ReservationsService {
       reservation.confirmed_at = new Date();
 
       // FIX-8: Push notification placeholder — reservation confirmed
-      this.logger.log(
-        `TODO: Push notification to user ${reservation.user_id} — reservation ${reservation.id.substring(0, 8)} confirmed`,
+      this.logger.debug(
+        `[PUSH_PENDING] Notification to user ${reservation.user_id} — requires FCM integration`,
       );
     }
 

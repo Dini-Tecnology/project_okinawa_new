@@ -39,9 +39,13 @@ import { GatewayTransaction } from '../../entities/gateway-transaction.entity';
  *
  * IMPORTANT: Stripe Terminal requires a Stripe account with Terminal enabled.
  * Tap to Pay on iPhone requires Apple Developer Program + entitlement.
- * Consult https://docs.stripe.com/terminal before implementing.
  *
- * TODO: All API calls are LOG PLACEHOLDERS.
+ * ADAPTER STUB — All API calls in this adapter are stubs returning mock data.
+ * To complete integration:
+ * 1. Obtain API credentials from the provider
+ * 2. Install the provider's SDK (if applicable)
+ * 3. Replace each stub method with real API calls
+ * See docs/integration-guide.md for detailed instructions.
  */
 @Injectable()
 export class StripeTerminalAdapter implements GatewayAdapter {
@@ -71,10 +75,6 @@ export class StripeTerminalAdapter implements GatewayAdapter {
   /**
    * Create a Stripe Terminal connection token.
    * Required by the mobile SDK to initialize the terminal.
-   *
-   * TODO: Replace with actual Stripe API call:
-   *   POST /v1/terminal/connection_tokens
-   *   Header: Authorization: Bearer sk_***
    */
   async createConnectionToken(restaurantId: string): Promise<string> {
     const config = await this.getConfig(restaurantId);
@@ -87,17 +87,12 @@ export class StripeTerminalAdapter implements GatewayAdapter {
     }
 
     this.logger.log(
-      `[TODO] Stripe Terminal connection token | ` +
+      `[ADAPTER_STUB] Stripe Terminal connection token | ` +
         `POST https://api.stripe.com/v1/terminal/connection_tokens | ` +
         `secretKey=${config.credentials?.secret_key ? '***configured' : 'MISSING'} | ` +
         `locationId=${config.credentials?.location_id || 'NOT_SET'} | ` +
         `restaurantId=${restaurantId}`,
     );
-
-    // TODO: Actual Stripe API call
-    // const stripe = new Stripe(config.credentials.secret_key);
-    // const connectionToken = await stripe.terminal.connectionTokens.create();
-    // return connectionToken.secret;
 
     // Simulated response
     const simulatedSecret = `pst_test_sim_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
@@ -113,10 +108,6 @@ export class StripeTerminalAdapter implements GatewayAdapter {
   /**
    * Create a Stripe PaymentIntent for Tap to Pay.
    * The mobile SDK uses the client_secret to collect and confirm the payment.
-   *
-   * TODO: Replace with actual Stripe API call:
-   *   POST /v1/payment_intents
-   *   { amount, currency, payment_method_types: ['card_present'], capture_method: 'automatic' }
    */
   async createPaymentIntent(
     params: ProcessPaymentParams,
@@ -128,7 +119,7 @@ export class StripeTerminalAdapter implements GatewayAdapter {
     }
 
     this.logger.log(
-      `[TODO] Stripe Terminal PaymentIntent | ` +
+      `[ADAPTER_STUB] Stripe Terminal PaymentIntent | ` +
         `POST https://api.stripe.com/v1/payment_intents | ` +
         `amount=${params.amount} | ` +
         `currency=brl | ` +
@@ -137,20 +128,6 @@ export class StripeTerminalAdapter implements GatewayAdapter {
         `orderId=${params.order_id} | ` +
         `restaurantId=${params.restaurant_id}`,
     );
-
-    // TODO: Actual Stripe API call
-    // const stripe = new Stripe(config.credentials.secret_key);
-    // const intent = await stripe.paymentIntents.create({
-    //   amount: params.amount,
-    //   currency: 'brl',
-    //   payment_method_types: ['card_present'],
-    //   capture_method: 'automatic',
-    //   metadata: {
-    //     order_id: params.order_id,
-    //     restaurant_id: params.restaurant_id,
-    //   },
-    // });
-    // return { client_secret: intent.client_secret, payment_intent_id: intent.id };
 
     // Simulated response
     const simulatedId = `pi_sim_${Date.now()}`;
@@ -250,10 +227,6 @@ export class StripeTerminalAdapter implements GatewayAdapter {
 
   /**
    * Refund a Stripe Terminal payment.
-   *
-   * TODO: Replace with actual Stripe API call:
-   *   POST /v1/refunds
-   *   { payment_intent: pi_***, amount }
    */
   async refundPayment(
     transactionId: string,
@@ -288,19 +261,12 @@ export class StripeTerminalAdapter implements GatewayAdapter {
     }
 
     this.logger.log(
-      `[TODO] Stripe Terminal refund | ` +
+      `[ADAPTER_STUB] Stripe Terminal refund | ` +
         `POST https://api.stripe.com/v1/refunds | ` +
         `payment_intent=${gatewayTx.external_id} | ` +
         `amount=${refundAmount} | ` +
         `transactionId=${transactionId}`,
     );
-
-    // TODO: Actual Stripe API call
-    // const stripe = new Stripe(config.credentials.secret_key);
-    // const refund = await stripe.refunds.create({
-    //   payment_intent: gatewayTx.external_id,
-    //   amount: refundAmount,
-    // });
 
     gatewayTx.refunded_amount_cents += refundAmount;
     gatewayTx.status =
@@ -328,9 +294,6 @@ export class StripeTerminalAdapter implements GatewayAdapter {
 
   /**
    * Get payment status from Stripe.
-   *
-   * TODO: Replace with actual Stripe API call:
-   *   GET /v1/payment_intents/:id
    */
   async getPaymentStatus(transactionId: string): Promise<PaymentStatus> {
     const gatewayTx = await this.transactionRepository.findOne({
@@ -342,7 +305,7 @@ export class StripeTerminalAdapter implements GatewayAdapter {
     }
 
     this.logger.log(
-      `[TODO] Stripe Terminal status | ` +
+      `[ADAPTER_STUB] Stripe Terminal status | ` +
         `GET https://api.stripe.com/v1/payment_intents/${gatewayTx.external_id} | ` +
         `transactionId=${transactionId}`,
     );

@@ -135,8 +135,8 @@ export class CallsService {
     const savedCall = await this.callRepository.save(call);
 
     // FIX-10: Push notification placeholder — call acknowledged (waiter is coming)
-    this.logger.log(
-      `TODO: Push notification to user ${call.user_id} — waiter is coming (call ${call.id.substring(0, 8)})`,
+    this.logger.debug(
+      `[PUSH_PENDING] Notification to user ${call.user_id} — requires FCM integration`,
     );
 
     try {

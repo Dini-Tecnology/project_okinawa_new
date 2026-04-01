@@ -49,8 +49,12 @@ import { AsaasPixService } from './asaas.pix.service';
  * Base URL prod:    https://api.asaas.com
  * Base URL sandbox: https://sandbox.asaas.com/api
  *
- * IMPORTANT: All API calls are LOG PLACEHOLDERS (marked TODO).
- * Consult https://docs.asaas.com before implementing real integration.
+ * ADAPTER STUB — All API calls in this adapter are stubs returning mock data.
+ * To complete integration:
+ * 1. Obtain API credentials from the provider
+ * 2. Install the provider's SDK (if applicable)
+ * 3. Replace each stub method with real API calls
+ * See docs/integration-guide.md for detailed instructions.
  */
 @Injectable()
 export class AsaasAdapter implements GatewayAdapter {
@@ -150,10 +154,6 @@ export class AsaasAdapter implements GatewayAdapter {
 
   /**
    * Process credit/debit card payment via Asaas.
-   *
-   * TODO: Replace log placeholders with actual Asaas API calls:
-   *   1. POST /v3/customers — find or create customer
-   *   2. POST /v3/payments — create charge with creditCardToken
    */
   private async processCardPayment(
     params: ProcessPaymentParams,
@@ -165,7 +165,7 @@ export class AsaasAdapter implements GatewayAdapter {
       params.payment_method === 'credit_card' ? 'CREDIT_CARD' : 'DEBIT_CARD';
 
     this.logger.log(
-      `[TODO] Asaas card payment | ` +
+      `[ADAPTER_STUB] Asaas card payment | ` +
         `POST ${baseUrl}/v3/payments | ` +
         `billingType=${billingType} | ` +
         `amount=${(params.amount / 100).toFixed(2)} | ` +
@@ -175,39 +175,6 @@ export class AsaasAdapter implements GatewayAdapter {
         `orderId=${params.order_id} | ` +
         `correlationId=${gatewayTx.correlation_id}`,
     );
-
-    // TODO: Step 1 — Find or create customer on Asaas
-    // const customerResponse = await fetch(`${baseUrl}/v3/customers`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'access_token': config.credentials.api_key,
-    //   },
-    //   body: JSON.stringify({
-    //     name: params.metadata?.customer_name || 'Customer',
-    //     cpfCnpj: params.metadata?.customer_cpf,
-    //     email: params.metadata?.customer_email,
-    //   }),
-    // });
-
-    // TODO: Step 2 — Create charge on Asaas
-    // const chargeResponse = await fetch(`${baseUrl}/v3/payments`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'access_token': config.credentials.api_key,
-    //   },
-    //   body: JSON.stringify({
-    //     customer: customerId,
-    //     billingType,
-    //     value: params.amount / 100,
-    //     creditCardToken: params.card_token,
-    //     installmentCount: params.installments || 1,
-    //     externalReference: params.order_id,
-    //     description: `Order ${params.order_id}`,
-    //   }),
-    // });
-    // const charge = await chargeResponse.json();
 
     // Simulated response for development
     const simulatedExternalId = `asaas_sim_${Date.now()}`;
@@ -239,9 +206,6 @@ export class AsaasAdapter implements GatewayAdapter {
   /**
    * Process PIX payment via Asaas.
    * Delegates to AsaasPixService for QR code generation.
-   *
-   * TODO: Replace with actual Asaas PIX API call:
-   *   POST /v3/payments (billingType: PIX)
    */
   private async processPixPayment(
     params: ProcessPaymentParams,
@@ -254,9 +218,6 @@ export class AsaasAdapter implements GatewayAdapter {
 
   /**
    * Refund a payment via Asaas.
-   *
-   * TODO: Replace with actual API call:
-   *   POST /v3/payments/:id/refund
    */
   async refundPayment(
     transactionId: string,
@@ -295,25 +256,12 @@ export class AsaasAdapter implements GatewayAdapter {
     const baseUrl = config ? this.getBaseUrl(config) : 'https://sandbox.asaas.com/api';
 
     this.logger.log(
-      `[TODO] Asaas refund | ` +
+      `[ADAPTER_STUB] Asaas refund | ` +
         `POST ${baseUrl}/v3/payments/${gatewayTx.external_id}/refund | ` +
         `amount=${(refundAmount / 100).toFixed(2)} | ` +
         `transactionId=${transactionId} | ` +
         `externalId=${gatewayTx.external_id}`,
     );
-
-    // TODO: Actual Asaas refund API call
-    // const refundResponse = await fetch(
-    //   `${baseUrl}/v3/payments/${gatewayTx.external_id}/refund`,
-    //   {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //       'access_token': config.credentials.api_key,
-    //     },
-    //     body: JSON.stringify({ value: refundAmount / 100 }),
-    //   },
-    // );
 
     // Update transaction
     gatewayTx.refunded_amount_cents += refundAmount;
@@ -342,9 +290,6 @@ export class AsaasAdapter implements GatewayAdapter {
 
   /**
    * Get payment status from Asaas.
-   *
-   * TODO: Replace with actual API call:
-   *   GET /v3/payments/:id
    */
   async getPaymentStatus(transactionId: string): Promise<PaymentStatus> {
     const gatewayTx = await this.transactionRepository.findOne({
@@ -359,20 +304,10 @@ export class AsaasAdapter implements GatewayAdapter {
     const baseUrl = config ? this.getBaseUrl(config) : 'https://sandbox.asaas.com/api';
 
     this.logger.log(
-      `[TODO] Asaas status check | ` +
+      `[ADAPTER_STUB] Asaas status check | ` +
         `GET ${baseUrl}/v3/payments/${gatewayTx.external_id} | ` +
         `transactionId=${transactionId}`,
     );
-
-    // TODO: Actual Asaas status API call
-    // const statusResponse = await fetch(
-    //   `${baseUrl}/v3/payments/${gatewayTx.external_id}`,
-    //   {
-    //     headers: { 'access_token': config.credentials.api_key },
-    //   },
-    // );
-    // const statusData = await statusResponse.json();
-    // Map Asaas status to internal status
 
     return {
       transaction_id: gatewayTx.id,

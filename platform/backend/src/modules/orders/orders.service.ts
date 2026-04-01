@@ -253,8 +253,8 @@ export class OrdersService {
       order.actual_ready_at = new Date();
 
       // FIX-7: Push notification placeholder — order ready
-      this.logger.log(
-        `TODO: Push notification to user ${order.user_id} — order #${order.id.substring(0, 8)} is ready`,
+      this.logger.debug(
+        `[PUSH_PENDING] Notification to user ${order.user_id} — requires FCM integration`,
       );
     }
 

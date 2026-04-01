@@ -21,8 +21,12 @@ import { GatewayTransaction } from '../../entities/gateway-transaction.entity';
  * The QR code has a configurable expiration (default 10 min = 600s).
  * If expired, a new charge must be created.
  *
- * TODO: All Asaas API calls are LOG PLACEHOLDERS.
- * Implement with actual Asaas PIX endpoints when ready.
+ * ADAPTER STUB — All API calls in this adapter are stubs returning mock data.
+ * To complete integration:
+ * 1. Obtain API credentials from the provider
+ * 2. Install the provider's SDK (if applicable)
+ * 3. Replace each stub method with real API calls
+ * See docs/integration-guide.md for detailed instructions.
  */
 @Injectable()
 export class AsaasPixService {
@@ -35,20 +39,6 @@ export class AsaasPixService {
 
   /**
    * Create a PIX charge on Asaas and return QR code data.
-   *
-   * TODO: Replace with actual Asaas API call:
-   *   POST /v3/payments
-   *   {
-   *     customer: customerId,
-   *     billingType: 'PIX',
-   *     value: amount / 100,
-   *     dueDate: expirationDate,
-   *     externalReference: orderId,
-   *   }
-   *
-   * Then fetch QR code:
-   *   GET /v3/payments/:id/pixQrCode
-   *   Returns: { encodedImage, payload, expirationDate }
    */
   async createPixCharge(
     params: ProcessPaymentParams,
@@ -60,7 +50,7 @@ export class AsaasPixService {
     const expirationDate = new Date(Date.now() + expirationSeconds * 1000);
 
     this.logger.log(
-      `[TODO] Asaas PIX charge | ` +
+      `[ADAPTER_STUB] Asaas PIX charge | ` +
         `POST ${baseUrl}/v3/payments | ` +
         `billingType=PIX | ` +
         `amount=${(params.amount / 100).toFixed(2)} | ` +
@@ -69,33 +59,6 @@ export class AsaasPixService {
         `orderId=${params.order_id} | ` +
         `correlationId=${gatewayTx.correlation_id}`,
     );
-
-    // TODO: Step 1 — Create PIX charge on Asaas
-    // const chargeResponse = await fetch(`${baseUrl}/v3/payments`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     'access_token': config.credentials.api_key,
-    //   },
-    //   body: JSON.stringify({
-    //     customer: customerId,
-    //     billingType: 'PIX',
-    //     value: params.amount / 100,
-    //     dueDate: expirationDate.toISOString().split('T')[0],
-    //     externalReference: params.order_id,
-    //     description: `Order ${params.order_id}`,
-    //   }),
-    // });
-    // const charge = await chargeResponse.json();
-
-    // TODO: Step 2 — Get QR code
-    // const qrResponse = await fetch(
-    //   `${baseUrl}/v3/payments/${charge.id}/pixQrCode`,
-    //   { headers: { 'access_token': config.credentials.api_key } },
-    // );
-    // const qrData = await qrResponse.json();
-    // qrData.encodedImage = base64 QR code
-    // qrData.payload = copy-paste code
 
     // Simulated response for development
     const simulatedExternalId = `asaas_pix_sim_${Date.now()}`;
@@ -136,9 +99,6 @@ export class AsaasPixService {
   /**
    * Retrieve the PIX QR code for an existing charge.
    * Used when the customer needs to re-display the QR code.
-   *
-   * TODO: Replace with actual Asaas API call:
-   *   GET /v3/payments/:id/pixQrCode
    */
   async getPixQrCode(
     transactionId: string,
@@ -173,13 +133,12 @@ export class AsaasPixService {
     }
 
     this.logger.log(
-      `[TODO] Asaas get PIX QR code | ` +
+      `[ADAPTER_STUB] Asaas get PIX QR code | ` +
         `GET /v3/payments/${gatewayTx.external_id}/pixQrCode | ` +
         `transactionId=${transactionId}`,
     );
 
-    // TODO: Fetch fresh QR code from Asaas
-    // For now return stored simulated data
+    // Return stored simulated data
     return {
       qr_code: `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==`,
       copy_paste: `00020126580014br.gov.bcb.pix0136${gatewayTx.external_id}5204000053039865802BR5913NOOWE6009SAO_PAULO62070503***6304ABCD`,
