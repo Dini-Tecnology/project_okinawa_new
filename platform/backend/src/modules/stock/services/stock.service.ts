@@ -368,6 +368,38 @@ export class StockService {
   }
 
   /**
+   * Check stock availability for a menu item based on its recipe.
+   * Returns whether all ingredients are available and lists any missing ones.
+   */
+  async checkAvailability(
+    menuItemId: string,
+    restaurantId: string,
+    quantity: number,
+  ): Promise<{ available: boolean; missingIngredients: string[] }> {
+    const recipe = await this.recipeService.findByMenuItem(menuItemId);
+    if (!recipe || !recipe.ingredients?.length) {
+      // No recipe defined = no stock tracking, assume available
+      return { available: true, missingIngredients: [] };
+    }
+
+    const missing: string[] = [];
+    for (const ri of recipe.ingredients) {
+      const stockItem = await this.stockRepo.findOne({
+        where: { ingredient_id: ri.ingredient_id, restaurant_id: restaurantId },
+      });
+
+      const needed = Number(ri.quantity) * quantity;
+      const available = stockItem ? Number(stockItem.current_quantity) : 0;
+
+      if (available < needed) {
+        missing.push(ri.ingredient?.name || ri.ingredient_id);
+      }
+    }
+
+    return { available: missing.length === 0, missingIngredients: missing };
+  }
+
+  /**
    * Get paginated movements with optional filters.
    */
   async getMovements(

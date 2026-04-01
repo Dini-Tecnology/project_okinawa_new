@@ -7,9 +7,10 @@ import {
   Logger,
 } from '@nestjs/common';
 import { UserRole as UserRoleEnum } from '@/common/enums';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Repository, In, DataSource } from 'typeorm';
+import { Repository, In, DataSource, LessThan } from 'typeorm';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
@@ -99,6 +100,27 @@ export class OrdersService {
         });
 
         orderItems.push(orderItem);
+      }
+
+      // Check stock availability for each item (warning only, does not block order)
+      for (const itemDto of createOrderDto.items) {
+        try {
+          const { available, missingIngredients } = await this.stockService.checkAvailability(
+            itemDto.menu_item_id,
+            createOrderDto.restaurant_id,
+            itemDto.quantity,
+          );
+          if (!available) {
+            this.logger.warn(
+              `Stock insufficient for menu item ${itemDto.menu_item_id}: missing ${missingIngredients.join(', ')}`,
+            );
+          }
+        } catch (stockCheckError) {
+          const err = stockCheckError as Error;
+          this.logger.warn(
+            `Stock availability check failed for menu item ${itemDto.menu_item_id}: ${err.message}`,
+          );
+        }
       }
 
       const { taxAmount, totalAmount } = this.orderCalculator.calculateTotals(
@@ -577,5 +599,34 @@ export class OrdersService {
    */
   serializeOrdersForRestaurant(orders: Order[]): any[] {
     return orders.map((order) => this.serializeOrderForRestaurant(order));
+  }
+
+  /**
+   * Cron: Detect orders stuck in PREPARING status for more than 2 hours.
+   * Runs every 5 minutes.
+   */
+  @Cron('*/5 * * * *')
+  async detectStuckOrders() {
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000);
+    const stuckOrders = await this.orderRepository.find({
+      where: {
+        status: OrderStatus.PREPARING,
+        updated_at: LessThan(twoHoursAgo),
+      },
+    });
+
+    for (const order of stuckOrders) {
+      this.logger.warn(`Order ${order.id} stuck in PREPARING for >2h`);
+      try {
+        // Notify restaurant via WebSocket
+        this.eventsGateway.server
+          .to(`restaurant:${order.restaurant_id}`)
+          .emit('order:stuck', {
+            orderId: order.id,
+            status: order.status,
+            stuckSince: order.updated_at,
+          });
+      } catch {}
+    }
   }
 }
