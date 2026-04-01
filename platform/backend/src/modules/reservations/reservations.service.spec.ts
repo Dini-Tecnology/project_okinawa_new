@@ -3,6 +3,8 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ReservationsService } from './reservations.service';
 import { Reservation } from './entities/reservation.entity';
+import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
+import { ReservationsGateway } from './reservations.gateway';
 import { NotFoundException } from '@nestjs/common';
 import { ReservationStatus } from '@common/enums';
 
@@ -98,8 +100,16 @@ describe('ReservationsService', () => {
           useValue: mockReservationRepository,
         },
         {
+          provide: getRepositoryToken(Restaurant),
+          useValue: { findOne: jest.fn().mockResolvedValue({ id: 'restaurant-1', service_type: 'casual-dining' }), save: jest.fn() },
+        },
+        {
           provide: DataSource,
           useValue: mockDataSource,
+        },
+        {
+          provide: ReservationsGateway,
+          useValue: { emitToRestaurant: jest.fn(), notifyReservationUpdate: jest.fn(), notifyReservationCreated: jest.fn(), notifyReservationUpdated: jest.fn() },
         },
       ],
     }).compile();

@@ -6,6 +6,7 @@ import { PromotionsService } from '../promotions.service';
 import { Promotion, PromotionType, PromotionStatus } from '../entities/promotion.entity';
 import { CreatePromotionDto } from '../dto/create-promotion.dto';
 import { ValidatePromotionDto } from '../dto/validate-promotion.dto';
+import { EventsGateway } from '@/modules/events/events.gateway';
 
 describe('PromotionsService', () => {
   let service: PromotionsService;
@@ -59,6 +60,10 @@ describe('PromotionsService', () => {
             increment: jest.fn(),
             createQueryBuilder: jest.fn().mockReturnValue(mockQueryBuilder),
           },
+        },
+        {
+          provide: EventsGateway,
+          useValue: { emitToRestaurant: jest.fn(), notifyRestaurant: jest.fn() },
         },
       ],
     }).compile();

@@ -6,6 +6,8 @@ import { QrCodeSecurityService } from './qr-code-security.service';
 import { TableQrCode } from '../tables/entities/table-qr-code.entity';
 import { TableSession } from '../tables/entities/table-session.entity';
 import { QrScanLog } from '../tables/entities/qr-scan-log.entity';
+import { RestaurantTable } from '../tables/entities/restaurant-table.entity';
+import { EventsGateway } from '@/modules/events/events.gateway';
 
 describe('QrCodeController', () => {
   let controller: QrCodeController;
@@ -33,6 +35,8 @@ describe('QrCodeController', () => {
         { provide: getRepositoryToken(TableQrCode), useValue: mockQrCodeRepository },
         { provide: getRepositoryToken(TableSession), useValue: mockSessionRepository },
         { provide: getRepositoryToken(QrScanLog), useValue: mockScanLogRepository },
+        { provide: getRepositoryToken(RestaurantTable), useValue: { findOne: jest.fn(), find: jest.fn(), save: jest.fn() } },
+        { provide: EventsGateway, useValue: { emitToRestaurant: jest.fn() } },
       ],
     })
       .overrideGuard(require('@/modules/auth/guards/jwt-auth.guard').JwtAuthGuard)

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LoyaltyController } from './loyalty.controller';
 import { LoyaltyService } from './loyalty.service';
+import { CashbackService } from './cashback.service';
 import { mockAuthenticatedUser } from '@common/interfaces/authenticated-user.interface';
 
 describe('LoyaltyController', () => {
@@ -23,7 +24,10 @@ describe('LoyaltyController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [LoyaltyController],
-      providers: [{ provide: LoyaltyService, useValue: mockService }],
+      providers: [
+        { provide: LoyaltyService, useValue: mockService },
+        { provide: CashbackService, useValue: { calculateCashback: jest.fn(), recordCashback: jest.fn() } },
+      ],
     })
       .overrideGuard(require('@/modules/auth/guards/jwt-auth.guard').JwtAuthGuard)
       .useValue({ canActivate: () => true })

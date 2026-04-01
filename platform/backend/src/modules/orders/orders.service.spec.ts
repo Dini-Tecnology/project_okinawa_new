@@ -7,11 +7,15 @@ import { OrderItem } from './entities/order-item.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.entity';
 import { Profile } from '@/modules/users/entities/profile.entity';
+import { WaitlistEntry } from '@/modules/restaurant-waitlist/entities/waitlist-entry.entity';
 import { EventsGateway } from '@/modules/events/events.gateway';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { OrderStatus, OrderType } from '@common/enums';
 import { OrderCalculatorHelper } from './helpers';
+import { StockService } from '@/modules/stock/services/stock.service';
+import { CustomerCrmService } from '@/modules/customer-crm/services/customer-crm.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 describe('OrdersService', () => {
   let service: OrdersService;
@@ -235,6 +239,10 @@ describe('OrdersService', () => {
           useValue: mockProfileRepository,
         },
         {
+          provide: getRepositoryToken(WaitlistEntry),
+          useValue: { findOne: jest.fn(), save: jest.fn(), find: jest.fn() },
+        },
+        {
           provide: EventsGateway,
           useValue: mockEventsGateway,
         },
@@ -247,6 +255,18 @@ describe('OrdersService', () => {
           useValue: mockDataSource,
         },
         OrderCalculatorHelper,
+        {
+          provide: StockService,
+          useValue: { deductForOrder: jest.fn() },
+        },
+        {
+          provide: CustomerCrmService,
+          useValue: { recordVisit: jest.fn() },
+        },
+        {
+          provide: EventEmitter2,
+          useValue: { emit: jest.fn() },
+        },
       ],
     }).compile();
 

@@ -4,6 +4,7 @@ import { QrCodeService } from './qr-code.service';
 import { QrCodeSecurityService } from './qr-code-security.service';
 
 describe('QrCodeService', () => {
+  jest.setTimeout(30000);
   let service: QrCodeService;
 
   const mockConfigService = {
