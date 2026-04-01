@@ -185,6 +185,38 @@ export const lightTheme = {
   successMuted: 'rgba(16, 185, 129, 0.15)',
   destructive: colorPalette.error.main,
 
+  // Loyalty Tier Colors
+  tierBronze: '#CD7F32',
+  tierBronzeBackground: 'rgba(205, 127, 50, 0.12)',
+  tierSilver: '#C0C0C0',
+  tierSilverBackground: 'rgba(192, 192, 192, 0.12)',
+  tierGold: '#FFD700',
+  tierGoldBackground: 'rgba(255, 215, 0, 0.12)',
+  tierPlatinum: '#E5E4E2',
+  tierPlatinumBackground: 'rgba(229, 228, 226, 0.12)',
+
+  // Order/Reservation Status Colors
+  statusPending: colorPalette.warning.main,
+  statusPendingBackground: 'rgba(245, 158, 11, 0.12)',
+  statusConfirmed: colorPalette.info.main,
+  statusConfirmedBackground: 'rgba(59, 130, 246, 0.12)',
+  statusPreparing: colorPalette.primary[500],
+  statusPreparingBackground: 'rgba(249, 115, 22, 0.12)',
+  statusReady: colorPalette.success.main,
+  statusReadyBackground: 'rgba(16, 185, 129, 0.12)',
+  statusCompleted: colorPalette.success.dark,
+  statusCompletedBackground: 'rgba(5, 150, 105, 0.12)',
+  statusCancelled: colorPalette.error.main,
+  statusCancelledBackground: 'rgba(239, 68, 68, 0.12)',
+  statusDelivering: '#8B5CF6',
+  statusDeliveringBackground: 'rgba(139, 92, 246, 0.12)',
+
+  // Onboarding slide accents (brand-aligned)
+  onboardingSlide1: colorPalette.primary[500],
+  onboardingSlide2: colorPalette.secondary[500],
+  onboardingSlide3: colorPalette.accent[500],
+  onboardingSlide4: '#8B5CF6',
+
   // Premium Dark Card (always dark, for elevated feature headers)
   premiumCard: colorPalette.neutral[800],
   premiumCardForeground: colorPalette.neutral[0],
@@ -290,6 +322,38 @@ export const darkTheme = {
   cardForeground: colorPalette.neutral[50],
   successMuted: 'rgba(16, 185, 129, 0.2)',
   destructive: colorPalette.error.main,
+
+  // Loyalty Tier Colors
+  tierBronze: '#CD7F32',
+  tierBronzeBackground: 'rgba(205, 127, 50, 0.2)',
+  tierSilver: '#D4D4D4',
+  tierSilverBackground: 'rgba(212, 212, 212, 0.15)',
+  tierGold: '#FFD700',
+  tierGoldBackground: 'rgba(255, 215, 0, 0.15)',
+  tierPlatinum: '#E5E4E2',
+  tierPlatinumBackground: 'rgba(229, 228, 226, 0.15)',
+
+  // Order/Reservation Status Colors
+  statusPending: colorPalette.warning.main,
+  statusPendingBackground: 'rgba(245, 158, 11, 0.2)',
+  statusConfirmed: colorPalette.info.main,
+  statusConfirmedBackground: 'rgba(59, 130, 246, 0.2)',
+  statusPreparing: colorPalette.primary[500],
+  statusPreparingBackground: 'rgba(249, 115, 22, 0.2)',
+  statusReady: colorPalette.success.main,
+  statusReadyBackground: 'rgba(16, 185, 129, 0.2)',
+  statusCompleted: colorPalette.success.dark,
+  statusCompletedBackground: 'rgba(5, 150, 105, 0.2)',
+  statusCancelled: colorPalette.error.main,
+  statusCancelledBackground: 'rgba(239, 68, 68, 0.2)',
+  statusDelivering: '#A78BFA',
+  statusDeliveringBackground: 'rgba(167, 139, 250, 0.2)',
+
+  // Onboarding slide accents (brand-aligned)
+  onboardingSlide1: colorPalette.primary[400],
+  onboardingSlide2: colorPalette.secondary[400],
+  onboardingSlide3: colorPalette.accent[400],
+  onboardingSlide4: '#A78BFA',
 
   // Premium Dark Card (always dark, for elevated feature headers)
   premiumCard: colorPalette.neutral[800],
