@@ -77,6 +77,38 @@ import TabScreen from '../screens/pub-bar/TabScreen';
 import TabPaymentScreen from '../screens/pub-bar/TabPaymentScreen';
 
 // ============================================
+// MISSING SCREENS — Navigation Registration
+// ============================================
+import OrderStatusScreen from '../screens/orders/OrderStatusScreen';
+import WalletScreen from '../screens/wallet/WalletScreen';
+import ReservationsScreen from '../screens/reservations/ReservationsScreen';
+import ReservationDetailScreen from '../screens/reservations/ReservationDetailScreen';
+import CreateReservationScreen from '../screens/reservations/CreateReservationScreen';
+import FavoritesScreen from '../screens/favorites/FavoritesScreen';
+import SharedOrderScreen from '../screens/orders/SharedOrderScreen';
+import SettingsScreen from '../screens/settings/SettingsScreen';
+import QRScannerScreen from '../screens/scanner/QRScannerScreen';
+import ReviewsScreen from '../screens/reviews/ReviewsScreen';
+import WaitlistScreen from '../screens/waitlist/WaitlistScreen';
+import ClubHomeScreen from '../screens/club/ClubHomeScreen';
+import ClubQueueScreen from '../screens/club/ClubQueueScreen';
+import TicketPurchaseScreen from '../screens/club/TicketPurchaseScreen';
+import VipTableScreen from '../screens/club/VipTableScreen';
+import LineupScreen from '../screens/club/LineupScreen';
+import PartialOrderScreen from '../screens/orders/PartialOrderScreen';
+import CallWaiterScreen from '../screens/calls/CallWaiterScreen';
+import GroupBookingScreen from '../screens/reservations/GroupBookingScreen';
+import GuestInvitationScreen from '../screens/reservations/GuestInvitationScreen';
+import ManageConsentsScreen from '../screens/settings/ManageConsentsScreen';
+import TipsScreen from '../screens/tips/TipsScreen';
+import StampCardsScreen from '../screens/loyalty/StampCardsScreen';
+import LoyaltyHomeScreen from '../screens/loyalty/LoyaltyHomeScreen';
+import BuffetCheckinScreen from '../screens/buffet/BuffetCheckinScreen';
+import BirthdayBookingScreen from '../screens/club/BirthdayBookingScreen';
+import WaitlistBarScreen from '../screens/waitlist/WaitlistBarScreen';
+import EntryChoiceScreen from '../screens/waitlist/EntryChoiceScreen';
+
+// ============================================
 // LEGAL SCREENS (Privacy Policy & Terms of Service)
 // ============================================
 import { PrivacyPolicyScreen, TermsOfServiceScreen, ReConsentScreen } from '@/shared/screens/legal';
@@ -399,6 +431,172 @@ function MainStack() {
         name="TabPayment"
         component={TabPaymentScreen}
         options={{ title: 'Payment', ...modalScreenOptions }}
+      />
+
+      {/* Orders — Status, Shared, Partial */}
+      <Stack.Screen
+        name="OrderStatus"
+        component={OrderStatusScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="SharedOrder"
+        component={SharedOrderScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PartialOrder"
+        component={PartialOrderScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Wallet */}
+      <Stack.Screen
+        name="Wallet"
+        component={WalletScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Reservations */}
+      <Stack.Screen
+        name="Reservations"
+        component={ReservationsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ReservationDetail"
+        component={ReservationDetailScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="CreateReservation"
+        component={CreateReservationScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GroupBooking"
+        component={GroupBookingScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="GuestInvitation"
+        component={GuestInvitationScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Favorites */}
+      <Stack.Screen
+        name="Favorites"
+        component={FavoritesScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Settings */}
+      <Stack.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ManageConsents"
+        component={ManageConsentsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Scanner */}
+      <Stack.Screen
+        name="QRScanner"
+        component={QRScannerScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Reviews */}
+      <Stack.Screen
+        name="Reviews"
+        component={ReviewsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Tips */}
+      <Stack.Screen
+        name="Tips"
+        component={TipsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Waitlist */}
+      <Stack.Screen
+        name="Waitlist"
+        component={WaitlistScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="WaitlistBar"
+        component={WaitlistBarScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="EntryChoice"
+        component={EntryChoiceScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Club */}
+      <Stack.Screen
+        name="ClubHome"
+        component={ClubHomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ClubQueue"
+        component={ClubQueueScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TicketPurchase"
+        component={TicketPurchaseScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VipTable"
+        component={VipTableScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Lineup"
+        component={LineupScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="BirthdayBooking"
+        component={BirthdayBookingScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Loyalty */}
+      <Stack.Screen
+        name="LoyaltyHome"
+        component={LoyaltyHomeScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="StampCards"
+        component={StampCardsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Buffet */}
+      <Stack.Screen
+        name="BuffetCheckin"
+        component={BuffetCheckinScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Calls */}
+      <Stack.Screen
+        name="CallWaiter"
+        component={CallWaiterScreen}
+        options={{ headerShown: false }}
       />
 
       {/* Legal Screens */}

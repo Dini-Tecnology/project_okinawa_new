@@ -172,6 +172,25 @@ import DriveThruScreen from '../screens/drive-thru/DriveThruScreen';
 import DoorControlScreen from '../screens/club/DoorControlScreen';
 
 // ============================================
+// MISSING SCREENS — Navigation Registration
+// ============================================
+import ApprovalsScreen from '../screens/manager/ApprovalsScreen';
+import DailyReportScreen from '../screens/manager/DailyReportScreen';
+import ManagerOpsScreen from '../screens/manager/ManagerOpsScreen';
+import PromotionsManagerScreen from '../screens/manager/PromotionsManagerScreen';
+import TableFormScreen from '../screens/tables/TableFormScreen';
+import TableListScreen from '../screens/tables/TableListScreen';
+import QRCodeBatchScreen from '../screens/qr-codes/QRCodeBatchScreen';
+import QRCodeGeneratorScreen from '../screens/qr-codes/QRCodeGeneratorScreen';
+import VipTableManagementScreen from '../screens/club/VipTableManagementScreen';
+import ClubQueueManagementScreen from '../screens/club/ClubQueueManagementScreen';
+import PromoterDashboardScreen from '../screens/club/PromoterDashboardScreen';
+import DoorManagementScreen from '../screens/club/DoorManagementScreen';
+import CasualDiningConfigScreen from '../screens/config/CasualDiningConfigScreen';
+import ChefApprovalsScreen from '../screens/chef/ChefApprovalsScreen';
+import MaitreWaitlistScreen from '../screens/maitre/MaitreWaitlistScreen';
+
+// ============================================
 // LEGAL SCREENS (Privacy Policy & Terms of Service)
 // ============================================
 import { PrivacyPolicyScreen, TermsOfServiceScreen, ReConsentScreen } from '@/shared/screens/legal';
@@ -497,6 +516,116 @@ function MainStack() {
         name="RestaurantReviews"
         component={RestaurantReviewsScreen}
         options={{ title: 'Reviews', ...scaleFadeScreenOptions }}
+      />
+
+      {/* Manager Screens */}
+      <Stack.Screen
+        name="Approvals"
+        component={ApprovalsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DailyReport"
+        component={DailyReportScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ManagerOps"
+        component={ManagerOpsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PromotionsManager"
+        component={PromotionsManagerScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Customer CRM (Stack entry for direct navigation) */}
+      <Stack.Screen
+        name="CustomerCrm"
+        component={CustomerCrmScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Integration Settings (Stack entry for direct navigation) */}
+      <Stack.Screen
+        name="IntegrationSettings"
+        component={IntegrationSettingsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Cost Control — Recipe */}
+      <Stack.Screen
+        name="Recipe"
+        component={RecipeScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Tables */}
+      <Stack.Screen
+        name="TableForm"
+        component={TableFormScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="TableList"
+        component={TableListScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* QR Codes */}
+      <Stack.Screen
+        name="QRCodeBatch"
+        component={QRCodeBatchScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="QRCodeGenerator"
+        component={QRCodeGeneratorScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Club Management */}
+      <Stack.Screen
+        name="VipTableManagement"
+        component={VipTableManagementScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ClubQueueManagement"
+        component={ClubQueueManagementScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PromoterDashboard"
+        component={PromoterDashboardScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="DoorManagement"
+        component={DoorManagementScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Config */}
+      <Stack.Screen
+        name="CasualDiningConfig"
+        component={CasualDiningConfigScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Chef */}
+      <Stack.Screen
+        name="ChefApprovals"
+        component={ChefApprovalsScreen}
+        options={{ headerShown: false }}
+      />
+
+      {/* Maitre */}
+      <Stack.Screen
+        name="MaitreWaitlist"
+        component={MaitreWaitlistScreen}
+        options={{ headerShown: false }}
       />
 
       {/* Legal Screens */}
