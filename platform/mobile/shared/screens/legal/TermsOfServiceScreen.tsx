@@ -10,6 +10,7 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { Text, ActivityIndicator, Button, Divider } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import ApiService from '@okinawa/shared/services/api';
 
@@ -37,26 +38,31 @@ export const TermsOfServiceScreen: React.FC<{ navigation?: any }> = ({ navigatio
 
   if (isLoading) {
     return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>{t('legal.loading')}</Text>
-      </View>
+      <ScreenContainer>
+        <View style={styles.centeredContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>{t('legal.loading')}</Text>
+        </View>
+      </ScreenContainer>
     );
   }
 
   if (isError || !document) {
     return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.errorIcon}>!</Text>
-        <Text style={styles.errorText}>{t('legal.error')}</Text>
-        <Button mode="contained" onPress={() => refetch()} style={styles.retryButton}>
-          {t('common.retry')}
-        </Button>
-      </View>
+      <ScreenContainer>
+        <View style={styles.centeredContainer}>
+          <Text style={styles.errorIcon}>!</Text>
+          <Text style={styles.errorText}>{t('legal.error')}</Text>
+          <Button mode="contained" onPress={() => refetch()} style={styles.retryButton}>
+            {t('common.retry')}
+          </Button>
+        </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       <Text style={styles.title}>{document.title}</Text>
 
@@ -73,6 +79,7 @@ export const TermsOfServiceScreen: React.FC<{ navigation?: any }> = ({ navigatio
 
       <Text style={styles.content}>{document.content}</Text>
     </ScrollView>
+    </ScreenContainer>
   );
 };
 

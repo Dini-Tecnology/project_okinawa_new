@@ -13,6 +13,7 @@ import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import { View, StyleSheet, Image, Platform, Animated } from 'react-native';
 import { Text, Button, Divider, ActivityIndicator } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useBiometricAuth } from '@/shared/hooks/useBiometricAuth';
 import { biometricAuthService } from '@/shared/services/biometric-auth';
@@ -86,13 +87,16 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
 
   if (checkingBiometric) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
+      <ScreenContainer>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       {/* Logo and Branding */}
       <View style={styles.header}>
@@ -194,6 +198,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
         </Text>
       </View>
     </Animated.View>
+    </ScreenContainer>
   );
 };
 

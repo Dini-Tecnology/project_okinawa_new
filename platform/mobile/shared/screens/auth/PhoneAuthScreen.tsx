@@ -9,9 +9,10 @@
  */
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { View, StyleSheet, KeyboardAvoidingView, Platform, Animated } from 'react-native';
+import { View, StyleSheet, Animated } from 'react-native';
 import { Text, Button, IconButton, HelperText, ActivityIndicator } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { PhoneInput, OTPInput, ResendTimer } from '@/shared/components/auth';
 import { otpAuthService, OTPChannel } from '@/shared/services/otp-auth';
@@ -174,10 +175,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
   };
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <ScreenContainer hasKeyboard>
       {/* Header */}
       <View style={styles.header}>
         <IconButton
@@ -275,7 +273,7 @@ export const PhoneAuthScreen: React.FC<PhoneAuthScreenProps> = ({
           </>
         )}
       </Animated.View>
-    </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 };
 

@@ -21,6 +21,7 @@ import {
 import { Text, Button, ActivityIndicator, Divider, Banner } from 'react-native-paper';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import ApiService from '@okinawa/shared/services/api';
 
 const FALLBACK_TERMS: LegalDocument = {
@@ -184,29 +185,34 @@ export const ReConsentScreen: React.FC<ReConsentScreenProps> = ({
 
   if (isLoading) {
     return (
-      <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" color={colors.primary} />
-        <Text style={styles.loadingText}>Loading legal documents...</Text>
-      </View>
+      <ScreenContainer>
+        <View style={styles.centeredContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>Loading legal documents...</Text>
+        </View>
+      </ScreenContainer>
     );
   }
 
   // If both queries failed and we have no data at all, show error with retry
   if (isOffline && !resolvedTerms && !resolvedPrivacy) {
     return (
-      <View style={styles.centeredContainer}>
-        <Text style={styles.headerTitle}>Erro de conexão</Text>
-        <Text style={[styles.loadingText, { marginBottom: 16 }]}>
-          Não foi possível carregar os documentos legais. Verifique sua conexão.
-        </Text>
-        <Button mode="contained" onPress={handleRetry}>
-          Tentar Novamente
-        </Button>
-      </View>
+      <ScreenContainer>
+        <View style={styles.centeredContainer}>
+          <Text style={styles.headerTitle}>Erro de conexão</Text>
+          <Text style={[styles.loadingText, { marginBottom: 16 }]}>
+            Não foi possível carregar os documentos legais. Verifique sua conexão.
+          </Text>
+          <Button mode="contained" onPress={handleRetry}>
+            Tentar Novamente
+          </Button>
+        </View>
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Offline banner */}
       {isOffline && (
@@ -310,6 +316,7 @@ export const ReConsentScreen: React.FC<ReConsentScreenProps> = ({
         </Button>
       </View>
     </View>
+    </ScreenContainer>
   );
 };
 

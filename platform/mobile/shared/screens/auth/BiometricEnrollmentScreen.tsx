@@ -8,6 +8,7 @@
 import React, { useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { BiometricPrompt } from '@/shared/components/auth';
 import { biometricAuthService } from '@/shared/services/biometric-auth';
@@ -79,13 +80,13 @@ export const BiometricEnrollmentScreen: React.FC<BiometricEnrollmentScreenProps>
   };
 
   return (
-    <View style={styles.container}>
+    <ScreenContainer>
       <BiometricPrompt
         onEnable={handleEnable}
         onSkip={handleSkip}
         loading={loading}
       />
-    </View>
+    </ScreenContainer>
   );
 };
 

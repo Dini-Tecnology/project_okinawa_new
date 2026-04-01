@@ -9,6 +9,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button, ActivityIndicator } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import ApiService from '@okinawa/shared/services/api';
 
@@ -43,6 +44,7 @@ export const MaintenanceScreen: React.FC<MaintenanceScreenProps> = ({
   }, [onMaintenanceOver]);
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.content}>
         {/* Maintenance Icon */}
@@ -77,6 +79,7 @@ export const MaintenanceScreen: React.FC<MaintenanceScreenProps> = ({
         </Button>
       </View>
     </View>
+    </ScreenContainer>
   );
 };
 

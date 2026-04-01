@@ -14,11 +14,10 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import { Text, TextInput, Button, IconButton, HelperText } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '../../components/ScreenContainer';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { LegalConsentSection } from '@okinawa/shared/components/LegalConsentSection';
 import { otpAuthService } from '@/shared/services/otp-auth';
@@ -196,10 +195,7 @@ export const PhoneRegisterScreen: React.FC<PhoneRegisterScreenProps> = ({
   // Links are handled internally by LegalConsentSection component
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <ScreenContainer hasKeyboard>
       <View style={styles.header}>
         <IconButton
           icon="arrow-left"
@@ -319,7 +315,7 @@ export const PhoneRegisterScreen: React.FC<PhoneRegisterScreenProps> = ({
           {t('auth.createAccount') || 'Create Account'}
         </Button>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 };
 
