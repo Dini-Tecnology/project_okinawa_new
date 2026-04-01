@@ -32,6 +32,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -343,13 +344,17 @@ export default function VipTableScreen({ route }: VipTableScreenProps) {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -442,6 +447,8 @@ export default function VipTableScreen({ route }: VipTableScreenProps) {
         isSubmitting={reserveMutation.isPending}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

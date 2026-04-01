@@ -17,6 +17,7 @@ import { useAuth } from '@okinawa/shared/hooks/useAuth';
 import { ApiService } from '@okinawa/shared/services/api';
 import logger from '@okinawa/shared/utils/logger';
 import type { Restaurant, Order } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.7;
@@ -437,14 +438,18 @@ export default function HomeScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer edges={['top']}>
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
@@ -588,5 +593,7 @@ export default function HomeScreen() {
       {/* Bottom Spacing */}
       <View style={styles.bottomSpacing} />
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

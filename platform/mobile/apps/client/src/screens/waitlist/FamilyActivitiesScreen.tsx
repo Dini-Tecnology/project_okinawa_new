@@ -9,6 +9,7 @@ import { Text, Card, Button, IconButton, Chip } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Activity {
   id: string;
@@ -225,6 +226,7 @@ export default function FamilyActivitiesScreen({ route }: FamilyActivitiesScreen
   );
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{t('activities.title')}</Text>
@@ -329,5 +331,7 @@ export default function FamilyActivitiesScreen({ route }: FamilyActivitiesScreen
         </Button>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

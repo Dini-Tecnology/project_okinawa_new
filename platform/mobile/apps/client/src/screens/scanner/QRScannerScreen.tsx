@@ -17,6 +17,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type QRCodeType = 'table' | 'menu' | 'invite' | 'payment' | 'unknown';
 
@@ -380,15 +381,19 @@ export default function QRScannerScreen() {
   // Permission not yet determined
   if (!permission) {
     return (
+      <ScreenContainer>
       <View style={styles.permissionContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // Permission denied
   if (!permission.granted) {
     return (
+      <ScreenContainer>
       <View style={styles.permissionContainer}>
         <IconButton icon="camera-off" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="headlineSmall" style={styles.permissionTitle}>
@@ -413,10 +418,13 @@ export default function QRScannerScreen() {
           {t('scanner.openSettings')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <CameraView
         style={styles.camera}
@@ -534,5 +542,7 @@ export default function QRScannerScreen() {
         </View>
       </CameraView>
     </View>
+  
+    </ScreenContainer>
   );
 }

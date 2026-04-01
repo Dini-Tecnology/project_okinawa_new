@@ -16,6 +16,7 @@ import { authService } from '@/shared/services/auth';
 import { useI18n, SupportedLanguage } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Settings {
   notifications: {
@@ -178,6 +179,7 @@ export default function SettingsScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <List.Section>
         <List.Subheader style={{ color: colors.foregroundMuted }}>{t('notifications.title')}</List.Subheader>
@@ -423,6 +425,8 @@ export default function SettingsScreen() {
         </Dialog>
       </Portal>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

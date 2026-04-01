@@ -19,6 +19,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { RootStackParamList, PaymentSuccessParams } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -282,6 +283,7 @@ export default function PaymentSuccessScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.scrollContent}>
         {/* Animated Checkmark */}
@@ -428,5 +430,7 @@ export default function PaymentSuccessScreen() {
         </Animated.View>
       </View>
     </View>
+  
+    </ScreenContainer>
   );
 }

@@ -33,6 +33,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
 import { ApiService } from '@okinawa/shared/services/api';
 import * as Haptics from 'expo-haptics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -295,11 +296,14 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
   // Show QR code on success
   if (purchaseResult) {
     return (
+      <ScreenContainer>
       <QrCodeDisplay
         result={purchaseResult}
         colors={colors}
         onDone={handleDone}
       />
+    
+      </ScreenContainer>
     );
   }
 
@@ -312,6 +316,7 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
     : '';
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -500,6 +505,8 @@ export default function TicketPurchaseScreen({ route }: TicketPurchaseScreenProp
         </LinearGradient>
       </Pressable>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

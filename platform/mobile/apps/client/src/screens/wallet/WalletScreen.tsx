@@ -16,6 +16,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/theme';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Wallet {
   id: string;
@@ -247,14 +248,18 @@ export default function WalletScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Wallet Balance Card */}
       <Card style={styles.balanceCard}>
@@ -387,5 +392,7 @@ export default function WalletScreen() {
         )}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

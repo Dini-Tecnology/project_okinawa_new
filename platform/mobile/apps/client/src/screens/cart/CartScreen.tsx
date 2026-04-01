@@ -8,6 +8,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 /**
  * CartScreen - Shopping cart management screen
@@ -326,6 +327,7 @@ export default function CartScreen() {
   );
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <FlatList
         data={cart.items}
@@ -479,5 +481,7 @@ export default function CartScreen() {
         </View>
       )}
     </View>
+  
+    </ScreenContainer>
   );
 }

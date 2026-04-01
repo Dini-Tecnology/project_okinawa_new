@@ -9,7 +9,6 @@ import {
   Platform,
   Linking,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import * as Location from 'expo-location';
@@ -18,6 +17,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { typography } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RootStackParamList = {
   GeolocationTracking: {
@@ -446,7 +446,7 @@ export const GeolocationTrackingScreen: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -593,7 +593,7 @@ export const GeolocationTrackingScreen: React.FC = () => {
           </TouchableOpacity>
         )}
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

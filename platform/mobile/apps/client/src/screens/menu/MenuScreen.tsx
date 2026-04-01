@@ -11,6 +11,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import MenuItemCard from './MenuItemCard';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 /**
  * MenuItem interface defines the structure of menu items
@@ -216,6 +217,7 @@ export default function MenuScreen() {
   }), [colors]);
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Searchbar
         placeholder={t('menu.searchMenu')}
@@ -282,5 +284,7 @@ export default function MenuScreen() {
         </View>
       )}
     </View>
+  
+    </ScreenContainer>
   );
 }

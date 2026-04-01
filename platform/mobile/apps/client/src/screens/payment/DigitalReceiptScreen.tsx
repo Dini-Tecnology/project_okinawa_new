@@ -9,7 +9,6 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -19,6 +18,7 @@ import { spacing } from '@okinawa/shared/theme/spacing';
 import { t } from '@okinawa/shared/i18n';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface ReceiptItem {
   id: string;
@@ -440,7 +440,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
   }), [colors]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} accessibilityLabel="Close receipt">
@@ -653,7 +653,7 @@ Pagamento: ${receipt.paymentMethod}${receipt.cardLastDigits ? ` (**** ${receipt.
           <Text style={styles.doneButtonText}>Voltar ao Início</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 import ApiService from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface ConsentRecord {
   id: string;
@@ -93,13 +94,17 @@ export default function ManageConsentsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.center, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.header, { color: colors.text }]}>
         Gerenciar Consentimentos
@@ -200,6 +205,8 @@ export default function ManageConsentsScreen() {
         </Button>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

@@ -35,6 +35,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { formatCurrency as fmtCurrencyUtil } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
 import type { RootStackParamList, PaymentSuccessParams } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -751,12 +752,13 @@ export default function UnifiedPaymentScreen() {
 
   // Loading
   if (initialLoading) {
-    return <PaymentSkeleton />;
+    return (<ScreenContainer><PaymentSkeleton /></ScreenContainer>);
   }
 
   // Error
   if (error && !order) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <Text variant="bodyLarge" style={styles.errorText}>
           {error}
@@ -765,17 +767,22 @@ export default function UnifiedPaymentScreen() {
           {t('common.retry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // No order
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.notFoundContainer}>
         <Text variant="bodyLarge" style={styles.notFoundText}>
           {t('payment.orderNotFound')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -789,6 +796,7 @@ export default function UnifiedPaymentScreen() {
   const isWalletInsufficient = !wallet || wallet.balance < finalTotal;
 
   return (
+    <ScreenContainer hasKeyboard>
     <>
       <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
@@ -1228,5 +1236,7 @@ export default function UnifiedPaymentScreen() {
         </Modal>
       </Portal>
     </>
+  
+    </ScreenContainer>
   );
 }

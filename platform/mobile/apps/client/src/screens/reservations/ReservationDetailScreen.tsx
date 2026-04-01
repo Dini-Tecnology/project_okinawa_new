@@ -8,6 +8,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Guest {
   id: string;
@@ -380,18 +381,24 @@ export default function ReservationDetailScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (!reservation) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <Text style={{ color: colors.foreground }}>{t('errors.notFound')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -405,6 +412,7 @@ export default function ReservationDetailScreen() {
   const pendingGuests = reservation.guests?.filter(g => g.status === 'pending') || [];
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -664,5 +672,7 @@ export default function ReservationDetailScreen() {
         </Card>
       )}
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

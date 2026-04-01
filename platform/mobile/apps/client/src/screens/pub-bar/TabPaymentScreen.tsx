@@ -43,6 +43,7 @@ import { t, getLanguage } from '@/shared/i18n';
 import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
 import { useTab, useTabSplitOptions } from '../../hooks/useTab';
 import type { TabItem } from '../../hooks/useTab';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -399,6 +400,7 @@ export default function TabPaymentScreen() {
   // --- Success state ---
   if (paymentSuccess) {
     return (
+      <ScreenContainer>
       <PaymentSuccess
         colors={colors}
         onViewReceipt={() => {
@@ -410,21 +412,27 @@ export default function TabPaymentScreen() {
           navigation.popToTop();
         }}
       />
+    
+      </ScreenContainer>
     );
   }
 
   // --- Loading state ---
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <PaymentSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // --- Error state ---
   if (isError || !tab) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.errorContainer}>
           <Icon name="alert-circle-outline" size={64} color={colors.error} />
@@ -436,12 +444,15 @@ export default function TabPaymentScreen() {
           </Button>
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   const isProcessing = isClosingTab || isProcessingPayment;
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Tab Summary */}
@@ -605,5 +616,7 @@ export default function TabPaymentScreen() {
         </Button>
       </View>
     </View>
+  
+    </ScreenContainer>
   );
 }

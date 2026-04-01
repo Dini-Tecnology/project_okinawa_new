@@ -35,6 +35,7 @@ import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type SplitMode = 'individual' | 'equal' | 'selective' | 'fixed';
@@ -694,12 +695,13 @@ export default function SplitPaymentScreen() {
 
   // Loading skeleton
   if (loading) {
-    return <SplitSkeleton />;
+    return (<ScreenContainer><SplitSkeleton /></ScreenContainer>);
   }
 
   // Error state
   if (error && !order) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle" size={48} iconColor={colors.error} accessibilityLabel={t('common.error')} />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -709,17 +711,22 @@ export default function SplitPaymentScreen() {
           {t('common.retry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // No order
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.notFoundContainer}>
         <Text variant="bodyLarge" style={styles.notFoundText}>
           {t('payment.orderNotFound')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -729,6 +736,7 @@ export default function SplitPaymentScreen() {
   const remaining = Math.max(0, order.total_amount - totalPaid);
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <ScrollView
         refreshControl={
@@ -1065,5 +1073,7 @@ export default function SplitPaymentScreen() {
         </Modal>
       </Portal>
     </View>
+  
+    </ScreenContainer>
   );
 }

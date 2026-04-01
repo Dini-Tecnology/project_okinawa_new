@@ -21,6 +21,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width } = Dimensions.get('window');
 
@@ -264,6 +265,7 @@ export default function OnboardingScreen() {
 
   if (showPreferences) {
     return (
+      <ScreenContainer>
       <View style={styles.preferencesContainer}>
         <View style={styles.preferencesHeader}>
           <Text variant="headlineMedium" style={styles.preferencesTitle}>
@@ -340,10 +342,13 @@ export default function OnboardingScreen() {
           </Button>
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <FlatList
         ref={flatListRef}
@@ -385,5 +390,7 @@ export default function OnboardingScreen() {
         </Button>
       </View>
     </View>
+  
+    </ScreenContainer>
   );
 }

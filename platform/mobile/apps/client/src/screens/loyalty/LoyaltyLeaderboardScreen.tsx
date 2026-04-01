@@ -14,11 +14,11 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { fontSize, fontWeight } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface LeaderboardUser {
   id: string;
@@ -562,7 +562,7 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -665,7 +665,7 @@ export const LoyaltyLeaderboardScreen: React.FC<{ navigation: any }> = ({ naviga
 
         <View style={{ height: 40 }} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

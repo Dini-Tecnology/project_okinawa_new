@@ -15,6 +15,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 import logger from '@okinawa/shared/utils/logger';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // Types
 interface StampCard {
@@ -317,7 +318,7 @@ export default function StampCardsScreen() {
   );
 
   if (loading) {
-    return <SkeletonLoader colors={colors} />;
+    return (<ScreenContainer><SkeletonLoader colors={colors} /></ScreenContainer>);
   }
 
   const renderCard = ({ item }: { item: StampCard }) => (
@@ -372,6 +373,7 @@ export default function StampCardsScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>
@@ -406,5 +408,7 @@ export default function StampCardsScreen() {
         }
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

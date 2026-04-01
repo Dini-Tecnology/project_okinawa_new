@@ -13,6 +13,7 @@ import ApiService from '@/shared/services/api';
 import FavoriteCard from './FavoriteCard';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Restaurant {
   id: string;
@@ -106,14 +107,18 @@ export default function FavoritesScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={[styles.loadingText, { color: colors.foregroundSecondary }]}>Carregando favoritos...</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Searchbar
         placeholder="Buscar nos favoritos..."
@@ -161,6 +166,8 @@ export default function FavoritesScreen() {
         }
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

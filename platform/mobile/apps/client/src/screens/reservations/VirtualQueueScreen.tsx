@@ -39,6 +39,7 @@ import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@/shared/theme';
 import logger from '@okinawa/shared/utils/logger';
 import type { RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -431,10 +432,13 @@ export default function VirtualQueueScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -442,6 +446,7 @@ export default function VirtualQueueScreen() {
   const historyEntries = queueEntries.filter(e => !['waiting', 'called'].includes(e.status));
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -656,5 +661,7 @@ export default function VirtualQueueScreen() {
         </Modal>
       </Portal>
     </View>
+  
+    </ScreenContainer>
   );
 }

@@ -7,6 +7,7 @@ import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 /**
  * Luhn algorithm for card number validation
@@ -492,15 +493,19 @@ export default function PaymentScreen() {
 
   if (initialLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (paymentSuccess) {
     return (
+      <ScreenContainer>
       <View style={styles.successContainer}>
         <IconButton icon="check-circle" size={80} iconColor={colors.success} />
         <Text variant="headlineMedium" style={styles.successTitle}>{t('payment.paymentConfirmed')}</Text>
@@ -508,18 +513,24 @@ export default function PaymentScreen() {
           {t('payment.paymentSuccess')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <Text style={styles.bodyText}>{t('payment.orderNotFound')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <>
       <ScrollView style={styles.container}>
         <Text variant="headlineSmall" style={styles.title}>
@@ -845,5 +856,7 @@ export default function PaymentScreen() {
         </Modal>
       </Portal>
     </>
+  
+    </ScreenContainer>
   );
 }

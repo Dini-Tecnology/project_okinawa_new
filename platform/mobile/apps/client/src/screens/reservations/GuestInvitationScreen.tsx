@@ -6,6 +6,7 @@ import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Guest {
   id: string;
@@ -410,14 +411,18 @@ export default function GuestInvitationScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       {/* Header Summary */}
       <Card style={styles.summaryCard}>
@@ -640,5 +645,7 @@ export default function GuestInvitationScreen() {
         {t('common.done')}
       </Button>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

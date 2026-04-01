@@ -8,6 +8,7 @@ import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import { SERVICE_TYPE_CONFIGS, ServiceType } from '../../contexts/ServiceTypeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Restaurant {
   id: string;
@@ -140,13 +141,17 @@ export default function RestaurantScreen() {
 
   if (!restaurant) {
     return (
+      <ScreenContainer>
       <View style={styles.loading}>
         <Text style={{ color: colors.foreground }}>Loading...</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       {restaurant.banner_url && (
         <Image source={{ uri: restaurant.banner_url }} style={styles.banner} accessibilityLabel={`${restaurant.name} banner`} />
@@ -327,6 +332,8 @@ export default function RestaurantScreen() {
         )}
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

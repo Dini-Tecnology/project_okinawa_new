@@ -35,6 +35,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -237,6 +238,7 @@ export default function AddressesScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <IconButton icon="map-marker" size={24} iconColor={colors.primary} style={{ margin: 0 }} />
@@ -246,11 +248,14 @@ export default function AddressesScreen() {
         </View>
         <AddressSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (isError) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle-outline" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -266,10 +271,13 @@ export default function AddressesScreen() {
           {t('common.retry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -513,6 +521,8 @@ export default function AddressesScreen() {
         </Dialog>
       </Portal>
     </View>
+  
+    </ScreenContainer>
   );
 }
 

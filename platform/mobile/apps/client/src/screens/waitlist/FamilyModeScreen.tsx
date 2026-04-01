@@ -19,6 +19,7 @@ import { useNavigation } from '@react-navigation/native';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface ChildInfo {
   id: string;
@@ -346,6 +347,7 @@ export default function FamilyModeScreen({ route }: FamilyModeScreenProps) {
   );
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         {/* Activated card */}
@@ -560,5 +562,7 @@ export default function FamilyModeScreen({ route }: FamilyModeScreenProps) {
         </View>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

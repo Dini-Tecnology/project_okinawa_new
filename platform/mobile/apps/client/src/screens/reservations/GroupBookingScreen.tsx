@@ -20,7 +20,6 @@ import {
   StyleSheet,
   Alert,
   Platform,
-  KeyboardAvoidingView,
 } from 'react-native';
 import {
   Text,
@@ -44,6 +43,7 @@ import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -379,6 +379,7 @@ export default function GroupBookingScreen() {
   // ---- Confirmation Screen ----
   if (confirmation) {
     return (
+      <ScreenContainer>
       <View style={styles.confirmationContainer}>
         <View style={styles.confirmationCard}>
           <IconButton
@@ -406,6 +407,7 @@ export default function GroupBookingScreen() {
           </Button>
         </View>
       </View>
+      </ScreenContainer>
     );
   }
 
@@ -623,10 +625,7 @@ export default function GroupBookingScreen() {
 
   // ---- Main Render ----
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <ScreenContainer hasKeyboard>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
@@ -684,6 +683,6 @@ export default function GroupBookingScreen() {
           )}
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }

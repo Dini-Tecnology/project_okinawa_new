@@ -9,6 +9,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Tip {
   id: string;
@@ -156,13 +157,17 @@ export default function TipsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <Card style={styles.summaryCard}>
         <Card.Content>
@@ -233,5 +238,7 @@ export default function TipsScreen() {
         )}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

@@ -29,6 +29,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -251,6 +252,7 @@ export default function NotificationsScreen() {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text variant="headlineSmall" style={styles.headerTitle}>
@@ -261,11 +263,14 @@ export default function NotificationsScreen() {
           <NotificationSkeleton key={i} colors={colors} />
         ))}
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (isError) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle-outline" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -275,11 +280,14 @@ export default function NotificationsScreen() {
           {t('common.retry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (notifications.length === 0) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <IconButton icon="bell-outline" size={80} iconColor={colors.foregroundMuted} />
         <Text variant="headlineSmall" style={styles.emptyTitle}>
@@ -289,6 +297,8 @@ export default function NotificationsScreen() {
           {t('notifications.emptyMessage')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -396,6 +406,7 @@ export default function NotificationsScreen() {
   };
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -444,6 +455,8 @@ export default function NotificationsScreen() {
         }
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

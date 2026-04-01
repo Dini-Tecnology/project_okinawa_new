@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import ApiService from '@/shared/services/api';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Review {
   id: string;
@@ -171,14 +172,18 @@ export default function ReviewsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>Loading reviews...</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <FlatList
         data={reviews}
@@ -320,6 +325,8 @@ export default function ReviewsScreen() {
         label="Write Review"
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

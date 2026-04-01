@@ -22,6 +22,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import type { Order, RootStackParamList } from '../../types';
 import { OrderCard, OrderCardOrder } from '@okinawa/shared/components/orders/OrderCard';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 type FilterType = 'all' | 'active' | 'completed';
@@ -180,6 +181,7 @@ export default function OrdersScreen() {
   }, [orders]);
 
   return (
+    <ScreenContainer edges={['top']}>
     <View style={styles.container}>
       <View style={[styles.filterContainer, { backgroundColor: colors.card, borderBottomColor: colors.border }]}>
         <SegmentedButtons
@@ -228,5 +230,7 @@ export default function OrdersScreen() {
         />
       )}
     </View>
+  
+    </ScreenContainer>
   );
 }

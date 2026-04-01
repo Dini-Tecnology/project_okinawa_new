@@ -10,6 +10,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/theme';
 import logger from '@okinawa/shared/utils/logger';
 import type { Reservation, ReservationStatus, RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -190,13 +191,17 @@ export default function ReservationsScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <FlatList
         data={reservations}
@@ -275,5 +280,7 @@ export default function ReservationsScreen() {
         color={colors.primaryForeground}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

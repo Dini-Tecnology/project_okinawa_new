@@ -26,6 +26,7 @@ import { getLanguage } from '@okinawa/shared/i18n';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -397,12 +398,13 @@ export default function CheckoutScreen() {
 
   // Loading state
   if (loading) {
-    return <CheckoutSkeleton />;
+    return (<ScreenContainer><CheckoutSkeleton /></ScreenContainer>);
   }
 
   // Error state
   if (error) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <Text variant="bodyLarge" style={styles.errorText}>
           {error}
@@ -411,12 +413,15 @@ export default function CheckoutScreen() {
           {t('checkout.errorRetry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // Empty state
   if (!order || !order.items || order.items.length === 0) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <Text variant="bodyLarge" style={styles.emptyText}>
           {t('checkout.empty')}
@@ -425,12 +430,15 @@ export default function CheckoutScreen() {
           {t('checkout.buttonBack')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   const serviceTypeBadge = getServiceTypeBadge();
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
@@ -592,5 +600,7 @@ export default function CheckoutScreen() {
         </Button>
       </ScrollView>
     </View>
+  
+    </ScreenContainer>
   );
 }

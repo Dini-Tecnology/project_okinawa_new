@@ -24,6 +24,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useAuth } from '@okinawa/shared/hooks/useAuth';
 import { useWebSocket } from '@okinawa/shared/hooks/useWebSocket';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface WaitlistEntry {
   id: string;
@@ -423,11 +424,14 @@ export default function WaitlistScreen({ route }: WaitlistScreenProps) {
   // Loading state
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <View style={[skeletonStyles.card, { backgroundColor: colors.card }]}>
           <View style={[skeletonStyles.title, { backgroundColor: colors.backgroundTertiary }]} />
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -437,6 +441,7 @@ export default function WaitlistScreen({ route }: WaitlistScreenProps) {
     const isNext = entry.position === 1;
 
     return (
+      <ScreenContainer>
       <ScrollView
         style={styles.container}
         refreshControl={
@@ -582,11 +587,14 @@ export default function WaitlistScreen({ route }: WaitlistScreenProps) {
           )}
         </View>
       </ScrollView>
+    
+      </ScreenContainer>
     );
   }
 
   // Join form
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{t('waitlist.joinTitle')}</Text>
@@ -659,6 +667,8 @@ export default function WaitlistScreen({ route }: WaitlistScreenProps) {
         </Button>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

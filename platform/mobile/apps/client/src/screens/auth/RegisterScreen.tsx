@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, ScrollView, StyleSheet } from 'react-native';
 import { TextInput, Button, Text, HelperText, Checkbox } from 'react-native-paper';
 import { authService } from '@/shared/services/auth';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
@@ -9,6 +9,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { registerSchema, validateForm, type RegisterFormData } from '@/shared/validation/schemas';
 import { LegalConsentSection } from '@okinawa/shared/components/LegalConsentSection';
 import Haptic from '@/shared/utils/haptics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const CURRENT_TERMS_VERSION = '1.0';
 const CURRENT_PRIVACY_VERSION = '1.0';
@@ -103,10 +104,7 @@ export default function RegisterScreen({ navigation }: any) {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <ScreenContainer hasKeyboard>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
@@ -242,7 +240,7 @@ export default function RegisterScreen({ navigation }: any) {
           {t('auth.hasAccount')}
         </Button>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }
 

@@ -26,6 +26,7 @@ import { gradients } from '@okinawa/shared/theme/colors';
 import logger from '@okinawa/shared/utils/logger';
 import { t } from '@okinawa/shared/i18n';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // Types
 interface LoyaltyProfile {
@@ -473,11 +474,12 @@ export default function LoyaltyHomeScreen() {
   );
 
   if (loading) {
-    return <SkeletonLoader colors={colors} />;
+    return (<ScreenContainer><SkeletonLoader colors={colors} /></ScreenContainer>);
   }
 
   if (!profile) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 32 }]}>
         <IconButton icon="star-outline" size={64} iconColor={colors.foregroundMuted} />
         <Text variant="titleMedium" style={{ color: colors.foreground, marginTop: 12, textAlign: 'center' }}>
@@ -487,6 +489,8 @@ export default function LoyaltyHomeScreen() {
           {t('loyalty.detail.emptyMessage')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -495,6 +499,7 @@ export default function LoyaltyHomeScreen() {
   const tiers = ['bronze', 'silver', 'gold', 'platinum'];
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={
@@ -710,5 +715,7 @@ export default function LoyaltyHomeScreen() {
         </TouchableOpacity>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

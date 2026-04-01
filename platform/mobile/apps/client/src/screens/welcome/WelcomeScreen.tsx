@@ -4,6 +4,7 @@ import { Text, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColors } from '@okinawa/shared/theme';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width, height } = Dimensions.get('window');
 
@@ -172,6 +173,7 @@ export default function WelcomeScreen() {
   });
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Background gradient effect */}
       <View style={styles.gradientTop} />
@@ -279,5 +281,7 @@ export default function WelcomeScreen() {
       <View style={styles.decorCircle1} />
       <View style={styles.decorCircle2} />
     </View>
+  
+    </ScreenContainer>
   );
 }

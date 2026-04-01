@@ -26,6 +26,7 @@ import { useQuery } from '@tanstack/react-query';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -276,6 +277,7 @@ export default function LineupScreen({ route }: LineupScreenProps) {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text
@@ -290,10 +292,13 @@ export default function LineupScreen({ route }: LineupScreenProps) {
         </View>
         <LineupSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
       <View style={styles.header}>
@@ -334,6 +339,8 @@ export default function LineupScreen({ route }: LineupScreenProps) {
         showsVerticalScrollIndicator={false}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

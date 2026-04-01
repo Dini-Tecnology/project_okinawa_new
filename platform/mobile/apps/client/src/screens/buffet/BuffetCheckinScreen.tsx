@@ -14,6 +14,7 @@ import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContex
 import { spacing, borderRadius } from '@okinawa/shared/theme/spacing';
 import { typography } from '@okinawa/shared/theme/typography';
 import ApiService from '@/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface BuffetCheckinProps {
   restaurantId: string;
@@ -81,6 +82,7 @@ export default function BuffetCheckinScreen({
   }, [restaurantId, tableAssignment, t]);
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.contentContainer}
@@ -228,6 +230,8 @@ export default function BuffetCheckinScreen({
         </>
       )}
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

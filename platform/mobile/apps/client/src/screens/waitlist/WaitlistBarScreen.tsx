@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface BarMenuItem {
   id: string;
@@ -286,6 +287,7 @@ export default function WaitlistBarScreen({ route }: WaitlistBarScreenProps) {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>{t('waitlistBar.title')}</Text>
@@ -356,5 +358,7 @@ export default function WaitlistBarScreen({ route }: WaitlistBarScreenProps) {
         )}
       </View>
     </View>
+  
+    </ScreenContainer>
   );
 }

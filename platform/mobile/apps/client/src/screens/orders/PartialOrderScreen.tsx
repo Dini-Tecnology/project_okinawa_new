@@ -39,6 +39,7 @@ import { getLanguage } from '@okinawa/shared/i18n';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@/shared/theme/spacing';
 import { typography } from '@/shared/theme/typography';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -371,24 +372,31 @@ export default function PartialOrderScreen() {
   // ---- Loading ----
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <Text style={{ color: colors.foregroundSecondary }}>
           {t('common.error')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // ---- Render ----
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
       {/* Header */}
       <View style={styles.header}>
@@ -550,5 +558,7 @@ export default function PartialOrderScreen() {
         {t('partialOrder.viewFullOrder')}
       </Button>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

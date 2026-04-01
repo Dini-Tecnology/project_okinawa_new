@@ -12,6 +12,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface FAQItem {
   id: string;
@@ -74,6 +75,7 @@ export default function SupportScreen() {
 
   if (showContactForm) {
     return (
+      <ScreenContainer>
       <ScrollView style={styles.container}>
         <View style={styles.contactFormContainer}>
           <Text variant="headlineMedium" style={styles.contactTitle}>Fale Conosco</Text>
@@ -100,10 +102,13 @@ export default function SupportScreen() {
           </Button>
         </View>
       </ScrollView>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView style={styles.container}>
       <View style={styles.searchContainer}>
         <Searchbar
@@ -186,6 +191,8 @@ export default function SupportScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

@@ -37,6 +37,7 @@ import { getLanguage } from '@okinawa/shared/i18n';
 import { useWebSocket } from '@/shared/hooks/useWebSocket';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -442,25 +443,32 @@ export default function SharedOrderScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <IconButton icon="receipt-text-remove" size={64} iconColor={colors.foregroundMuted} accessibilityLabel={t('orders.notFound')} />
         <Text variant="titleLarge" style={{ color: colors.foreground }}>{t('orders.notFound')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   const itemsByGuest = getItemsByGuest();
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <ScrollView
         refreshControl={
@@ -718,5 +726,7 @@ export default function SharedOrderScreen() {
         accessibilityLabel={t('orders.addItems')}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

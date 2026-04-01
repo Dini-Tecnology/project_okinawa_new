@@ -31,6 +31,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useAuth } from '@okinawa/shared/hooks/useAuth';
 import { ApiService } from '@okinawa/shared/services/api';
 import io, { Socket } from 'socket.io-client';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -259,6 +260,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
   // Not in queue yet - show join screen
   if (!queueEntry && !isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.joinContainer}>
           <Text style={{ fontSize: 64, textAlign: 'center', marginBottom: 16 }}>
@@ -305,14 +307,19 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
           </Button>
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, styles.centerContent, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -320,6 +327,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
   const isFirstInLine = (queueEntry?.position ?? 99) <= 1;
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -437,6 +445,8 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
         </Button>
       )}
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

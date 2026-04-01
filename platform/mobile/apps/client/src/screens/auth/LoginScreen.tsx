@@ -12,6 +12,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import { loginSchema, validateForm, type LoginFormData } from '@/shared/validation/schemas';
 import Haptic from '@/shared/utils/haptics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 export default function LoginScreen({ navigation }: any) {
   useScreenTracking('Login');
@@ -160,6 +161,7 @@ export default function LoginScreen({ navigation }: any) {
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={styles.container}>
       <Text variant="headlineLarge" style={styles.title}>
         {t('auth.welcomeBack')}
@@ -248,6 +250,8 @@ export default function LoginScreen({ navigation }: any) {
         {t('auth.noAccount')}
       </Button>
     </View>
+  
+    </ScreenContainer>
   );
 }
 

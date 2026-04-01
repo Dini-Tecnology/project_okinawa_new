@@ -28,6 +28,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import type { User } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const DIETARY_OPTIONS = [
   'Vegetariano',
@@ -260,13 +261,17 @@ export default function ProfileScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer edges={['top']} hasKeyboard>
     <ScrollView style={styles.container}>
       {/* Profile Header */}
       <View style={styles.header}>
@@ -526,5 +531,7 @@ export default function ProfileScreen() {
         </Dialog>
       </Portal>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

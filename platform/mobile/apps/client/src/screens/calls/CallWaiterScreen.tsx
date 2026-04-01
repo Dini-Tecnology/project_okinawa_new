@@ -33,6 +33,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
 import { ApiService } from '@okinawa/shared/services/api';
 import { useWebSocket } from '@okinawa/shared/hooks/useWebSocket';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -226,6 +227,7 @@ export default function CallWaiterScreen({ route }: CallWaiterScreenProps) {
   // --- Success state ---
   if (showSuccess) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.successContainer}>
           {/* Large green gradient circle */}
@@ -262,10 +264,13 @@ export default function CallWaiterScreen({ route }: CallWaiterScreenProps) {
           </Button>
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Title */}
@@ -394,6 +399,8 @@ export default function CallWaiterScreen({ route }: CallWaiterScreenProps) {
         )}
       </ScrollView>
     </View>
+  
+    </ScreenContainer>
   );
 }
 

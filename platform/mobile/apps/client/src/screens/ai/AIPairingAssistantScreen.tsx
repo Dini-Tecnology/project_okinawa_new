@@ -8,13 +8,13 @@ import {
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { fontSize, fontWeight } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
 import { BetaBadge } from '@okinawa/shared/components/BetaBadge';
 import ApiService from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface MenuItem {
   id: string;
@@ -187,7 +187,7 @@ export const AIPairingAssistantScreen: React.FC<AIPairingAssistantScreenProps> =
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -309,7 +309,7 @@ export const AIPairingAssistantScreen: React.FC<AIPairingAssistantScreenProps> =
           </TouchableOpacity>
         </View>
       )}
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

@@ -33,6 +33,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
 import { format } from 'date-fns';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -185,11 +186,12 @@ export default function LoyaltyDetailScreen() {
   // ============================================
 
   if (isLoading) {
-    return <LoyaltyDetailSkeleton colors={colors} />;
+    return (<ScreenContainer><LoyaltyDetailSkeleton colors={colors} /></ScreenContainer>);
   }
 
   if (isError || !loyalty) {
     return (
+      <ScreenContainer>
       <View style={styles.errorContainer}>
         <IconButton icon="alert-circle-outline" size={64} iconColor={colors.foregroundMuted} accessibilityLabel={t('loyalty.detail.emptyTitle')} />
         <Text variant="bodyLarge" style={styles.errorText}>
@@ -202,6 +204,8 @@ export default function LoyaltyDetailScreen() {
           {t('common.retry')}
         </Button>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -210,6 +214,7 @@ export default function LoyaltyDetailScreen() {
   const tierName = t(`loyalty.tiers.${tierKey}`);
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
@@ -422,6 +427,8 @@ export default function LoyaltyDetailScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

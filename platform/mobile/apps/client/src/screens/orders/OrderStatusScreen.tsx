@@ -36,6 +36,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { Portal, Modal, TouchableRipple } from 'react-native-paper';
 import * as Haptics from 'expo-haptics';
 import type { RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -469,19 +470,25 @@ export default function OrderStatusScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('common.loading')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (!order) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <IconButton icon="receipt-text-remove" size={64} iconColor={colors.foregroundMuted} accessibilityLabel={t('orders.notFound')} />
         <Text variant="titleLarge" style={{ color: colors.foreground }}>{t('orders.notFound')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -490,6 +497,7 @@ export default function OrderStatusScreen() {
   const isCancelled = order.status === 'cancelled';
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       <ScrollView
         refreshControl={
@@ -759,5 +767,7 @@ export default function OrderStatusScreen() {
         </Modal>
       </Portal>
     </View>
+  
+    </ScreenContainer>
   );
 }

@@ -34,6 +34,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { ApiService } from '@okinawa/shared/services/api';
 import * as Haptics from 'expo-haptics';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -395,16 +396,20 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
   // Show confirmation
   if (bookingResult) {
     return (
+      <ScreenContainer>
       <ConfirmationView
         booking={bookingResult}
         colors={colors}
         onDone={handleDone}
       />
+    
+      </ScreenContainer>
     );
   }
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text
@@ -422,10 +427,13 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
         </View>
         <BookingSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer hasKeyboard>
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.content}
@@ -623,6 +631,8 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
         {t('club.birthday.submit')}
       </Button>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

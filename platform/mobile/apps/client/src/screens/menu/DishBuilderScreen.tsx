@@ -7,11 +7,11 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import { fontSize, fontWeight } from '@okinawa/shared/theme/typography';
 import { spacing } from '@okinawa/shared/theme/spacing';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface Ingredient {
   id: string;
@@ -327,7 +327,7 @@ export const DishBuilderScreen: React.FC<DishBuilderScreenProps> = ({
   }), [colors]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenContainer>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -490,7 +490,7 @@ export const DishBuilderScreen: React.FC<DishBuilderScreenProps> = ({
           )}
         </View>
       </View>
-    </SafeAreaView>
+    </ScreenContainer>
   );
 };
 

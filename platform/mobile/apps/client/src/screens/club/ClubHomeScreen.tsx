@@ -32,6 +32,7 @@ import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { gradients } from '@okinawa/shared/theme/colors';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -378,6 +379,7 @@ export default function ClubHomeScreen({ route }: ClubHomeScreenProps) {
 
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={[eventStyles.container, { backgroundColor: colors.background }]}>
         <View style={eventStyles.header}>
           <Text
@@ -395,10 +397,13 @@ export default function ClubHomeScreen({ route }: ClubHomeScreenProps) {
         </View>
         <EventSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <View style={[eventStyles.container, { backgroundColor: colors.background }]}>
       <View style={eventStyles.header}>
         <Text
@@ -431,6 +436,8 @@ export default function ClubHomeScreen({ route }: ClubHomeScreenProps) {
         showsVerticalScrollIndicator={false}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }
 

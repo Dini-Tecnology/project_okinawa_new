@@ -10,6 +10,7 @@ import { useNavigation } from '@react-navigation/native';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface WaitlistStatsData {
   totalWaiting: number;
@@ -183,15 +184,19 @@ export default function EntryChoiceScreen({ route }: EntryChoiceScreenProps) {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <SkeletonCard />
         <SkeletonCard />
         <SkeletonCard />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer>
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{t('entryChoice.title')}</Text>
@@ -308,5 +313,7 @@ export default function EntryChoiceScreen({ route }: EntryChoiceScreenProps) {
         </TouchableOpacity>
       </View>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }

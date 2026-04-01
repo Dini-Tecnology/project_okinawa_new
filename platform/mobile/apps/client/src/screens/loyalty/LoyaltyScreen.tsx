@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 import logger from '@okinawa/shared/utils/logger';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface LoyaltyProgram {
   id: string;
@@ -165,15 +166,19 @@ export default function LoyaltyScreen() {
 
   if (loading) {
     return (
+      <ScreenContainer>
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
         <Text style={styles.loadingText}>{t('loyaltyScreen.loadingPrograms')}</Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   if (programs.length === 0) {
     return (
+      <ScreenContainer>
       <View style={styles.emptyContainer}>
         <IconButton icon="star-outline" size={80} iconColor={colors.foregroundMuted} />
         <Text variant="headlineSmall" style={styles.emptyTitle}>
@@ -183,6 +188,8 @@ export default function LoyaltyScreen() {
           {t('loyaltyScreen.emptyMessage')}
         </Text>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -194,6 +201,7 @@ export default function LoyaltyScreen() {
   const progress = calculateProgress(selectedProgram);
 
   return (
+    <ScreenContainer>
     <ScrollView
       style={styles.container}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
@@ -382,6 +390,8 @@ export default function LoyaltyScreen() {
         </Card.Content>
       </Card>
     </ScrollView>
+  
+    </ScreenContainer>
   );
 }
 

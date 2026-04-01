@@ -14,8 +14,6 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
 import {
   Text,
@@ -29,6 +27,7 @@ import { useMutation } from '@tanstack/react-query';
 import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ApiService } from '@okinawa/shared/services/api';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -220,15 +219,14 @@ export default function BirthdayEntryRequestScreen({ route }: BirthdayEntryReque
   // Show confirmation on success
   if (result) {
     return (
-      <ConfirmationDisplay result={result} colors={colors} onDone={handleDone} />
+      <ScreenContainer>
+        <ConfirmationDisplay result={result} colors={colors} onDone={handleDone} />
+      </ScreenContainer>
     );
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <ScreenContainer hasKeyboard>
       <ScrollView
         style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.content}
@@ -331,7 +329,7 @@ export default function BirthdayEntryRequestScreen({ route }: BirthdayEntryReque
           {t('club.birthday.submit')}
         </Button>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </ScreenContainer>
   );
 }
 

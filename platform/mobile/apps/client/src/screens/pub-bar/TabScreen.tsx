@@ -40,6 +40,7 @@ import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { useTab } from '../../hooks/useTab';
 import type { TabItem } from '../../hooks/useTab';
 import RoundBuilderSheet from './RoundBuilderSheet';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 // ============================================
 // TYPES
@@ -506,15 +507,19 @@ export default function TabScreen() {
   // --- Loading state ---
   if (isLoading) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <TabSkeleton colors={colors} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   // --- Error state ---
   if (isError || !tab) {
     return (
+      <ScreenContainer>
       <View style={styles.container}>
         <View style={styles.errorContainer}>
           <Icon name="alert-circle-outline" size={64} color={colors.error} />
@@ -526,6 +531,8 @@ export default function TabScreen() {
           </Button>
         </View>
       </View>
+    
+      </ScreenContainer>
     );
   }
 
@@ -560,6 +567,7 @@ export default function TabScreen() {
   );
 
   return (
+    <ScreenContainer>
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
@@ -722,5 +730,7 @@ export default function TabScreen() {
         restaurantId={tab.restaurant_id}
       />
     </View>
+  
+    </ScreenContainer>
   );
 }

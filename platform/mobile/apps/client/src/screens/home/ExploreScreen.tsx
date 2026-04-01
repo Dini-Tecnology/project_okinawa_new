@@ -38,6 +38,7 @@ import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import type { Restaurant, Location as LocationType, RootStackParamList } from '../../types';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width, height } = Dimensions.get('window');
 const ASPECT_RATIO = width / height;
@@ -494,13 +495,17 @@ export default function ExploreScreen() {
 
   if (loading && restaurants.length === 0) {
     return (
+      <ScreenContainer>
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
+    
+      </ScreenContainer>
     );
   }
 
   return (
+    <ScreenContainer edges={['top']}>
     <View style={styles.container}>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
@@ -550,5 +555,7 @@ export default function ExploreScreen() {
       {/* Content */}
       {viewMode === 'list' ? renderListView() : renderMapView()}
     </View>
+  
+    </ScreenContainer>
   );
 }
