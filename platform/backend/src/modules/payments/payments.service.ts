@@ -139,7 +139,21 @@ export class PaymentsService {
     await queryRunner.startTransaction();
 
     try {
-      const wallet = await this.getWallet(userId);
+      // Lock wallet row to prevent concurrent modifications
+      const Wallet = (await import('../entities/wallet.entity')).Wallet;
+      let wallet = await queryRunner.manager.findOne(Wallet, {
+        where: { user_id: userId, wallet_type: 'client' },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!wallet) {
+        wallet = queryRunner.manager.create(Wallet, {
+          user_id: userId,
+          wallet_type: 'client',
+          balance: 0,
+        });
+        await queryRunner.manager.save(wallet);
+      }
 
       // Validate compliance limits before proceeding
       await this.validateWalletLimits(wallet, rechargeDto.amount, 'recharge');
@@ -178,7 +192,17 @@ export class PaymentsService {
     await queryRunner.startTransaction();
 
     try {
-      const wallet = await this.getWallet(userId);
+      // Lock wallet row to prevent concurrent modifications
+      const Wallet = (await import('../entities/wallet.entity')).Wallet;
+      let wallet = await queryRunner.manager.findOne(Wallet, {
+        where: { user_id: userId, wallet_type: 'client' },
+        lock: { mode: 'pessimistic_write' },
+      });
+
+      if (!wallet) {
+        throw new BadRequestException('Wallet not found');
+      }
+
       const balanceBefore = Number(wallet.balance);
 
       if (balanceBefore < withdrawDto.amount) {
@@ -336,23 +360,38 @@ export class PaymentsService {
 
       // Process based on payment method
       switch (processDto.payment_method) {
-        case 'wallet':
-          // Deduct from wallet
-          const wallet = await this.getWallet(userId);
-          if (Number(wallet.balance) < processDto.amount) {
+        case 'wallet': {
+          // Load wallet with pessimistic lock to prevent concurrent balance race
+          const Wallet = (await import('../entities/wallet.entity')).Wallet;
+          let wallet = await queryRunner.manager.findOne(Wallet, {
+            where: { user_id: userId, wallet_type: 'client' },
+            lock: { mode: 'pessimistic_write' },
+          });
+
+          if (!wallet) {
+            wallet = queryRunner.manager.create(Wallet, {
+              user_id: userId,
+              wallet_type: 'client',
+              balance: 0,
+            });
+            await queryRunner.manager.save(wallet);
+          }
+
+          const balanceBefore = Number(wallet.balance);
+          if (balanceBefore < processDto.amount) {
             this.logger.warn({
               message: 'Payment failed - insufficient wallet balance',
               correlationId: paymentCorrelationId,
               userId,
               orderId: processDto.order_id,
-              walletBalance: Number(wallet.balance),
+              walletBalance: balanceBefore,
               requiredAmount: processDto.amount,
               duration: Date.now() - startTime,
             });
             throw new BadRequestException('Insufficient wallet balance');
           }
 
-          wallet.balance = Number(wallet.balance) - processDto.amount;
+          wallet.balance = balanceBefore - processDto.amount;
           await queryRunner.manager.save(wallet);
 
           // Create transaction record
@@ -360,13 +399,14 @@ export class PaymentsService {
             wallet_id: wallet.id,
             transaction_type: TransactionType.PAYMENT,
             amount: processDto.amount,
-            balance_before: Number(wallet.balance) + processDto.amount,
+            balance_before: balanceBefore,
             balance_after: Number(wallet.balance),
             description: `Payment for order #${order.id.substring(0, 8)}`,
             order_id: order.id,
           });
           await queryRunner.manager.save(transaction);
           break;
+        }
 
         case 'credit_card':
         case 'debit_card':
