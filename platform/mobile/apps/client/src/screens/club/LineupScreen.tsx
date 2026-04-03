@@ -299,7 +299,7 @@ export default function LineupScreen({ route }: LineupScreenProps) {
 
   return (
     <ScreenContainer>
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} accessibilityLabel="Event lineup">
       {/* Header */}
       <View style={styles.header}>
         <Text

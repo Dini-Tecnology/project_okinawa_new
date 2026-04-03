@@ -49,6 +49,15 @@ interface FiscalConfigData {
   isActive: boolean;
 }
 
+const formatCNPJ = (text: string): string => {
+  const cleaned = text.replace(/\D/g, '').slice(0, 14);
+  return cleaned
+    .replace(/^(\d{2})(\d)/, '$1.$2')
+    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3/$4')
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, '$1.$2.$3/$4-$5');
+};
+
 const REGIME_OPTIONS = [
   { value: 'simples_nacional', label: 'Simples Nacional' },
   { value: 'lucro_presumido', label: 'Lucro Presumido' },
@@ -196,7 +205,7 @@ export default function FiscalSetupScreen() {
 
   return (
     <ScreenContainer hasKeyboard>
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }} accessibilityLabel="Fiscal setup">
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
@@ -228,11 +237,11 @@ export default function FiscalSetupScreen() {
 
           <TextInput
             label={t('financial.fiscal.setup.cnpj')}
-            value={config.cnpj}
-            onChangeText={(v) => updateField('cnpj', v.replace(/\D/g, ''))}
+            value={formatCNPJ(config.cnpj)}
+            onChangeText={(v) => updateField('cnpj', v.replace(/\D/g, '').slice(0, 14))}
             mode="outlined"
             keyboardType="numeric"
-            maxLength={14}
+            maxLength={18}
             style={styles.input}
             outlineColor={colors.border}
             activeOutlineColor={colors.primary}

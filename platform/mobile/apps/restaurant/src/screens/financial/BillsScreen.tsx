@@ -378,12 +378,16 @@ export default function BillsScreen() {
                       size={18}
                       onPress={() => openEditModal(bill)}
                       iconColor={colors.primary}
+                      accessibilityLabel="Edit bill"
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     />
                     <IconButton
                       icon="delete"
                       size={18}
                       onPress={() => handleDelete(bill)}
                       iconColor={colors.error}
+                      accessibilityLabel="Delete bill"
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                     />
                   </View>
                 )}
@@ -426,7 +430,7 @@ export default function BillsScreen() {
                   ? t('financial.bills.edit')
                   : t('financial.bills.create')}
               </Text>
-              <IconButton icon="close" onPress={closeModal} />
+              <IconButton icon="close" onPress={closeModal} accessibilityLabel="Close" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} />
             </View>
 
             <ScrollView style={styles.modalForm}>

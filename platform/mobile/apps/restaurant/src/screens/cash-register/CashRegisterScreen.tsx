@@ -631,6 +631,11 @@ export default function CashRegisterScreen() {
         data={movements}
         keyExtractor={(item) => item.id}
         renderItem={renderMovementItem}
+        getItemLayout={(_, index) => ({
+          length: 72,
+          offset: 72 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
@@ -685,6 +690,11 @@ export default function CashRegisterScreen() {
     <FlatList
       data={history}
       keyExtractor={(item) => item.id}
+      getItemLayout={(_, index) => ({
+        length: 100,
+        offset: 100 * index,
+        index,
+      })}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
       }
@@ -799,7 +809,7 @@ export default function CashRegisterScreen() {
 
   return (
     <ScreenContainer hasKeyboard>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Cash register">
       {/* Tab selector */}
       <SegmentedButtons
         value={tab}

@@ -63,6 +63,12 @@ interface AddressFormData {
   zip: string;
 }
 
+const formatCEP = (text: string): string => {
+  const cleaned = text.replace(/\D/g, '').slice(0, 8);
+  if (cleaned.length > 5) return `${cleaned.slice(0, 5)}-${cleaned.slice(5)}`;
+  return cleaned;
+};
+
 const LABEL_ICONS: Record<string, string> = {
   home: 'home',
   work: 'briefcase',
@@ -487,8 +493,8 @@ export default function AddressesScreen() {
 
                 <TextInput
                   label={t('addresses.form.zip')}
-                  value={formData.zip}
-                  onChangeText={(v) => updateField('zip', v)}
+                  value={formatCEP(formData.zip)}
+                  onChangeText={(v) => updateField('zip', v.replace(/\D/g, '').slice(0, 8))}
                   mode="outlined"
                   style={styles.input}
                   keyboardType="numeric"

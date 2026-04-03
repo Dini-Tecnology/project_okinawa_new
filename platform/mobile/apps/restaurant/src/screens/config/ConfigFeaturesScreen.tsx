@@ -179,7 +179,7 @@ export default function ConfigFeaturesScreen() {
 
   return (
     <ScreenContainer>
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} accessibilityLabel="Feature toggles">
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('config.features.title')}</Text>
         {FEATURES.map((feature) => (

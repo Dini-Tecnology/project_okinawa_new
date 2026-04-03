@@ -517,6 +517,11 @@ export default function DoorManagementScreen({ route }: DoorManagementScreenProp
         keyExtractor={(item) => item.id}
         renderItem={renderEntry}
         contentContainerStyle={{ padding: 16, paddingTop: 12, gap: 12 }}
+        getItemLayout={(_, index) => ({
+          length: 152,
+          offset: 152 * index,
+          index,
+        })}
         ListEmptyComponent={renderEmpty}
         refreshControl={
           <RefreshControl

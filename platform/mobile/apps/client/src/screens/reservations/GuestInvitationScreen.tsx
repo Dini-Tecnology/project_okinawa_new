@@ -489,6 +489,8 @@ export default function GuestInvitationScreen() {
                   size={20}
                   onPress={() => handleCancelInvite(guest.id)}
                   iconColor={colors.foregroundMuted}
+                  accessibilityLabel="Cancel invite"
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 />
               )}
             </View>
@@ -526,6 +528,7 @@ export default function GuestInvitationScreen() {
               style={styles.contactItem}
               onPress={() => handleInviteContact(contact)}
               disabled={inviting}
+              accessibilityLabel={`Invite ${contact.name}`}
             >
               <Avatar.Text
                 size={40}

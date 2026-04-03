@@ -382,12 +382,16 @@ export default function StationSettingsScreen() {
                 size={20}
                 iconColor={colors.primary}
                 onPress={() => openEditModal(item)}
+                accessibilityLabel={`Edit ${item.name}`}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               />
               <IconButton
                 icon={item.is_active ? 'eye-off' : 'eye'}
                 size={20}
                 iconColor={item.is_active ? colors.warning : colors.success}
                 onPress={() => handleToggleActive(item)}
+                accessibilityLabel={item.is_active ? `Deactivate ${item.name}` : `Activate ${item.name}`}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               />
             </View>
           </View>
@@ -431,6 +435,11 @@ export default function StationSettingsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderStationCard}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 120,
+          offset: 120 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}

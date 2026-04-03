@@ -245,7 +245,7 @@ export default function TipsScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Tips management">
       <SegmentedButtons
         value={period}
         onValueChange={setPeriod}
@@ -348,6 +348,11 @@ export default function TipsScreen() {
         renderItem={renderTransaction}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        getItemLayout={(_, index) => ({
+          length: 72,
+          offset: 72 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

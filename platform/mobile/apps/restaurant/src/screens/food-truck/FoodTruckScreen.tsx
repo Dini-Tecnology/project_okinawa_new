@@ -320,6 +320,11 @@ export default function FoodTruckScreen() {
         contentContainerStyle={styles.listContent}
         refreshing={isLoading}
         onRefresh={loadOrders}
+        getItemLayout={(_, index) => ({
+          length: 140,
+          offset: 140 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[typography.bodyLarge, { color: colors.foregroundMuted }]}>

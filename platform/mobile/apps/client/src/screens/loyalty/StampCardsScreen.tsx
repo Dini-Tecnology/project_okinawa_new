@@ -405,6 +405,7 @@ export default function StampCardsScreen() {
               icon="cards-outline"
               size={64}
               iconColor={colors.foregroundMuted}
+              accessibilityLabel="No stamp cards"
             />
             <Text style={styles.emptyText}>
               {t('loyalty.detail.emptyMessage')}

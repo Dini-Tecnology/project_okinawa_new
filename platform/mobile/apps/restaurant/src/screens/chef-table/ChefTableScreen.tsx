@@ -327,6 +327,11 @@ export default function ChefTableScreen() {
         renderItem={renderCourse}
         contentContainerStyle={styles.coursesList}
         showsVerticalScrollIndicator={false}
+        getItemLayout={(_, index) => ({
+          length: 120,
+          offset: 120 * index,
+          index,
+        })}
       />
 
       {/* Next course CTA */}

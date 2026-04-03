@@ -168,7 +168,7 @@ export default function TipsScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Tips history">
       <Card style={styles.summaryCard}>
         <Card.Content>
           <View style={styles.summaryHeader}>

@@ -387,6 +387,7 @@ export default function GroupBookingScreen() {
             size={64}
             iconColor={colors.success}
             style={styles.confirmationIcon}
+            accessibilityLabel="Booking confirmed"
           />
           <Text style={styles.confirmationTitle}>
             {t('groupBooking.submitted')}
@@ -445,7 +446,7 @@ export default function GroupBookingScreen() {
           style={styles.dateButton}
           onTouchEnd={() => setShowDatePicker(true)}
         >
-          <IconButton icon="calendar" size={20} iconColor={colors.primary} style={{ margin: 0 }} />
+          <IconButton icon="calendar" size={20} iconColor={colors.primary} style={{ margin: 0 }} accessibilityLabel="Select date" />
           <Text style={styles.dateButtonText}>
             {format(form.date, 'dd/MM/yyyy')}
           </Text>
@@ -468,7 +469,7 @@ export default function GroupBookingScreen() {
           style={styles.dateButton}
           onTouchEnd={() => setShowTimePicker(true)}
         >
-          <IconButton icon="clock-outline" size={20} iconColor={colors.primary} style={{ margin: 0 }} />
+          <IconButton icon="clock-outline" size={20} iconColor={colors.primary} style={{ margin: 0 }} accessibilityLabel="Select time" />
           <Text style={styles.dateButtonText}>
             {format(form.time, 'HH:mm')}
           </Text>

@@ -181,7 +181,7 @@ export default function MarginDashboardScreen() {
 
   return (
     <ScreenContainer>
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]} accessibilityLabel="Margin dashboard">
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={

@@ -957,6 +957,11 @@ export default function PromotionsManagerScreen() {
         renderItem={renderPromoCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingTop: 4, paddingBottom: 80 }}
+        getItemLayout={(_, index) => ({
+          length: 160,
+          offset: 160 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

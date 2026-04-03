@@ -371,6 +371,15 @@ export default function ReservationsScreen({ navigation }: any) {
         renderItem={renderReservation}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
+        getItemLayout={(_, index) => ({
+          length: 195,
+          offset: 195 * index,
+          index,
+        })}
+        windowSize={10}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        removeClippedSubviews={true}
         refreshControl={
           <RefreshControl 
             refreshing={refreshing} 

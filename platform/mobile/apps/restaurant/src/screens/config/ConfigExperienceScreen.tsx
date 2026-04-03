@@ -141,7 +141,7 @@ export default function ConfigExperienceScreen() {
 
   return (
     <ScreenContainer>
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} accessibilityLabel="Experience settings">
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('config.experience.title')}</Text>
         {EXPERIENCE_FLAGS.map((flag) => (

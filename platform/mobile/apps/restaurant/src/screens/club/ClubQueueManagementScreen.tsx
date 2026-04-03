@@ -467,6 +467,11 @@ export default function ClubQueueManagementScreen({ route }: ClubQueueManagement
         keyExtractor={(item) => item.id}
         renderItem={renderEntry}
         contentContainerStyle={styles.list}
+        getItemLayout={(_, index) => ({
+          length: 88,
+          offset: 88 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Text style={{ fontSize: 48, marginBottom: 12 }}>📋</Text>

@@ -242,6 +242,7 @@ function TabSelector({
             },
           ]}
           onPress={() => onTabChange(tab.id)}
+          accessibilityLabel={tab.label}
         >
           <Text
             style={{
@@ -740,6 +741,11 @@ export default function CallsManagementScreen() {
         }
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 24, gap: 10 }}
         showsVerticalScrollIndicator={false}
+        getItemLayout={(_, index) => ({
+          length: 150,
+          offset: 150 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 }}>
             <IconButton
@@ -793,6 +799,7 @@ function TouchableButton({
     <Pressable
       onPress={onPress}
       disabled={disabled}
+      accessibilityLabel={label}
       style={{
         flexDirection: 'row',
         alignItems: 'center',

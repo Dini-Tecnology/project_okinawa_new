@@ -134,7 +134,7 @@ export default function ForecastScreen() {
       }
     >
       {/* Period Selection */}
-      <View style={styles.periodRow}>
+      <View style={styles.periodRow} accessibilityLabel="Forecast period selection">
         <Chip
           selected={period === 7}
           onPress={() => setPeriod(7)}

@@ -192,6 +192,11 @@ export default function ReviewsScreen() {
         keyExtractor={(item) => item.id}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 160,
+          offset: 160 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <IconButton icon="star-outline" size={80} iconColor={colors.foregroundMuted} />

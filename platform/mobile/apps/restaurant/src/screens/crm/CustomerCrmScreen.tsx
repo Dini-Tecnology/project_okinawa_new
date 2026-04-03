@@ -613,6 +613,15 @@ export default function CustomerCrmScreen() {
         data={filteredCustomers}
         keyExtractor={(item) => item.id}
         renderItem={renderCustomerItem}
+        getItemLayout={(_, index) => ({
+          length: 100,
+          offset: 100 * index,
+          index,
+        })}
+        windowSize={10}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        removeClippedSubviews={true}
         ListEmptyComponent={
           customersLoading ? (
             <View style={styles.loadingContainer}>

@@ -212,6 +212,11 @@ export default function PromoterDashboardScreen({ route }: PromoterDashboardScre
         data={filteredGuests} keyExtractor={(item) => item.id} renderItem={renderGuest}
         ListHeaderComponent={renderHeader} ListEmptyComponent={renderEmpty}
         contentContainerStyle={styles.list}
+        getItemLayout={(_, index) => ({
+          length: 82,
+          offset: 82 * index,
+          index,
+        })}
         refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} tintColor={colors.primary} />}
         showsVerticalScrollIndicator={false}
       />

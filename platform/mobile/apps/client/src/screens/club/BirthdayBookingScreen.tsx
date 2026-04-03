@@ -217,6 +217,7 @@ function PackageCard({
         onSelect(pkg);
       }}
       activeOpacity={0.7}
+      accessibilityLabel={`${pkg.name} ${pkg.tier} package`}
     >
       <Card
         style={[
@@ -471,6 +472,7 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setSelectedDate(d.value);
               }}
+              accessibilityLabel={`Select date ${d.label}`}
               style={[
                 styles.dateChip,
                 {
@@ -508,6 +510,8 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
             onPress={() => handlePartySizeChange(-1)}
             disabled={partySize <= 1}
             size={24}
+            accessibilityLabel="Decrease party size"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           />
           <Text
             variant="headlineMedium"
@@ -521,6 +525,8 @@ export default function BirthdayBookingScreen({ route }: BirthdayBookingScreenPr
             onPress={() => handlePartySizeChange(1)}
             disabled={partySize >= 50}
             size={24}
+            accessibilityLabel="Increase party size"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           />
         </View>
       </View>

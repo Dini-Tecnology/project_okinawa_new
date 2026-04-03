@@ -242,6 +242,8 @@ export default function RecipeScreen() {
               icon="arrow-left"
               onPress={() => setSelectedRecipe(null)}
               iconColor={colors.foreground}
+              accessibilityLabel="Back to recipes"
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             />
             <Text style={[styles.detailTitle, { color: colors.foreground }]}>
               {selectedRecipe.menu_item_name}
@@ -310,6 +312,8 @@ export default function RecipeScreen() {
                 onPress={() =>
                   handleRemoveIngredient(selectedRecipe.id, ri.ingredient_id, ri.ingredient_name)
                 }
+                accessibilityLabel={`Remove ${ri.ingredient_name}`}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               />
             </View>
           ))}
@@ -445,6 +449,11 @@ export default function RecipeScreen() {
           />
         }
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 132,
+          offset: 132 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Icon name="book-open-variant" size={48} color={colors.muted} />

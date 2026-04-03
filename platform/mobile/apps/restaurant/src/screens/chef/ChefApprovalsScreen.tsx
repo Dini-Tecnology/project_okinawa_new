@@ -184,6 +184,11 @@ export default function ChefApprovalsScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
+        getItemLayout={(_, index) => ({
+          length: 152,
+          offset: 152 * index,
+          index,
+        })}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.primary} />}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>

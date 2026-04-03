@@ -369,7 +369,8 @@ export default function ConfigFloorScreen() {
                       key={tbl.id}
                       style={styles.tableChip}
                       onPress={() => openEditTable(tbl)}
-                      onLongPress={() => deleteTable(tbl.id)}
+                      accessibilityHint="Long press to edit or delete"
+              onLongPress={() => deleteTable(tbl.id)}
                       accessibilityRole="button"
                       accessibilityLabel={`${t('config.floor.tableNumber')} ${tbl.tableNumber}, ${tbl.seats} ${t('config.floor.tableSeats')}`}
                     >

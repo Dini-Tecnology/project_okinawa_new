@@ -174,7 +174,7 @@ export default function WelcomeScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Welcome to Okinawa">
       {/* Background gradient effect */}
       <View style={styles.gradientTop} />
       <View style={styles.gradientBottom} />

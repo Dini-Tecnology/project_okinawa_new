@@ -506,7 +506,7 @@ export default function KdsAnalyticsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('kds.analytics.title')}</Text>
-        <View style={styles.periodSelector}>
+        <View style={styles.periodSelector} accessibilityLabel="Analytics period selection">
           <SegmentedButtons
             value={period}
             onValueChange={setPeriod}

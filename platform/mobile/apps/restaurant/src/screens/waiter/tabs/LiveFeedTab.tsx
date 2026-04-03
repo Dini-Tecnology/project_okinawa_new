@@ -237,6 +237,11 @@ export default function LiveFeedTab({
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       contentContainerStyle={styles.listContent}
+      getItemLayout={(_, index) => ({
+        length: 80,
+        offset: 80 * index,
+        index,
+      })}
       ListHeaderComponent={ListHeader}
       ListEmptyComponent={EmptyComponent}
       showsVerticalScrollIndicator={false}

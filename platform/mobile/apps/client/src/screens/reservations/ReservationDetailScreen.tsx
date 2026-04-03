@@ -423,7 +423,7 @@ export default function ReservationDetailScreen() {
       <Card style={[styles.statusCard, { backgroundColor: statusConfig.color }]}>
         <Card.Content>
           <View style={styles.statusHeader}>
-            <IconButton icon={statusConfig.icon} size={32} iconColor={colors.premiumCardForeground} />
+            <IconButton icon={statusConfig.icon} size={32} iconColor={colors.premiumCardForeground} accessibilityLabel={`Status: ${statusConfig.label}`} />
             <View style={styles.statusInfo}>
               <Text style={styles.statusLabel}>{statusConfig.label}</Text>
               {isUpcoming && minutesUntil > 0 && (

@@ -415,6 +415,11 @@ export default function ChefViewScreen() {
         key={numColumns}
         renderItem={renderStationCard}
         contentContainerStyle={styles.stationGrid}
+        getItemLayout={(_, index) => ({
+          length: 120,
+          offset: 120 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={isRefetching}

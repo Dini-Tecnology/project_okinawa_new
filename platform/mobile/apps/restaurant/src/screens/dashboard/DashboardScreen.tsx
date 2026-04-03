@@ -189,6 +189,7 @@ export default function DashboardScreen() {
     <ScreenContainer>
     <ScrollView
       style={styles.container}
+      accessibilityLabel="Restaurant dashboard"
       refreshControl={
         <RefreshControl
           refreshing={refreshing}

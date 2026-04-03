@@ -960,6 +960,11 @@ export default function CookStationScreen() {
         numColumns={numColumns}
         key={numColumns}
         columnWrapperStyle={numColumns > 1 ? styles.row : undefined}
+        getItemLayout={(_, index) => ({
+          length: 200,
+          offset: 200 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={useDynamicStations ? queueLoading : refreshing}

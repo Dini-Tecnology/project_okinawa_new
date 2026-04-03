@@ -335,7 +335,7 @@ export default function TapToPayScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Tap to pay">
       {state === 'ready' && renderReadyState()}
       {state === 'reading' && renderReadingState()}
       {state === 'success' && renderSuccessState()}

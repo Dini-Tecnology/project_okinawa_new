@@ -358,6 +358,11 @@ export default function WaiterCallsScreen() {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
           }
           contentContainerStyle={styles.listContent}
+          getItemLayout={(_, index) => ({
+            length: 110,
+            offset: 110 * index,
+            index,
+          })}
           ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
         />
       )}

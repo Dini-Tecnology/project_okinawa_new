@@ -437,6 +437,11 @@ export default function WaiterActionBar({
             <FlatList
               data={availableTables.filter((tbl) => tbl.id !== tableId)}
               keyExtractor={(item) => item.id}
+              getItemLayout={(_, index) => ({
+                length: 56,
+                offset: 56 * index,
+                index,
+              })}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   style={styles.tableOption}

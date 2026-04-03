@@ -137,7 +137,7 @@ export default function ConfigNotificationsScreen() {
 
   return (
     <ScreenContainer>
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} accessibilityLabel="Notification preferences">
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('config.notifications.title')}</Text>
         {NOTIFICATION_OPTIONS.map((opt) => (

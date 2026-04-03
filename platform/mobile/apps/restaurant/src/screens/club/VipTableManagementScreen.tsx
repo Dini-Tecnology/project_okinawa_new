@@ -558,6 +558,11 @@ export default function VipTableManagementScreen({ route }: VipTableManagementSc
           />
         }
         showsVerticalScrollIndicator={false}
+        getItemLayout={(_, index) => ({
+          length: 164,
+          offset: 164 * index,
+          index,
+        })}
       />
 
       {/* Table Detail Modal */}

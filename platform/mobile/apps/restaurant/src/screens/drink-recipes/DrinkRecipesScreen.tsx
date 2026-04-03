@@ -344,6 +344,11 @@ export default function DrinkRecipesScreen({ navigation }: { navigation: any }) 
         renderItem={renderRecipeCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 100,
+          offset: 100 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

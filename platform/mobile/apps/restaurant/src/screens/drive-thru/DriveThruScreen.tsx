@@ -311,6 +311,11 @@ export default function DriveThruScreen() {
         contentContainerStyle={styles.listContent}
         refreshing={isLoading}
         onRefresh={loadOrders}
+        getItemLayout={(_, index) => ({
+          length: 148,
+          offset: 148 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text

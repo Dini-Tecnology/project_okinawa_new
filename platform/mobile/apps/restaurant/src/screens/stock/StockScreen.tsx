@@ -580,6 +580,15 @@ export default function StockScreen({ navigation }: { navigation: any }) {
         renderItem={renderItem}
         ListEmptyComponent={renderEmptyState}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 88,
+          offset: 88 * index,
+          index,
+        })}
+        windowSize={10}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        removeClippedSubviews={true}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

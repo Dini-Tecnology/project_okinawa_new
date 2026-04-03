@@ -300,6 +300,7 @@ export default function PaymentSuccessScreen() {
             size={60}
             iconColor={colors.success}
             style={{ margin: 0 }}
+            accessibilityLabel="Payment successful"
           />
         </Animated.View>
 

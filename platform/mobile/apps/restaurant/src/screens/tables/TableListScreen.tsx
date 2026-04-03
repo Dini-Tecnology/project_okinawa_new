@@ -273,6 +273,15 @@ export default function TableListScreen() {
         keyExtractor={(item) => item.id}
         renderItem={renderTableCard}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 112,
+          offset: 112 * index,
+          index,
+        })}
+        windowSize={10}
+        initialNumToRender={15}
+        maxToRenderPerBatch={10}
+        removeClippedSubviews={true}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}

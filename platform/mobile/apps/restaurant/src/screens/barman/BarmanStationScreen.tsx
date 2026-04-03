@@ -1120,6 +1120,11 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
         data={filteredRecipes}
         renderItem={renderRecipeCard}
         keyExtractor={(item) => item.id}
+        getItemLayout={(_, index) => ({
+          length: 100,
+          offset: 100 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={recipesRefreshing}
@@ -1218,6 +1223,11 @@ export default function BarmanStationScreen({ navigation }: { navigation: any })
         renderItem={renderStockCard}
         keyExtractor={(item) => item.id}
         contentContainerStyle={{ paddingTop: 12, paddingBottom: 20 }}
+        getItemLayout={(_, index) => ({
+          length: 80,
+          offset: 80 * index,
+          index,
+        })}
         refreshControl={
           <RefreshControl
             refreshing={stockRefreshing}

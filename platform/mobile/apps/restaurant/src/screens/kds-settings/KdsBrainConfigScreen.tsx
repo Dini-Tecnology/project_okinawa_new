@@ -230,7 +230,7 @@ export default function KdsBrainConfigScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="KDS Brain configuration">
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('kds.config.title')}</Text>
       </View>

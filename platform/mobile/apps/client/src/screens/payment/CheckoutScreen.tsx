@@ -504,6 +504,7 @@ export default function CheckoutScreen() {
                     ]}
                     onPress={() => setSelectedTip(tip)}
                     activeOpacity={0.7}
+                    accessibilityLabel={tip === 0 ? 'No tip' : `${tip}% tip`}
                   >
                     <Text
                       style={[

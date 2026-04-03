@@ -420,7 +420,7 @@ export default function IntegrationSettingsScreen() {
               <Text variant="titleLarge" style={styles.modalTitle}>
                 {editingPlatform?.name}
               </Text>
-              <IconButton icon="close" onPress={() => setModalVisible(false)} />
+              <IconButton icon="close" onPress={() => setModalVisible(false)} accessibilityLabel="Close" hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} />
             </View>
 
             <ScrollView style={styles.modalBody}>

@@ -271,6 +271,11 @@ export default function QRCodeBatchScreen() {
         numColumns={2}
         columnWrapperStyle={styles.tableRow}
         contentContainerStyle={styles.listContent}
+        getItemLayout={(_, index) => ({
+          length: 64,
+          offset: 64 * index,
+          index,
+        })}
         renderItem={({ item }) => {
           const isSelected = selectedTables.has(item.id);
           const hasQR = generatedQRs.find((qr) => qr.table_id === item.id);

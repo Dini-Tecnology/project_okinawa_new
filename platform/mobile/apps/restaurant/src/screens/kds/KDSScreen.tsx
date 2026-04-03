@@ -367,6 +367,11 @@ export default function KDSScreen() {
         contentContainerStyle={styles.listContent}
         numColumns={2}
         columnWrapperStyle={styles.row}
+        getItemLayout={(_, index) => ({
+          length: 200,
+          offset: 200 * index,
+          index,
+        })}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <IconButton icon="chef-hat" size={48} iconColor={colors.foregroundMuted} accessibilityLabel="No active orders" />

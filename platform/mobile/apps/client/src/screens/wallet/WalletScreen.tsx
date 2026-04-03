@@ -260,7 +260,7 @@ export default function WalletScreen() {
 
   return (
     <ScreenContainer>
-    <View style={styles.container}>
+    <View style={styles.container} accessibilityLabel="Wallet">
       {/* Wallet Balance Card */}
       <Card style={styles.balanceCard}>
         <Card.Content>

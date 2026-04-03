@@ -452,6 +452,8 @@ export default function PartialOrderScreen() {
                   size={24}
                   iconColor={colors.error}
                   onPress={() => updateNewItemQuantity(ni.menu_item_id, -1)}
+                  accessibilityLabel={`Decrease ${ni.menuItem.name}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 />
                 <Text style={styles.itemQuantity}>{ni.quantity}</Text>
                 <IconButton
@@ -459,12 +461,16 @@ export default function PartialOrderScreen() {
                   size={24}
                   iconColor={colors.primary}
                   onPress={() => updateNewItemQuantity(ni.menu_item_id, 1)}
+                  accessibilityLabel={`Increase ${ni.menuItem.name}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 />
                 <IconButton
                   icon="trash-can-outline"
                   size={20}
                   iconColor={colors.error}
                   onPress={() => removeNewItem(ni.menu_item_id)}
+                  accessibilityLabel={`Remove ${ni.menuItem.name}`}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 />
               </View>
             </View>
@@ -500,6 +506,7 @@ export default function PartialOrderScreen() {
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => addNewItem(item)}
+                accessibilityLabel={`Add ${item.name}`}
               >
                 <Text style={styles.menuItemName}>{item.name}</Text>
                 <Text style={styles.menuItemPrice}>

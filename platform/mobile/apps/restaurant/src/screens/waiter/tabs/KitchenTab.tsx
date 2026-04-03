@@ -115,6 +115,7 @@ export default function KitchenTab({ pickedUpIds, onPickup }: KitchenTabProps) {
       style={styles.container}
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
+      accessibilityLabel="Kitchen pipeline"
     >
       {/* Urgency banner */}
       {readyDishes.length > 0 && (

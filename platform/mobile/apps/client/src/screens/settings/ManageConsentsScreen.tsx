@@ -134,6 +134,7 @@ export default function ManageConsentsScreen() {
                 disabled={!info.revocable || revokeMutation.isPending}
                 onValueChange={() => handleToggle(type, !isActive)}
                 color={colors.primary}
+                accessibilityLabel={`${info.label} consent toggle`}
               />
             </View>
             <Divider />

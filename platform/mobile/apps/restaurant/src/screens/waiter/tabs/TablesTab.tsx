@@ -137,8 +137,18 @@ export default function TablesTab({
       renderItem={renderItem}
       keyExtractor={keyExtractor}
       contentContainerStyle={styles.listContent}
+      getItemLayout={(_, index) => ({
+        length: 100,
+        offset: 100 * index,
+        index,
+      })}
+      windowSize={10}
+      initialNumToRender={15}
+      maxToRenderPerBatch={10}
+      removeClippedSubviews={true}
       ListEmptyComponent={EmptyComponent}
       showsVerticalScrollIndicator={false}
+      accessibilityLabel="Assigned tables"
       refreshControl={
         <RefreshControl
           refreshing={isRefetching}

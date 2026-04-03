@@ -180,7 +180,7 @@ export default function SettingsScreen() {
 
   return (
     <ScreenContainer>
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} accessibilityLabel="Settings">
       <List.Section>
         <List.Subheader style={{ color: colors.foregroundMuted }}>{t('notifications.title')}</List.Subheader>
         <List.Item

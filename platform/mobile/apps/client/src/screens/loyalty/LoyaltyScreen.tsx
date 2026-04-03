@@ -181,7 +181,7 @@ export default function LoyaltyScreen() {
     return (
       <ScreenContainer>
       <View style={styles.emptyContainer}>
-        <IconButton icon="star-outline" size={80} iconColor={colors.foregroundMuted} />
+        <IconButton icon="star-outline" size={80} iconColor={colors.foregroundMuted} accessibilityLabel="No loyalty programs" />
         <Text variant="headlineSmall" style={styles.emptyTitle}>
           {t('loyaltyScreen.emptyTitle')}
         </Text>
