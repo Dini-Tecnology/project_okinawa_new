@@ -75,11 +75,26 @@ import { TipsManagementScreen } from './restaurant/TipsManagementScreen';
 import { WaiterScreen } from './restaurant/WaiterScreen';
 import { StaffManagementScreen } from './restaurant/StaffManagementScreen';
 
+// Restaurant Operations screens
+import { ChefViewScreen } from './restaurant/ChefViewScreen';
+import { CookStationScreen } from './restaurant/CookStationScreen';
+import { BarmanStationScreen } from './restaurant/BarmanStationScreen';
+import { CashRegisterScreen } from './restaurant/CashRegisterScreen';
+import { FloorPlanScreen } from './restaurant/FloorPlanScreen';
+import { StockScreen } from './restaurant/StockScreen';
+import { WaiterDashboardScreen } from './restaurant/WaiterDashboardScreen';
+
+// Restaurant Financial screens
+import { BillsScreen, FinancialReportScreen, ForecastScreen, FiscalSetupScreen, MarginDashboardScreen, KdsAnalyticsScreen, CustomerCrmScreen } from './restaurant/FinancialScreens';
+
 // Restaurant Pub & Bar screens
 import { TabManagementScreen, WaiterCallsScreen, HappyHourManagementScreen } from './restaurant/pub-bar';
 
 // Restaurant Club screens
 import { DoorControlScreen, QueueManagementScreen, VipTableManagementScreen, BirthdayApprovalScreen, PromoterManagementScreen } from './restaurant/club';
+
+// Restaurant Config screens
+import { ConfigHubScreen, ConfigProfileScreen, ConfigServiceTypesConfigScreen, ConfigExperienceScreen, ConfigFloorScreen, ConfigKitchenScreen, ConfigPaymentsScreen, ConfigFeaturesScreen, ConfigTeamScreen, ConfigNotificationsScreen, ConfigLanguageScreen } from './restaurant/config';
 
 type AppMode = 'client' | 'restaurant';
 
@@ -179,6 +194,22 @@ const screenComponents: Record<string, React.ComponentType> = {
   'bar-kds': BarKDSScreen,
   maitre: MaitreScreen,
   waiter: WaiterScreen,
+  'chef-view': ChefViewScreen,
+  'cook-station': CookStationScreen,
+  'barman-station': BarmanStationScreen,
+  'cash-register': CashRegisterScreen,
+  'floor-plan': FloorPlanScreen,
+  'stock': StockScreen,
+  'waiter-dashboard': WaiterDashboardScreen,
+
+  // Restaurant Financial & Analytics
+  'bills': BillsScreen,
+  'financial-report': FinancialReportScreen,
+  'forecast': ForecastScreen,
+  'fiscal-setup': FiscalSetupScreen,
+  'margin-dashboard': MarginDashboardScreen,
+  'kds-analytics': KdsAnalyticsScreen,
+  'customer-crm': CustomerCrmScreen,
   
   // Restaurant Configuration
   'service-type-config': ServiceTypeConfigScreen,
@@ -197,6 +228,19 @@ const screenComponents: Record<string, React.ComponentType> = {
   'vip-table-management': VipTableManagementScreen,
   'birthday-approval': BirthdayApprovalScreen,
   'promoter-management': PromoterManagementScreen,
+
+  // Restaurant Config Hub
+  'config-hub': ConfigHubScreen,
+  'config-profile': ConfigProfileScreen,
+  'config-service-types': ConfigServiceTypesConfigScreen,
+  'config-experience': ConfigExperienceScreen,
+  'config-floor': ConfigFloorScreen,
+  'config-kitchen': ConfigKitchenScreen,
+  'config-payments': ConfigPaymentsScreen,
+  'config-features': ConfigFeaturesScreen,
+  'config-team': ConfigTeamScreen,
+  'config-notifications': ConfigNotificationsScreen,
+  'config-language': ConfigLanguageScreen,
 };
 
 function MobilePreviewContent({ mode }: { mode: AppMode }) {
