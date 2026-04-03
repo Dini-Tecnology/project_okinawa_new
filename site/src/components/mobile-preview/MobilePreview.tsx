@@ -34,12 +34,30 @@ import { TipScreen } from './client/TipScreen';
 import { OrderStatusScreen } from './client/OrderStatusScreen';
 import { DigitalReceiptScreen } from './client/DigitalReceiptScreen';
 import { PairingAssistantScreen } from './client/PairingAssistantScreen';
+// NEW: 15 missing client screens
+import { RegisterScreen } from './client/RegisterScreen';
+import { MenuScreen } from './client/MenuScreen';
+import { PaymentScreen } from './client/PaymentScreen';
+import { PaymentSuccessScreen } from './client/PaymentSuccessScreen';
+import { GuestInvitationScreen } from './client/GuestInvitationScreen';
+import { BuffetCheckinScreen } from './client/BuffetCheckinScreen';
+import { LoyaltyHomeScreen } from './client/LoyaltyHomeScreen';
+import { StampCardsScreen } from './client/StampCardsScreen';
+import { ManageConsentsScreen } from './client/ManageConsentsScreen';
 
 // Pub & Bar screens
 import { TabScreen, RepeatRoundSheet, TabSplitSheet, TabPaymentScreen } from './client/pub-bar';
 
 // Club screens
 import { TicketPurchaseScreen, QueueScreen, VipTableScreen, LineupScreen, BirthdayEntryRequestScreen } from './client/club';
+import { ClubHomeScreen } from './client/club/ClubHomeScreen';
+import { BirthdayBookingScreen } from './client/club/BirthdayBookingScreen';
+
+// Waitlist screens
+import { WaitlistBarScreen } from './client/waitlist/WaitlistBarScreen';
+import { EntryChoiceScreen } from './client/waitlist/EntryChoiceScreen';
+import { FamilyModeScreen } from './client/waitlist/FamilyModeScreen';
+import { FamilyActivitiesScreen } from './client/waitlist/FamilyActivitiesScreen';
 
 // Restaurant screens
 import { RestaurantDashboardScreen } from './restaurant/RestaurantDashboardScreen';
@@ -101,16 +119,31 @@ const screenComponents: Record<string, React.ComponentType> = {
   reservations: ReservationsScreen,
   'new-reservation': NewReservationScreen,
   'reservation-detail': ReservationDetailScreen,
+  'guest-invitation': GuestInvitationScreen,
   
   // Client Loyalty & Rewards
   loyalty: LoyaltyScreen,
   'loyalty-leaderboard': LoyaltyLeaderboardScreen,
+  'loyalty-home': LoyaltyHomeScreen,
+  'stamp-cards': StampCardsScreen,
   
   // Client Account
   favorites: FavoritesScreen,
   notifications: NotificationsScreen,
   settings: SettingsScreen,
   wallet: WalletScreen,
+  'manage-consents': ManageConsentsScreen,
+  
+  // Client Auth
+  register: RegisterScreen,
+  
+  // Client Menu & Payment
+  menu: MenuScreen,
+  payment: PaymentScreen,
+  'payment-success': PaymentSuccessScreen,
+  
+  // Client Buffet
+  'buffet-checkin': BuffetCheckinScreen,
   
   // Pub & Bar
   'tab': TabScreen,
@@ -124,6 +157,14 @@ const screenComponents: Record<string, React.ComponentType> = {
   'vip-table': VipTableScreen,
   'lineup': LineupScreen,
   'birthday-entry-request': BirthdayEntryRequestScreen,
+  'club-home': ClubHomeScreen,
+  'birthday-booking': BirthdayBookingScreen,
+  
+  // Waitlist
+  'waitlist-bar': WaitlistBarScreen,
+  'entry-choice': EntryChoiceScreen,
+  'family-mode': FamilyModeScreen,
+  'family-activities': FamilyActivitiesScreen,
   
   // Restaurant Main
   'restaurant-dashboard': RestaurantDashboardScreen,
