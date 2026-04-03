@@ -25,7 +25,22 @@
       "Bash(grep -rn 'label=\"\"\"\"[^\"\"\"\"]*\"\"\"\"' apps/*/src/screens/ shared/screens/ --include=\"*.tsx\")",
       "Bash(grep -rn \"fontSize: 11\\\\b\\\\|fontSize: 13\\\\b\\\\|fontSize: 15\\\\b\\\\|fontSize: 17\\\\b\\\\|fontSize: 19\\\\b\\\\|fontSize: 21\\\\b\\\\|fontSize: 22\\\\b\\\\|fontSize: 23\\\\b\\\\|fontSize: 25\\\\b\\\\|fontSize: 26\\\\b\\\\|fontSize: 9\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
       "Bash(grep -rn \"padding: 15\\\\b\\\\|margin: 15\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
-      "Bash(grep -rn \"padding: 3\\\\b\\\\|margin: 3\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)"
+      "Bash(grep -rn \"padding: 3\\\\b\\\\|margin: 3\\\\b\" /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rn 'padding: 3\\\\b' /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl accessibilityLabel /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rL accessibilityLabel /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl getItemLayout /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rL getItemLayout /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl hitSlop /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl accessibilityHint /Users/pedrodini/project_okinawa-2/platform/mobile/apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -r \"formatCNPJ\\\\|formatCnpj\" /Users/pedrodini/project_okinawa-2/platform/mobile/ --include=*.tsx --include=*.ts)",
+      "Bash(grep -r \"formatCEP\\\\|formatCep\\\\|formatPostalCode\" /Users/pedrodini/project_okinawa-2/platform/mobile/ --include=*.tsx --include=*.ts)",
+      "Bash(grep -rL \"getItemLayout\" apps/*/src/screens/ --include=\"*.tsx\")",
+      "Bash(grep -rl onLongPress apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rL accessibilityLabel apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl hitSlop apps/*/src/screens/ --include=*.tsx)",
+      "Bash(grep -rl accessibilityHint apps/*/src/screens/ --include=*.tsx)",
+      "Read(//Users/pedrodini/project_okinawa-2/**)"
     ]
   }
 }
