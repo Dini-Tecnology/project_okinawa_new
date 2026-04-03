@@ -106,6 +106,7 @@ interface DemoContextType {
   
   // Client actions
   placeOrder: () => DemoOrder | null;
+  pushExternalOrder: (items: { name: string; price: number; quantity: number; prepTime?: number }[], total: number, source?: string) => DemoOrder;
   clientActiveOrder: DemoOrder | null;
   loyaltyPoints: number;
   
@@ -338,6 +339,51 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return newOrder;
   }, [cart, cartTotal]);
 
+  // Push order from experiences with their own cart (not DemoContext cart)
+  const pushExternalOrder = useCallback((items: { name: string; price: number; quantity: number; prepTime?: number }[], total: number, source?: string) => {
+    const orderItems: DemoOrderItem[] = items.map(i => ({
+      menuItem: { id: i.name.toLowerCase().replace(/\s/g, '-'), name: i.name, description: '', price: i.price, category: 'Geral', image: '', prepTime: i.prepTime || 10 },
+      quantity: i.quantity,
+    }));
+    const newOrder: DemoOrder = {
+      id: `ext-${orderCounterRef.current++}`,
+      tableNumber: 7,
+      customerName: source || 'Cliente Demo',
+      items: orderItems,
+      status: 'pending',
+      total,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      isKitchen: true,
+      isBar: false,
+    };
+    setOrders(prev => [newOrder, ...prev]);
+    setClientActiveOrder(newOrder);
+    setNotifications(prev => [{
+      id: `ne-${Date.now()}`,
+      type: 'new_order' as const,
+      message: `Novo pedido — ${source || 'Cliente'} · R$ ${total}`,
+      timestamp: new Date(),
+      read: false,
+    }, ...prev].slice(0, 10));
+
+    // Auto-progress
+    setTimeout(() => {
+      setClientActiveOrder(prev => prev?.id === newOrder.id ? { ...prev, status: 'confirmed', updatedAt: new Date() } : prev);
+      setOrders(prev => prev.map(o => o.id === newOrder.id ? { ...o, status: 'confirmed', updatedAt: new Date() } : o));
+    }, 3000);
+    setTimeout(() => {
+      setClientActiveOrder(prev => prev?.id === newOrder.id ? { ...prev, status: 'preparing', updatedAt: new Date() } : prev);
+      setOrders(prev => prev.map(o => o.id === newOrder.id ? { ...o, status: 'preparing', updatedAt: new Date() } : o));
+    }, 8000);
+    setTimeout(() => {
+      setClientActiveOrder(prev => prev?.id === newOrder.id ? { ...prev, status: 'ready', updatedAt: new Date() } : prev);
+      setOrders(prev => prev.map(o => o.id === newOrder.id ? { ...o, status: 'ready', updatedAt: new Date() } : o));
+    }, 18000);
+
+    return newOrder;
+  }, []);
+
   // ---- Restaurant actions ----
   const updateOrderStatus = useCallback((orderId: string, status: OrderStatus) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status, updatedAt: new Date() } : o));
@@ -446,7 +492,7 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       menu: MENU_ITEMS,
       orders, tables, reservations, notifications, analytics,
       cart, addToCart, removeFromCart, updateCartQuantity, clearCart, cartTotal,
-      placeOrder, clientActiveOrder, loyaltyPoints,
+      placeOrder, pushExternalOrder, clientActiveOrder, loyaltyPoints,
       updateOrderStatus, updateTableStatus, markNotificationRead, unreadNotifications,
       isSimulationRunning, toggleSimulation,
     }}>

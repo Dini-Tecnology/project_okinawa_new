@@ -3,20 +3,26 @@
  * Deep journey: Discover → Skip the Line → Menu with Combos → Item Customization → Cart → Payment → Live Prep Tracking → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Search, Star, Clock, Minus, Plus, Check, Loader2,
   Zap, Timer, QrCode, ChevronRight, CreditCard, Gift, Smartphone,
   ChefHat, CheckCircle, MapPin, ShoppingBag, ArrowRight, Receipt,
   Flame, X, Heart, Nfc, Wallet, Award, ChevronDown, AlertCircle,
-  Bell, Users,
+  Bell, Users, Sparkles,
 } from 'lucide-react';
 
-type Screen = 'home' | 'restaurant' | 'menu' | 'item' | 'cart' | 'payment' | 'preparing' | 'ready' | 'rating';
+type Screen = 'home' | 'restaurant' | 'menu' | 'item' | 'combo-builder' | 'cart' | 'payment' | 'preparing' | 'ready' | 'rating' | 'stamp-card'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 interface CartItem {
   id: string;
@@ -60,14 +66,20 @@ const CUSTOMIZATIONS = {
 };
 
 export const JOURNEY_STEPS = [
-  { step: 1, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
-  { step: 2, label: 'Skip the Line & menu', screens: ['menu'] },
-  { step: 3, label: 'Personalizar item', screens: ['item'] },
-  { step: 4, label: 'Revisar carrinho', screens: ['cart'] },
-  { step: 5, label: 'Pagamento rápido', screens: ['payment'] },
-  { step: 6, label: 'Acompanhar preparo', screens: ['preparing'] },
-  { step: 7, label: 'Retirar pedido', screens: ['ready'] },
-  { step: 8, label: 'Avaliar & fidelidade', screens: ['rating'] },
+  { step: 1, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
+  { step: 2, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
+  { step: 3, label: 'Skip the Line & menu', screens: ['menu'] },
+  { step: 4, label: 'Montar combo (3 níveis)', screens: ['combo-builder'] },
+  { step: 5, label: 'Personalizar item', screens: ['item'] },
+  { step: 5, label: 'Revisar carrinho', screens: ['cart'] },
+  { step: 6, label: 'Pagamento rápido', screens: ['payment'] },
+  { step: 7, label: 'Acompanhar preparo', screens: ['preparing'] },
+  { step: 8, label: 'Retirar pedido', screens: ['ready'] },
+  { step: 9, label: 'Avaliar & fidelidade', screens: ['rating'] },
+  { step: 10, label: 'Cartão de selos', screens: ['stamp-card'] },
+  { step: 11, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 12, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 13, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
@@ -75,16 +87,26 @@ export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
   'restaurant': { title: 'NOOWE Express', desc: 'Restaurante focado em velocidade com pedido antecipado, combos otimizados e prep time visível.' },
   'menu': { title: 'Menu Rápido', desc: 'Combos em destaque, menu categorizado por tipo, tempo de preparo por item e montagem de carrinho.' },
   'item': { title: 'Personalizar Item', desc: 'Customize: extras pagos (bacon, cheddar), remoção de ingredientes, tamanho e observações.' },
+  'combo-builder': { title: 'Montar Combo', desc: 'Monte seu combo em 3 etapas: escolha o lanche, acompanhamento e bebida com desconto progressivo.' },
   'cart': { title: 'Carrinho', desc: 'Revisão completa com quantidades, cupom de desconto, tempo estimado total e modo de retirada.' },
   'payment': { title: 'Pagamento', desc: 'PIX, cartão, Apple Pay, Google Pay ou carteira NOOWE. Pontos de fidelidade podem ser usados.' },
   'preparing': { title: 'Preparo ao Vivo', desc: 'Tracking em 4 etapas: Recebido → Preparando → Conferência → Pronto. Push notification automática.' },
   'ready': { title: 'Pronto!', desc: 'Código de retirada, tempo total, balcão express designado e registro de velocidade.' },
   'rating': { title: 'Avaliar', desc: 'Avaliação por categorias (velocidade, sabor, atendimento), pontos de fidelidade ganhos e stamp card.' },
+  'stamp-card': { title: 'Cartão Fidelidade', desc: 'Cartão de selos digital: a cada 10 visitas ganhe um combo grátis. Acompanhe seu progresso e resgate prêmios.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface Props { onNavigate: (s: string) => void; screen: string; }
 
 export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<typeof MENU[0] | null>(null);
   const [activeCategory, setActiveCategory] = useState('Combos');
@@ -93,6 +115,10 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const [removedItems, setRemovedItems] = useState<string[]>([]);
   const [itemQty, setItemQty] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState('pix');
+  const [comboStep, setComboStep] = useState(0);
+  const [comboLanche, setComboLanche] = useState('q1');
+  const [comboSide, setComboSide] = useState('q5');
+  const [comboDrink, setComboDrink] = useState('q10');
   const [ratingStars, setRatingStars] = useState(0);
   const [ratingTags, setRatingTags] = useState<string[]>([]);
 
@@ -315,6 +341,15 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               ))}
             </div>
           )}
+          {activeCategory === 'Combos' && (
+            <div className="px-5 mt-3">
+              <button onClick={() => { setComboStep(0); onNavigate('combo-builder'); }} className="w-full p-4 rounded-xl border-2 border-dashed border-primary bg-primary/5 text-left flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center"><Sparkles className="w-5 h-5 text-primary" /></div>
+                <div className="flex-1"><p className="font-bold text-sm text-primary">Monte seu Combo</p><p className="text-[10px] text-muted-foreground">Escolha lanche + acompanhamento + bebida com 20% off</p></div>
+                <ArrowRight className="w-4 h-4 text-primary" />
+              </button>
+            </div>
+          )}
 
           {/* Regular menu items */}
           {activeCategory !== 'Combos' && (
@@ -430,6 +465,73 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
+    case 'combo-builder': {
+      const COMBO_LANCHES = MENU.filter(m => m.cat === 'Burgers');
+      const COMBO_SIDES = MENU.filter(m => m.cat === 'Acompanhamentos');
+      const COMBO_DRINKS = MENU.filter(m => m.cat === 'Bebidas');
+      const cSteps = [
+        { label: 'Lanche', items: COMBO_LANCHES, selected: comboLanche, set: setComboLanche },
+        { label: 'Acompanhamento', items: COMBO_SIDES, selected: comboSide, set: setComboSide },
+        { label: 'Bebida', items: COMBO_DRINKS, selected: comboDrink, set: setComboDrink },
+      ];
+      const selL = COMBO_LANCHES.find(m => m.id === comboLanche) || COMBO_LANCHES[0];
+      const selS = COMBO_SIDES.find(m => m.id === comboSide) || COMBO_SIDES[0];
+      const selD = COMBO_DRINKS.find(m => m.id === comboDrink) || COMBO_DRINKS[0];
+      const cOrig = selL.price + selS.price + selD.price;
+      const cDisc = Math.round(cOrig * 0.2);
+      const cFinal = cOrig - cDisc;
+      return (
+        <div className="px-5 pb-4">
+          <div className="flex items-center justify-between py-4">
+            <button onClick={() => onNavigate('menu')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+            <h1 className="font-display font-bold text-sm">Monte seu Combo</h1>
+            <div className="w-8" />
+          </div>
+          <div className="flex items-center gap-1 mb-4">
+            {cSteps.map((s, i) => (
+              <div key={s.label} className="flex-1">
+                <div className={`h-1.5 rounded-full transition-all ${i <= comboStep ? 'bg-primary' : 'bg-muted'}`} />
+                <p className={`text-[9px] text-center mt-1 ${i <= comboStep ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{s.label}</p>
+              </div>
+            ))}
+          </div>
+          <GuidedHint text={`Etapa ${comboStep + 1}/3: Escolha ${cSteps[comboStep].label.toLowerCase()}`} />
+          <div className="space-y-2 mb-4">
+            {cSteps[comboStep].items.map(item => (
+              <button key={item.id} onClick={() => cSteps[comboStep].set(item.id)}
+                className={`w-full flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${cSteps[comboStep].selected === item.id ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
+                <FoodImg id={item.img} size="sm" alt={item.name} />
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">{item.name}</p>
+                  <p className="text-[10px] text-muted-foreground">{item.desc?.slice(0, 50)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs font-bold">R$ {item.price}</p>
+                  {cSteps[comboStep].selected === item.id && <Check className="w-4 h-4 text-primary ml-auto mt-0.5" />}
+                </div>
+              </button>
+            ))}
+          </div>
+          <div className="p-3 rounded-xl bg-muted/30 mb-4">
+            <div className="flex justify-between text-xs mb-1"><span className="text-muted-foreground">Original</span><span className="line-through">R$ {cOrig}</span></div>
+            <div className="flex justify-between text-xs mb-1"><span className="text-success">Desconto combo (-20%)</span><span className="text-success font-semibold">-R$ {cDisc}</span></div>
+            <div className="border-t border-border pt-1.5 mt-1.5 flex justify-between font-bold"><span>Combo</span><span className="text-primary">R$ {cFinal}</span></div>
+          </div>
+          <div className="flex gap-2">
+            {comboStep > 0 && (
+              <button onClick={() => setComboStep(prev => prev - 1)} className="flex-1 py-3.5 border border-border rounded-xl font-semibold text-sm">Voltar</button>
+            )}
+            <button onClick={() => {
+              if (comboStep < 2) { setComboStep(prev => prev + 1); }
+              else { addToCart({ id: `combo-custom-${Date.now()}`, name: `Combo: ${selL.name}`, price: cFinal, img: selL.img }, 1); setComboStep(0); onNavigate('cart'); }
+            }} className="flex-1 py-3.5 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow">
+              {comboStep < 2 ? 'Próximo' : `Adicionar · R$ ${cFinal}`}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     case 'cart':
       return (
         <div className="px-5 pb-4">
@@ -509,22 +611,22 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           loyalty={{ title: 'Você tem 340 pontos', subtitle: 'Use 200 pts = R$ 10 de desconto', actionLabel: 'Usar' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('cart')}
-          onConfirm={() => onNavigate('preparing')}
+          onConfirm={() => {
+            pushExternalOrder(cart.map(c => ({ name: c.name, price: c.price, quantity: c.qty, prepTime: MENU.find(m => m.id === c.id)?.time || 5 })), cartTotal, 'NOOWE Express');
+            onNavigate('preparing');
+          }}
           ctaLabel="Confirmar Pagamento"
         />
       );
 
     case 'preparing': {
-      const prepItems = cart.length > 0 ? cart.map((c, i) => ({
+      const prepItems = cart.map((c, i) => ({
         id: c.id,
         name: c.name,
         status: (prepStage > i + 1 ? 'ready' : prepStage > i ? 'preparing' : 'queued') as 'ready' | 'preparing' | 'queued',
         eta: `${Math.max(1, (estTime || 5) - prepStage * 2)} min`,
         quantity: c.qty,
-      })) : [
-        { id: 'q1', name: 'Smash Burger Classic', status: 'preparing' as const, eta: '3 min', quantity: 1 },
-        { id: 'q5', name: 'Batata Frita G', status: 'queued' as const, eta: '4 min', quantity: 1 },
-      ];
+      }));
       return (
         <DemoOrderStatus
           title="Preparo ao Vivo"
@@ -597,9 +699,9 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             </>
           )}
 
-          {/* Loyalty stamp card */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-4">
-            <div className="flex items-center gap-2 mb-3"><Gift className="w-4 h-4 text-primary" /><span className="text-sm font-bold">Cartão Fidelidade</span></div>
+          {/* Loyalty stamp card teaser */}
+          <button onClick={() => onNavigate('stamp-card')} className="w-full p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-4 text-left">
+            <div className="flex items-center gap-2 mb-3"><Gift className="w-4 h-4 text-primary" /><span className="text-sm font-bold">Cartão Fidelidade</span><ChevronRight className="w-4 h-4 text-primary ml-auto" /></div>
             <div className="flex gap-1.5 mb-2">
               {Array.from({ length: 10 }).map((_, i) => (
                 <div key={i} className={`flex-1 h-6 rounded-md flex items-center justify-center ${i < 7 ? 'bg-primary' : 'bg-muted'}`}>
@@ -608,14 +710,114 @@ export const QuickServiceDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               ))}
             </div>
             <p className="text-xs text-muted-foreground">7 de 10 visitas · Mais 3 e ganhe um combo grátis!</p>
+          </button>
+
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
+            {ratingStars > 0 ? 'Enviar Avaliação' : 'Voltar ao Início'}
+          </button>
+          <button onClick={() => onNavigate('wallet')} className="w-full mt-2 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground">Ver Carteira</button>
+        </div>
+      );
+
+    case 'stamp-card':
+      const stampCount = 7;
+      const stampTotal = 10;
+      const rewards = [
+        { stamps: 3, label: 'Batata Frita grátis', redeemed: true },
+        { stamps: 5, label: 'Milkshake grátis', redeemed: true },
+        { stamps: 7, label: 'Combo com 30% off', redeemed: false, current: true },
+        { stamps: 10, label: '🎉 Combo Completo Grátis!', redeemed: false },
+      ];
+      return (
+        <div className="px-5 pb-4">
+          <div className="flex items-center justify-between py-4">
+            <button onClick={() => onNavigate('rating')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+            <h1 className="font-display font-bold">Cartão Fidelidade</h1>
+            <div className="w-8" />
+          </div>
+
+          {/* Card visual */}
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-primary/15 via-accent/10 to-primary/5 border border-primary/20 mb-5">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2"><Award className="w-5 h-5 text-primary" /><span className="font-display font-bold text-lg">NOOWE Express</span></div>
+              <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-[10px] font-bold">Nível Ouro</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Cartão de selos digital</p>
+
+            <div className="grid grid-cols-5 gap-2 mb-3">
+              {Array.from({ length: stampTotal }).map((_, i) => (
+                <div key={i} className={`aspect-square rounded-xl flex flex-col items-center justify-center border-2 transition-all ${i < stampCount ? 'bg-primary border-primary' : i === stampCount ? 'border-primary/40 bg-primary/5 animate-pulse' : 'border-border bg-muted/30'}`}>
+                  {i < stampCount ? (
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  ) : (
+                    <span className="text-xs font-bold text-muted-foreground">{i + 1}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">{stampCount}/{stampTotal} selos</p>
+              <p className="text-xs text-primary font-semibold">Faltam {stampTotal - stampCount}!</p>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="mb-5">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-muted-foreground">Progresso</span>
+              <span className="font-semibold text-primary">{Math.round((stampCount / stampTotal) * 100)}%</span>
+            </div>
+            <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-primary to-accent rounded-full transition-all" style={{ width: `${(stampCount / stampTotal) * 100}%` }} />
+            </div>
+          </div>
+
+          {/* Rewards milestones */}
+          <h3 className="font-semibold text-sm mb-3">Recompensas</h3>
+          <div className="space-y-2 mb-5">
+            {rewards.map((r, i) => (
+              <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${r.current ? 'border-primary bg-primary/5' : r.redeemed ? 'border-border bg-muted/20' : 'border-border'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${r.redeemed ? 'bg-success/20 text-success' : r.current ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                  {r.redeemed ? <Check className="w-4 h-4" /> : r.stamps}
+                </div>
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${r.redeemed ? 'line-through text-muted-foreground' : ''}`}>{r.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{r.redeemed ? 'Resgatado ✓' : r.current ? 'Disponível agora!' : `Ao completar ${r.stamps} selos`}</p>
+                </div>
+                {r.current && <button className="px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-bold">Resgatar</button>}
+              </div>
+            ))}
+          </div>
+
+          {/* History */}
+          <h3 className="font-semibold text-sm mb-2">Últimas visitas</h3>
+          <div className="space-y-1.5 mb-4">
+            {[
+              { date: 'Hoje', item: 'Combo Classic', stamp: true },
+              { date: 'Ontem', item: 'Smash Burger Duplo', stamp: true },
+              { date: '29 Mar', item: 'Combo Duplo', stamp: true },
+            ].map((v, i) => (
+              <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30">
+                <span className="text-xs text-muted-foreground w-12">{v.date}</span>
+                <span className="text-sm flex-1">{v.item}</span>
+                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-bold">+1 selo</span>
+              </div>
+            ))}
           </div>
 
           <button onClick={() => onNavigate('home')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-semibold">
-            {ratingStars > 0 ? 'Enviar Avaliação' : 'Voltar ao Início'}
+            Voltar ao Início
           </button>
         </div>
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

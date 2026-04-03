@@ -18,23 +18,14 @@ export interface CookieConsentState {
 }
 
 export interface UseCookieConsentReturn {
-  /** Whether the user has made any consent choice */
   hasConsented: boolean;
-  /** Current cookie preferences */
   preferences: CookiePreferences;
-  /** Timestamp of last consent action */
   consentedAt: string | null;
-  /** Update a single preference category */
   updatePreference: (category: keyof Omit<CookiePreferences, 'necessary'>, value: boolean) => void;
-  /** Accept all cookie categories */
   acceptAll: () => void;
-  /** Reject all non-essential cookies */
   rejectNonEssential: () => void;
-  /** Save custom preferences (from the customization view) */
   saveCustomPreferences: (prefs: Partial<CookiePreferences>) => void;
-  /** Reset consent (re-shows the banner) */
   resetConsent: () => void;
-  /** Check if a specific category is allowed */
   isAllowed: (category: keyof CookiePreferences) => boolean;
 }
 
@@ -52,12 +43,11 @@ const DEFAULT_PREFERENCES: CookiePreferences = {
   marketing: false,
 };
 
-// Cookie durations (for reference / documentation)
 export const COOKIE_DURATIONS = {
-  necessary: 'session', // Session-only (CSRF, auth)
-  preferences: '1 year', // Language, theme
-  statistics: '2 years', // Analytics, performance
-  marketing: '90 days', // Conversion pixels, retargeting
+  necessary: 'session',
+  preferences: '1 year',
+  statistics: '2 years',
+  marketing: '90 days',
 } as const;
 
 // ============================================================
@@ -110,7 +100,6 @@ function persistState(preferences: CookiePreferences): string {
 export function useCookieConsent(): UseCookieConsentReturn {
   const [state, setState] = useState<CookieConsentState>(loadState);
 
-  // Sync across tabs via the storage event
   useEffect(() => {
     const handler = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY || e.key === PREFERENCES_KEY) {

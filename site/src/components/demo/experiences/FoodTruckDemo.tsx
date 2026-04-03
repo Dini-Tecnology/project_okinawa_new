@@ -2,10 +2,15 @@
  * Food Truck Demo — Taco Noowe
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Timer, ArrowRight, Loader2, Bell, Map, Sparkles,
@@ -13,9 +18,11 @@ import {
   ShoppingBag, Smartphone, UtensilsCrossed, Footprints, ClipboardList,
 } from 'lucide-react';
 
-type Screen = 'home' | 'map' | 'truck-detail' | 'schedule' | 'queue' | 'menu' | 'item-detail' | 'cart' | 'payment' | 'waiting' | 'ready' | 'rating';
+type Screen = 'home' | 'map' | 'truck-detail' | 'schedule' | 'queue' | 'menu' | 'item-detail' | 'cart' | 'payment' | 'waiting' | 'ready' | 'rating'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir no mapa', screens: ['home', 'map'] },
   { step: 2, label: 'Ver food truck', screens: ['truck-detail', 'schedule'] },
   { step: 3, label: 'Fila virtual', screens: ['queue'] },
@@ -23,6 +30,9 @@ export const JOURNEY_STEPS = [
   { step: 5, label: 'Pagamento', screens: ['payment'] },
   { step: 6, label: 'Preparo ao vivo', screens: ['waiting'] },
   { step: 7, label: 'Retirada & avaliação', screens: ['ready', 'rating'] },
+  { step: 8, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 9, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 10, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -38,6 +48,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'waiting': { title: 'Preparando', desc: 'Acompanhe o preparo em tempo real.' },
   'ready': { title: 'Pronto!', desc: 'Retire no truck com seu código.' },
   'rating': { title: 'Avaliação', desc: 'Avalie e ganhe stamps extras.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 const MENU = [
@@ -60,6 +77,7 @@ const MENU_CAT_MAP: Record<string, string> = {
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [queuePos, setQueuePos] = useState(5);
   const [prepProgress, setPrepProgress] = useState(0);
 
@@ -358,7 +376,10 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           infoBanner={{ icon: Zap, text: `Fila #${queuePos} · Pedido começa quando for sua vez`, variant: 'success' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('cart')}
-          onConfirm={() => onNavigate('waiting')}
+          onConfirm={() => {
+            pushExternalOrder(MENU.map(m => ({ name: m.name, price: m.price, quantity: 1, prepTime: 10 })), MENU.reduce((s, m) => s + m.price, 0), 'Taco Noowe');
+            onNavigate('waiting');
+          }}
           ctaLabel="Confirmar Pagamento"
         />
       );
@@ -437,11 +458,18 @@ export const FoodTruckDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <button key={tag} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium border border-primary/20">{tag}</button>
             ))}
           </div>
-          <button onClick={() => onNavigate('home')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow">Enviar Avaliação</button>
-          <button onClick={() => onNavigate('home')} className="w-full mt-2 py-3 text-sm text-muted-foreground">Pular</button>
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow">Enviar Avaliação</button>
+          <button onClick={() => onNavigate('wallet')} className="w-full mt-2 py-3 text-sm text-muted-foreground">Ver Carteira</button>
         </div>
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

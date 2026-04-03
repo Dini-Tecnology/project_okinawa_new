@@ -7,10 +7,15 @@
  * 8. Split → 9. Payment → 10. Post-Experience
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoSplitBill from '../DemoSplitBill';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
@@ -23,20 +28,26 @@ import {
 
 type Screen =
   | 'discovery' | 'venue' | 'check-in' | 'tab-opened'
-  | 'invite-friends' | 'menu' | 'drink-detail'
+  | 'invite-friends' | 'menu' | 'drink-detail' | 'recipe-book'
   | 'order-status' | 'call-waiter' | 'round-builder' | 'round-sent'
-  | 'tab-live' | 'split' | 'payment' | 'post';
+  | 'tab-live' | 'split' | 'payment' | 'post'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descoberta', screens: ['discovery', 'venue'] },
   { step: 2, label: 'Chegada & Check-in', screens: ['check-in', 'tab-opened'] },
   { step: 3, label: 'Convidar amigos', screens: ['invite-friends'] },
   { step: 4, label: 'Cardápio & Pedido', screens: ['menu', 'drink-detail', 'order-status'] },
+  { step: 5, label: 'Livro de receitas', screens: ['recipe-book'] },
   { step: 5, label: 'Chamar garçom', screens: ['call-waiter'] },
   { step: 6, label: 'Rodada do grupo', screens: ['round-builder', 'round-sent'] },
   { step: 7, label: 'Conta ao vivo', screens: ['tab-live'] },
   { step: 8, label: 'Dividir & Pagar', screens: ['split', 'payment'] },
   { step: 9, label: 'Pós-experiência', screens: ['post'] },
+  { step: 10, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 11, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 12, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -48,6 +59,7 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'menu': { title: 'Cardápio', desc: 'Peça direto do celular — sem esperar garçom.' },
   'drink-detail': { title: 'Detalhe', desc: 'Ficha do chopp: ABV, IBU, harmonização.' },
   'order-status': { title: 'Pedido Enviado', desc: 'Barman recebeu — acompanhe o status.' },
+  'recipe-book': { title: 'Livro de Receitas', desc: 'Fichas completas dos drinks: ingredientes, método de preparo e harmonização.' },
   'call-waiter': { title: 'Chamar Garçom', desc: 'Garçom notificado com motivo — sem levantar a mão.' },
   'round-builder': { title: 'Rodada', desc: 'Monte a rodada do grupo — cada um escolhe o seu.' },
   'round-sent': { title: 'Rodada Enviada', desc: 'Todos os drinks enviados ao bar de uma vez.' },
@@ -55,6 +67,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'split': { title: 'Dividir Conta', desc: 'Por consumo, igual ou seletivo.' },
   'payment': { title: 'Pagamento', desc: 'Pague e saia — sem esperar.' },
   'post': { title: 'Pós-Experiência', desc: 'Avalie, ganhe pontos, salve o bar.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface Drink {
@@ -89,6 +108,7 @@ const FRIENDS = [
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [isHappyHour] = useState(true);
   const [selectedDrink, setSelectedDrink] = useState<Drink | null>(null);
   const [selectedCat, setSelectedCat] = useState('Todos');
@@ -105,6 +125,7 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const [roundDrinks, setRoundDrinks] = useState<{ drinkId: string; who: string }[]>([]);
   const [hhMinutes, setHhMinutes] = useState(92);
   const [waiterReason, setWaiterReason] = useState<string | null>(null);
+  const [selRecipe, setSelRecipe] = useState<{ id: string; name: string; cat: string; abv: number; ibu?: number; style?: string; imgId: string; prepTime: string; glass: string; ingredients: string[]; steps: string[]; pairing: string; flavor: Record<string, number> } | null>(null);
   const coverCredit = 25;
 
   useEffect(() => {
@@ -543,6 +564,148 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
         </div>
       );
 
+    /* ═══ RECIPE BOOK ═══ */
+    case 'recipe-book': {
+      const RECIPES = [
+        {
+          id: 'r1', name: 'IPA Artesanal', cat: 'Chopp', abv: 6.5, ibu: 55, style: 'American IPA',
+          imgId: 'ipa', prepTime: '5 min', glass: 'Pint Americano',
+          ingredients: ['Malte Pale Ale', 'Lúpulo Citra', 'Lúpulo Mosaic', 'Levedura US-05', 'Água mineral'],
+          steps: ['Servir no copo pint gelado', 'Inclinar 45° e preencher lentamente', 'Completar com 2 dedos de espuma', 'Servir entre 4-6°C'],
+          pairing: 'Hambúrguer artesanal, nachos, queijos curados',
+          flavor: { amargo: 80, corpo: 60, doce: 20, aroma: 90 },
+        },
+        {
+          id: 'r2', name: 'Gin Tônica Artesanal', cat: 'Drinks', abv: 12.0,
+          imgId: 'gin-tonic', prepTime: '3 min', glass: 'Taça Balon',
+          ingredients: ['50ml Gin artesanal', '150ml Tônica premium', 'Fatias de pepino', 'Zimbro desidratado', 'Gelo cristal'],
+          steps: ['Gelo cristal na taça balon', 'Adicionar gin e misturar', 'Completar com tônica sem agitar', 'Decorar com pepino e zimbro'],
+          pairing: 'Tábua de frios, frutos do mar, saladas',
+          flavor: { amargo: 50, corpo: 30, doce: 15, aroma: 75 },
+        },
+        {
+          id: 'r3', name: 'Moscow Mule', cat: 'Drinks', abv: 10.0,
+          imgId: 'moscow-mule', prepTime: '3 min', glass: 'Caneca de Cobre',
+          ingredients: ['50ml Vodka', '120ml Ginger Beer', '20ml Suco de limão', 'Fatia de limão', 'Gelo em cubos'],
+          steps: ['Preencher caneca de cobre com gelo', 'Adicionar vodka e limão', 'Completar com ginger beer', 'Mexer suavemente e decorar'],
+          pairing: 'Petiscos asiáticos, edamame, gyoza',
+          flavor: { amargo: 25, corpo: 40, doce: 45, aroma: 60 },
+        },
+        {
+          id: 'r4', name: 'Aperol Spritz', cat: 'Drinks', abv: 8.0,
+          imgId: 'aperol', prepTime: '2 min', glass: 'Taça de Vinho',
+          ingredients: ['60ml Aperol', '90ml Prosecco', '30ml Água com gás', 'Fatia de laranja', 'Gelo'],
+          steps: ['Gelo na taça de vinho', 'Adicionar Prosecco primeiro', 'Completar com Aperol', 'Splash de água com gás e laranja'],
+          pairing: 'Bruschetta, antipasto, queijos leves',
+          flavor: { amargo: 40, corpo: 25, doce: 55, aroma: 65 },
+        },
+      ];
+
+      
+
+      if (selRecipe) {
+        return (
+          <div className="px-4 pb-4">
+            <button onClick={() => setSelRecipe(null)} className="flex items-center gap-1 text-sm text-primary mb-3">
+              <ArrowLeft className="w-4 h-4" /> Voltar
+            </button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
+                <FoodImg id={selRecipe.imgId} className="w-14 h-14 rounded-lg object-cover" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold">{selRecipe.name}</h2>
+                <p className="text-xs text-muted-foreground">{selRecipe.style || selRecipe.cat} · {selRecipe.abv}% ABV</p>
+                <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-0.5"><Timer className="w-3 h-3" /> {selRecipe.prepTime}</span>
+                  <span>· {selRecipe.glass}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Flavor profile */}
+            <div className="p-3 rounded-xl bg-card border border-border mb-3">
+              <p className="text-xs font-semibold mb-2">Perfil de Sabor</p>
+              <div className="space-y-1.5">
+                {Object.entries(selRecipe.flavor).map(([k, v]) => (
+                  <div key={k} className="flex items-center gap-2">
+                    <span className="text-[10px] text-muted-foreground w-12 capitalize">{k}</span>
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full bg-primary rounded-full" style={{ width: `${v}%` }} />
+                    </div>
+                    <span className="text-[10px] text-muted-foreground w-6 text-right">{v}%</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Ingredients */}
+            <div className="p-3 rounded-xl bg-card border border-border mb-3">
+              <p className="text-xs font-semibold mb-2">🧪 Ingredientes</p>
+              <div className="space-y-1">
+                {selRecipe.ingredients.map((ing, i) => (
+                  <div key={i} className="flex items-center gap-2 text-xs">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    <span>{ing}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Steps */}
+            <div className="p-3 rounded-xl bg-card border border-border mb-3">
+              <p className="text-xs font-semibold mb-2">📋 Modo de Preparo</p>
+              <div className="space-y-2">
+                {selRecipe.steps.map((step, i) => (
+                  <div key={i} className="flex items-start gap-2 text-xs">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold shrink-0 mt-0.5">{i + 1}</div>
+                    <span>{step}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Pairing */}
+            <div className="p-3 rounded-xl bg-accent/30 border border-accent/50 mb-4">
+              <p className="text-xs font-semibold mb-1 flex items-center gap-1"><Utensils className="w-3 h-3" /> Harmonização</p>
+              <p className="text-xs text-muted-foreground">{selRecipe.pairing}</p>
+            </div>
+
+            <button onClick={() => { setSelRecipe(null); onNavigate('menu'); }} className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-semibold text-sm">
+              Pedir Este Drink
+            </button>
+          </div>
+        );
+      }
+
+      return (
+        <div className="px-4 pb-4">
+          <Header title="Livro de Receitas" back="menu" />
+          <GuidedHint text="Explore fichas completas dos drinks com ingredientes, preparo e harmonização" />
+
+          <div className="space-y-3 mt-3">
+            {RECIPES.map(r => (
+              <button key={r.id} onClick={() => setSelRecipe(r)} className="w-full flex items-center gap-3 p-3 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors text-left">
+                <div className="w-14 h-14 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                  <FoodImg id={r.imgId} className="w-12 h-12 rounded-lg object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm truncate">{r.name}</h3>
+                  <p className="text-[10px] text-muted-foreground">{r.style || r.cat} · {r.abv}% ABV · {r.prepTime}</p>
+                  <div className="flex gap-1 mt-1">
+                    {Object.entries(r.flavor).slice(0, 3).map(([k, v]) => (
+                      <span key={k} className="text-[8px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary capitalize">{k} {v}%</span>
+                    ))}
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
     /* ═══ STAGE 6: CONTINUOUS CONSUMPTION ═══ */
     case 'call-waiter':
       return (
@@ -768,7 +931,11 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           infoBanner={{ icon: Check, text: 'Pré-autorização será liquidada', variant: 'success' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('split')}
-          onConfirm={() => onNavigate('post')}
+          onConfirm={() => {
+            const items = tabItems.map(t => { const d = DRINKS.find(dr => dr.id === t.drinkId); return { name: d?.name || t.drinkId, price: d ? getPrice(d) : 0, quantity: 1 }; });
+            pushExternalOrder(items, tabTotal, 'Noowe Tap House');
+            onNavigate('post');
+          }}
           ctaLabel={`Confirmar · R$ ${getPersonTotal('Você')}`}
         />
       );
@@ -791,10 +958,18 @@ export const PubBarDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           ]}
           loyaltyReward={{ points: '+45 pontos ganhos!', description: 'Próximo chopp grátis em 3 visitas' }}
           badge={{ icon: Trophy, text: 'Selo "Bar Regular" conquistado!' }}
+          primaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
           secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('discovery') }}
         />
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

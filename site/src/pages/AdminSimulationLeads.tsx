@@ -72,12 +72,12 @@ export default function AdminSimulationLeads() {
   useEffect(() => {
     if (!auth) return;
     setLoading(true);
-    (supabase
-      .from('simulation_leads' as any)
+    supabase
+      .from('simulation_leads')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(500) as any)
-      .then(({ data: rows }: any) => {
+      .limit(500)
+      .then(({ data: rows }) => {
         setData((rows as LeadRow[]) || []);
         setLoading(false);
       });

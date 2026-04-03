@@ -6,9 +6,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { DemoProvider, useDemoContext } from '@/contexts/DemoContext';
-import { PhoneShell, BottomNav, SERVICE_TYPES, ItemIcon, type NavTab } from '@/components/demo/DemoShared';
+import { PhoneShell, SERVICE_TYPES, ItemIcon } from '@/components/demo/DemoShared';
 import DemoFeedbackWidget, { trackDemoAction } from '@/components/demo/DemoFeedbackWidget';
 import { DemoAutoTranslate, DemoI18nProvider, DemoLangSelector, useDemoI18n } from '@/components/demo/DemoI18n';
+import DemoBottomNav from '@/components/demo/DemoBottomNav';
 import {
   ArrowLeft, Check, ChevronRight, Search, QrCode, Gift, User,
   UtensilsCrossed, Zap,
@@ -35,40 +36,22 @@ interface DemoConfig {
   info: Record<string, { title: string; desc: string }>;
   defaultScreen: string;
   hasBottomNav: boolean;
+  /** Screen names for bottom nav tabs */
+  navScreens?: { home?: string; menu?: string; orders?: string; wallet?: string; profile?: string };
 }
 
 const DEMO_REGISTRY: Record<string, DemoConfig> = {
-  'fine-dining':    { component: FineDiningDemo,   steps: FD_STEPS, info: FD_INFO, defaultScreen: 'home', hasBottomNav: true },
-  'quick-service':  { component: QuickServiceDemo, steps: QS_STEPS, info: QS_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'fast-casual':    { component: FastCasualDemo,   steps: FC_STEPS, info: FC_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'cafe-bakery':    { component: CafeBakeryDemo,   steps: CB_STEPS, info: CB_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'buffet':         { component: BuffetDemo,       steps: BF_STEPS, info: BF_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'drive-thru':     { component: DriveThruDemo,    steps: DT_STEPS, info: DT_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'food-truck':     { component: FoodTruckDemo,    steps: FT_STEPS, info: FT_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'chefs-table':    { component: ChefsTableDemo,   steps: CT_STEPS, info: CT_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'casual-dining':  { component: CasualDiningDemo, steps: CD_STEPS, info: CD_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'pub-bar':        { component: PubBarDemo,       steps: PB_STEPS, info: PB_INFO, defaultScreen: 'home', hasBottomNav: false },
-  'club':           { component: ClubDemo,         steps: CL_STEPS, info: CL_INFO, defaultScreen: 'home', hasBottomNav: false },
-};
-
-// ============ FINE DINING NAV HELPERS ============
-
-const FD_TAB_MAP: Record<string, NavTab> = {
-  home: 'explore', restaurant: 'explore',
-  menu: 'orders', item: 'orders', comanda: 'orders', 'fechar-conta': 'orders',
-  'order-status': 'orders', 'my-orders': 'orders', 'call-waiter': 'orders',
-  'payment-success': 'orders', 'ai-harmonization': 'orders',
-  'qr-scan': 'scan',
-  loyalty: 'loyalty',
-  profile: 'profile', reservations: 'profile', 'virtual-queue': 'profile', notifications: 'profile',
-};
-
-const FD_TAB_SCREENS: Record<NavTab, string> = {
-  explore: 'home',
-  orders: 'my-orders',
-  scan: 'qr-scan',
-  loyalty: 'loyalty',
-  profile: 'profile',
+  'fine-dining':    { component: FineDiningDemo,   steps: FD_STEPS, info: FD_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'comanda' } },
+  'quick-service':  { component: QuickServiceDemo, steps: QS_STEPS, info: QS_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'cart' } },
+  'fast-casual':    { component: FastCasualDemo,   steps: FC_STEPS, info: FC_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { menu: 'builder-base', orders: 'builder-summary' } },
+  'cafe-bakery':    { component: CafeBakeryDemo,   steps: CB_STEPS, info: CB_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'comanda' } },
+  'buffet':         { component: BuffetDemo,       steps: BF_STEPS, info: BF_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { menu: 'stations', orders: 'comanda' } },
+  'drive-thru':     { component: DriveThruDemo,    steps: DT_STEPS, info: DT_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'cart' } },
+  'food-truck':     { component: FoodTruckDemo,    steps: FT_STEPS, info: FT_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'cart' } },
+  'chefs-table':    { component: ChefsTableDemo,   steps: CT_STEPS, info: CT_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { menu: 'detail', orders: 'course-1' } },
+  'casual-dining':  { component: CasualDiningDemo, steps: CD_STEPS, info: CD_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { orders: 'comanda' } },
+  'pub-bar':        { component: PubBarDemo,       steps: PB_STEPS, info: PB_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { home: 'discovery', menu: 'menu', orders: 'tab-live' } },
+  'club':           { component: ClubDemo,         steps: CL_STEPS, info: CL_INFO, defaultScreen: 'home', hasBottomNav: true, navScreens: { home: 'discovery', menu: 'floor-menu', orders: 'min-spend' } },
 };
 
 // ============ MAIN COMPONENT ============
@@ -108,10 +91,6 @@ const DemoClientInner = () => {
     currentScreen,
   }), [serviceType, currentStepIdx, config, currentScreen]);
 
-  const handleTabChange = (tab: NavTab) => {
-    const screen = FD_TAB_SCREENS[tab];
-    if (screen) setCurrentScreen(screen);
-  };
 
   return (
     <>
@@ -215,12 +194,13 @@ const DemoClientInner = () => {
                 {ActiveDemo && <ActiveDemo screen={currentScreen} onNavigate={setCurrentScreen} />}
               </PhoneShell>
               {config?.hasBottomNav && (
-                <BottomNav
-                  activeTab={FD_TAB_MAP[currentScreen] || 'explore'}
-                  onTabChange={handleTabChange}
-                  cartCount={cartCount}
-                  notifCount={3}
-                />
+                <div className="absolute bottom-[3px] left-[3px] right-[3px] rounded-b-[2.8rem] overflow-hidden">
+                  <DemoBottomNav
+                    onNavigate={setCurrentScreen}
+                    activeScreen={currentScreen}
+                    screens={config.navScreens}
+                  />
+                </div>
               )}
             </div>
 

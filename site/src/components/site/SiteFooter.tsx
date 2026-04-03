@@ -20,20 +20,14 @@ const SiteFooter: React.FC = () => {
       title: t('footer.foryou'),
       links: [
         { label: t('nav.foryou'), to: '/para-voce' },
-      ],
-    },
-    {
-      title: t('footer.company'),
-      links: [
-        { label: t('footer.about'), to: '#' },
-        { label: t('footer.careers'), to: '#' },
+        { label: t('footer.request_demo'), to: '/request-demo' },
       ],
     },
     {
       title: t('footer.legal'),
       links: [
-        { label: t('footer.privacy'), to: '#' },
-        { label: t('footer.terms'), to: '#' },
+        { label: t('footer.privacy'), to: '/privacy' },
+        { label: t('footer.terms'), to: '/terms' },
       ],
     },
   ];
@@ -50,12 +44,11 @@ const SiteFooter: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           <div className="col-span-2 md:col-span-1">
             <NooweLogo size="sm" />
             <p className="text-muted-foreground text-sm mt-4 leading-relaxed max-w-[240px]">
-              The Operating System
-              <br />for Restaurants.
+              {t('footer.tagline')}
             </p>
           </div>
 

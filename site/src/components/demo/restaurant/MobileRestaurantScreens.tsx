@@ -32,6 +32,15 @@ import {
   ConfigFloor, ConfigMenu, ConfigTeam, ConfigKitchen, ConfigPayments, ConfigFeatures,
 } from './ConfigHubScreens';
 import { useDemoContext, type OrderStatus, type TableStatus } from '@/contexts/DemoContext';
+import { WaiterAssistScreen } from './RoleScreens';
+import {
+  FinancialDashboardScreen, CashRegisterScreen, FiscalScreen, CostControlScreen, ForecastScreen,
+  ChefApprovalsScreen, ChefTableScreen, KdsAnalyticsScreen, KdsBrainConfigScreen,
+  CrmScreen, HrScreen, IntegrationsScreen, LoyaltyMgmtScreen, PromotionsMgmtScreen,
+  QrCodesScreen, TapToPayScreen, ReportsScreen, ReviewsMgmtScreen, ReservationsMgmtScreen,
+  ClubDoorScreen, ClubQueueMgmtScreen, ClubPromoterScreen, ClubVipMgmtScreen,
+  DriveThruMgmtScreen, FoodTruckMgmtScreen, ConfigLanguageScreen, ConfigNotificationsScreen,
+} from './ExtendedScreens';
 import { useDemoI18n } from '@/components/demo/DemoI18n';
 import {
   DRINK_RECIPES,
@@ -348,6 +357,19 @@ const MobileKDS: React.FC<{ view: 'kitchen' | 'bar' }> = ({ view }) => {
   );
 };
 
+const reservationStatusLabel: Record<string, string> = {
+  confirmed: 'Confirmada',
+  waiting: 'Aguardando',
+  cancelled: 'Cancelada',
+  seated: 'Acomodado',
+};
+
+const reservationNoteLabel: Record<string, string> = {
+  'Aniversário de casamento': 'Aniversário de casamento',
+  'Jantar de negócios': 'Jantar de negócios',
+  'Mesa no terraço': 'Mesa no terraço',
+};
+
 const MobileMaitre: React.FC = () => {
   const { reservations, tables } = useDemoContext();
   const available = tables.filter(t => t.status === 'available').length;
@@ -367,9 +389,9 @@ const MobileMaitre: React.FC = () => {
                   <p className="text-sm font-semibold">{reservation.customerName}</p>
                   <p className="text-[11px] text-muted-foreground">{reservation.time} · {reservation.partySize} pessoas</p>
                 </div>
-                <span className="rounded-full bg-warning/10 px-2 py-1 text-[10px] font-semibold text-warning">{reservation.status}</span>
+                <span className="rounded-full bg-warning/10 px-2 py-1 text-[10px] font-semibold text-warning">{reservationStatusLabel[reservation.status] || reservation.status}</span>
               </div>
-              {reservation.notes ? <p className="mt-2 text-[11px] text-muted-foreground">{reservation.notes}</p> : null}
+              {reservation.notes ? <p className="mt-2 text-[11px] text-muted-foreground">{reservationNoteLabel[reservation.notes] || reservation.notes}</p> : null}
             </div>
           ))}
         </div>
@@ -1403,6 +1425,10 @@ const MobileCalls: React.FC = () => <MobileWaiter initialTab="live" />;
 const MobilePayment: React.FC = () => <MobileWaiter initialTab="charge" />;
 const MobileActions: React.FC = () => <MobileWaiter initialTab="live" />;
 
+const MobileWaiterAssist: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
+  return <WaiterAssistScreen onNavigate={onNavigate} />;
+};
+
 const MobileTips: React.FC = () => (
   <div className="space-y-4">
     <CompactStat label="Gorjetas do dia" value="R$ 410" tone="success" />
@@ -1442,7 +1468,7 @@ const MobileFloorFlow: React.FC = () => {
           {reservations.slice(0, 4).map(item => (
             <div key={item.id} className="rounded-2xl border border-border bg-card p-3">
               <p className="text-sm font-semibold">{item.customerName}</p>
-              <p className="text-[11px] text-muted-foreground">{item.time} · {item.partySize} pessoas · {item.status}</p>
+              <p className="text-[11px] text-muted-foreground">{item.time} · {item.partySize} pessoas · {reservationStatusLabel[item.status] || item.status}</p>
             </div>
           ))}
         </div>
@@ -1520,7 +1546,7 @@ export const MobileRestaurantScreen: React.FC<{
   const title = translateText(SCREEN_INFO[screen]?.title || '');
 
   return (
-    <div className="space-y-4 pb-4">
+    <div className="space-y-4 px-4 pb-4 pt-1">
       <div className="rounded-2xl border border-border bg-card px-3 py-2">
         <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Modo mobile')}</p>
         <p className="mt-1 text-sm font-semibold text-foreground">{title}</p>
@@ -1548,6 +1574,7 @@ export const MobileRestaurantScreen: React.FC<{
       {screen === 'waiter-tips' && <MobileTips />}
       {screen === 'waiter-payment' && <MobilePayment />}
       {screen === 'waiter-actions' && <MobileActions />}
+      {screen === 'waiter-assist' && <MobileWaiterAssist onNavigate={onNavigate} />}
       {screen === 'waiter-table-detail' && <MobileWaiter />}
       {screen === 'floor-flow' && <MobileFloorFlow />}
       {screen === 'daily-report' && <MobileDailyReport />}
@@ -1557,10 +1584,37 @@ export const MobileRestaurantScreen: React.FC<{
       {screen === 'config-experience' && <ConfigExperience onNavigate={onNavigate} />}
       {screen === 'config-floor' && <ConfigFloor onNavigate={onNavigate} />}
       {screen === 'config-menu' && <ConfigMenu onNavigate={onNavigate} />}
-      {screen === 'config-team' && <ConfigTeam onNavigate={onNavigate} />}
+      {screen === 'config-team' && <ConfigTeam onNavigate={onNavigate} activeRole={activeRole} />}
       {screen === 'config-kitchen' && <ConfigKitchen onNavigate={onNavigate} />}
       {screen === 'config-payments' && <ConfigPayments onNavigate={onNavigate} />}
       {screen === 'config-features' && <ConfigFeatures onNavigate={onNavigate} />}
+      {screen === 'config-language' && <ConfigLanguageScreen />}
+      {screen === 'config-notifications' && <ConfigNotificationsScreen />}
+      {screen === 'financial-dashboard' && <FinancialDashboardScreen />}
+      {screen === 'cash-register' && <CashRegisterScreen />}
+      {screen === 'fiscal' && <FiscalScreen />}
+      {screen === 'cost-control' && <CostControlScreen />}
+      {screen === 'forecast' && <ForecastScreen />}
+      {screen === 'chef-approvals' && <ChefApprovalsScreen />}
+      {screen === 'chef-table' && <ChefTableScreen />}
+      {screen === 'kds-analytics' && <KdsAnalyticsScreen />}
+      {screen === 'kds-brain-config' && <KdsBrainConfigScreen />}
+      {screen === 'crm' && <CrmScreen />}
+      {screen === 'hr' && <HrScreen />}
+      {screen === 'integrations' && <IntegrationsScreen />}
+      {screen === 'loyalty-mgmt' && <LoyaltyMgmtScreen />}
+      {screen === 'promotions-mgmt' && <PromotionsMgmtScreen />}
+      {screen === 'qr-codes' && <QrCodesScreen />}
+      {screen === 'tap-to-pay' && <TapToPayScreen />}
+      {screen === 'reports' && <ReportsScreen />}
+      {screen === 'reviews-mgmt' && <ReviewsMgmtScreen />}
+      {screen === 'reservations-mgmt' && <ReservationsMgmtScreen />}
+      {screen === 'club-door' && <ClubDoorScreen />}
+      {screen === 'club-queue-mgmt' && <ClubQueueMgmtScreen />}
+      {screen === 'club-promoter' && <ClubPromoterScreen />}
+      {screen === 'club-vip-mgmt' && <ClubVipMgmtScreen />}
+      {screen === 'drive-thru-mgmt' && <DriveThruMgmtScreen />}
+      {screen === 'food-truck-mgmt' && <FoodTruckMgmtScreen />}
 
       <div className="rounded-2xl border border-border bg-card p-3">
         <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Perfil ativo')}</p>
