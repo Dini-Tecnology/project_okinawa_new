@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "cd site && npm install --legacy-peer-deps && npm run dev",
     "build": "cd site && npm install --legacy-peer-deps && npm run build",
+    "build:dev": "cd site && npm install --legacy-peer-deps && npm run build:dev",
     "preview": "cd site && npm run preview"
   }
 }
