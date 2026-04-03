@@ -194,6 +194,22 @@ const screenComponents: Record<string, React.ComponentType> = {
   'bar-kds': BarKDSScreen,
   maitre: MaitreScreen,
   waiter: WaiterScreen,
+  'chef-view': ChefViewScreen,
+  'cook-station': CookStationScreen,
+  'barman-station': BarmanStationScreen,
+  'cash-register': CashRegisterScreen,
+  'floor-plan': FloorPlanScreen,
+  'stock': StockScreen,
+  'waiter-dashboard': WaiterDashboardScreen,
+
+  // Restaurant Financial & Analytics
+  'bills': BillsScreen,
+  'financial-report': FinancialReportScreen,
+  'forecast': ForecastScreen,
+  'fiscal-setup': FiscalSetupScreen,
+  'margin-dashboard': MarginDashboardScreen,
+  'kds-analytics': KdsAnalyticsScreen,
+  'customer-crm': CustomerCrmScreen,
   
   // Restaurant Configuration
   'service-type-config': ServiceTypeConfigScreen,
