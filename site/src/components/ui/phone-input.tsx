@@ -2,11 +2,11 @@ import React, { useState, useRef, useEffect, useMemo, forwardRef } from 'react';
 import { ChevronDown, Search } from 'lucide-react';
 
 interface Country {
-  code: string;
-  dial: string;
-  flag: string;
+  code: string;   // ISO 3166 alpha-2
+  dial: string;   // e.g. "+55"
+  flag: string;   // emoji flag
   name: string;
-  mask: string;
+  mask: string;   // e.g. "(##) #####-####"
 }
 
 const COUNTRIES: Country[] = [
@@ -59,13 +59,14 @@ interface PhoneInputProps {
 }
 
 const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>(({ value, onChange, placeholder, className = '', hasError }, ref) => {
-  const [country, setCountry] = useState<Country>(COUNTRIES[0]);
+  const [country, setCountry] = useState<Country>(COUNTRIES[0]); // BR default
   const [localNumber, setLocalNumber] = useState('');
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [search, setSearch] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
+  // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
@@ -105,6 +106,7 @@ const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>(({ value, onChang
     setCountry(c);
     setDropdownOpen(false);
     setSearch('');
+    // Re-apply mask with new country
     const raw = localNumber.replace(/\D/g, '');
     const limited = raw.slice(0, maxDigits(c.mask));
     const masked = applyMask(limited, c.mask);
@@ -115,6 +117,7 @@ const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>(({ value, onChang
   return (
     <div ref={containerRef} className={`relative ${className}`}>
       <div className={`flex items-center w-full rounded-xl border bg-background transition-all focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary ${hasError ? 'border-destructive' : 'border-border'}`}>
+        {/* Country selector */}
         <button
           type="button"
           onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -127,6 +130,7 @@ const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>(({ value, onChang
 
         <div className="w-px h-6 bg-border flex-shrink-0" />
 
+        {/* Number input */}
         <input
           type="tel"
           value={localNumber}
@@ -136,6 +140,7 @@ const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>(({ value, onChang
         />
       </div>
 
+      {/* Dropdown */}
       {dropdownOpen && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-border rounded-xl shadow-lg z-50 overflow-hidden animate-scale-in">
           <div className="p-2 border-b border-border">

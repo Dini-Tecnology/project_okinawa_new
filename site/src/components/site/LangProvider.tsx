@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { LangContext, detectLang, setLang as persistLang, t as translate } from '@/lib/i18n';
 import type { Lang } from '@/lib/i18n';
 

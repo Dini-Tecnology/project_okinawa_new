@@ -11,7 +11,6 @@ import type { CookiePreferences } from '@/hooks/useCookieConsent';
 type CookieStrings = Record<string, Record<Lang, string>>;
 
 const strings: CookieStrings = {
-  // Banner
   'cookie.title': {
     pt: 'Respeitamos sua privacidade',
     en: 'We respect your privacy',
@@ -47,8 +46,6 @@ const strings: CookieStrings = {
     en: 'Back',
     es: 'Volver',
   },
-
-  // Categories
   'cookie.cat.necessary': {
     pt: 'Estritamente Necessários',
     en: 'Strictly Necessary',
@@ -89,8 +86,6 @@ const strings: CookieStrings = {
     en: 'Used to track visitors across websites to display relevant ads. Includes conversion pixels and retargeting. Duration: 90 days.',
     es: 'Utilizados para rastrear visitantes en sitios web con el objetivo de mostrar anuncios relevantes. Incluyen píxeles de conversión y retargeting. Duración: 90 días.',
   },
-
-  // Duration labels
   'cookie.duration.necessary': {
     pt: 'Sessão',
     en: 'Session',
@@ -111,8 +106,6 @@ const strings: CookieStrings = {
     en: '90 days',
     es: '90 días',
   },
-
-  // Privacy link
   'cookie.privacy_link': {
     pt: 'Política de Privacidade',
     en: 'Privacy Policy',
@@ -147,34 +140,10 @@ interface CategoryInfo {
 }
 
 const CATEGORIES: CategoryInfo[] = [
-  {
-    key: 'necessary',
-    titleKey: 'cookie.cat.necessary',
-    descKey: 'cookie.cat.necessary_desc',
-    durationKey: 'cookie.duration.necessary',
-    alwaysOn: true,
-  },
-  {
-    key: 'preferences',
-    titleKey: 'cookie.cat.preferences',
-    descKey: 'cookie.cat.preferences_desc',
-    durationKey: 'cookie.duration.preferences',
-    alwaysOn: false,
-  },
-  {
-    key: 'statistics',
-    titleKey: 'cookie.cat.statistics',
-    descKey: 'cookie.cat.statistics_desc',
-    durationKey: 'cookie.duration.statistics',
-    alwaysOn: false,
-  },
-  {
-    key: 'marketing',
-    titleKey: 'cookie.cat.marketing',
-    descKey: 'cookie.cat.marketing_desc',
-    durationKey: 'cookie.duration.marketing',
-    alwaysOn: false,
-  },
+  { key: 'necessary', titleKey: 'cookie.cat.necessary', descKey: 'cookie.cat.necessary_desc', durationKey: 'cookie.duration.necessary', alwaysOn: true },
+  { key: 'preferences', titleKey: 'cookie.cat.preferences', descKey: 'cookie.cat.preferences_desc', durationKey: 'cookie.duration.preferences', alwaysOn: false },
+  { key: 'statistics', titleKey: 'cookie.cat.statistics', descKey: 'cookie.cat.statistics_desc', durationKey: 'cookie.duration.statistics', alwaysOn: false },
+  { key: 'marketing', titleKey: 'cookie.cat.marketing', descKey: 'cookie.cat.marketing_desc', durationKey: 'cookie.duration.marketing', alwaysOn: false },
 ];
 
 // ============================================================
@@ -224,7 +193,6 @@ const CookieConsent: React.FC = () => {
     acceptAll,
     rejectNonEssential,
     saveCustomPreferences,
-    resetConsent,
   } = useCookieConsent();
 
   const [showBanner, setShowBanner] = useState(false);
@@ -236,17 +204,14 @@ const CookieConsent: React.FC = () => {
     marketing: false,
   });
 
-  // Show banner only when consent hasn't been given
   useEffect(() => {
     if (!hasConsented) {
-      // Small delay for a smooth entrance after page load
       const timer = setTimeout(() => setShowBanner(true), 800);
       return () => clearTimeout(timer);
     }
     setShowBanner(false);
   }, [hasConsented]);
 
-  // Sync custom preferences when opening customize view
   useEffect(() => {
     if (showCustomize) {
       setCustomPrefs({ ...preferences });
@@ -278,9 +243,7 @@ const CookieConsent: React.FC = () => {
 
   const t = (key: string) => ct(key, lang);
 
-  // -----------------------------------------------------------
-  // Floating re-open button (visible after consent is given)
-  // -----------------------------------------------------------
+  // Floating re-open button
   if (hasConsented && !showBanner) {
     return (
       <button
@@ -294,17 +257,7 @@ const CookieConsent: React.FC = () => {
           focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2
         "
       >
-        {/* Cookie icon */}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className="h-5 w-5"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
           <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" />
           <path d="M8.5 8.5v.01" />
           <path d="M16 15.5v.01" />
@@ -316,9 +269,6 @@ const CookieConsent: React.FC = () => {
     );
   }
 
-  // -----------------------------------------------------------
-  // Banner (hidden when consent given and not reopened)
-  // -----------------------------------------------------------
   if (!showBanner) return null;
 
   return (
@@ -333,17 +283,11 @@ const CookieConsent: React.FC = () => {
       `}
     >
       <div className="mx-auto max-w-3xl rounded-2xl border border-border bg-background/95 p-6 shadow-2xl backdrop-blur-md">
-        {/* ----- CUSTOMIZE VIEW ----- */}
         {showCustomize ? (
           <div className="space-y-5">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-foreground">
-                {t('cookie.customize')}
-              </h2>
-              <button
-                onClick={() => setShowCustomize(false)}
-                className="text-sm text-muted-foreground underline hover:text-foreground transition-colors"
-              >
+              <h2 className="text-lg font-semibold text-foreground">{t('cookie.customize')}</h2>
+              <button onClick={() => setShowCustomize(false)} className="text-sm text-muted-foreground underline hover:text-foreground transition-colors">
                 {t('cookie.back')}
               </button>
             </div>
@@ -354,28 +298,18 @@ const CookieConsent: React.FC = () => {
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-foreground text-sm">
-                          {t(cat.titleKey)}
-                        </span>
-                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                          {t(cat.durationKey)}
-                        </span>
+                        <span className="font-medium text-foreground text-sm">{t(cat.titleKey)}</span>
+                        <span className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">{t(cat.durationKey)}</span>
                       </div>
-                      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                        {t(cat.descKey)}
-                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{t(cat.descKey)}</p>
                     </div>
                     <div className="shrink-0">
                       {cat.alwaysOn ? (
-                        <span className="text-xs font-medium text-primary">
-                          {t('cookie.always_active')}
-                        </span>
+                        <span className="text-xs font-medium text-primary">{t('cookie.always_active')}</span>
                       ) : (
                         <Toggle
                           checked={customPrefs[cat.key as keyof CookiePreferences] as boolean}
-                          onChange={(val) =>
-                            setCustomPrefs((prev) => ({ ...prev, [cat.key]: val }))
-                          }
+                          onChange={(val) => setCustomPrefs((prev) => ({ ...prev, [cat.key]: val }))}
                           label={t(cat.titleKey)}
                         />
                       )}
@@ -386,88 +320,35 @@ const CookieConsent: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
-              <button
-                onClick={handleRejectNonEssential}
-                className="
-                  rounded-lg border border-border px-4 py-2 text-sm font-medium
-                  text-foreground transition-colors hover:bg-muted
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                "
-              >
+              <button onClick={handleRejectNonEssential} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                 {t('cookie.reject_non_essential')}
               </button>
-              <button
-                onClick={handleAcceptAll}
-                className="
-                  rounded-lg border border-border px-4 py-2 text-sm font-medium
-                  text-foreground transition-colors hover:bg-muted
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                "
-              >
+              <button onClick={handleAcceptAll} className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                 {t('cookie.accept_all')}
               </button>
-              <button
-                onClick={handleSaveCustom}
-                className="
-                  rounded-lg bg-primary px-4 py-2 text-sm font-medium
-                  text-primary-foreground transition-colors hover:bg-primary/90
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                "
-              >
+              <button onClick={handleSaveCustom} className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                 {t('cookie.save_preferences')}
               </button>
             </div>
           </div>
         ) : (
-          /* ----- MAIN BANNER VIEW ----- */
           <div className="space-y-4">
             <div>
-              <h2 className="text-lg font-semibold text-foreground">
-                {t('cookie.title')}
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                {t('cookie.description')}
-              </p>
-              <a
-                href="/privacy"
-                className="mt-1 inline-block text-xs text-primary underline hover:text-primary/80 transition-colors"
-              >
+              <h2 className="text-lg font-semibold text-foreground">{t('cookie.title')}</h2>
+              <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{t('cookie.description')}</p>
+              <a href="/privacy" className="mt-1 inline-block text-xs text-primary underline hover:text-primary/80 transition-colors">
                 {t('cookie.privacy_link')}
               </a>
             </div>
 
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-              <button
-                onClick={handleAcceptAll}
-                className="
-                  rounded-lg bg-primary px-4 py-2.5 text-sm font-medium
-                  text-primary-foreground transition-colors hover:bg-primary/90
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                  sm:order-3
-                "
-              >
+              <button onClick={handleAcceptAll} className="rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:order-3">
                 {t('cookie.accept_all')}
               </button>
-              <button
-                onClick={handleRejectNonEssential}
-                className="
-                  rounded-lg border border-border px-4 py-2.5 text-sm font-medium
-                  text-foreground transition-colors hover:bg-muted
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                  sm:order-2
-                "
-              >
+              <button onClick={handleRejectNonEssential} className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:order-2">
                 {t('cookie.reject_non_essential')}
               </button>
-              <button
-                onClick={() => setShowCustomize(true)}
-                className="
-                  rounded-lg border border-border px-4 py-2.5 text-sm font-medium
-                  text-foreground transition-colors hover:bg-muted
-                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary
-                  sm:order-1
-                "
-              >
+              <button onClick={() => setShowCustomize(true)} className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:order-1">
                 {t('cookie.customize')}
               </button>
             </div>
