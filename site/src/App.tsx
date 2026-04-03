@@ -59,7 +59,6 @@ const App = () => (
               <SkipNavLink />
               <Toaster />
               <Sonner />
-              <CookieConsent />
               <BrowserRouter>
                 <Suspense fallback={<PageLoader />}>
                   <div id="main-content">
@@ -88,6 +87,7 @@ const App = () => (
                   </div>
                 </Suspense>
               </BrowserRouter>
+              <CookieConsent />
             </ErrorBoundary>
           </TooltipProvider>
         </LangProvider>
