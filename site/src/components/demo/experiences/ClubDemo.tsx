@@ -7,10 +7,15 @@
  * 7. Bill (min spend tracker) → 8. Split → 9. Payment → 10. Post
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoSplitBill from '../DemoSplitBill';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
@@ -28,9 +33,11 @@ type Screen =
   | 'floor-menu' | 'order-pickup'
   | 'vip-table' | 'vip-map' | 'bottle-service'
   | 'min-spend' | 'split' | 'payment'
-  | 'post' | 'rate';
+  | 'post' | 'rate'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descoberta', screens: ['discovery', 'event-detail', 'lineup'] },
   { step: 2, label: 'Decisão / Ingresso', screens: ['tickets', 'digital-ticket', 'promoter-list'] },
   { step: 3, label: 'Chegada & Check-in', screens: ['virtual-queue', 'check-in'] },
@@ -40,6 +47,9 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Conta & Consumação', screens: ['min-spend'] },
   { step: 8, label: 'Dividir & Pagar', screens: ['split', 'payment'] },
   { step: 9, label: 'Pós-experiência', screens: ['post', 'rate'] },
+  { step: 10, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 11, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 12, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -61,6 +71,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'payment': { title: 'Pagamento', desc: 'Pague sua parte e saia.' },
   'post': { title: 'Noite Encerrada', desc: 'Resumo da noite com pontos e Uber.' },
   'rate': { title: 'Avaliação', desc: 'Avalie a noite por categoria.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
@@ -84,6 +101,7 @@ const FLOOR_DRINKS = [
 ];
 
 export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [ticketType, setTicketType] = useState<'pista' | 'vip' | 'open'>('pista');
   const [selectedBottle, setSelectedBottle] = useState(BOTTLES[0]);
   const [consumed, setConsumed] = useState(1580);
@@ -729,7 +747,10 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           ]}
           fullMethodGrid={true}
           onBack={() => onNavigate('split')}
-          onConfirm={() => onNavigate('post')}
+          onConfirm={() => {
+            pushExternalOrder([{ name: 'Consumo Club', price: consumed, quantity: 1 }], consumed, 'NOOWE Club');
+            onNavigate('post');
+          }}
           ctaLabel="Confirmar Pagamento"
         />
       );
@@ -756,7 +777,7 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { label: 'Garrafas', value: '2' },
           ]}
           primaryAction={{ label: 'Avaliar', onClick: () => onNavigate('rate'), icon: Star }}
-          secondaryAction={{ label: 'Uber', onClick: () => {}, icon: Car }}
+          secondaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
         />
       );
 
@@ -790,12 +811,20 @@ export const ClubDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <button key={tag} className="px-2.5 py-1 rounded-full bg-muted text-[10px] text-muted-foreground">{tag}</button>
             ))}
           </div>
-          <button onClick={() => onNavigate('discovery')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
             <ThumbsUp className="w-5 h-5" /> Enviar Avaliação
           </button>
+          <button onClick={() => onNavigate('wallet')} className="w-full mt-2 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground">Ver Carteira</button>
         </div>
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

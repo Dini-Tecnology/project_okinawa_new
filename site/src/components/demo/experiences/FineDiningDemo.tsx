@@ -1,6 +1,7 @@
 /**
  * Fine Dining Demo — Bistrô Noowe
  * Full journey: Discover → QR Scan → Menu → AI Harmonization → Order → Pay → Loyalty
+ * Connected state: cart items flow through all screens
  */
 import React, { useState, useEffect } from 'react';
 import { useDemoContext, type DemoMenuItem } from '@/contexts/DemoContext';
@@ -8,6 +9,10 @@ import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen,
+} from '../ClientExtendedScreens';
 import {
   ArrowLeft, ArrowRight, Search, MapPin, Star, Clock, Heart,
   Minus, Plus, X, ChevronRight, CreditCard,
@@ -24,22 +29,36 @@ type Screen =
   | 'home' | 'restaurant' | 'menu' | 'item' | 'comanda'
   | 'fechar-conta' | 'payment' | 'order-status' | 'loyalty' | 'reservations'
   | 'qr-scan' | 'call-waiter' | 'profile' | 'virtual-queue' | 'my-orders'
-  | 'payment-success' | 'notifications' | 'ai-harmonization';
+  | 'payment-success' | 'notifications' | 'ai-harmonization'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support';
+
+// ============ GUEST TYPE ============
+
+export interface DemoGuest {
+  id: string;
+  name: string;
+  initial: string;
+  color: string;
+  paid: boolean;
+}
 
 // ============ JOURNEY CONFIG ============
 
 export const JOURNEY_STEPS = [
-  { step: 1, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
-  { step: 2, label: 'Escanear QR da mesa', screens: ['qr-scan'] },
-  { step: 3, label: 'Explorar cardápio', screens: ['menu', 'item', 'ai-harmonization'] },
-  { step: 4, label: 'Montar comanda', screens: ['comanda'] },
-  { step: 5, label: 'Acompanhar pedido', screens: ['order-status'] },
-  { step: 6, label: 'Fechar conta & pagar', screens: ['fechar-conta', 'payment-success'] },
-  { step: 7, label: 'Programa de fidelidade', screens: ['loyalty'] },
-  { step: 8, label: 'Reservar mesa', screens: ['reservations'] },
-  { step: 9, label: 'Fila virtual', screens: ['virtual-queue'] },
-  { step: 10, label: 'Chamar equipe', screens: ['call-waiter'] },
-  { step: 11, label: 'Notificações', screens: ['notifications'] },
+  { step: 1, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
+  { step: 2, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
+  { step: 3, label: 'Escanear QR da mesa', screens: ['qr-scan'] },
+  { step: 4, label: 'Explorar cardápio', screens: ['menu', 'item', 'ai-harmonization'] },
+  { step: 5, label: 'Montar comanda', screens: ['comanda'] },
+  { step: 6, label: 'Acompanhar pedido', screens: ['order-status'] },
+  { step: 7, label: 'Fechar conta & pagar', screens: ['fechar-conta', 'payment-success', 'digital-receipt'] },
+  { step: 8, label: 'Carteira digital', screens: ['wallet'] },
+  { step: 9, label: 'Programa de fidelidade', screens: ['loyalty'] },
+  { step: 10, label: 'Reservar mesa', screens: ['reservations'] },
+  { step: 11, label: 'Fila virtual', screens: ['virtual-queue'] },
+  { step: 12, label: 'Chamar equipe', screens: ['call-waiter'] },
+  { step: 13, label: 'Notificações', screens: ['notifications'] },
+  { step: 14, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
@@ -61,6 +80,12 @@ export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
   'payment-success': { title: 'Pagamento Confirmado', desc: 'Confirmação com pontos ganhos, gorjeta e saldo restante da mesa.' },
   'notifications': { title: 'Notificações', desc: 'Convites para comanda, fila pronta, pontos ganhos, promoções e status de pedidos.' },
   'ai-harmonization': { title: 'Harmonização IA', desc: 'A IA sugere combinações perfeitas de pratos e bebidas baseado em suas preferências.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
 };
 
 // ============ HOME ============
@@ -390,7 +415,7 @@ const ProfileScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
           { icon: CreditCard, label: 'Métodos de Pagamento' },
           { icon: Heart, label: 'Restaurantes Favoritos' },
           { icon: Settings, label: 'Configurações' },
-          { icon: HelpCircle, label: 'Ajuda & Suporte' },
+          { icon: HelpCircle, label: 'Ajuda & Suporte', screen: 'support' },
         ].map(({ icon: Icon, label, screen, badge }) => (
           <button key={label} onClick={() => screen ? onNavigate(screen) : undefined} className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
             <Icon className="w-5 h-5 text-muted-foreground" />
@@ -405,28 +430,39 @@ const ProfileScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
   );
 };
 
-// ============ MY ORDERS ============
+// ============ MY ORDERS (uses cart) ============
 
 const MyOrdersScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
-  const { clientActiveOrder } = useDemoContext();
+  const { clientActiveOrder, cart, cartTotal } = useDemoContext();
+  const hasCartItems = cart.length > 0;
   return (
     <div className="px-5 pb-4">
       <div className="py-4"><h1 className="font-display text-xl font-bold">Meus Pedidos</h1></div>
-      {clientActiveOrder && (
+      {hasCartItems && (
         <>
-          <GuidedHint text="Você tem um pedido ativo! Toque para acompanhar" />
+          <GuidedHint text="Você tem itens na comanda! Toque para acompanhar" />
           <button onClick={() => onNavigate('order-status')} className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 text-left">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-semibold text-primary uppercase tracking-wide">Pedido ativo</span>
-              <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
-                {clientActiveOrder.status === 'preparing' ? 'Preparando' : clientActiveOrder.status === 'ready' ? 'Pronto!' : 'Em andamento'}
-              </span>
+              <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">Preparando</span>
             </div>
             <p className="text-sm font-semibold">Bistrô Noowe · Mesa 7</p>
-            <p className="text-xs text-muted-foreground">{clientActiveOrder.items.length} itens · R$ {clientActiveOrder.total}</p>
+            <p className="text-xs text-muted-foreground">{cart.reduce((s, c) => s + c.quantity, 0)} itens · R$ {cartTotal}</p>
             <div className="flex items-center gap-1 mt-2 text-primary text-xs font-medium"><span>Acompanhar</span><ArrowRight className="w-3 h-3" /></div>
           </button>
         </>
+      )}
+      {clientActiveOrder && !hasCartItems && (
+        <button onClick={() => onNavigate('order-status')} className="w-full p-4 rounded-xl bg-primary/5 border border-primary/20 mb-3 text-left">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-primary uppercase tracking-wide">Pedido ativo</span>
+            <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-semibold">
+              {clientActiveOrder.status === 'preparing' ? 'Preparando' : clientActiveOrder.status === 'ready' ? 'Pronto!' : 'Em andamento'}
+            </span>
+          </div>
+          <p className="text-sm font-semibold">Bistrô Noowe · Mesa 7</p>
+          <p className="text-xs text-muted-foreground">{clientActiveOrder.items.length} itens · R$ {clientActiveOrder.total}</p>
+        </button>
       )}
       <h3 className="text-sm font-semibold mb-3 text-muted-foreground">Últimas visitas</h3>
       {[
@@ -509,85 +545,61 @@ const MenuScreen: React.FC<{ onNavigate: (s: string) => void; onSelectItem: (ite
 const AIHarmonizationScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
   const [step, setStep] = useState<'preferences' | 'loading' | 'results'>('preferences');
   const [selectedPrefs, setSelectedPrefs] = useState<string[]>(['Vinho Tinto']);
-  const togglePref = (p: string) => setSelectedPrefs(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
   useEffect(() => { if (step === 'loading') { const t = setTimeout(() => setStep('results'), 2000); return () => clearTimeout(t); } }, [step]);
-
+  const prefs = ['Vinho Tinto', 'Vinho Branco', 'Espumante', 'Sem Álcool', 'Carne Vermelha', 'Peixe', 'Vegetariano', 'Aventureiro'];
+  const togglePref = (p: string) => setSelectedPrefs(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  const suggestions = [
+    { icon: Wine, name: 'Château Margaux 2015', desc: 'Bordeaux · Full body · 95pts', price: 'R$ 89', match: 97 },
+    { icon: Flame, name: 'Filé ao Molho de Vinho', desc: 'Harmoniza perfeitamente com o Margaux', price: 'R$ 118', match: 94 },
+    { icon: Leaf, name: 'Tartare de Atum', desc: 'Entrada leve que complementa', price: 'R$ 58', match: 91 },
+    { icon: CakeSlice, name: 'Crème Brûlée', desc: 'Sobremesa para fechar com elegância', price: 'R$ 38', match: 88 },
+  ];
   return (
     <div className="px-5 pb-4">
       <div className="flex items-center justify-between py-4">
         <button onClick={() => onNavigate('menu')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
-        <h1 className="font-display font-bold flex items-center gap-2"><Brain className="w-5 h-5 text-primary" />Harmonização IA</h1>
-        <div className="w-8" />
+        <h1 className="font-display font-bold">Harmonização IA</h1>
+        <Brain className="w-5 h-5 text-primary" />
       </div>
       {step === 'preferences' && (
         <>
           <div className="text-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3"><Sparkles className="w-8 h-8 text-primary" /></div>
-            <h2 className="font-display text-lg font-bold mb-1">Deixe a IA montar sua experiência</h2>
-            <p className="text-xs text-muted-foreground">Selecione suas preferências e nossa IA sugerirá a combinação perfeita</p>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-3"><Brain className="w-8 h-8 text-primary" /></div>
+            <h2 className="font-display text-lg font-bold mb-1">Monte sua experiência</h2>
+            <p className="text-sm text-muted-foreground">Selecione suas preferências e a IA criará a combinação perfeita</p>
           </div>
-          <div className="mb-5">
-            <label className="text-sm font-semibold mb-3 block">Preferência de bebida</label>
-            <div className="flex flex-wrap gap-2">
-              {['Vinho Tinto', 'Vinho Branco', 'Espumante', 'Cerveja', 'Cocktail', 'Sem álcool'].map(p => (
-                <button key={p} onClick={() => togglePref(p)} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${selectedPrefs.includes(p) ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
-              ))}
-            </div>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {prefs.map(p => (<button key={p} onClick={() => togglePref(p)} className={`px-4 py-2 rounded-full text-xs font-medium border transition-colors ${selectedPrefs.includes(p) ? 'bg-primary text-primary-foreground border-primary' : 'bg-card border-border text-muted-foreground'}`}>{p}</button>))}
           </div>
-          <div className="mb-5">
-            <label className="text-sm font-semibold mb-3 block">Restrições alimentares</label>
-            <div className="flex flex-wrap gap-2">
-              {['Nenhuma', 'Vegetariano', 'Vegano', 'Sem glúten', 'Sem lactose'].map((p, i) => (
-                <button key={p} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${i === 0 ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
-              ))}
-            </div>
-          </div>
-          <div className="mb-5">
-            <label className="text-sm font-semibold mb-3 block">Ocasião</label>
-            <div className="flex flex-wrap gap-2">
-              {['Jantar casual', 'Encontro romântico', 'Negócios', 'Aniversário', 'Com amigos'].map((p, i) => (
-                <button key={p} className={`px-3 py-2 rounded-xl text-xs font-medium border transition-all ${i === 0 ? 'border-primary bg-primary/10 text-primary' : 'border-border text-muted-foreground'}`}>{p}</button>
-              ))}
-            </div>
-          </div>
-          <button onClick={() => setStep('loading')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-semibold text-sm shadow-glow flex items-center justify-center gap-2"><Brain className="w-4 h-4" />Gerar Harmonização</button>
+          <button onClick={() => setStep('loading')} disabled={selectedPrefs.length === 0} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-semibold text-sm shadow-glow disabled:opacity-50 flex items-center justify-center gap-2"><Sparkles className="w-4 h-4" />Gerar Harmonização</button>
         </>
       )}
       {step === 'loading' && (
         <div className="text-center py-12">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-5 animate-pulse"><Brain className="w-10 h-10 text-primary" /></div>
-          <h2 className="font-display text-lg font-bold mb-2">Analisando combinações...</h2>
-          <p className="text-xs text-muted-foreground mb-4">Nossa IA está avaliando 430+ combinações</p>
-          <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto" />
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center mx-auto mb-6 animate-pulse"><Brain className="w-10 h-10 text-primary" /></div>
+          <h2 className="font-display text-lg font-bold mb-2">Analisando preferências...</h2>
+          <p className="text-sm text-muted-foreground">A IA está criando a combinação perfeita</p>
+          <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto mt-4" />
         </div>
       )}
       {step === 'results' && (
         <>
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20 mb-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-bold text-foreground">Harmonização Perfeita</span>
-              <span className="px-2 py-0.5 rounded-full bg-success/20 text-success text-[10px] font-bold">98% match</span>
-            </div>
-            <p className="text-xs text-muted-foreground">Baseado nas suas preferências</p>
+          <div className="p-4 rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 border border-primary/20 mb-5">
+            <div className="flex items-center gap-2 mb-2"><Sparkles className="w-4 h-4 text-primary" /><span className="text-sm font-semibold">Combinação Perfeita</span></div>
+            <p className="text-xs text-muted-foreground">Baseado em: {selectedPrefs.join(', ')}</p>
           </div>
           <div className="space-y-3 mb-5">
-            {[
-              { course: 'Entrada', name: 'Tartare de Atum', desc: 'Notas cítricas que preparam o paladar', price: 58, icon: Leaf },
-              { course: 'Principal', name: 'Filé ao Molho de Vinho', desc: 'Harmoniza com taninos encorpados', price: 118, icon: Flame },
-              { course: 'Vinho', name: 'Malbec Reserva 2019', desc: 'Argentino, frutado com taninos macios', price: 89, icon: Wine },
-              { course: 'Sobremesa', name: 'Crème Brûlée', desc: 'Finaliza com doçura equilibrada', price: 38, icon: Star },
-            ].map((item, i) => (
-              <div key={i} className="p-4 rounded-xl border border-border bg-card">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center"><item.icon className="w-4 h-4 text-primary" /></div>
-                  <div className="flex-1">
-                    <p className="text-[10px] text-primary font-semibold uppercase tracking-wider">{item.course}</p>
+            {suggestions.map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-card border border-border">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center"><item.icon className="w-5 h-5 text-primary" /></div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold text-foreground">{item.name}</p>
+                    <span className="px-1.5 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-bold">{item.match}%</span>
                   </div>
-                  <span className="font-display font-bold text-sm text-foreground">R$ {item.price}</span>
+                  <p className="text-xs text-muted-foreground">{item.desc}</p>
                 </div>
-                <p className="text-xs text-muted-foreground ml-10">{item.desc}</p>
+                <span className="font-display font-bold text-sm text-foreground">R$ {item.price}</span>
               </div>
             ))}
           </div>
@@ -643,10 +655,12 @@ const ItemDetailScreen: React.FC<{ item: DemoMenuItem; onNavigate: (s: string) =
   );
 };
 
-// ============ COMANDA ============
+// ============ COMANDA (connected to cart + guests) ============
 
-const ComandaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
+const ComandaScreen: React.FC<{ onNavigate: (s: string) => void; guests: DemoGuest[]; onAddGuest: (name: string) => void }> = ({ onNavigate, guests, onAddGuest }) => {
   const { cart, updateCartQuantity, removeFromCart, cartTotal } = useDemoContext();
+  const [showInvite, setShowInvite] = useState(false);
+  const [newGuestName, setNewGuestName] = useState('');
   return (
     <div className="px-5 pb-4">
       <div className="flex items-center justify-between py-4">
@@ -664,7 +678,7 @@ const ComandaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
         <>
           <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/30 mb-4">
             <span className="text-2xl">🍽️</span>
-            <div className="flex-1"><p className="font-semibold text-sm">Bistrô Noowe</p><p className="text-xs text-muted-foreground">Mesa 7 · Fine Dining</p></div>
+            <div className="flex-1"><p className="font-semibold text-sm">Bistrô Noowe</p><p className="text-xs text-muted-foreground">Mesa 7 · {guests.length} pessoa{guests.length > 1 ? 's' : ''}</p></div>
           </div>
           <GuidedHint text="Revise seus itens e feche a conta quando quiser" pulse={false} />
           {cart.map((item) => (
@@ -681,15 +695,42 @@ const ComandaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
               </div>
             </div>
           ))}
-          <button className="w-full mt-4 p-3 rounded-xl border border-dashed border-border flex items-center justify-center gap-2 text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-            <UserPlus className="w-4 h-4" /><span className="text-xs font-medium">Convidar pessoas para a comanda</span>
-          </button>
-          <div className="mt-5 p-4 rounded-xl bg-muted/30">
-            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Subtotal</span><span className="font-medium">R$ {cartTotal}</span></div>
+          {/* Guests */}
+          <div className="mt-4 mb-2">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />Na mesa ({guests.length})</span>
+              <button onClick={() => setShowInvite(!showInvite)} className="text-xs text-primary font-medium flex items-center gap-1"><UserPlus className="w-3 h-3" />Convidar</button>
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {guests.map((g) => (
+                <div key={g.id} className={`flex-shrink-0 px-3 py-2 rounded-xl border text-center ${g.id === 'you' ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
+                  <div className={`w-7 h-7 rounded-full mx-auto mb-1 flex items-center justify-center text-primary-foreground font-bold text-xs ${g.color}`}>{g.initial}</div>
+                  <p className="text-[10px] font-medium truncate">{g.name.split(' ')[0]}</p>
+                </div>
+              ))}
+            </div>
+            {showInvite && (
+              <div className="mt-2 p-3 rounded-xl border border-primary/20 bg-primary/5">
+                <p className="text-xs text-muted-foreground mb-2">Adicionar pessoa à mesa</p>
+                <div className="flex gap-2">
+                  <input value={newGuestName} onChange={e => setNewGuestName(e.target.value)} placeholder="Nome" className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm" />
+                  <button onClick={() => { if (newGuestName.trim()) { onAddGuest(newGuestName.trim()); setNewGuestName(''); setShowInvite(false); } }} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">Adicionar</button>
+                </div>
+                <div className="flex gap-2 mt-2">
+                  {['Maria', 'João', 'Ana'].filter(n => !guests.find(g => g.name === n)).map(n => (
+                    <button key={n} onClick={() => onAddGuest(n)} className="px-3 py-1.5 rounded-lg bg-muted text-xs font-medium">{n}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="mt-3 p-4 rounded-xl bg-muted/30">
+            <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Subtotal ({cart.reduce((s, c) => s + c.quantity, 0)} itens)</span><span className="font-medium">R$ {cartTotal}</span></div>
             <div className="flex justify-between text-sm mb-1"><span className="text-muted-foreground">Taxa de serviço (10%)</span><span className="font-medium">R$ {Math.round(cartTotal * 0.1)}</span></div>
             <div className="border-t border-border pt-2 mt-2 flex justify-between font-display font-bold text-lg"><span>Total</span><span>R$ {Math.round(cartTotal * 1.1)}</span></div>
           </div>
           <div className="space-y-2 mt-4">
+            <button onClick={() => onNavigate('order-status')} className="w-full py-3 border border-primary/30 bg-primary/5 text-primary rounded-xl font-semibold text-sm flex items-center justify-center gap-2"><Clock className="w-4 h-4" />Enviar Pedido</button>
             <button onClick={() => onNavigate('fechar-conta')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground rounded-xl font-semibold text-sm shadow-glow flex items-center justify-center gap-2"><CreditCard className="w-4 h-4" />Fechar Conta</button>
             <button onClick={() => onNavigate('menu')} className="w-full py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground">Adicionar mais itens</button>
           </div>
@@ -699,27 +740,38 @@ const ComandaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
   );
 };
 
-// ============ ORDER STATUS ============
+// ============ ORDER STATUS (connected to cart) ============
 
-const OrderStatusScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
+const OrderStatusScreen: React.FC<{ onNavigate: (s: string) => void; guests: DemoGuest[] }> = ({ onNavigate, guests }) => {
+  const { cart } = useDemoContext();
+  const statusCycle: Array<'preparing' | 'ready' | 'pending'> = ['preparing', 'ready', 'pending'];
+  const items = cart.map((c, i) => ({
+      id: c.menuItem.id,
+      name: c.menuItem.name,
+      status: statusCycle[i % statusCycle.length],
+      eta: `${c.menuItem.prepTime} min`,
+      chef: ['Chef Marco', 'Chef Ana', 'Pâtissier'][i % 3],
+      quantity: c.quantity,
+    }));
+
+  const readyCount = items.filter(i => i.status === 'ready').length;
+  const progress = items.length > 0 ? Math.round((readyCount / items.length) * 100) : 0;
+  const prepTimes = cart.length > 0 ? cart.map(c => c.menuItem.prepTime) : [0];
+
   return (
     <DemoOrderStatus
       title="Status do Pedido"
       subtitle="Mesa 7 · Bistrô Noowe"
       orderCode="#2847"
-      etaRange="8-20 min"
-      progress={55}
+      etaRange={`${Math.min(...prepTimes)}-${Math.max(...prepTimes)} min`}
+      progress={progress}
       steps={ORDER_STEPS.fineDining}
-      activeStep={1}
-      items={[
-        { id: 1, name: 'Tartare de Atum', status: 'ready', eta: '12 min', chef: 'Chef Marco' },
-        { id: 2, name: 'Filé ao Molho de Vinho', status: 'preparing', eta: '~8 min', chef: 'Chef Ana' },
-        { id: 3, name: 'Crème Brûlée', status: 'pending', eta: '~20 min', chef: 'Pâtissier' },
-      ]}
+      activeStep={readyCount > 0 ? 1 : 0}
+      items={items}
       onBack={() => onNavigate('comanda')}
       tableInfo={{
-        label: 'Mesa 7 · 3 pessoas',
-        sublabel: 'Você, Maria e João',
+        label: `Mesa 7 · ${guests.length} pessoa${guests.length > 1 ? 's' : ''}`,
+        sublabel: guests.map(g => g.name.split(' ')[0]).join(', '),
         actionLabel: 'Fechar Conta',
         onAction: () => onNavigate('fechar-conta'),
       }}
@@ -727,82 +779,73 @@ const OrderStatusScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
   );
 };
 
-// ============ FECHAR CONTA ============
+// ============ FECHAR CONTA (connected to cart + guests) ============
 
-const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => {
-  const [payMode, setPayMode] = useState<'solo' | 'split'>('split');
+const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void; guests: DemoGuest[]; onAddGuest: (name: string) => void; onMarkPaid: (guestId: string) => void }> = ({ onNavigate, guests, onAddGuest }) => {
+  const { cart, cartTotal } = useDemoContext();
+  const [payMode, setPayMode] = useState<'solo' | 'split'>(guests.length > 1 ? 'split' : 'solo');
   const [splitMode, setSplitMode] = useState<'individual' | 'equal' | 'selective' | 'fixed'>('individual');
   const [tipPercent, setTipPercent] = useState(10);
-  const [selectedItems, setSelectedItems] = useState<string[]>(['i1', 'i2']);
-  const [sharedItems, setSharedItems] = useState<string[]>(['i7']);
-  const [fixedAmount, setFixedAmount] = useState(200);
-  const [showInvite, setShowInvite] = useState(false);
-  const [inviteSent, setInviteSent] = useState(false);
+  const [fixedAmount, setFixedAmount] = useState(Math.round(cartTotal / Math.max(1, guests.length)));
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
+  // itemAssignments: maps item id -> array of guest ids who share that item
+  const [itemAssignments, setItemAssignments] = useState<Record<string, string[]>>({});
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [showInvite, setShowInvite] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState<'config' | 'payment'>('config');
+  const [newGuestName, setNewGuestName] = useState('');
 
-  const orderItems = [
-    { id: 'i1', name: 'Tartare de Atum', price: 58, orderedBy: 'Você' },
-    { id: 'i2', name: 'Filé ao Molho de Vinho', price: 118, orderedBy: 'Você' },
-    { id: 'i3', name: 'Risoto de Funghi', price: 82, orderedBy: 'Maria' },
-    { id: 'i4', name: 'Crème Brûlée', price: 38, orderedBy: 'Maria' },
-    { id: 'i5', name: 'Salmão Grelhado', price: 96, orderedBy: 'João' },
-    { id: 'i6', name: 'Gin Tônica Aurora', price: 38, orderedBy: 'João' },
-    { id: 'i7', name: 'Batata Truffle Fries', price: 45, orderedBy: 'Mesa' },
-  ];
-
-  const guests = [
-    { id: 'you', name: 'Você', role: 'Anfitrião', paid: false, items: ['i1', 'i2'] },
-    { id: 'maria', name: 'Maria Silva', role: 'Convidada', paid: true, items: ['i3', 'i4'] },
-    { id: 'joao', name: 'João Santos', role: 'Convidado', paid: false, items: ['i5', 'i6'] },
-  ];
+  const orderItems = cart.map(c => ({
+    id: c.menuItem.id,
+    name: c.menuItem.name,
+    price: c.menuItem.price * c.quantity,
+    quantity: c.quantity,
+  }));
 
   const unpaidGuests = guests.filter(g => !g.paid);
-  const totalOrder = orderItems.reduce((s, i) => s + i.price, 0);
+  const totalOrder = cartTotal;
   const serviceCharge = Math.round(totalOrder * 0.1);
   const totalWithService = totalOrder + serviceCharge;
-  const paidByOthers = 120;
-  const sharedTotal = orderItems.filter(i => sharedItems.includes(i.id)).reduce((s, i) => s + i.price, 0);
-  const mySharedPortion = sharedTotal / guests.length;
+  const paidByOthers = guests.filter(g => g.paid).length > 0
+    ? Math.round(totalWithService * (guests.filter(g => g.paid).length / guests.length))
+    : 0;
+
+  const selectedItemsTotal = orderItems.filter(i => selectedItems.includes(i.id)).reduce((s, i) => s + i.price, 0);
+  const selectedWithService = selectedItemsTotal + Math.round(selectedItemsTotal * 0.1);
+
+  // Calculate "my" total for selective mode
+  const getSelectiveMyTotal = () => {
+    let myTotal = 0;
+    for (const item of orderItems) {
+      const isSplitAll = (itemAssignments[item.id] || []).length === guests.length;
+      const isSelected = selectedItems.includes(item.id);
+      if (isSplitAll) {
+        myTotal += item.price / guests.length;
+      } else if (isSelected) {
+        myTotal += item.price;
+      }
+    }
+    return Math.round(myTotal + myTotal * 0.1);
+  };
 
   const calculateMyAmount = () => {
-    if (payMode === 'solo') return totalWithService - paidByOthers;
+    if (payMode === 'solo') return totalWithService;
     switch (splitMode) {
       case 'individual': {
-        const myItems = orderItems.filter(i => i.orderedBy === 'Você' && !sharedItems.includes(i.id));
-        const myDirect = myItems.reduce((s, i) => s + i.price, 0);
-        return myDirect + mySharedPortion + Math.round((myDirect + mySharedPortion) * 0.1);
+        const myItems = orderItems.filter(i => i.quantity > 0);
+        const myItemsTotal = myItems.reduce((s, i) => s + i.price, 0);
+        return myItemsTotal + Math.round(myItemsTotal * 0.1);
       }
-      case 'equal': return Math.round((totalWithService - paidByOthers) / unpaidGuests.length);
-      case 'selective': {
-        const directTotal = selectedItems.filter(id => !sharedItems.includes(id)).reduce((sum, itemId) => {
-          const item = orderItems.find(i => i.id === itemId);
-          return sum + (item ? item.price : 0);
-        }, 0);
-        return directTotal + mySharedPortion;
-      }
+      case 'equal': return Math.round((totalWithService - paidByOthers) / Math.max(1, unpaidGuests.length));
+      case 'selective': return getSelectiveMyTotal();
       case 'fixed': return Math.min(fixedAmount, totalWithService - paidByOthers);
-      default: return 0;
+      default: return Math.round(totalWithService / Math.max(1, unpaidGuests.length));
     }
   };
 
   const mySubtotal = calculateMyAmount();
   const myTip = Math.round(mySubtotal * tipPercent / 100);
   const myTotal = mySubtotal + myTip;
-
-  const toggleItem = (itemId: string) => {
-    if (sharedItems.includes(itemId)) return;
-    setSelectedItems(prev => prev.includes(itemId) ? prev.filter(id => id !== itemId) : [...prev, itemId]);
-  };
-
-  const toggleShared = (itemId: string) => {
-    setSharedItems(prev => {
-      if (prev.includes(itemId)) return prev.filter(id => id !== itemId);
-      setSelectedItems(si => si.filter(id => id !== itemId));
-      return [...prev, itemId];
-    });
-    setExpandedItem(null);
-  };
 
   if (checkoutStep === 'payment') {
     return (
@@ -812,24 +855,29 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
         total={`R$ ${myTotal.toFixed(2)}`}
         totalLabel="Você paga"
         items={[
-          { label: 'Sua parte', value: `R$ ${mySubtotal.toFixed(2)}` },
-          ...(payMode === 'split' && sharedTotal > 0
-            ? [{ label: 'Itens compartilhados', value: `R$ ${mySharedPortion.toFixed(2)}`, highlight: 'accent' as const }]
-            : []),
-          ...(tipPercent > 0
-            ? [{ label: `Gorjeta (${tipPercent}%)`, value: `R$ ${myTip.toFixed(2)}` }]
-            : []),
-          ...(paidByOthers > 0
-            ? [{ label: 'Pago por outros', value: `- R$ ${paidByOthers.toFixed(2)}`, highlight: 'success' as const }]
-            : []),
+          ...orderItems.map(i => ({ label: `${i.name}${i.quantity > 1 ? ` x${i.quantity}` : ''}`, value: `R$ ${i.price.toFixed(2)}` })),
+          { label: 'Taxa de serviço (10%)', value: `R$ ${serviceCharge.toFixed(2)}` },
+          ...(payMode === 'split' && guests.length > 1 ? [{ label: `Sua parte (÷ ${unpaidGuests.length})`, value: `R$ ${mySubtotal.toFixed(2)}` }] : []),
+          ...(tipPercent > 0 ? [{ label: `Gorjeta (${tipPercent}%)`, value: `R$ ${myTip.toFixed(2)}` }] : []),
+          ...(paidByOthers > 0 ? [{ label: 'Pago por outros', value: `- R$ ${paidByOthers.toFixed(2)}`, highlight: 'success' as const }] : []),
         ]}
-        infoBanner={{ icon: Zap, text: 'Pagamento premium com os mesmos métodos disponíveis em todas as demos', variant: 'primary' }}
+        infoBanner={{ icon: Zap, text: `${cart.reduce((s, c) => s + c.quantity, 0)} itens · ${guests.length} pessoa${guests.length > 1 ? 's' : ''} na mesa`, variant: 'primary' }}
         showTip={false}
         fullMethodGrid={true}
         onBack={() => setCheckoutStep('config')}
         onConfirm={() => onNavigate('payment-success')}
         ctaLabel={`Pagar R$ ${myTotal.toFixed(2)}`}
       />
+    );
+  }
+
+  if (cart.length === 0) {
+    return (
+      <div className="px-5 pb-4 text-center py-12">
+        <Receipt className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+        <p className="text-muted-foreground mb-2">Nenhum item na comanda</p>
+        <button onClick={() => onNavigate('menu')} className="mt-2 px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">Ver Cardápio</button>
+      </div>
     );
   }
 
@@ -853,33 +901,31 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
         {/* People at the table */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-semibold text-foreground text-sm flex items-center gap-2"><Users className="w-4 h-4 text-primary" />Na mesa</h2>
+            <h2 className="font-semibold text-foreground text-sm flex items-center gap-2"><Users className="w-4 h-4 text-primary" />Na mesa ({guests.length})</h2>
             <button onClick={() => setShowInvite(!showInvite)} className="text-xs text-primary font-medium flex items-center gap-1"><UserPlus className="w-3 h-3" />Convidar</button>
           </div>
           {showInvite && (
             <div className="p-4 rounded-xl border border-primary/20 bg-primary/5 mb-3">
-              <p className="text-xs text-muted-foreground mb-3">Convide alguém para se juntar à comanda</p>
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-card border border-border mb-2">
-                <Share2 className="w-4 h-4 text-primary" />
-                <span className="flex-1 text-xs text-muted-foreground">noowe.app/join/BN-7-2847</span>
-                <button className="p-1.5 rounded-md bg-primary/10"><Copy className="w-3 h-3 text-primary" /></button>
-              </div>
+              <p className="text-xs text-muted-foreground mb-2">Adicionar pessoa à mesa</p>
               <div className="flex gap-2">
-                <button onClick={() => { setInviteSent(true); setTimeout(() => setShowInvite(false), 1000); }} className="flex-1 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1">
-                  {inviteSent ? <><Check className="w-3 h-3" />Enviado!</> : <><Send className="w-3 h-3" />SMS</>}
-                </button>
-                <button className="flex-1 py-2 rounded-lg border border-border text-xs font-medium flex items-center justify-center gap-1"><MessageCircle className="w-3 h-3" />WhatsApp</button>
+                <input value={newGuestName} onChange={e => setNewGuestName(e.target.value)} placeholder="Nome" className="flex-1 px-3 py-2 rounded-lg border border-border bg-background text-sm" />
+                <button onClick={() => { if (newGuestName.trim()) { onAddGuest(newGuestName.trim()); setNewGuestName(''); setShowInvite(false); } }} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-semibold">Adicionar</button>
+              </div>
+              <div className="flex gap-2 mt-2">
+                {['Maria', 'João', 'Ana'].filter(n => !guests.find(g => g.name === n)).map(n => (
+                  <button key={n} onClick={() => onAddGuest(n)} className="px-3 py-1.5 rounded-lg bg-muted text-xs font-medium">{n}</button>
+                ))}
               </div>
             </div>
           )}
           <div className="flex gap-2 overflow-x-auto pb-1">
             {guests.map((guest) => (
               <div key={guest.id} className={`flex-shrink-0 p-3 rounded-2xl border-2 min-w-[90px] text-center ${guest.paid ? 'border-success bg-success/5' : guest.id === 'you' ? 'border-primary bg-primary/5' : 'border-border bg-card'}`}>
-                <div className={`w-9 h-9 rounded-full mx-auto mb-1.5 flex items-center justify-center text-primary-foreground font-bold text-sm ${guest.paid ? 'bg-success' : guest.id === 'you' ? 'bg-primary' : 'bg-muted text-muted-foreground'}`}>
-                  {guest.paid ? <Check className="w-4 h-4" /> : guest.name.charAt(0)}
+                <div className={`w-9 h-9 rounded-full mx-auto mb-1.5 flex items-center justify-center text-primary-foreground font-bold text-sm ${guest.paid ? 'bg-success' : guest.color}`}>
+                  {guest.paid ? <Check className="w-4 h-4" /> : guest.initial}
                 </div>
                 <p className="text-xs font-medium text-foreground truncate">{guest.name.split(' ')[0]}</p>
-                <p className={`text-[10px] ${guest.paid ? 'text-success font-semibold' : 'text-muted-foreground'}`}>{guest.paid ? '✓ Pago' : guest.role}</p>
+                <p className={`text-[10px] ${guest.paid ? 'text-success font-semibold' : 'text-muted-foreground'}`}>{guest.paid ? '✓ Pago' : guest.id === 'you' ? 'Anfitrião' : 'Convidado'}</p>
               </div>
             ))}
             <button onClick={() => setShowInvite(true)} className="flex-shrink-0 w-[90px] p-3 rounded-2xl border-2 border-dashed border-border flex flex-col items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors">
@@ -888,39 +934,55 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
           </div>
         </div>
 
-        {/* Pay mode */}
+        {/* Order items from actual cart */}
         <div>
-          <h2 className="font-semibold text-foreground text-sm mb-3">Como deseja pagar?</h2>
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={() => setPayMode('solo')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'solo' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-              <User className={`w-5 h-5 mx-auto mb-1 ${payMode === 'solo' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <p className={`text-xs font-semibold ${payMode === 'solo' ? 'text-primary' : 'text-foreground'}`}>Pagar Tudo</p>
-              <p className="text-[10px] text-muted-foreground">Você paga a conta toda</p>
-            </button>
-            <button onClick={() => setPayMode('split')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'split' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-              <Users className={`w-5 h-5 mx-auto mb-1 ${payMode === 'split' ? 'text-primary' : 'text-muted-foreground'}`} />
-              <p className={`text-xs font-semibold ${payMode === 'split' ? 'text-primary' : 'text-foreground'}`}>Dividir Conta</p>
-              <p className="text-[10px] text-muted-foreground">Cada um paga sua parte</p>
-            </button>
+          <h2 className="font-semibold text-foreground text-sm mb-3">Itens da comanda</h2>
+          <div className="space-y-2">
+            {orderItems.map((item) => (
+              <div key={item.id} className="flex items-center justify-between p-3 rounded-xl bg-card border border-border">
+                <div>
+                  <p className="text-sm font-medium text-foreground">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">Você{item.quantity > 1 ? ` · x${item.quantity}` : ''}</p>
+                </div>
+                <span className="font-semibold text-sm text-foreground">R$ {item.price.toFixed(2)}</span>
+              </div>
+            ))}
           </div>
         </div>
 
+        {/* Pay mode - only show when multiple guests */}
+        {guests.length > 1 && (
+          <div>
+            <h2 className="font-semibold text-foreground text-sm mb-3">Como deseja pagar?</h2>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={() => setPayMode('solo')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'solo' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+                <User className={`w-5 h-5 mx-auto mb-1 ${payMode === 'solo' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <p className={`text-xs font-semibold ${payMode === 'solo' ? 'text-primary' : 'text-foreground'}`}>Pagar Tudo</p>
+              </button>
+              <button onClick={() => setPayMode('split')} className={`p-3 rounded-2xl border-2 text-center transition-all ${payMode === 'split' ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
+                <Users className={`w-5 h-5 mx-auto mb-1 ${payMode === 'split' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <p className={`text-xs font-semibold ${payMode === 'split' ? 'text-primary' : 'text-foreground'}`}>Dividir Conta</p>
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Split modes */}
-        {payMode === 'split' && (
+        {payMode === 'split' && guests.length > 1 && (
           <div>
             <h2 className="font-semibold text-foreground text-sm mb-3">Modo de divisão</h2>
             <div className="grid grid-cols-2 gap-2">
-              {[
+              {([
                 { id: 'individual' as const, name: 'Meus Itens', desc: 'Cada um paga o que pediu', icon: User },
                 { id: 'equal' as const, name: 'Partes Iguais', desc: 'Divide igualmente', icon: Users },
-                { id: 'selective' as const, name: 'Por Item', desc: 'Escolha itens específicos', icon: Check },
+                { id: 'selective' as const, name: 'Por Item', desc: 'Escolha itens específicos', icon: Receipt },
                 { id: 'fixed' as const, name: 'Valor Fixo', desc: 'Defina quanto pagar', icon: DollarSign },
-              ].map((mode) => (
+              ]).map((mode) => (
                 <button key={mode.id} onClick={() => setSplitMode(mode.id)} className={`p-3 rounded-2xl border-2 text-left transition-all ${splitMode === mode.id ? 'bg-primary/10 border-primary' : 'bg-card border-border'}`}>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1 ${splitMode === mode.id ? 'bg-primary/20' : 'bg-muted'}`}>
                     <mode.icon className={`w-4 h-4 ${splitMode === mode.id ? 'text-primary' : 'text-muted-foreground'}`} />
-                    <span className={`font-semibold text-xs ${splitMode === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.name}</span>
                   </div>
+                  <p className={`text-xs font-semibold ${splitMode === mode.id ? 'text-primary' : 'text-foreground'}`}>{mode.name}</p>
                   <p className="text-[10px] text-muted-foreground">{mode.desc}</p>
                 </button>
               ))}
@@ -928,65 +990,123 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
           </div>
         )}
 
-        {/* Selective items */}
-        {payMode === 'split' && splitMode === 'selective' && (
-          <div>
-            <h2 className="font-semibold text-foreground text-sm mb-3">Selecione os itens que você paga</h2>
-            {sharedTotal > 0 && (
-              <div className="flex items-center gap-3 p-3 rounded-xl bg-accent/10 border border-accent/20 mb-3">
-                <Users className="w-4 h-4 text-accent shrink-0" />
-                <p className="text-[10px] text-muted-foreground">Itens compartilhados: <span className="text-accent font-semibold">R$ {(sharedTotal / guests.length).toFixed(2)}/pessoa</span></p>
-              </div>
-            )}
+        {/* Individual mode — show items assigned to you */}
+        {payMode === 'split' && splitMode === 'individual' && (
+          <div className="bg-card rounded-2xl p-4 border border-border">
+            <h3 className="font-semibold text-foreground text-sm mb-2 flex items-center gap-2"><User className="w-4 h-4 text-primary" />Seus itens</h3>
             <div className="space-y-2">
-              {orderItems.map((item) => {
-                const isSelected = selectedItems.includes(item.id);
-                const isShared = sharedItems.includes(item.id);
-                const guest = guests.find(g => g.paid && g.items.includes(item.id));
-                const isPaid = !!guest;
-                const isExpanded = expandedItem === item.id;
-                return (
-                  <div key={item.id} className={`rounded-xl border-2 transition-all overflow-hidden ${isPaid ? 'border-success/30 bg-success/5 opacity-60' : isShared ? 'border-accent bg-accent/5' : isSelected ? 'border-primary bg-primary/10' : 'border-border bg-card'}`}>
-                    <button onClick={() => { if (isPaid) return; if (isShared) { setExpandedItem(isExpanded ? null : item.id); return; } toggleItem(item.id); }}
-                      onContextMenu={(e) => { e.preventDefault(); if (!isPaid) setExpandedItem(isExpanded ? null : item.id); }}
-                      className="w-full p-3 flex items-center gap-3">
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${isPaid ? 'border-success bg-success' : isShared ? 'border-accent bg-accent' : isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
-                        {(isSelected || isPaid) && <Check className="w-3 h-3 text-primary-foreground" />}
-                        {isShared && <Users className="w-2.5 h-2.5 text-primary-foreground" />}
-                      </div>
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-1.5">
-                          <p className="text-sm font-medium text-foreground">{item.name}</p>
-                          {isShared && <span className="px-1.5 py-0.5 rounded-full bg-accent/20 text-accent text-[9px] font-semibold">÷ todos</span>}
-                        </div>
-                        <p className="text-xs text-muted-foreground">{isPaid ? `${item.orderedBy} · Pago` : isShared ? `R$ ${(item.price / guests.length).toFixed(2)}/pessoa` : item.orderedBy}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm text-foreground">R$ {item.price}</span>
-                        {!isPaid && (
-                          <button onClick={(e) => { e.stopPropagation(); setExpandedItem(isExpanded ? null : item.id); }} className="p-1 rounded-lg hover:bg-muted transition-colors">
-                            <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                          </button>
-                        )}
-                      </div>
-                    </button>
-                    {isExpanded && !isPaid && (
-                      <div className="px-3 pb-3 pt-1 border-t border-border/50">
-                        <button onClick={() => toggleShared(item.id)} className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isShared ? 'bg-accent/10 border border-accent/30' : 'bg-muted/50 border border-transparent hover:border-accent/30'}`}>
-                          <Users className={`w-4 h-4 ${isShared ? 'text-accent' : 'text-muted-foreground'}`} />
-                          <div className="flex-1 text-left">
-                            <p className={`text-xs font-semibold ${isShared ? 'text-accent' : 'text-foreground'}`}>Dividir por todos</p>
-                            <p className="text-[10px] text-muted-foreground">R$ {(item.price / guests.length).toFixed(2)} p/ cada ({guests.length} pessoas)</p>
-                          </div>
-                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${isShared ? 'border-accent bg-accent' : 'border-muted-foreground/30'}`}>
-                            {isShared && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
-                          </div>
-                        </button>
-                      </div>
-                    )}
+              {orderItems.map(item => (
+                <div key={item.id} className="flex items-center justify-between p-2 rounded-xl bg-primary/5 border border-primary/20">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center"><Check className="w-3 h-3 text-primary" /></div>
+                    <span className="text-sm text-foreground">{item.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
                   </div>
-                );
-              })}
+                  <span className="text-sm font-semibold text-primary">R$ {item.price.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-2 text-center">Toque nos itens dos convidados para reatribuir</p>
+          </div>
+        )}
+
+        {/* Selective mode — shared items summary ABOVE the selection card */}
+        {payMode === 'split' && splitMode === 'selective' && Object.keys(itemAssignments).length > 0 && (
+          <div className="p-3 rounded-2xl bg-accent/10 border border-accent/20 flex items-center gap-3">
+            <Users className="w-5 h-5 text-accent flex-shrink-0" />
+            <p className="text-xs font-medium text-accent">
+              Itens compartilhados: <span className="font-bold text-accent">R$ {(orderItems.filter(i => (itemAssignments[i.id] || []).length === guests.length).reduce((s, i) => s + i.price / guests.length, 0)).toFixed(2)}/pessoa</span>
+            </p>
+          </div>
+        )}
+
+        {/* Selective mode — select items you pay, with "Dividir por todos" */}
+        {payMode === 'split' && splitMode === 'selective' && (
+          <div className="space-y-2">
+            {/* Shared items first */}
+            {orderItems.filter(i => (itemAssignments[i.id] || []).length === guests.length).map(item => {
+              const perPerson = item.price / guests.length;
+              const expanded = expandedItem === item.id;
+              return (
+                <div key={item.id} className="rounded-2xl border-2 border-accent bg-accent/5">
+                  <button onClick={() => setExpandedItem(expanded ? null : item.id)} className="w-full flex items-center gap-3 p-3">
+                    <Users className="w-5 h-5 text-accent flex-shrink-0" />
+                    <div className="flex-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-foreground">{item.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-accent/20 text-accent font-medium">÷ todos</span>
+                      </div>
+                      <p className="text-xs text-accent">R$ {perPerson.toFixed(2)}/pessoa</p>
+                    </div>
+                    <span className="text-sm font-semibold text-foreground">R$ {item.price.toFixed(0)}</span>
+                    <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                  </button>
+                  {expanded && (
+                    <div className="px-3 pb-3">
+                      <button onClick={() => { setItemAssignments(prev => { const n = { ...prev }; delete n[item.id]; return n; }); }} className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground">Remover divisão</p>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Non-shared items */}
+            <div className="bg-card rounded-2xl p-4 border border-border">
+              <h3 className="font-semibold text-foreground text-sm mb-3">Selecione os itens que você paga</h3>
+              <div className="space-y-2">
+                {orderItems.filter(i => (itemAssignments[i.id] || []).length !== guests.length).map(item => {
+                  const isSelected = selectedItems.includes(item.id);
+                  const perPerson = item.price / guests.length;
+                  const expanded = expandedItem === item.id;
+
+                  const toggleSelect = () => {
+                    setSelectedItems(prev => prev.includes(item.id) ? prev.filter(id => id !== item.id) : [...prev, item.id]);
+                  };
+
+                  const toggleSplitAll = () => {
+                    setItemAssignments(prev => ({ ...prev, [item.id]: guests.map(g => g.id) }));
+                    setSelectedItems(prev => prev.filter(id => id !== item.id));
+                    setExpandedItem(null);
+                  };
+
+                  return (
+                    <div key={item.id} className={`rounded-2xl border-2 transition-all ${isSelected ? 'border-primary bg-primary/5' : 'border-border bg-background'}`}>
+                      <button onClick={() => setExpandedItem(expanded ? null : item.id)} className="w-full flex items-center gap-3 p-3">
+                        <div onClick={(e) => { e.stopPropagation(); toggleSelect(); }} className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 cursor-pointer ${isSelected ? 'border-primary bg-primary' : 'border-muted-foreground/30'}`}>
+                          {isSelected && <Check className="w-3 h-3 text-primary-foreground" />}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <p className="text-sm font-medium text-foreground">{item.name}{item.quantity > 1 ? ` x${item.quantity}` : ''}</p>
+                          <p className="text-xs text-primary">Você</p>
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">R$ {item.price.toFixed(0)}</span>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform ${expanded ? 'rotate-180' : ''}`} />
+                      </button>
+                      {expanded && (
+                        <div className="px-3 pb-3">
+                          <button onClick={toggleSplitAll} className="w-full flex items-center gap-3 p-3 rounded-xl bg-muted/50">
+                            <Users className={`w-5 h-5 text-muted-foreground`} />
+                            <div className="flex-1 text-left">
+                              <p className="text-sm font-medium text-foreground">Dividir por todos</p>
+                              <p className="text-xs text-muted-foreground">R$ {perPerson.toFixed(2)} p/ cada ({guests.length} pessoas)</p>
+                            </div>
+                            <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-3 rounded-xl bg-primary/5 border border-primary/20">
+              <div className="flex justify-between text-sm">
+                <span className="text-foreground font-medium">Você paga</span>
+                <span className="text-primary font-bold">R$ {getSelectiveMyTotal().toFixed(2)}</span>
+              </div>
             </div>
           </div>
         )}
@@ -1000,18 +1120,29 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
               <span className="text-3xl font-bold text-foreground">R$ {fixedAmount}</span>
               <button onClick={() => setFixedAmount(Math.min(totalWithService, fixedAmount + 10))} className="w-12 h-12 rounded-full bg-muted text-xl font-bold text-muted-foreground">+</button>
             </div>
+            <p className="text-[10px] text-muted-foreground mt-2 text-center">Restante: R$ {Math.max(0, totalWithService - paidByOthers - fixedAmount).toFixed(2)} para os demais</p>
           </div>
         )}
 
+        {/* Summary */}
         <div className="p-4 rounded-2xl bg-card border border-border">
-          <h3 className="font-semibold text-foreground mb-3">Resumo da sua parte</h3>
+          <h3 className="font-semibold text-foreground mb-3">Resumo</h3>
           <div className="space-y-2 text-sm">
-            <div className="flex justify-between"><span className="text-muted-foreground">Sua parte</span><span className="text-foreground">R$ {mySubtotal.toFixed(2)}</span></div>
-            {payMode === 'split' && sharedTotal > 0 && (
-              <div className="flex justify-between text-accent"><span className="flex items-center gap-1"><Users className="w-3 h-3" />Itens compartilhados</span><span>R$ {mySharedPortion.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Subtotal ({cart.reduce((s, c) => s + c.quantity, 0)} itens)</span><span className="text-foreground">R$ {totalOrder.toFixed(2)}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">Taxa de serviço (10%)</span><span className="text-foreground">R$ {serviceCharge.toFixed(2)}</span></div>
+            {payMode === 'split' && splitMode === 'equal' && guests.length > 1 && (
+              <div className="flex justify-between text-primary"><span>Sua parte (÷ {unpaidGuests.length})</span><span>R$ {mySubtotal.toFixed(2)}</span></div>
+            )}
+            {payMode === 'split' && splitMode === 'individual' && (
+              <div className="flex justify-between text-primary"><span>Meus itens</span><span>R$ {mySubtotal.toFixed(2)}</span></div>
+            )}
+            {payMode === 'split' && splitMode === 'selective' && selectedItems.length > 0 && (
+              <div className="flex justify-between text-primary"><span>Itens selecionados ({selectedItems.length})</span><span>R$ {mySubtotal.toFixed(2)}</span></div>
+            )}
+            {payMode === 'split' && splitMode === 'fixed' && (
+              <div className="flex justify-between text-primary"><span>Valor definido</span><span>R$ {mySubtotal.toFixed(2)}</span></div>
             )}
             {tipPercent > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Gorjeta ({tipPercent}%)</span><span className="text-foreground">R$ {myTip.toFixed(2)}</span></div>}
-            {paidByOthers > 0 && <div className="flex justify-between text-success"><span>Pago por outros</span><span>- R$ {paidByOthers.toFixed(2)}</span></div>}
             <div className="border-t border-border pt-2 flex justify-between"><span className="font-semibold text-foreground">Você paga</span><span className="font-bold text-xl text-primary">R$ {myTotal.toFixed(2)}</span></div>
           </div>
         </div>
@@ -1026,22 +1157,32 @@ const FecharContaScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNa
   );
 };
 
-// ============ PAYMENT SUCCESS ============
+// ============ PAYMENT SUCCESS (connected to cart + guests) ============
 
-const PaymentSuccessScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNavigate }) => (
-  <DemoPaymentSuccess
-    heading="Pagamento Confirmado!"
-    subtitle="Bistrô Noowe agradece sua visita"
-    summaryItems={[
-      { label: 'Pontos ganhos', value: '+19 pts' },
-      { label: 'Valor restante da mesa', value: 'R$ 97,40' },
-      { label: 'João (pendente)', value: 'Aguardando', highlight: 'warning' },
-    ]}
-    loyaltyReward={{ points: 'Nível Gold · 1.269 pts', description: 'Faltam 731 pts para Platinum' }}
-    primaryAction={{ label: 'Ver Programa de Fidelidade', onClick: () => onNavigate('loyalty'), icon: Gift }}
-    secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
-  />
-);
+const PaymentSuccessScreen: React.FC<{ onNavigate: (s: string) => void; total: number; guests: DemoGuest[] }> = ({ onNavigate, total, guests }) => {
+  const { cart } = useDemoContext();
+  const itemCount = cart.reduce((s, c) => s + c.quantity, 0);
+  const pointsEarned = Math.round(total * 0.1);
+  const unpaidGuests = guests.filter(g => !g.paid && g.id !== 'you');
+
+  return (
+    <DemoPaymentSuccess
+      heading="Pagamento Confirmado!"
+      subtitle="Bistrô Noowe agradece sua visita"
+      summaryItems={[
+        { label: `${itemCount} itens pagos`, value: `R$ ${total.toFixed(2)}` },
+        { label: 'Pontos ganhos', value: `+${pointsEarned} pts`, highlight: 'success' },
+        ...(unpaidGuests.length > 0
+          ? unpaidGuests.map(g => ({ label: `${g.name} (pendente)`, value: 'Aguardando', highlight: 'warning' as const }))
+          : [{ label: 'Todos pagaram', value: '✓ Completo', highlight: 'success' as const }]
+        ),
+      ]}
+      loyaltyReward={{ points: `Nível Gold · ${1250 + pointsEarned} pts`, description: `Faltam ${Math.max(0, 750 - pointsEarned)} pts para Platinum` }}
+      primaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
+      secondaryAction={{ label: 'Ver Programa de Fidelidade', onClick: () => onNavigate('loyalty') }}
+    />
+  );
+};
 
 // ============ RESERVATIONS ============
 
@@ -1170,26 +1311,55 @@ const LoyaltyScreen: React.FC<{ onNavigate: (s: string) => void }> = ({ onNaviga
   );
 };
 
+// Need CakeSlice for AI harmonization
+const CakeSlice = ({ className }: { className?: string }) => <UtensilsCrossed className={className} />;
+
 // ============ MAIN COMPONENT ============
+
+const DEFAULT_GUESTS: DemoGuest[] = [
+  { id: 'you', name: 'Você', initial: 'V', color: 'bg-primary', paid: false },
+];
 
 export const FineDiningDemo: React.FC<{ screen: string; onNavigate: (s: string) => void }> = ({ screen, onNavigate }) => {
   const [selectedItem, setSelectedItem] = useState<DemoMenuItem | null>(null);
+  const [guests, setGuests] = useState<DemoGuest[]>(DEFAULT_GUESTS);
+  const { cart, cartTotal } = useDemoContext();
 
   const handleSelectItem = (item: DemoMenuItem) => {
     setSelectedItem(item);
     onNavigate('item');
   };
 
+  const addGuest = (name: string) => {
+    const id = name.toLowerCase().replace(/\s+/g, '-');
+    if (guests.find(g => g.id === id)) return;
+    const colors = ['bg-secondary', 'bg-accent', 'bg-warning', 'bg-destructive'];
+    setGuests(prev => [...prev, {
+      id, name, initial: name.charAt(0).toUpperCase(),
+      color: colors[(prev.length - 1) % colors.length],
+      paid: false,
+    }]);
+  };
+
+  const markGuestPaid = (guestId: string) => {
+    setGuests(prev => prev.map(g => g.id === guestId ? { ...g, paid: true } : g));
+  };
+
+  const serviceRate = 0.1;
+  const subtotal = cartTotal;
+  const service = Math.round(subtotal * serviceRate);
+  const total = subtotal + service;
+
   switch (screen) {
     case 'home': return <HomeScreen onNavigate={onNavigate} />;
     case 'restaurant': return <RestaurantScreen onNavigate={onNavigate} />;
     case 'menu': return <MenuScreen onNavigate={onNavigate} onSelectItem={handleSelectItem} />;
     case 'item': return selectedItem ? <ItemDetailScreen item={selectedItem} onNavigate={onNavigate} /> : <HomeScreen onNavigate={onNavigate} />;
-    case 'comanda': return <ComandaScreen onNavigate={onNavigate} />;
+    case 'comanda': return <ComandaScreen onNavigate={onNavigate} guests={guests} onAddGuest={addGuest} />;
     case 'fechar-conta':
     case 'payment':
-      return <FecharContaScreen onNavigate={onNavigate} />;
-    case 'order-status': return <OrderStatusScreen onNavigate={onNavigate} />;
+      return <FecharContaScreen onNavigate={onNavigate} guests={guests} onAddGuest={addGuest} onMarkPaid={markGuestPaid} />;
+    case 'order-status': return <OrderStatusScreen onNavigate={onNavigate} guests={guests} />;
     case 'loyalty': return <LoyaltyScreen onNavigate={onNavigate} />;
     case 'reservations': return <ReservationsScreen onNavigate={onNavigate} />;
     case 'qr-scan': return <QRScanScreen onNavigate={onNavigate} />;
@@ -1197,9 +1367,15 @@ export const FineDiningDemo: React.FC<{ screen: string; onNavigate: (s: string) 
     case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     case 'virtual-queue': return <VirtualQueueScreen onNavigate={onNavigate} />;
     case 'my-orders': return <MyOrdersScreen onNavigate={onNavigate} />;
-    case 'payment-success': return <PaymentSuccessScreen onNavigate={onNavigate} />;
+    case 'payment-success': return <PaymentSuccessScreen onNavigate={onNavigate} total={total} guests={guests} />;
     case 'notifications': return <NotificationsScreen onNavigate={onNavigate} />;
     case 'ai-harmonization': return <AIHarmonizationScreen onNavigate={onNavigate} />;
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
     default: return <HomeScreen onNavigate={onNavigate} />;
   }
 };

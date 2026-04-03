@@ -2,10 +2,15 @@
  * Drive-Thru Demo — NOOWE Drive
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift,
   MapPin, Navigation, Car, ArrowRight, Loader2, Radio, Zap, Sparkles,
@@ -13,9 +18,11 @@ import {
   UtensilsCrossed, Satellite, CircleParking,
 } from 'lucide-react';
 
-type Screen = 'home' | 'restaurant' | 'menu' | 'customize' | 'cart' | 'payment' | 'gps-tracking' | 'geofence' | 'lane-assign' | 'pickup' | 'done';
+type Screen = 'home' | 'restaurant' | 'menu' | 'customize' | 'cart' | 'payment' | 'gps-tracking' | 'geofence' | 'lane-assign' | 'pickup' | 'done'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Pedir no caminho', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Montar pedido', screens: ['menu', 'customize', 'cart'] },
   { step: 3, label: 'Pagamento antecipado', screens: ['payment'] },
@@ -23,6 +30,9 @@ export const JOURNEY_STEPS = [
   { step: 5, label: 'Geofencing (500m)', screens: ['geofence'] },
   { step: 6, label: 'Pista designada', screens: ['lane-assign'] },
   { step: 7, label: 'Retirada & avaliação', screens: ['pickup', 'done'] },
+  { step: 8, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 9, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 10, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -37,6 +47,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'lane-assign': { title: 'Pista Designada', desc: 'Siga para a pista indicada pelo app.' },
   'pickup': { title: 'Retirada', desc: 'Pedido pronto e pago — retire na janela.' },
   'done': { title: 'Concluído', desc: 'Entrega sem espera. Avalie a experiência.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 const MENU_ITEMS = [
@@ -55,6 +72,7 @@ interface CartItem { id: string; qty: number; notes: string; }
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [cart, setCart] = useState<CartItem[]>([
     { id: 'classic', qty: 1, notes: 'Sem cebola, molho extra' },
     { id: 'sundae', qty: 1, notes: 'Chocolate' },
@@ -304,7 +322,11 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           infoBanner={{ icon: Zap, text: 'Pré-pagamento = retirada express (sem parar no caixa)', variant: 'success' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('cart')}
-          onConfirm={() => { setDistance(5.2); setGeoTriggered(false); onNavigate('gps-tracking'); }}
+          onConfirm={() => {
+            const items = cart.map(c => { const m = MENU_ITEMS.find(i => i.id === c.id); return { name: m?.name || c.id, price: m?.price || 0, quantity: c.qty, prepTime: 8 }; });
+            pushExternalOrder(items, cartTotal, 'NOOWE Drive');
+            setDistance(5.2); setGeoTriggered(false); onNavigate('gps-tracking');
+          }}
           ctaLabel={`Confirmar R$ ${cartTotal - 5}`}
         />
       );
@@ -396,10 +418,18 @@ export const DriveThruDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           ]}
           loyaltyReward={{ points: `+${Math.round(cartTotal / 5)} pontos ganhos!`, description: 'Stamp #12 — próximo combo grátis!' }}
           badge={{ text: 'Sem sair do carro. Sem esperar. Sem fila.' }}
-          primaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
+          primaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
+          secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
         />
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

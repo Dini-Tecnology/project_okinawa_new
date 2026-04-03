@@ -3,10 +3,15 @@
  * Deep UX: Discovery → Saved Bowls → Dish Builder (4 steps) → Allergy/Nutrition → Favorites → Payment → Live Prep → Pickup → Rating
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoOrderStatus, { ORDER_STEPS } from '../DemoOrderStatus';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Loader2, Star, Clock, ChevronRight,
@@ -19,9 +24,11 @@ import {
 type Screen =
   | 'home' | 'restaurant' | 'saved-bowls'
   | 'builder-base' | 'builder-protein' | 'builder-toppings' | 'builder-sauce'
-  | 'builder-summary' | 'allergies' | 'payment' | 'prep-tracking' | 'ready' | 'rating';
+  | 'builder-summary' | 'allergies' | 'payment' | 'prep-tracking' | 'ready' | 'rating'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Bowls salvos ou novo', screens: ['saved-bowls'] },
   { step: 3, label: 'Montar prato (4 etapas)', screens: ['builder-base', 'builder-protein', 'builder-toppings', 'builder-sauce'] },
@@ -29,6 +36,9 @@ export const JOURNEY_STEPS = [
   { step: 5, label: 'Pagamento', screens: ['payment'] },
   { step: 6, label: 'Preparo em tempo real', screens: ['prep-tracking'] },
   { step: 7, label: 'Retirada & avaliação', screens: ['ready', 'rating'] },
+  { step: 8, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 9, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 10, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -45,6 +55,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'prep-tracking': { title: 'Preparando', desc: 'Acompanhe cada etapa do preparo em tempo real.' },
   'ready': { title: 'Pronto!', desc: 'Retire na bandeja com seu nome.' },
   'rating': { title: 'Avaliação', desc: 'Avalie e ganhe pontos extras.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 const BASES = [
@@ -86,6 +103,7 @@ const SAUCES = [
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [base, setBase] = useState('quinoa');
   const [protein, setProtein] = useState('chicken');
   const [toppings, setToppings] = useState<string[]>(['tomato', 'corn', 'avocado']);
@@ -148,15 +166,32 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
     </div>
   );
 
-  // Running cal indicator
-  const CalBadge = () => (
-    <div className="mx-5 mb-3 flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/50">
-      <Flame className="w-3.5 h-3.5 text-primary" />
-      <span className="text-xs font-semibold">{totalCal} kcal</span>
-      <span className="text-[10px] text-muted-foreground">· {totalProt}g prot</span>
-      <span className="ml-auto text-xs font-bold text-primary">R$ {totalPrice}</span>
-    </div>
-  );
+  // Running cal indicator with dynamic macro bars
+  const CalBadge = () => {
+    const macros = [
+      { label: 'Calorias', value: totalCal, max: 800, unit: 'kcal', color: 'bg-orange-500' },
+      { label: 'Proteína', value: totalProt, max: 60, unit: 'g', color: 'bg-blue-500' },
+      { label: 'Carbos', value: totalCarbs, max: 100, unit: 'g', color: 'bg-amber-500' },
+      { label: 'Fibras', value: totalFiber, max: 15, unit: 'g', color: 'bg-green-500' },
+    ];
+    return (
+      <div className="mx-5 mb-3 p-3 rounded-xl bg-muted/50 space-y-1.5">
+        <div className="flex items-center justify-between mb-0.5">
+          <div className="flex items-center gap-1.5"><Flame className="w-3.5 h-3.5 text-primary" /><span className="text-xs font-bold">{totalCal} kcal</span></div>
+          <span className="text-xs font-bold text-primary">R$ {totalPrice}</span>
+        </div>
+        {macros.map(m => (
+          <div key={m.label} className="flex items-center gap-2">
+            <span className="text-[9px] text-muted-foreground w-12">{m.label}</span>
+            <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className={`h-full ${m.color} rounded-full transition-all duration-300`} style={{ width: `${Math.min(100, (m.value / m.max) * 100)}%` }} />
+            </div>
+            <span className="text-[9px] font-semibold w-10 text-right">{m.value}{m.unit}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   switch (screen) {
     case 'home':
@@ -533,7 +568,10 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           estimatedTime="8-10 min"
           fullMethodGrid={true}
           onBack={() => onNavigate('builder-summary')}
-          onConfirm={() => onNavigate('prep-tracking')}
+          onConfirm={() => {
+            pushExternalOrder([{ name: `Bowl: ${baseItem.name} + ${proteinItem.name}`, price: totalPrice, quantity: 1, prepTime: 10 }], totalPrice, 'NOOWE Fresh');
+            onNavigate('prep-tracking');
+          }}
           ctaLabel="Confirmar Pagamento"
         />
       );
@@ -606,13 +644,20 @@ export const FastCasualDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <button key={tag} className="px-3 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-medium border border-primary/20">{tag}</button>
             ))}
           </div>
-          <button onClick={() => onNavigate('home')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
             <ThumbsUp className="w-5 h-5" />Enviar Avaliação
           </button>
-          <button onClick={() => onNavigate('home')} className="w-full mt-2 py-3 text-sm text-muted-foreground">Pular</button>
+          <button onClick={() => onNavigate('wallet')} className="w-full mt-2 py-3 text-sm text-muted-foreground">Ver Carteira</button>
         </div>
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

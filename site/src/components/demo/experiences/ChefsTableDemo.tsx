@@ -2,9 +2,14 @@
  * Chef's Table Demo — Mesa do Chef Noowe
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import { FoodImg } from '../FoodImages';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import {
   ArrowLeft, Check, Star, Clock, CreditCard, Gift, Calendar,
   Crown, ChefHat, Wine, Camera, ArrowRight, Sparkles, Heart, Flame,
@@ -12,9 +17,11 @@ import {
   MapPin, Shirt, Timer, ClipboardList, Trophy,
 } from 'lucide-react';
 
-type Screen = 'home' | 'detail' | 'reservation' | 'dietary' | 'wine-pref' | 'payment' | 'countdown' | 'welcome' | 'course-1' | 'course-2' | 'course-3' | 'photo' | 'finale';
+type Screen = 'home' | 'detail' | 'reservation' | 'dietary' | 'wine-pref' | 'payment' | 'countdown' | 'welcome' | 'course-1' | 'course-2' | 'course-3' | 'photo' | 'finale'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir experiência', screens: ['home', 'detail'] },
   { step: 2, label: 'Reserva exclusiva', screens: ['reservation'] },
   { step: 3, label: 'Preferências alimentares', screens: ['dietary'] },
@@ -24,6 +31,9 @@ export const JOURNEY_STEPS = [
   { step: 7, label: 'Dia da experiência', screens: ['welcome'] },
   { step: 8, label: 'Degustação (3 cursos)', screens: ['course-1', 'course-2', 'course-3'] },
   { step: 9, label: 'Foto & encerramento', screens: ['photo', 'finale'] },
+  { step: 10, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 11, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 12, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -40,11 +50,19 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'course-3': { title: 'Sobremesa', desc: 'Grand finale com soufflé e espumante.' },
   'photo': { title: 'Foto', desc: 'Registro com o chef e menu assinado.' },
   'finale': { title: 'Certificado', desc: 'Certificado digital e avaliação da experiência.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [selectedDate, setSelectedDate] = useState(0);
   const [guests, setGuests] = useState(2);
 
@@ -252,7 +270,10 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               ))}
             </div>
           </div>
-          <button onClick={() => onNavigate('payment')} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
+          <button onClick={() => {
+            pushExternalOrder([{ name: 'Experiência Mesa do Chef', price: guests * 680, quantity: 1, prepTime: 120 }], guests * 680, 'Mesa do Chef Noowe');
+            onNavigate('payment');
+          }} className="w-full py-4 bg-gradient-to-r from-primary to-accent text-primary-foreground font-bold rounded-xl shadow-glow flex items-center justify-center gap-2">
             <CreditCard className="w-5 h-5" />Confirmar & Pagar R$ {guests * 680}
           </button>
         </div>
@@ -497,10 +518,18 @@ export const ChefsTableDemo: React.FC<Props> = ({ onNavigate, screen }) => {
             { label: 'Vinhos', value: '5' },
             { label: 'Avaliação', value: '★★★★★' },
           ]}
+          primaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
           secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
         />
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

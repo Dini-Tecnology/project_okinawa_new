@@ -3,9 +3,14 @@
  * Deep UX: Discovery → Occupation/Menu → QR Check-in → Browse Stations → Smart Scale (multi-weigh) → Drinks Order → Live Comanda → Payment → Rating
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, CreditCard, Gift, QrCode,
@@ -13,9 +18,11 @@ import {
   Loader2, RefreshCw, AlertCircle, ChefHat, Minus, Zap, Bell,
 } from 'lucide-react';
 
-type Screen = 'home' | 'restaurant' | 'checkin' | 'stations' | 'scale' | 'scale-history' | 'drinks' | 'comanda' | 'payment' | 'payment-success';
+type Screen = 'home' | 'restaurant' | 'checkin' | 'stations' | 'scale' | 'scale-history' | 'drinks' | 'comanda' | 'payment' | 'payment-success'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir buffet', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Check-in digital', screens: ['checkin'] },
   { step: 3, label: 'Estações ao vivo', screens: ['stations'] },
@@ -23,6 +30,9 @@ export const JOURNEY_STEPS = [
   { step: 5, label: 'Pedir bebidas', screens: ['drinks'] },
   { step: 6, label: 'Comanda em tempo real', screens: ['comanda'] },
   { step: 7, label: 'Pagamento sem fila', screens: ['payment', 'payment-success'] },
+  { step: 8, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 9, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 10, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -36,6 +46,13 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'comanda': { title: 'Comanda', desc: 'Comanda ao vivo: comida por peso + bebidas + sobremesa.' },
   'payment': { title: 'Pagamento', desc: 'Pague sem fila no caixa.' },
   'payment-success': { title: 'Sucesso', desc: 'Pagamento confirmado com pontos e stamps.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 const STATIONS = [
@@ -60,6 +77,7 @@ const DRINK_MENU = [
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [weight, setWeight] = useState(0);
   const [weighing, setWeighing] = useState(false);
   const [weighHistory, setWeighHistory] = useState<number[]>([]);
@@ -384,7 +402,14 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           infoBanner={{ icon: Zap, text: 'Pague pelo app — sem fila no caixa!', variant: 'primary' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('comanda')}
-          onConfirm={() => onNavigate('payment-success')}
+          onConfirm={() => {
+            const items = [
+              { name: `Buffet ${totalWeight}g`, price: foodTotal, quantity: 1 },
+              ...selectedDrinks.map(sd => { const d = DRINK_MENU.find(dm => dm.id === sd.id); return { name: d?.name || sd.id, price: d?.price || 0, quantity: sd.qty }; }),
+            ];
+            pushExternalOrder(items, grandTotal, 'Sabores Noowe');
+            onNavigate('payment-success');
+          }}
         />
       );
 
@@ -398,10 +423,18 @@ export const BuffetDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           ]}
           loyaltyReward={{ points: `+${Math.round(grandTotal / 2)} pontos ganhos!`, description: 'Visita #5 — próxima sobremesa grátis!' }}
           badge={{ text: 'Peso médio: 520g · Estação favorita: Grelhados' }}
+          primaryAction={{ label: 'Ver Recibo Digital', onClick: () => onNavigate('digital-receipt') }}
           secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
         />
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

@@ -3,9 +3,14 @@
  * Deep journey: Discover → QR Scan → Work Mode → Coffee Customization → Comanda Live → Refill → Payment → Loyalty
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard,
@@ -15,7 +20,8 @@ import {
   Zap, X, ChevronDown, Users, Sparkles,
 } from 'lucide-react';
 
-type Screen = 'home' | 'restaurant' | 'qr-scan' | 'work-mode' | 'menu' | 'customize' | 'comanda' | 'payment' | 'payment-success';
+type Screen = 'home' | 'restaurant' | 'qr-scan' | 'work-mode' | 'menu' | 'customize' | 'comanda' | 'payment' | 'payment-success' | 'stamp-card'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 interface CartItem {
   id: string;
@@ -54,12 +60,17 @@ const FLAVOR_OPTIONS = ['Baunilha', 'Caramelo', 'Avelã', 'Canela'];
 const TEMP_OPTIONS = ['Quente', 'Morno', 'Gelado'];
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir café', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Escanear QR da mesa', screens: ['qr-scan'] },
   { step: 3, label: 'Modo trabalho', screens: ['work-mode'] },
   { step: 4, label: 'Cardápio & personalização', screens: ['menu', 'customize'] },
   { step: 5, label: 'Comanda & refil', screens: ['comanda'] },
   { step: 6, label: 'Pagamento', screens: ['payment', 'payment-success'] },
+  { step: 7, label: 'Cartão de selos', screens: ['stamp-card'] },
+  { step: 8, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 9, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 10, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
@@ -72,11 +83,20 @@ export const SCREEN_INFO: Record<string, { title: string; desc: string }> = {
   'comanda': { title: 'Comanda', desc: 'Comanda aberta: adicione itens, peça refils e acompanhe o total sem sair da mesa.' },
   'payment': { title: 'Pagamento', desc: 'Pague quando quiser ir embora. PIX, cartão, Apple Pay ou carteira NOOWE.' },
   'payment-success': { title: 'Conta Fechada', desc: 'Pagamento confirmado com stamp card: a cada 10 cafés, o próximo é grátis.' },
+  'stamp-card': { title: 'Cartão Fidelidade', desc: 'Cartão de selos do café: a cada 10 cafés, o próximo é por nossa conta. Acompanhe seu progresso e resgate prêmios.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface Props { onNavigate: (s: string) => void; screen: string; }
 
 export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [scanned, setScanned] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedItem, setSelectedItem] = useState<typeof CAFE_MENU[0] | null>(null);
@@ -553,7 +573,10 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           loyalty={{ title: 'Café #8 de 10!', subtitle: 'Mais 2 cafés e o próximo é grátis ☕' }}
           fullMethodGrid={true}
           onBack={() => onNavigate('comanda')}
-          onConfirm={() => onNavigate('payment-success')}
+          onConfirm={() => {
+            pushExternalOrder(cart.map(c => ({ name: c.name, price: c.price, quantity: 1 })), cartTotal, 'Café Noowe');
+            onNavigate('payment-success');
+          }}
         />
       );
 
@@ -564,10 +587,115 @@ export const CafeBakeryDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           subtitle={`Obrigado pela visita — Sessão: ${sessionMinutes}min · Mesa 3`}
           loyaltyReward={{ points: `+${Math.round(cartTotal / 5)} pontos ganhos!`, description: '8 de 10 cafés — mais 2 e o próximo é GRÁTIS!' }}
           badge={{ text: 'Cartão Fidelidade Café · 8/10 selos' }}
+          primaryAction={{ label: 'Ver Cartão Fidelidade', onClick: () => onNavigate('stamp-card') }}
           secondaryAction={{ label: 'Voltar ao Início', onClick: () => onNavigate('home') }}
         />
       );
 
+    case 'stamp-card': {
+      const cafeStamps = 8;
+      const cafeTotal = 10;
+      const cafeRewards = [
+        { stamps: 3, label: 'Cookie grátis', redeemed: true },
+        { stamps: 5, label: 'Qualquer chá grátis', redeemed: true },
+        { stamps: 8, label: 'Upgrade de tamanho grátis', redeemed: false, current: true },
+        { stamps: 10, label: '☕ Café Especial Grátis!', redeemed: false },
+      ];
+      return (
+        <div className="px-5 pb-4">
+          <div className="flex items-center justify-between py-4">
+            <button onClick={() => onNavigate('payment-success')} className="w-8 h-8 rounded-full bg-muted flex items-center justify-center"><ArrowLeft className="w-4 h-4" /></button>
+            <h1 className="font-display font-bold">Cartão Fidelidade</h1>
+            <div className="w-8" />
+          </div>
+
+          {/* Card visual */}
+          <div className="p-5 rounded-2xl bg-gradient-to-br from-amber-700/15 via-orange-600/10 to-amber-800/5 border border-amber-700/20 mb-5">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-2"><Coffee className="w-5 h-5 text-amber-700" /><span className="font-display font-bold text-lg">Café Noowe</span></div>
+              <span className="px-2 py-0.5 rounded-full bg-amber-700/20 text-amber-700 text-[10px] font-bold">Frequente</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">A cada 10 cafés, o próximo é por nossa conta!</p>
+
+            <div className="grid grid-cols-5 gap-2 mb-3">
+              {Array.from({ length: cafeTotal }).map((_, i) => (
+                <div key={i} className={`aspect-square rounded-xl flex flex-col items-center justify-center border-2 transition-all ${i < cafeStamps ? 'bg-amber-700 border-amber-700' : i === cafeStamps ? 'border-amber-700/40 bg-amber-700/5 animate-pulse' : 'border-border bg-muted/30'}`}>
+                  {i < cafeStamps ? (
+                    <Coffee className="w-4 h-4 text-white" />
+                  ) : (
+                    <span className="text-xs font-bold text-muted-foreground">{i + 1}</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-semibold">{cafeStamps}/{cafeTotal} cafés</p>
+              <p className="text-xs text-amber-700 font-semibold">Faltam {cafeTotal - cafeStamps}!</p>
+            </div>
+          </div>
+
+          {/* Progress */}
+          <div className="mb-5">
+            <div className="flex justify-between text-xs mb-1">
+              <span className="text-muted-foreground">Progresso</span>
+              <span className="font-semibold text-amber-700">{Math.round((cafeStamps / cafeTotal) * 100)}%</span>
+            </div>
+            <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-amber-700 to-orange-500 rounded-full transition-all" style={{ width: `${(cafeStamps / cafeTotal) * 100}%` }} />
+            </div>
+          </div>
+
+          {/* Rewards */}
+          <h3 className="font-semibold text-sm mb-3">Recompensas</h3>
+          <div className="space-y-2 mb-5">
+            {cafeRewards.map((r, i) => (
+              <div key={i} className={`flex items-center gap-3 p-3 rounded-xl border transition-all ${r.current ? 'border-amber-700 bg-amber-700/5' : r.redeemed ? 'border-border bg-muted/20' : 'border-border'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${r.redeemed ? 'bg-success/20 text-success' : r.current ? 'bg-amber-700/20 text-amber-700' : 'bg-muted text-muted-foreground'}`}>
+                  {r.redeemed ? <Check className="w-4 h-4" /> : r.stamps}
+                </div>
+                <div className="flex-1">
+                  <p className={`text-sm font-medium ${r.redeemed ? 'line-through text-muted-foreground' : ''}`}>{r.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{r.redeemed ? 'Resgatado ✓' : r.current ? 'Disponível agora!' : `Ao completar ${r.stamps} cafés`}</p>
+                </div>
+                {r.current && <button className="px-3 py-1.5 rounded-lg bg-amber-700 text-white text-xs font-bold">Resgatar</button>}
+              </div>
+            ))}
+          </div>
+
+          {/* History */}
+          <h3 className="font-semibold text-sm mb-2">Últimos cafés</h3>
+          <div className="space-y-1.5 mb-4">
+            {[
+              { date: 'Hoje', item: 'Cappuccino M + Croissant', stamp: true },
+              { date: 'Ontem', item: 'Latte G com Baunilha', stamp: true },
+              { date: '30 Mar', item: 'Café Filtrado + Refil', stamp: true },
+              { date: '28 Mar', item: 'Cold Brew + Brownie', stamp: true },
+            ].map((v, i) => (
+              <div key={i} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/30">
+                <span className="text-xs text-muted-foreground w-12">{v.date}</span>
+                <span className="text-sm flex-1">{v.item}</span>
+                <span className="px-2 py-0.5 rounded-full bg-amber-700/10 text-amber-700 text-[9px] font-bold">+1 ☕</span>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-amber-700 text-white rounded-xl font-semibold">
+            Ver Recibo Digital
+          </button>
+          <button onClick={() => onNavigate('home')} className="w-full mt-2 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground">
+            Voltar ao Início
+          </button>
+        </div>
+      );
+    }
+
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };

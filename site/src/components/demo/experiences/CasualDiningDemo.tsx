@@ -4,10 +4,15 @@
  * Rich Menu with allergens/popularity → Per-Person Ordering → Interactive Split Bill → Tip & Loyalty → Review
  */
 import React, { useState, useEffect } from 'react';
+import { useDemoContext } from '@/contexts/DemoContext';
 import { GuidedHint, ItemIcon } from '../DemoShared';
 import DemoSplitBill from '../DemoSplitBill';
 import DemoPayment from '../DemoPayment';
 import DemoPaymentSuccess from '../DemoPaymentSuccess';
+import {
+  AuthLoginScreen, AuthRegisterScreen, OnboardingScreen,
+  WalletScreen, DigitalReceiptScreen, SupportScreen, ProfileScreen,
+} from '../ClientExtendedScreens';
 import { FoodImg } from '../FoodImages';
 import {
   ArrowLeft, Check, Star, Clock, Plus, Minus, CreditCard, Gift, QrCode,
@@ -16,24 +21,31 @@ import {
   Bell, MessageCircle, ThumbsUp, Sparkles, Wine, Dog, Sun, CircleParking,
   Accessibility, Lightbulb, GlassWater, ClipboardList, Palette, Puzzle,
   Map, ChefHat, Scale, DollarSign, Receipt, Wallet, Award, Trophy,
-  User, CircleUser,
+  User, CircleUser, Cake, PartyPopper, Music, Camera,
 } from 'lucide-react';
 
 type Screen =
   | 'home' | 'restaurant' | 'entry-choice' | 'waitlist' | 'waitlist-bar'
   | 'family-mode' | 'family-activities' | 'menu' | 'item-detail'
-  | 'comanda' | 'split' | 'split-by-item' | 'tip' | 'payment-success' | 'review';
+  | 'comanda' | 'split' | 'split-by-item' | 'tip' | 'payment-success' | 'review'
+  | 'birthday-setup' | 'party-management'
+  | 'auth-login' | 'auth-register' | 'onboarding' | 'wallet' | 'digital-receipt' | 'support' | 'profile';
 
 export const JOURNEY_STEPS = [
+  { step: 0, label: 'Entrar / Cadastrar', screens: ['auth-login', 'auth-register', 'onboarding'] },
   { step: 1, label: 'Descobrir restaurante', screens: ['home', 'restaurant'] },
   { step: 2, label: 'Walk-in ou reserva', screens: ['entry-choice'] },
-  { step: 3, label: 'Lista de espera inteligente', screens: ['waitlist', 'waitlist-bar'] },
-  { step: 4, label: 'Modo família', screens: ['family-mode', 'family-activities'] },
-  { step: 5, label: 'Cardápio interativo', screens: ['menu', 'item-detail'] },
-  { step: 6, label: 'Comanda por pessoa', screens: ['comanda'] },
-  { step: 7, label: 'Dividir conta', screens: ['split', 'split-by-item'] },
-  { step: 8, label: 'Gorjeta & pagamento', screens: ['tip', 'payment-success'] },
-  { step: 9, label: 'Avaliação & fidelidade', screens: ['review'] },
+  { step: 3, label: 'Aniversário & festas', screens: ['birthday-setup', 'party-management'] },
+  { step: 4, label: 'Lista de espera inteligente', screens: ['waitlist', 'waitlist-bar'] },
+  { step: 5, label: 'Modo família', screens: ['family-mode', 'family-activities'] },
+  { step: 6, label: 'Cardápio interativo', screens: ['menu', 'item-detail'] },
+  { step: 7, label: 'Comanda por pessoa', screens: ['comanda'] },
+  { step: 8, label: 'Dividir conta', screens: ['split', 'split-by-item'] },
+  { step: 9, label: 'Gorjeta & pagamento', screens: ['tip', 'payment-success'] },
+  { step: 10, label: 'Avaliação & fidelidade', screens: ['review'] },
+  { step: 11, label: 'Recibo digital', screens: ['digital-receipt'] },
+  { step: 12, label: 'Carteira & perfil', screens: ['wallet', 'profile'] },
+  { step: 13, label: 'Ajuda & Suporte', screens: ['support'] },
 ];
 
 export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
@@ -52,6 +64,15 @@ export const SCREEN_INFO: Record<Screen, { title: string; desc: string }> = {
   'tip': { title: 'Gorjeta', desc: 'Gorjeta sugerida com base no serviço.' },
   'payment-success': { title: 'Pagamento', desc: 'Confirmação com pontos de fidelidade.' },
   'review': { title: 'Avaliação', desc: 'Avalie comida, serviço e ambiente.' },
+  'auth-login': { title: 'Login', desc: 'Acesse sua conta por e-mail, social login ou biometria.' },
+  'auth-register': { title: 'Cadastro', desc: 'Cadastro rápido — nome, e-mail, celular e senha.' },
+  'onboarding': { title: 'Onboarding', desc: 'Apresentação rápida das funcionalidades do app.' },
+  'wallet': { title: 'Carteira Digital', desc: 'Saldo, cashback, métodos de pagamento, extrato e resgates.' },
+  'digital-receipt': { title: 'Recibo Digital', desc: 'Recibo completo com NFC-e, exportação PDF e compartilhamento.' },
+  'support': { title: 'Ajuda & Suporte', desc: 'FAQ, chat ao vivo, WhatsApp e histórico de chamados.' },
+  'birthday-setup': { title: 'Aniversário', desc: 'Configure uma comemoração especial — bolo, decoração e surpresas.' },
+  'party-management': { title: 'Gestão de Festa', desc: 'Gerencie mesas unificadas, pedidos em grupo e conta centralizada ou dividida.' },
+  'profile': { title: 'Meu Perfil', desc: 'Perfil com histórico, favoritos, nível de fidelidade e configurações.' },
 };
 
 interface MenuItem {
@@ -90,6 +111,7 @@ const PEOPLE = [
 interface Props { onNavigate: (s: Screen) => void; screen: Screen; }
 
 export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
+  const { pushExternalOrder } = useDemoContext();
   const [queuePos, setQueuePos] = useState(3);
   const [familyMode, setFamilyMode] = useState(false);
   const [selectedCat, setSelectedCat] = useState('Todas');
@@ -104,6 +126,8 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
   const [splitMode, setSplitMode] = useState<'mine' | 'equal' | 'by-item' | 'fixed'>('mine');
   const [tipPct, setTipPct] = useState(10);
   const [ratings, setRatings] = useState({ food: 0, service: 0, ambiance: 0 });
+  const [birthdayName, setBirthdayName] = useState('Sofia');
+  const [partyTables, setPartyTables] = useState([8, 9]);
   const [waitlistDrinks] = useState([
     { name: 'Caipirinha', price: 22, cat: 'drink', imgId: 'cocktail' },
     { name: 'Cerveja Artesanal', price: 18, cat: 'beer', imgId: 'ipa' },
@@ -286,6 +310,16 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
                 ))}
               </div>
             </button>
+            <button onClick={() => onNavigate('birthday-setup')} className="w-full p-4 rounded-2xl border-2 border-accent/30 bg-accent/5 text-left flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center">
+                <Cake className="w-5 h-5 text-accent" />
+              </div>
+              <div className="flex-1">
+                <p className="font-bold text-sm text-accent">Aniversário / Festa</p>
+                <p className="text-xs text-muted-foreground">Decoração, bolo e mesas unificadas</p>
+              </div>
+              <ChevronRight className="w-4 h-4 text-accent" />
+            </button>
             <button className="w-full p-4 rounded-2xl border-2 border-border bg-card text-left flex items-center gap-3">
               <QrCode className="w-6 h-6 text-muted-foreground" />
               <div>
@@ -294,6 +328,107 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               </div>
             </button>
           </div>
+        </div>
+      );
+
+    case 'birthday-setup':
+      return (
+        <div className="px-5 pb-4">
+          <Header title="Aniversário" back="entry-choice" />
+          <GuidedHint text="O restaurante detectou que hoje pode ser uma data especial!" />
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-accent/10 to-primary/10 border border-accent/20 mb-4 text-center">
+            <Cake className="w-10 h-10 text-accent mx-auto mb-2" />
+            <h2 className="font-display text-lg font-bold">Comemoração Especial?</h2>
+            <p className="text-xs text-muted-foreground mt-1">Configure tudo — nós cuidamos dos detalhes</p>
+          </div>
+          <div className="space-y-3 mb-4">
+            <div className="p-3 rounded-xl border border-border bg-card">
+              <p className="text-xs font-semibold mb-1">Quem é o aniversariante?</p>
+              <div className="flex gap-2">
+                {PEOPLE.map(p => (
+                  <button key={p.id} onClick={() => setBirthdayName(p.name)}
+                    className={`flex-1 p-2 rounded-lg text-center ${birthdayName === p.name ? 'bg-accent/10 border-2 border-accent' : 'bg-muted/30 border border-border'}`}>
+                    <div className={`w-7 h-7 rounded-full ${p.color} flex items-center justify-center text-primary-foreground text-[10px] font-bold mx-auto`}>{p.name[0]}</div>
+                    <p className="text-[9px] mt-0.5">{p.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+            {[
+              { icon: Cake, label: 'Bolo surpresa', desc: 'Brownie com vela · Cortesia', included: true },
+              { icon: Music, label: 'Parabéns musical', desc: 'Equipe canta na mesa', included: true },
+              { icon: Camera, label: 'Foto polaroid', desc: 'Foto impressa de lembrança', included: true },
+              { icon: PartyPopper, label: 'Decoração na mesa', desc: 'Balões e toalha especial', included: true },
+              { icon: Gift, label: 'Sobremesa extra', desc: 'Tiramisù ou gelato para o grupo', included: false },
+            ].map((opt, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${opt.included ? 'bg-accent/10' : 'bg-muted/30'}`}>
+                  <opt.icon className={`w-4 h-4 ${opt.included ? 'text-accent' : 'text-muted-foreground'}`} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{opt.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{opt.desc}</p>
+                </div>
+                {opt.included ? (
+                  <span className="px-2 py-0.5 rounded-full bg-success/10 text-success text-[9px] font-bold">Incluso</span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-muted text-muted-foreground text-[9px] font-medium">+R$ 35</span>
+                )}
+              </div>
+            ))}
+          </div>
+          <button onClick={() => onNavigate('party-management')} className="w-full py-4 bg-gradient-to-r from-accent to-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+            <PartyPopper className="w-5 h-5" /> Confirmar Celebração
+          </button>
+        </div>
+      );
+
+    case 'party-management':
+      return (
+        <div className="px-5 pb-4">
+          <Header title="Gestão da Festa" back="birthday-setup" />
+          <div className="p-3 rounded-xl bg-accent/5 border border-accent/20 mb-4 flex items-center gap-3">
+            <Cake className="w-5 h-5 text-accent" />
+            <div>
+              <p className="text-sm font-bold text-accent">Aniversário de {birthdayName}</p>
+              <p className="text-[10px] text-muted-foreground">Tudo configurado · Surpresa às 21:30</p>
+            </div>
+          </div>
+          <h3 className="font-semibold text-sm mb-2 flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary" /> Mesas Unificadas</h3>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {partyTables.map(t => (
+              <div key={t} className="p-3 rounded-xl bg-primary/5 border-2 border-primary text-center">
+                <p className="font-bold text-sm text-primary">Mesa {t}</p>
+                <p className="text-[9px] text-muted-foreground">{t === 8 ? '4 pessoas' : '4 pessoas'}</p>
+              </div>
+            ))}
+            <button onClick={() => setPartyTables(prev => [...prev, 10])} className="p-3 rounded-xl border-2 border-dashed border-border text-center">
+              <Plus className="w-4 h-4 mx-auto text-muted-foreground mb-0.5" />
+              <p className="text-[9px] text-muted-foreground">Juntar mesa</p>
+            </button>
+          </div>
+          <h3 className="font-semibold text-sm mb-2 flex items-center gap-1.5"><Users className="w-3.5 h-3.5 text-primary" /> Convidados ({PEOPLE.length + 4})</h3>
+          <div className="space-y-1.5 mb-4">
+            {[...PEOPLE, { id: 'g1', name: 'Tio Pedro', color: 'bg-emerald-500' }, { id: 'g2', name: 'Ana', color: 'bg-amber-500' }, { id: 'g3', name: 'Carlos', color: 'bg-cyan-500' }, { id: 'g4', name: 'Lúcia', color: 'bg-rose-500' }].map(p => (
+              <div key={p.id} className="flex items-center gap-2 py-1.5">
+                <div className={`w-7 h-7 rounded-full ${p.color} flex items-center justify-center text-primary-foreground text-[10px] font-bold`}>{p.name[0]}</div>
+                <span className="text-sm flex-1">{p.name}</span>
+                {p.name === birthdayName && <span className="px-2 py-0.5 rounded-full bg-accent/10 text-accent text-[9px] font-bold flex items-center gap-0.5"><Cake className="w-2.5 h-2.5" /> Aniversariante</span>}
+                <Check className="w-3.5 h-3.5 text-success" />
+              </div>
+            ))}
+          </div>
+          <div className="p-3 rounded-xl bg-muted/30 border border-border mb-4">
+            <p className="text-xs font-semibold mb-1">Conta da festa</p>
+            <div className="flex gap-3 text-[10px]">
+              <span className="px-2 py-1 rounded-lg bg-primary/10 text-primary font-semibold">Conta única</span>
+              <span className="px-2 py-1 rounded-lg bg-muted text-muted-foreground">Dividir por mesa</span>
+              <span className="px-2 py-1 rounded-lg bg-muted text-muted-foreground">Individual</span>
+            </div>
+          </div>
+          <button onClick={() => onNavigate('menu')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+            <UtensilsCrossed className="w-5 h-5" /> Ir para o Cardápio
+          </button>
         </div>
       );
 
@@ -713,7 +848,10 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
           tipBase={myTotal}
           fullMethodGrid={true}
           onBack={() => onNavigate('split')}
-          onConfirm={() => onNavigate('payment-success')}
+          onConfirm={() => {
+            pushExternalOrder(orders.map(o => ({ name: o.item.name, price: o.item.price, quantity: o.qty, prepTime: o.item.prepTime })), subtotal, 'Cantina Noowe');
+            onNavigate('payment-success');
+          }}
           ctaLabel={`Pagar R$ ${myTotal + Math.round(myTotal * 0.1) + Math.round(myTotal * tipPct / 100)}`}
         />
       );
@@ -765,12 +903,20 @@ export const CasualDiningDemo: React.FC<Props> = ({ onNavigate, screen }) => {
               <button key={tag} className="px-2.5 py-1 rounded-full bg-muted text-[10px] text-muted-foreground">{tag}</button>
             ))}
           </div>
-          <button onClick={() => onNavigate('home')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
+          <button onClick={() => onNavigate('digital-receipt')} className="w-full py-4 bg-primary text-primary-foreground rounded-xl font-bold shadow-glow flex items-center justify-center gap-2">
             <ThumbsUp className="w-5 h-5" /> Enviar Avaliação
           </button>
+          <button onClick={() => onNavigate('wallet')} className="w-full mt-2 py-3 border border-border rounded-xl text-sm font-medium text-muted-foreground">Ver Carteira</button>
         </div>
       );
 
+    case 'auth-login': return <AuthLoginScreen onNavigate={onNavigate} />;
+    case 'auth-register': return <AuthRegisterScreen onNavigate={onNavigate} />;
+    case 'onboarding': return <OnboardingScreen onNavigate={onNavigate} />;
+    case 'wallet': return <WalletScreen onNavigate={onNavigate} />;
+    case 'digital-receipt': return <DigitalReceiptScreen onNavigate={onNavigate} />;
+    case 'support': return <SupportScreen onNavigate={onNavigate} />;
+    case 'profile': return <ProfileScreen onNavigate={onNavigate} />;
     default: return null;
   }
 };
