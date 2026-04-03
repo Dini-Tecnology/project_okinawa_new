@@ -75,6 +75,18 @@ import { TipsManagementScreen } from './restaurant/TipsManagementScreen';
 import { WaiterScreen } from './restaurant/WaiterScreen';
 import { StaffManagementScreen } from './restaurant/StaffManagementScreen';
 
+// Restaurant Operations screens
+import { ChefViewScreen } from './restaurant/ChefViewScreen';
+import { CookStationScreen } from './restaurant/CookStationScreen';
+import { BarmanStationScreen } from './restaurant/BarmanStationScreen';
+import { CashRegisterScreen } from './restaurant/CashRegisterScreen';
+import { FloorPlanScreen } from './restaurant/FloorPlanScreen';
+import { StockScreen } from './restaurant/StockScreen';
+import { WaiterDashboardScreen } from './restaurant/WaiterDashboardScreen';
+
+// Restaurant Financial screens
+import { BillsScreen, FinancialReportScreen, ForecastScreen, FiscalSetupScreen, MarginDashboardScreen, KdsAnalyticsScreen, CustomerCrmScreen } from './restaurant/FinancialScreens';
+
 // Restaurant Pub & Bar screens
 import { TabManagementScreen, WaiterCallsScreen, HappyHourManagementScreen } from './restaurant/pub-bar';
 
