@@ -1,13 +1,16 @@
 /**
- * Restaurant Demo — Welcome + Setup Screens
+ * Restaurant Demo — Welcome + Setup Hub Screens
+ * Mirrors the real SetupHubScreen from platform/mobile with 8 steps
+ * (5 required + 3 optional), persistent progress, and toggle completion.
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   ArrowRight, Check, ChefHat, BarChart3, LayoutGrid, UtensilsCrossed,
   CalendarDays, Users, Star, Smartphone, Zap, Shield, Clock,
   TrendingUp, Bell, QrCode, CreditCard, Wifi, ParkingSquare,
   Accessibility, Dog, Sun, Wine, MapPin, Phone, Globe, Camera,
-  Settings, Sparkles,
+  Settings, Sparkles, Rocket, AlertCircle, CircleCheck, Circle,
+  Store, Table2, CashSign, UserPlus, Link2, HandCoins,
 } from 'lucide-react';
 import { GuidedHint } from '@/components/demo/DemoShared';
 import { ROLE_CONFIG, type StaffRole } from './RestaurantDemoShared';
@@ -98,187 +101,265 @@ export const WelcomeScreen: React.FC<{
   </div>
 );
 
-// ============ SETUP WIZARD ============
+// ============ SETUP STEPS (mirrors real SetupHubScreen) ============
+
+interface SetupStep {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  required: boolean;
+  route?: string;
+}
+
+const SETUP_STEPS: SetupStep[] = [
+  {
+    id: '1',
+    title: 'Informações Básicas',
+    description: 'Nome, endereço, tipo de culinária e horário de funcionamento',
+    icon: Store,
+    required: true,
+    route: 'config-profile',
+  },
+  {
+    id: '2',
+    title: 'Configurar Cardápio',
+    description: 'Adicione categorias, pratos, preços e descrições',
+    icon: UtensilsCrossed,
+    required: true,
+    route: 'menu-editor',
+  },
+  {
+    id: '3',
+    title: 'Configurar Mesas',
+    description: 'Defina o layout do salão e número de mesas',
+    icon: LayoutGrid,
+    required: true,
+    route: 'config-floor',
+  },
+  {
+    id: '4',
+    title: 'Sistema de Reservas',
+    description: 'Configure capacidade, horários e políticas de reserva',
+    icon: CalendarDays,
+    required: true,
+    route: 'config-experience',
+  },
+  {
+    id: '5',
+    title: 'Métodos de Pagamento',
+    description: 'Integre formas de pagamento e configure taxas',
+    icon: CreditCard,
+    required: true,
+    route: 'config-payments',
+  },
+  {
+    id: '6',
+    title: 'Equipe e Funções',
+    description: 'Adicione membros da equipe e defina permissões (7 roles)',
+    icon: Users,
+    required: false,
+    route: 'config-team',
+  },
+  {
+    id: '7',
+    title: 'Configurações de Gorjetas',
+    description: 'Defina porcentagens sugeridas e distribuição',
+    icon: Star,
+    required: false,
+    route: 'config-payments',
+  },
+  {
+    id: '8',
+    title: 'Integrações',
+    description: 'Conecte delivery apps e sistemas externos',
+    icon: Link2,
+    required: false,
+  },
+];
+
+// ============ SETUP HUB SCREEN ============
 
 export const SetupScreen: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
-  const [setupStep, setSetupStep] = useState(0);
-  const [serviceType, setServiceType] = useState('full-service');
+  const [completed, setCompleted] = useState<Set<string>>(new Set(['1', '2']));
 
-  const SERVICE_TYPES = [
-    { id: 'full-service', label: 'Fine Dining', desc: 'Mesa com garçom completo', features: 26 },
-    { id: 'casual-dining', label: 'Casual Dining', desc: 'Ambiente descontraído', features: 22 },
-    { id: 'fast-casual', label: 'Fast Casual', desc: 'Pedido no balcão', features: 18 },
-    { id: 'cafe', label: 'Café / Padaria', desc: 'Work Mode + Refill', features: 16 },
-    { id: 'bar', label: 'Pub & Bar', desc: 'Comanda digital', features: 20 },
-    { id: 'buffet', label: 'Buffet', desc: 'Balança inteligente', features: 14 },
-    { id: 'drive-thru', label: 'Drive-Thru', desc: 'Geofencing GPS', features: 12 },
-    { id: 'food-truck', label: 'Food Truck', desc: 'Mapa + Fila virtual', features: 14 },
-    { id: 'chefs-table', label: "Chef's Table", desc: 'Menu degustação', features: 24 },
-    { id: 'quick-service', label: 'Quick Service', desc: 'Skip the Line', features: 15 },
-    { id: 'club', label: 'Club & Balada', desc: 'Ingressos + VIP', features: 22 },
-  ];
+  const toggleStep = useCallback((id: string) => {
+    setCompleted(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }, []);
 
-  const FEATURES = [
-    { label: 'Wi-Fi', icon: Wifi, active: true },
-    { label: 'Estacionamento', icon: ParkingSquare, active: true },
-    { label: 'Acessível', icon: Accessibility, active: true },
-    { label: 'Pet Friendly', icon: Dog, active: true },
-    { label: 'Terraço', icon: Sun, active: true },
-    { label: 'Carta de Vinhos', icon: Wine, active: true },
-    { label: 'Reservas Online', icon: CalendarDays, active: true },
-    { label: 'QR Code nas Mesas', icon: QrCode, active: true },
-  ];
-
-  const steps = ['Perfil', 'Tipo de Serviço', 'Recursos', 'Pagamentos'];
+  const requiredSteps = SETUP_STEPS.filter(s => s.required);
+  const optionalSteps = SETUP_STEPS.filter(s => !s.required);
+  const completedRequired = requiredSteps.filter(s => completed.has(s.id)).length;
+  const totalRequired = requiredSteps.length;
+  const progress = totalRequired > 0 ? (completedRequired / totalRequired) * 100 : 0;
+  const isSetupComplete = completedRequired === totalRequired;
 
   return (
     <div className="space-y-6">
-      <GuidedHint text="Veja como é simples configurar seu restaurante na NOOWE em poucos passos" />
+      <GuidedHint text="Veja o hub de configuração real — 8 passos guiados para configurar seu restaurante na NOOWE" />
 
-      {/* Progress */}
-      <div className="flex items-center gap-2 mb-6">
-        {steps.map((s, i) => (
-          <React.Fragment key={s}>
-            <button
-              onClick={() => setSetupStep(i)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold transition-all ${
-                i === setupStep ? 'bg-primary text-primary-foreground shadow-glow' :
-                i < setupStep ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
-              }`}
-            >
-              {i < setupStep ? <Check className="w-3.5 h-3.5" /> : <span className="w-4 text-center">{i + 1}</span>}
-              <span className="hidden md:inline">{s}</span>
-            </button>
-            {i < steps.length - 1 && <div className={`flex-1 h-0.5 rounded-full ${i < setupStep ? 'bg-success' : 'bg-border'}`} />}
-          </React.Fragment>
-        ))}
+      {/* Header Card — mirrors real SetupHubScreen header */}
+      <div className="bg-card rounded-2xl border border-border p-6 space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Rocket className="w-6 h-6 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display font-bold text-lg">Configuração do Restaurante</h2>
+            <p className="text-sm text-muted-foreground">Complete os passos abaixo para começar a operar</p>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold">Progresso da Configuração</p>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+              isSetupComplete ? 'bg-success/10 text-success' : 'bg-primary/10 text-primary'
+            }`}>
+              {isSetupComplete ? <Check className="w-3 h-3" /> : <Clock className="w-3 h-3" />}
+              {completedRequired}/{totalRequired}
+            </span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${isSetupComplete ? 'bg-success' : 'bg-gradient-to-r from-primary to-primary/70'}`}
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="text-xs text-muted-foreground text-center">
+            {isSetupComplete
+              ? 'Configuração básica completa! 🎉'
+              : `Faltam ${totalRequired - completedRequired} passos obrigatórios`}
+          </p>
+        </div>
       </div>
 
-      {setupStep === 0 && (
-        <div className="bg-card rounded-xl border border-border p-6 space-y-6">
-          <h3 className="font-display font-bold text-lg">Perfil do Restaurante</h3>
-          <div className="flex gap-6">
-            <div className="w-28 h-28 rounded-2xl bg-muted flex items-center justify-center relative group cursor-pointer overflow-hidden shrink-0">
-              <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200" alt="Restaurant" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-foreground/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Camera className="w-6 h-6 text-primary-foreground" />
-              </div>
-            </div>
-            <div className="flex-1 space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Nome</label>
-                <div className="mt-1 p-3 rounded-xl border border-border bg-background text-sm font-semibold">Bistrô Noowe</div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Descrição</label>
-                <div className="mt-1 p-3 rounded-xl border border-border bg-background text-sm text-muted-foreground">Gastronomia contemporânea com ingredientes locais e sazonais</div>
-              </div>
-            </div>
-          </div>
-          <div className="grid md:grid-cols-2 gap-4">
-            {[
-              { icon: MapPin, label: 'Endereço', value: 'Rua Oscar Freire, 432 - Jardins, SP' },
-              { icon: Phone, label: 'Telefone', value: '(11) 3042-8900' },
-              { icon: Clock, label: 'Horário', value: 'Ter-Dom · 12h–15h, 19h–00h' },
-              { icon: Globe, label: 'Website', value: 'www.bistronoowe.com.br' },
-            ].map(({ icon: Icon, label, value }) => (
-              <div key={label} className="flex items-start gap-3 p-3 rounded-xl bg-muted/30">
-                <Icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</p>
-                  <p className="text-sm">{value}</p>
+      {/* Required Steps */}
+      <div>
+        <div className="flex items-center gap-2 mb-3">
+          <AlertCircle className="w-5 h-5 text-destructive" />
+          <h3 className="font-display font-bold text-base">Passos Obrigatórios</h3>
+        </div>
+        <div className="space-y-3">
+          {requiredSteps.map(step => {
+            const Icon = step.icon;
+            const done = completed.has(step.id);
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+                  done ? 'bg-success/5 border-success/20' : 'bg-card border-border hover:border-primary/20'
+                }`}
+                onClick={() => step.route && onNavigate(step.route)}
+              >
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
+                  done ? 'bg-success/10' : 'bg-destructive/10'
+                }`}>
+                  <Icon className={`w-7 h-7 ${done ? 'text-success' : 'text-destructive'}`} />
                 </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-semibold text-sm ${done ? 'line-through text-success' : 'text-foreground'}`}>
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleStep(step.id); }}
+                  className="shrink-0"
+                >
+                  {done
+                    ? <CircleCheck className="w-6 h-6 text-success" />
+                    : <Circle className="w-6 h-6 text-muted-foreground/40" />
+                  }
+                </button>
               </div>
-            ))}
-          </div>
-          <button onClick={() => setSetupStep(1)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-glow">
-            Próximo <ArrowRight className="w-4 h-4" />
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Optional Steps */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <Star className="w-5 h-5 text-warning" />
+          <h3 className="font-display font-bold text-base">Passos Opcionais</h3>
+        </div>
+        <p className="text-xs text-muted-foreground mb-3 ml-7">Melhore a experiência do seu restaurante</p>
+        <div className="space-y-3">
+          {optionalSteps.map(step => {
+            const Icon = step.icon;
+            const done = completed.has(step.id);
+            return (
+              <div
+                key={step.id}
+                className={`flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
+                  done ? 'bg-success/5 border-success/20' : 'bg-card border-border hover:border-warning/20'
+                }`}
+                onClick={() => step.route && onNavigate(step.route)}
+              >
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
+                  done ? 'bg-success/10' : 'bg-warning/10'
+                }`}>
+                  <Icon className={`w-7 h-7 ${done ? 'text-success' : 'text-warning'}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`font-semibold text-sm ${done ? 'line-through text-success' : 'text-foreground'}`}>
+                    {step.title}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{step.description}</p>
+                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); toggleStep(step.id); }}
+                  className="shrink-0"
+                >
+                  {done
+                    ? <CircleCheck className="w-6 h-6 text-success" />
+                    : <Circle className="w-6 h-6 text-muted-foreground/40" />
+                  }
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Quick Actions — mirrors real SetupHubScreen */}
+      <div className="bg-card rounded-2xl border border-border p-5 space-y-3">
+        <h3 className="font-semibold text-sm">Ações Rápidas</h3>
+        <p className="text-xs text-muted-foreground">Acesse diretamente a configuração avançada</p>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => onNavigate('config-hub')}
+            className="flex items-center gap-2 px-4 py-3 rounded-xl border border-border bg-muted/30 hover:bg-muted/60 transition-colors"
+          >
+            <Settings className="w-4 h-4 text-primary" />
+            <span className="text-xs font-semibold">Config Hub Avançado</span>
+          </button>
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className="flex items-center gap-2 px-4 py-3 rounded-xl bg-primary text-primary-foreground"
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span className="text-xs font-semibold">Ir para Dashboard</span>
           </button>
         </div>
-      )}
+      </div>
 
-      {setupStep === 1 && (
-        <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-          <div>
-            <h3 className="font-display font-bold text-lg">Tipo de Serviço</h3>
-            <p className="text-sm text-muted-foreground">Define as funcionalidades disponíveis</p>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {SERVICE_TYPES.map(type => (
-              <button key={type.id} onClick={() => setServiceType(type.id)}
-                className={`p-4 rounded-xl border text-left transition-all ${
-                  serviceType === type.id ? 'border-primary bg-primary/5 shadow-glow ring-1 ring-primary/20' : 'border-border hover:border-muted-foreground/30'
-                }`}>
-                <p className="font-semibold text-sm">{type.label}</p>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{type.desc}</p>
-                <div className="flex items-center gap-1 mt-2">
-                  <Zap className="w-3 h-3 text-primary" />
-                  <span className="text-[10px] text-primary font-semibold">{type.features} features</span>
-                </div>
-                {serviceType === type.id && <Check className="w-4 h-4 text-primary mt-1" />}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setSetupStep(0)} className="px-6 py-2.5 rounded-xl border border-border text-sm font-medium">Voltar</button>
-            <button onClick={() => setSetupStep(2)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-glow">
-              Próximo <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {setupStep === 2 && (
-        <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-          <h3 className="font-display font-bold text-lg">Características</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            {FEATURES.map(({ icon: Icon, label, active }) => (
-              <button key={label} className={`flex items-center gap-2 p-3.5 rounded-xl border transition-colors ${active ? 'border-primary/30 bg-primary/5 text-foreground' : 'border-border text-muted-foreground'}`}>
-                <Icon className={`w-4 h-4 ${active ? 'text-primary' : ''}`} />
-                <span className="text-xs font-medium">{label}</span>
-                {active && <Check className="w-3 h-3 text-primary ml-auto" />}
-              </button>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <button onClick={() => setSetupStep(1)} className="px-6 py-2.5 rounded-xl border border-border text-sm font-medium">Voltar</button>
-            <button onClick={() => setSetupStep(3)} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-semibold shadow-glow">
-              Próximo <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {setupStep === 3 && (
-        <div className="space-y-6">
-          <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-            <h3 className="font-display font-bold text-lg">Pagamentos</h3>
-            <div className="space-y-3">
-              {[
-                { label: 'Taxa de serviço', value: '10%', desc: 'Cobrada automaticamente' },
-                { label: 'Gorjeta', value: 'Opcional', desc: '5%, 10%, 15%' },
-                { label: 'Split de pagamento', value: 'Ativo', desc: '4 modos disponíveis' },
-                { label: 'Métodos', value: 'Todos', desc: 'Cartão, PIX, Apple/Google Pay, NFC' },
-              ].map(({ label, value, desc }) => (
-                <div key={label} className="flex items-center justify-between p-3.5 rounded-xl bg-muted/30">
-                  <div>
-                    <p className="text-sm font-semibold">{label}</p>
-                    <p className="text-[10px] text-muted-foreground">{desc}</p>
-                  </div>
-                  <span className="text-sm font-semibold text-primary">{value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="bg-gradient-to-r from-success/10 to-primary/10 rounded-xl border border-success/20 p-6 text-center">
-            <Check className="w-12 h-12 text-success mx-auto mb-3" />
-            <h3 className="font-display font-bold text-lg">Configuração Completa!</h3>
-            <p className="text-sm text-muted-foreground mt-1 mb-4">Seu restaurante está pronto para operar</p>
-            <button onClick={() => onNavigate('dashboard')}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-glow mx-auto">
-              Ir para o Dashboard <ArrowRight className="w-5 h-5" />
-            </button>
-          </div>
+      {/* Completion CTA */}
+      {isSetupComplete && (
+        <div className="bg-gradient-to-r from-success/10 to-primary/10 rounded-2xl border border-success/20 p-6 text-center">
+          <Check className="w-12 h-12 text-success mx-auto mb-3" />
+          <h3 className="font-display font-bold text-lg">Configuração Completa!</h3>
+          <p className="text-sm text-muted-foreground mt-1 mb-4">Seu restaurante está pronto para operar</p>
+          <button onClick={() => onNavigate('dashboard')}
+            className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground font-semibold shadow-glow mx-auto">
+            Ir para o Dashboard <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
       )}
     </div>

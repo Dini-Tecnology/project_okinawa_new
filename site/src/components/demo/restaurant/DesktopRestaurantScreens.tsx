@@ -1251,23 +1251,86 @@ const DesktopWelcome: React.FC<{ onSelectRole?: (role: StaffRole) => void }> = (
   </div>
 );
 
-const DesktopSetup: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => (
-  <div className="space-y-5">
-    <div className="grid grid-cols-4 gap-4">
-      {['Perfil', 'Serviço', 'Recursos', 'Pagamentos'].map((item, i) => (
-        <div key={item} className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-xs text-muted-foreground">Etapa {i + 1}</p>
-          <p className="text-base font-bold mt-1">{item}</p>
+const DesktopSetup: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
+  const STEPS = [
+    { id: '1', title: 'Informações Básicas', desc: 'Nome, endereço, tipo de culinária e horário', icon: '🏪', required: true, done: true },
+    { id: '2', title: 'Configurar Cardápio', desc: 'Categorias, pratos, preços e descrições', icon: '🍽️', required: true, done: true },
+    { id: '3', title: 'Configurar Mesas', desc: 'Layout do salão e número de mesas', icon: '🪑', required: true, done: false },
+    { id: '4', title: 'Sistema de Reservas', desc: 'Capacidade, horários e políticas', icon: '📅', required: true, done: false },
+    { id: '5', title: 'Métodos de Pagamento', desc: 'Formas de pagamento e taxas', icon: '💳', required: true, done: false },
+    { id: '6', title: 'Equipe e Funções', desc: 'Membros e permissões (7 roles)', icon: '👥', required: false, done: false },
+    { id: '7', title: 'Configurações de Gorjetas', desc: 'Porcentagens e distribuição', icon: '⭐', required: false, done: false },
+    { id: '8', title: 'Integrações', desc: 'Delivery apps e sistemas externos', icon: '🔗', required: false, done: false },
+  ];
+  const req = STEPS.filter(s => s.required);
+  const opt = STEPS.filter(s => !s.required);
+  const doneReq = req.filter(s => s.done).length;
+  const pct = Math.round((doneReq / req.length) * 100);
+
+  return (
+    <div className="space-y-5">
+      {/* Header card */}
+      <div className="rounded-2xl border border-border bg-card p-6">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-2xl">🚀</div>
+          <div className="flex-1">
+            <h2 className="text-lg font-bold">Configuração do Restaurante</h2>
+            <p className="text-sm text-muted-foreground">Complete os passos abaixo para começar a operar</p>
+          </div>
+          <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">{doneReq}/{req.length}</span>
         </div>
-      ))}
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-to-r from-primary to-primary/70 rounded-full" style={{ width: `${pct}%` }} />
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">Faltam {req.length - doneReq} passos obrigatórios</p>
+      </div>
+
+      {/* Required steps grid */}
+      <div>
+        <p className="text-xs font-bold text-destructive uppercase tracking-wider mb-3 flex items-center gap-1">⚠️ Passos Obrigatórios</p>
+        <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
+          {req.map(s => (
+            <div key={s.id} className={`flex items-center gap-3 p-4 rounded-2xl border ${s.done ? 'bg-green-500/5 border-green-500/20' : 'bg-card border-border hover:border-primary/20'} transition-colors cursor-pointer`}>
+              <span className="text-2xl">{s.icon}</span>
+              <div className="flex-1">
+                <p className={`text-sm font-semibold ${s.done ? 'line-through text-green-600' : ''}`}>{s.title}</p>
+                <p className="text-xs text-muted-foreground">{s.desc}</p>
+              </div>
+              {s.done ? <span className="text-green-500">✓</span> : <span className="text-muted-foreground/30">○</span>}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Optional steps */}
+      <div>
+        <p className="text-xs font-bold text-amber-500 uppercase tracking-wider mb-3 flex items-center gap-1">⭐ Passos Opcionais</p>
+        <div className="grid grid-cols-3 gap-3">
+          {opt.map(s => (
+            <div key={s.id} className="flex items-center gap-3 p-4 rounded-2xl border border-border bg-card hover:border-warning/20 transition-colors cursor-pointer">
+              <span className="text-2xl">{s.icon}</span>
+              <div className="flex-1">
+                <p className="text-sm font-semibold">{s.title}</p>
+                <p className="text-xs text-muted-foreground">{s.desc}</p>
+              </div>
+              <span className="text-muted-foreground/30">○</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex gap-3">
+        <button onClick={() => onNavigate('config-hub')} className="flex items-center gap-2 px-6 py-3 rounded-xl border border-border bg-muted/30 text-sm font-semibold hover:bg-muted/60 transition-colors">
+          ⚙️ Config Hub Avançado
+        </button>
+        <button onClick={() => onNavigate('dashboard')} className="flex items-center gap-2 px-8 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-semibold">
+          📊 Ir para Dashboard
+        </button>
+      </div>
     </div>
-    <div className="rounded-2xl border border-border bg-card p-6">
-      <p className="text-lg font-bold">Configuração resumida</p>
-      <p className="mt-2 text-sm text-muted-foreground">Fine Dining, reservas online, QR nas mesas, split de pagamento e operação full-service.</p>
-      <button onClick={() => onNavigate('dashboard')} className="mt-4 rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground">Ir para dashboard</button>
-    </div>
-  </div>
-);
+  );
+};
 
 const DesktopWaiterAssist: React.FC<{ onNavigate: (screen: string) => void }> = ({ onNavigate }) => {
   return <WaiterAssistScreen onNavigate={onNavigate} />;
