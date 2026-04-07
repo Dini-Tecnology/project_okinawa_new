@@ -36,7 +36,9 @@ export type RestaurantScreen =
   | 'config-hub' | 'config-profile' | 'config-service-types' | 'config-experience'
   | 'config-floor' | 'config-menu' | 'config-team' | 'config-kitchen'
   | 'config-payments' | 'config-features'
-  | 'config-language' | 'config-notifications';
+  | 'config-language' | 'config-notifications'
+  // Missing screens added for parity
+  | 'scanner' | 'station-settings' | 'maitre-dashboard' | 'restaurant-settings';
 
 export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
