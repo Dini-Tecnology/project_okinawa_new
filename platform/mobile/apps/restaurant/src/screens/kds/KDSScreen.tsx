@@ -6,6 +6,7 @@ import { ptBR as dateFnsPtBR } from 'date-fns/locale';
 import socketService from '../../services/socket';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
+import logger from '@okinawa/shared/utils/logger';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';
 import type { Order, OrderStatus } from '../../types';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
@@ -54,7 +55,7 @@ export default function KDSScreen() {
       const orders = await ApiService.getKitchenOrders();
       setActiveOrders(orders);
     } catch (error) {
-      console.error(error);
+      logger.error('Failed to load active kitchen orders', error);
       setActiveOrders([]);
     }
   };

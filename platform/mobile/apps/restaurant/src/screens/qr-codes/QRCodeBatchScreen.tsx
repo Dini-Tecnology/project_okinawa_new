@@ -23,6 +23,7 @@ import * as Haptics from 'expo-haptics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import ApiService from '@/shared/services/api';
+import logger from '@okinawa/shared/utils/logger';
 import { Card, Badge } from '@okinawa/shared/components';
 
 type QRStyle = 'minimal' | 'premium' | 'bold' | 'elegant';
@@ -74,7 +75,7 @@ export default function QRCodeBatchScreen() {
       // Select all tables by default
       setSelectedTables(new Set(tableList.map((t: Table) => t.id)));
     } catch (error) {
-      console.error('Error fetching tables:', error);
+      logger.error('Error fetching tables', error);
       Alert.alert('Erro', 'Não foi possível carregar as mesas');
     } finally {
       setLoading(false);
@@ -136,7 +137,7 @@ export default function QRCodeBatchScreen() {
         `${result.total_generated || tableIds.length} QR Codes gerados com sucesso!`
       );
     } catch (error) {
-      console.error('Error batch generating QR codes:', error);
+      logger.error('Error batch generating QR codes', error);
       Alert.alert('Erro', 'Não foi possível gerar os QR Codes');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -177,7 +178,7 @@ export default function QRCodeBatchScreen() {
 
       Alert.alert('Sucesso', 'QR Codes exportados com sucesso');
     } catch (error) {
-      console.error('Error exporting QR codes:', error);
+      logger.error('Error exporting QR codes', error);
       Alert.alert('Erro', 'Não foi possível exportar os QR Codes');
     }
   };

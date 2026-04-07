@@ -12,6 +12,7 @@ import {
 interface JwtDecodedPayload {
   sub: string;
   email: string;
+  phone?: string | null;
   roles?: string[];
   restaurant_id?: string;
   jti?: string;

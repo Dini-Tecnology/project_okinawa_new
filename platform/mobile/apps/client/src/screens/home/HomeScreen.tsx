@@ -372,7 +372,7 @@ export default function HomeScreen() {
       accessibilityLabel={`View ${restaurant.name} restaurant`}
     >
       <Image
-        source={{ uri: restaurant.cover_image_url || 'https://via.placeholder.com/300x150' }}
+        source={restaurant.cover_image_url ? { uri: restaurant.cover_image_url } : undefined}
         style={styles.restaurantImage}
         resizeMode="cover"
         accessibilityLabel={`${restaurant.name} cover photo`}

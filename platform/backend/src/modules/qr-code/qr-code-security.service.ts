@@ -17,7 +17,11 @@ export class QrCodeSecurityService {
   private readonly baseUrl: string;
 
   constructor(private configService: ConfigService) {
-    this.secretKey = this.configService.get<string>('QR_SECRET_KEY') || 'okinawa-qr-secret-key-change-in-production';
+    const key = this.configService.get<string>('QR_SECRET_KEY');
+    if (!key) {
+      throw new Error('QR_SECRET_KEY environment variable is required');
+    }
+    this.secretKey = key;
     this.baseUrl = this.configService.get<string>('APP_URL') || 'https://app.okinawa.com';
   }
 

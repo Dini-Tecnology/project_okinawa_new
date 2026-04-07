@@ -11,10 +11,18 @@ import * as crypto from 'crypto';
  */
 @Injectable()
 export class QrCodeService {
-  private readonly SECRET_KEY = process.env.QR_SECRET_KEY || 'okinawa-qr-secret-2025';
-  
+  private readonly SECRET_KEY: string;
+
   // In-memory storage for QR validation (replace with Redis in production)
   private validatedCodes: Map<string, { validatedAt: Date; type: string; referenceId: string }> = new Map();
+
+  constructor() {
+    const key = process.env.QR_SECRET_KEY;
+    if (!key) {
+      throw new Error('QR_SECRET_KEY environment variable is required');
+    }
+    this.SECRET_KEY = key;
+  }
 
   /**
    * Generate a unique QR code for an entry

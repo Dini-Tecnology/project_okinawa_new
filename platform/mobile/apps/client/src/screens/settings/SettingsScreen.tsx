@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, ScrollView, StyleSheet, Alert, Switch } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, Switch, Linking } from 'react-native';
 import {
   Text,
   List,
@@ -286,7 +286,7 @@ export default function SettingsScreen() {
           descriptionStyle={{ color: colors.foregroundMuted }}
           left={(props) => <List.Icon {...props} icon="shield-account" color={colors.foregroundMuted} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" color={colors.foregroundMuted} />}
-          onPress={() => Alert.alert(t('common.comingSoon') || 'Em Breve', t('common.featureInDevelopment') || 'Funcionalidade em desenvolvimento')}
+          onPress={() => Linking.openURL('https://noowebr.com/privacidade')}
         />
         <Divider />
         <List.Item
@@ -319,7 +319,7 @@ export default function SettingsScreen() {
           titleStyle={{ color: colors.foreground }}
           left={(props) => <List.Icon {...props} icon="file-document" color={colors.foregroundMuted} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" color={colors.foregroundMuted} />}
-          onPress={() => Alert.alert(t('common.comingSoon') || 'Em Breve', t('common.featureInDevelopment') || 'Funcionalidade em desenvolvimento')}
+          onPress={() => Linking.openURL('https://noowebr.com/termos')}
         />
         <Divider />
         <List.Item
@@ -327,7 +327,7 @@ export default function SettingsScreen() {
           titleStyle={{ color: colors.foreground }}
           left={(props) => <List.Icon {...props} icon="shield-check" color={colors.foregroundMuted} />}
           right={(props) => <List.Icon {...props} icon="chevron-right" color={colors.foregroundMuted} />}
-          onPress={() => Alert.alert(t('common.comingSoon') || 'Em Breve', t('common.featureInDevelopment') || 'Funcionalidade em desenvolvimento')}
+          onPress={() => Linking.openURL('https://noowebr.com/privacidade')}
         />
       </List.Section>
 

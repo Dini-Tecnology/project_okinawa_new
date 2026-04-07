@@ -30,6 +30,7 @@ import { t } from '@okinawa/shared/i18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import ApiService from '@/shared/services/api';
 import io, { Socket } from 'socket.io-client';
+import { ENV } from '@okinawa/shared/config/env';
 
 // ============================================
 // TYPES
@@ -251,8 +252,7 @@ export default function ClubQueueManagementScreen({ route }: ClubQueueManagement
   useEffect(() => {
     if (!restaurantId) return;
 
-    const apiUrl = __DEV__ ? 'http://localhost:3000' : 'https://api.okinawa.com';
-    const socket = io(`${apiUrl}/queue`, {
+    const socket = io(`${ENV.API_BASE_URL}/queue`, {
       transports: ['websocket'],
     });
 

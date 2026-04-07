@@ -40,6 +40,7 @@ import ApiService from '@/shared/services/api';
 import { Card } from '@okinawa/shared/components';
 import * as Haptics from 'expo-haptics';
 import { io, Socket } from 'socket.io-client';
+import { ENV } from '@okinawa/shared/config/env';
 
 interface CashMovement {
   id: string;
@@ -156,8 +157,7 @@ export default function CashRegisterScreen() {
   useEffect(() => {
     if (!restaurantId) return;
 
-    const apiBaseUrl = __DEV__ ? 'http://localhost:3000' : 'https://api.okinawa.com';
-    const socket = io(apiBaseUrl, { transports: ['websocket'] });
+    const socket = io(ENV.API_BASE_URL, { transports: ['websocket'] });
 
     const onConnect = () => {
       socket.emit('restaurant:join', { restaurant_id: restaurantId });

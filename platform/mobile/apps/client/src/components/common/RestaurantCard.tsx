@@ -3,6 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Card, Text, Chip, IconButton } from 'react-native-paper';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { t, getLanguage } from '@okinawa/shared/i18n';
+import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import type { Restaurant } from '../../types';
 
 interface RestaurantCardProps {
@@ -11,6 +12,8 @@ interface RestaurantCardProps {
 }
 
 export default function RestaurantCard({ restaurant, onPress }: RestaurantCardProps) {
+  const colors = useColors();
+
   return (
     <TouchableOpacity onPress={onPress}>
       <Card style={styles.card}>
@@ -23,7 +26,7 @@ export default function RestaurantCard({ restaurant, onPress }: RestaurantCardPr
           <View style={styles.meta}>
             {restaurant.rating && (
               <View style={styles.metaItem}>
-                <IconButton icon="star" size={16} iconColor="#FFC107" style={styles.icon} />
+                <IconButton icon="star" size={16} iconColor={colors.warning} style={styles.icon} />
                 <Text variant="bodySmall">{restaurant.rating.toFixed(1)}</Text>
               </View>
             )}
@@ -42,7 +45,7 @@ export default function RestaurantCard({ restaurant, onPress }: RestaurantCardPr
           </View>
 
           {restaurant.description && (
-            <Text variant="bodyMedium" numberOfLines={2} style={styles.description}>
+            <Text variant="bodyMedium" numberOfLines={2} style={[styles.description, { color: colors.foregroundSecondary }]}>
               {restaurant.description}
             </Text>
           )}
@@ -54,7 +57,7 @@ export default function RestaurantCard({ restaurant, onPress }: RestaurantCardPr
           </View>
 
           {restaurant.min_order_amount && (
-            <Text variant="bodySmall" style={styles.minOrder}>
+            <Text variant="bodySmall" style={[styles.minOrder, { color: colors.foregroundSecondary }]}>
               {t('restaurants.minOrder')}: {formatCurrency(restaurant.min_order_amount, getLanguage())}
             </Text>
           )}
@@ -70,8 +73,8 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', alignItems: 'center', marginTop: 4, marginBottom: 8 },
   metaItem: { flexDirection: 'row', alignItems: 'center', marginRight: 12 },
   icon: { margin: 0, padding: 0 },
-  description: { marginBottom: 8, color: '#666' },
+  description: { marginBottom: 8 },
   cuisines: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 },
   chip: { marginRight: 8, marginBottom: 8 },
-  minOrder: { marginTop: 8, color: '#666' },
+  minOrder: { marginTop: 8 },
 });

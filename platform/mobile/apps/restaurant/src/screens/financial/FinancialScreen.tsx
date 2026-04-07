@@ -20,6 +20,7 @@ import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns';
 import { io, Socket } from 'socket.io-client';
+import { ENV } from '@okinawa/shared/config/env';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface FinancialSummary {
@@ -231,8 +232,7 @@ export default function FinancialScreen() {
   useEffect(() => {
     if (!restaurantId) return;
 
-    const apiBaseUrl = __DEV__ ? 'http://localhost:3000' : 'https://api.okinawa.com';
-    const socket = io(apiBaseUrl, { transports: ['websocket'] });
+    const socket = io(ENV.API_BASE_URL, { transports: ['websocket'] });
 
     const onConnect = () => {
       socket.emit('restaurant:join', { restaurant_id: restaurantId });

@@ -13,6 +13,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Card, ActivityIndicator } from 'react-native-paper';
 import { useQuery } from '@tanstack/react-query';
 import ApiService from '@/shared/services/api';
+import { useAuth } from '@/shared/hooks/useAuth';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@okinawa/shared/theme/spacing';
@@ -51,14 +52,16 @@ const SEGMENT_KEYS: Segment[] = ['new', 'regular', 'vip', 'dormant'];
 
 export default function CustomerCrmScreen() {
   const { t } = useI18n();
+  const { user } = useAuth();
   const colors = useColors();
 
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerProfile | null>(null);
 
-  // Mock restaurant ID (in production, from auth context)
-  const restaurantId = 'current-restaurant-id';
+  const restaurantId = useMemo(() => {
+    return user?.roles?.[0]?.restaurant_id ?? '';
+  }, [user]);
 
   // Fetch overview
   const {

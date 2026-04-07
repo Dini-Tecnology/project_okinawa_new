@@ -24,6 +24,7 @@ import * as Haptics from 'expo-haptics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import ApiService from '@/shared/services/api';
+import logger from '@okinawa/shared/utils/logger';
 import { Card } from '@okinawa/shared/components';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -118,7 +119,7 @@ export default function QRCodeGeneratorScreen() {
         // No existing QR code
       }
     } catch (error) {
-      console.error('Error fetching table:', error);
+      logger.error('Error fetching table', error);
       Alert.alert('Erro', 'Não foi possível carregar os dados da mesa');
       navigation.goBack();
     } finally {
@@ -151,7 +152,7 @@ export default function QRCodeGeneratorScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Sucesso', 'QR Code gerado com sucesso!');
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      logger.error('Error generating QR code', error);
       Alert.alert('Erro', 'Não foi possível gerar o QR Code');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } finally {
@@ -180,7 +181,7 @@ export default function QRCodeGeneratorScreen() {
         Alert.alert('Erro', 'Compartilhamento não disponível neste dispositivo');
       }
     } catch (error) {
-      console.error('Error sharing QR code:', error);
+      logger.error('Error sharing QR code', error);
       Alert.alert('Erro', 'Não foi possível compartilhar o QR Code');
     }
   };
@@ -199,7 +200,7 @@ export default function QRCodeGeneratorScreen() {
 
       Alert.alert('Sucesso', `QR Code salvo como ${fileName}`);
     } catch (error) {
-      console.error('Error downloading QR code:', error);
+      logger.error('Error downloading QR code', error);
       Alert.alert('Erro', 'Não foi possível salvar o QR Code');
     }
   };

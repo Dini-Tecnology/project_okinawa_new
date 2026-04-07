@@ -11,6 +11,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 } from 'react-native';
 import { Text, Card, ActivityIndicator, FAB } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
+import { useAuth } from '@/shared/hooks/useAuth';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { spacing, borderRadius } from '@okinawa/shared/theme/spacing';
@@ -47,6 +48,7 @@ const STATUS_ORDER: Record<InventoryStatus, number> = {
 
 export default function StockScreen({ navigation }: { navigation: any }) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const colors = useColors();
 
   const [items, setItems] = useState<InventoryItem[]>([]);
@@ -63,8 +65,9 @@ export default function StockScreen({ navigation }: { navigation: any }) {
   const [levelNotes, setLevelNotes] = useState('');
   const [saving, setSaving] = useState(false);
 
-  // Mock restaurant ID (in production, from auth context)
-  const restaurantId = 'current-restaurant-id';
+  const restaurantId = useMemo(() => {
+    return user?.roles?.[0]?.restaurant_id ?? '';
+  }, [user]);
 
   const loadData = useCallback(async () => {
     try {

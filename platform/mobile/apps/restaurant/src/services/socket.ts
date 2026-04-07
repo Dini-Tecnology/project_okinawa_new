@@ -1,9 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ENV } from '@okinawa/shared/config/env';
+import logger from '@okinawa/shared/utils/logger';
 
-const SOCKET_URL = __DEV__
-  ? 'http://localhost:3000'
-  : 'https://api.okinawa.com';
+const SOCKET_URL = ENV.API_BASE_URL;
 
 type OrderStatus =
   | 'pending'
@@ -62,7 +62,7 @@ class SocketService {
     const token = await AsyncStorage.getItem('access_token');
 
     if (!token) {
-      console.warn('No access token found, cannot connect to socket');
+      logger.warn('No access token found, cannot connect to socket');
       return;
     }
 
@@ -83,15 +83,15 @@ class SocketService {
     if (!this.socket) return;
 
     this.socket.on('connect', () => {
-      console.log('Socket connected:', this.socket?.id);
+      logger.debug('Socket connected:', this.socket?.id);
     });
 
     this.socket.on('disconnect', () => {
-      console.log('Socket disconnected');
+      logger.debug('Socket disconnected');
     });
 
     this.socket.on('error', (error: Error) => {
-      console.error('Socket error:', error);
+      logger.error('Socket error:', error);
     });
 
     // New orders from customers
@@ -258,7 +258,7 @@ class SocketService {
     if (this.socket?.connected) {
       this.socket.emit(event, data);
     } else {
-      console.warn('Socket not connected, cannot send:', event);
+      logger.warn('Socket not connected, cannot send:', event);
     }
   }
 

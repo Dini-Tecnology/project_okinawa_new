@@ -330,7 +330,7 @@ export default function CreateReservationScreen() {
 
       {/* Restaurant Info */}
       <Card style={styles.card}>
-        <Card.Cover source={{ uri: restaurant.image_url || 'https://via.placeholder.com/400x200' }} />
+        <Card.Cover source={restaurant.image_url ? { uri: restaurant.image_url } : undefined} />
         <Card.Content style={styles.restaurantInfo}>
           <Text variant="titleLarge" style={styles.restaurantName}>
             {restaurant.name}

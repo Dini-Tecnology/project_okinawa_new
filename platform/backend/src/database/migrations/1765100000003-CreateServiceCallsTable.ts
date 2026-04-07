@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateServiceCallsTable1765100000001 implements MigrationInterface {
-  name = 'CreateServiceCallsTable1765100000001';
+export class CreateServiceCallsTable1765100000003 implements MigrationInterface {
+  name = 'CreateServiceCallsTable1765100000003';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     // Create enum types

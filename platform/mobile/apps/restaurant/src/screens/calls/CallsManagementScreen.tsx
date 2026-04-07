@@ -35,6 +35,7 @@ import { useAuth } from '@/shared/hooks/useAuth';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { io, Socket } from 'socket.io-client';
+import { ENV } from '@okinawa/shared/config/env';
 import * as Haptics from 'expo-haptics';
 
 // ============================================
@@ -291,8 +292,7 @@ export default function CallsManagementScreen() {
   useEffect(() => {
     if (!restaurantId) return;
 
-    const apiBaseUrl = __DEV__ ? 'http://localhost:3000' : 'https://api.okinawa.com';
-    const socket = io(`${apiBaseUrl}/calls`, {
+    const socket = io(`${ENV.API_BASE_URL}/calls`, {
       transports: ['websocket'],
     });
 

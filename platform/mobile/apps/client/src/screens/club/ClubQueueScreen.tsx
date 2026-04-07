@@ -32,6 +32,7 @@ import { useAuth } from '@okinawa/shared/hooks/useAuth';
 import { ApiService } from '@okinawa/shared/services/api';
 import io, { Socket } from 'socket.io-client';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import { ENV } from '@okinawa/shared/config/env';
 
 // ============================================
 // TYPES
@@ -140,8 +141,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
   useEffect(() => {
     if (!restaurantId || !user?.id) return;
 
-    const apiUrl = __DEV__ ? 'http://localhost:3000' : 'https://api.okinawa.com';
-    const socket = io(`${apiUrl}/queue`, {
+    const socket = io(`${ENV.API_BASE_URL}/queue`, {
       transports: ['websocket'],
     });
 

@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
 import { View, StyleSheet, ScrollView, Alert } from 'react-native';
-import { List, Switch, Divider, RadioButton, Dialog, Portal, Button } from 'react-native-paper';
+import { List, Switch, Divider, RadioButton, Dialog, Portal, Button, Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
+import ApiService from '@/shared/services/api';
 import { authService } from '@/shared/services/auth';
 import { useI18n, SupportedLanguage } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import logger from '@okinawa/shared/utils/logger';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 export default function SettingsScreen() {
@@ -25,6 +27,46 @@ export default function SettingsScreen() {
           text: t('common.confirm'),
           onPress: async () => {
             await authService.logout();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t('profile.deleteAccount'),
+      t('profile.deleteAccountWarning'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              t('common.confirm'),
+              t('profile.deleteAccountWarning'),
+              [
+                { text: t('common.cancel'), style: 'cancel' },
+                {
+                  text: t('common.confirm'),
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      await ApiService.deleteAccount();
+                      Alert.alert(
+                        t('common.success'),
+                        t('success.deleted')
+                      );
+                      await authService.logout();
+                    } catch (error) {
+                      logger.error('Failed to delete account', error);
+                      Alert.alert(t('common.error'), t('errors.generic'));
+                    }
+                  },
+                },
+              ]
+            );
           },
         },
       ]
@@ -57,6 +99,19 @@ export default function SettingsScreen() {
     },
     listDescription: {
       color: colors.foregroundSecondary,
+    },
+    dangerZone: {
+      padding: 20,
+      marginTop: 20,
+      marginBottom: 40,
+    },
+    dangerZoneTitle: {
+      color: colors.error,
+      fontWeight: 'bold' as const,
+      marginBottom: 15,
+    },
+    deleteButton: {
+      borderColor: colors.error,
     },
   }), [colors]);
 
@@ -119,6 +174,24 @@ export default function SettingsScreen() {
           accessibilityLabel={t('settings.disconnect')}
         />
       </List.Section>
+
+      <Divider style={{ backgroundColor: colors.border }} />
+
+      <View style={styles.dangerZone}>
+        <Text variant="titleMedium" style={styles.dangerZoneTitle}>
+          {t('settings.dangerZone')}
+        </Text>
+        <Button
+          mode="outlined"
+          textColor={colors.error}
+          style={[styles.deleteButton, { borderColor: colors.error }]}
+          onPress={handleDeleteAccount}
+          accessibilityRole="button"
+          accessibilityLabel={t('profile.deleteAccount')}
+        >
+          {t('profile.deleteAccount')}
+        </Button>
+      </View>
 
       {/* Language Dialog */}
       <Portal>

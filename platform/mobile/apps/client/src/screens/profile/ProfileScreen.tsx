@@ -30,13 +30,13 @@ import logger from '@okinawa/shared/utils/logger';
 import type { User } from '../../types';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
-const DIETARY_OPTIONS = [
-  'Vegetariano',
-  'Vegano',
-  'Sem Gluten',
-  'Sem Lactose',
-  'Kosher',
-  'Halal',
+const DIETARY_OPTION_KEYS = [
+  { key: 'vegetarian', i18nKey: 'profile.dietary.vegetarian' },
+  { key: 'vegan', i18nKey: 'profile.dietary.vegan' },
+  { key: 'gluten_free', i18nKey: 'profile.dietary.gluten_free' },
+  { key: 'lactose_free', i18nKey: 'profile.dietary.lactose_free' },
+  { key: 'kosher', i18nKey: 'profile.dietary.kosher' },
+  { key: 'halal', i18nKey: 'profile.dietary.halal' },
 ];
 
 export default function ProfileScreen() {
@@ -356,19 +356,19 @@ export default function ProfileScreen() {
           {t('profile.dietaryPreferences') || 'Prefer\u00EAncias Alimentares'}
         </Text>
         <View style={styles.dietaryContainer}>
-          {DIETARY_OPTIONS.map((option) => (
+          {DIETARY_OPTION_KEYS.map((option) => (
             <Chip
-              key={option}
-              selected={dietaryRestrictions.includes(option)}
-              onPress={() => toggleDietary(option)}
+              key={option.key}
+              selected={dietaryRestrictions.includes(option.key)}
+              onPress={() => toggleDietary(option.key)}
               style={styles.dietaryChip}
               showSelectedOverlay
               selectedColor={colors.primary}
-              mode={dietaryRestrictions.includes(option) ? 'flat' : 'outlined'}
+              mode={dietaryRestrictions.includes(option.key) ? 'flat' : 'outlined'}
               accessibilityRole="checkbox"
-              accessibilityState={{ checked: dietaryRestrictions.includes(option) }}
+              accessibilityState={{ checked: dietaryRestrictions.includes(option.key) }}
             >
-              {option}
+              {t(option.i18nKey)}
             </Chip>
           ))}
           {savingDietary && (
