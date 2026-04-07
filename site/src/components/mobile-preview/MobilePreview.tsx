@@ -34,7 +34,7 @@ import { TipScreen } from './client/TipScreen';
 import { OrderStatusScreen } from './client/OrderStatusScreen';
 import { DigitalReceiptScreen } from './client/DigitalReceiptScreen';
 import { PairingAssistantScreen } from './client/PairingAssistantScreen';
-// NEW: 15 missing client screens
+// NEW: missing client screens
 import { RegisterScreen } from './client/RegisterScreen';
 import { MenuScreen } from './client/MenuScreen';
 import { PaymentScreen } from './client/PaymentScreen';
@@ -44,6 +44,11 @@ import { BuffetCheckinScreen } from './client/BuffetCheckinScreen';
 import { LoyaltyHomeScreen } from './client/LoyaltyHomeScreen';
 import { StampCardsScreen } from './client/StampCardsScreen';
 import { ManageConsentsScreen } from './client/ManageConsentsScreen';
+import { AddressesScreen } from './client/AddressesScreen';
+import { CouponsScreen } from './client/CouponsScreen';
+import { LoyaltyDetailScreen } from './client/LoyaltyDetailScreen';
+import { RatingScreen } from './client/RatingScreen';
+import { SupportScreen } from './client/SupportScreen';
 
 // Pub & Bar screens
 import { TabScreen, RepeatRoundSheet, TabSplitSheet, TabPaymentScreen } from './client/pub-bar';
@@ -74,6 +79,11 @@ import { RoleDashboardScreen } from './restaurant/RoleDashboardScreen';
 import { TipsManagementScreen } from './restaurant/TipsManagementScreen';
 import { WaiterScreen } from './restaurant/WaiterScreen';
 import { StaffManagementScreen } from './restaurant/StaffManagementScreen';
+import { PromotionsScreen } from './restaurant/PromotionsScreen';
+import { ReportsScreen } from './restaurant/ReportsScreen';
+import { ReviewsScreen } from './restaurant/ReviewsScreen';
+import { LoyaltyManagementScreen } from './restaurant/LoyaltyManagementScreen';
+import { OrderPaymentTrackingScreen } from './restaurant/OrderPaymentTrackingScreen';
 
 // Restaurant Operations screens
 import { ChefViewScreen } from './restaurant/ChefViewScreen';
@@ -157,6 +167,13 @@ const screenComponents: Record<string, React.ComponentType> = {
   payment: PaymentScreen,
   'payment-success': PaymentSuccessScreen,
   
+  // Client Extra
+  addresses: AddressesScreen,
+  coupons: CouponsScreen,
+  'loyalty-detail': LoyaltyDetailScreen,
+  rating: RatingScreen,
+  support: SupportScreen,
+  
   // Client Buffet
   'buffet-checkin': BuffetCheckinScreen,
   
@@ -216,6 +233,11 @@ const screenComponents: Record<string, React.ComponentType> = {
   'role-dashboard': RoleDashboardScreen,
   'staff-management': StaffManagementScreen,
   'tips-management': TipsManagementScreen,
+  'promotions': PromotionsScreen,
+  'reports': ReportsScreen,
+  'reviews': ReviewsScreen,
+  'loyalty-management': LoyaltyManagementScreen,
+  'order-payment-tracking': OrderPaymentTrackingScreen,
   
   // Restaurant Pub & Bar Management
   'tab-management': TabManagementScreen,
