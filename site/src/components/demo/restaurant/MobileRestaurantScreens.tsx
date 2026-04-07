@@ -40,6 +40,7 @@ import {
   QrCodesScreen, TapToPayScreen, ReportsScreen, ReviewsMgmtScreen, ReservationsMgmtScreen,
   ClubDoorScreen, ClubQueueMgmtScreen, ClubPromoterScreen, ClubVipMgmtScreen,
   DriveThruMgmtScreen, FoodTruckMgmtScreen, ConfigLanguageScreen, ConfigNotificationsScreen,
+  QRScannerStaffScreen, StationSettingsScreen, MaitreDashboardScreen, RestaurantSettingsScreen as RestaurantSettingsExtScreen,
 } from './ExtendedScreens';
 import { useDemoI18n } from '@/components/demo/DemoI18n';
 import {
@@ -1664,6 +1665,10 @@ export const MobileRestaurantScreen: React.FC<{
       {screen === 'club-vip-mgmt' && <ClubVipMgmtScreen />}
       {screen === 'drive-thru-mgmt' && <DriveThruMgmtScreen />}
       {screen === 'food-truck-mgmt' && <FoodTruckMgmtScreen />}
+      {screen === 'scanner' && <QRScannerStaffScreen />}
+      {screen === 'station-settings' && <StationSettingsScreen />}
+      {screen === 'maitre-dashboard' && <MaitreDashboardScreen />}
+      {screen === 'restaurant-settings' && <RestaurantSettingsExtScreen />}
 
       <div className="rounded-2xl border border-border bg-card p-3">
         <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{translateText('Perfil ativo')}</p>

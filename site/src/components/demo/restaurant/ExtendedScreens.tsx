@@ -893,3 +893,318 @@ export const ConfigNotificationsScreen: React.FC = () => {
     </div>
   );
 };
+
+// ============ QR SCANNER (Staff) ============
+
+export const QRScannerStaffScreen: React.FC = () => {
+  const [scanned, setScanned] = useState(false);
+  const [flashOn, setFlashOn] = useState(false);
+
+  return (
+    <div className="space-y-4">
+      <GuidedHint text="Scanner QR para associação rápida de mesas e verificação de pedidos" />
+
+      {/* Camera viewport simulation */}
+      <div className="relative rounded-2xl overflow-hidden bg-foreground/90 aspect-square flex items-center justify-center">
+        <div className="absolute inset-8 border-2 border-primary/60 rounded-2xl" />
+        <div className="absolute top-10 left-10 w-6 h-6 border-t-2 border-l-2 border-primary rounded-tl-lg" />
+        <div className="absolute top-10 right-10 w-6 h-6 border-t-2 border-r-2 border-primary rounded-tr-lg" />
+        <div className="absolute bottom-10 left-10 w-6 h-6 border-b-2 border-l-2 border-primary rounded-bl-lg" />
+        <div className="absolute bottom-10 right-10 w-6 h-6 border-b-2 border-r-2 border-primary rounded-br-lg" />
+
+        {!scanned ? (
+          <div className="text-center space-y-3 z-10">
+            <QrCode className="w-16 h-16 text-primary/80 mx-auto animate-pulse" />
+            <p className="text-primary-foreground/80 text-sm font-medium">Aponte para o QR code da mesa</p>
+          </div>
+        ) : (
+          <div className="text-center space-y-2 z-10 bg-card/90 backdrop-blur-sm rounded-2xl p-6">
+            <CheckCircle2 className="w-12 h-12 text-success mx-auto" />
+            <p className="text-foreground font-bold">Mesa #07 Identificada</p>
+            <p className="text-muted-foreground text-xs">4 lugares · Seção Jardim</p>
+          </div>
+        )}
+
+        {/* Controls */}
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-4 z-10">
+          <button onClick={() => setFlashOn(!flashOn)} className={`w-10 h-10 rounded-full flex items-center justify-center ${flashOn ? 'bg-primary' : 'bg-card/30'}`}>
+            <Zap className={`w-5 h-5 ${flashOn ? 'text-primary-foreground' : 'text-primary-foreground/70'}`} />
+          </button>
+          <button onClick={() => setScanned(!scanned)} className="px-6 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
+            {scanned ? 'Escanear Novamente' : 'Simular Scan'}
+          </button>
+        </div>
+      </div>
+
+      {/* Scan types info */}
+      <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <h3 className="text-xs font-bold text-foreground">Tipos de QR Suportados</h3>
+        {[
+          { type: 'Mesa', desc: 'Associação rápida mesa → pedido', icon: '🪑', color: 'text-primary' },
+          { type: 'Cardápio', desc: 'Abre cardápio digital da mesa', icon: '📋', color: 'text-info' },
+          { type: 'Pedido', desc: 'Consulta status do pedido', icon: '📦', color: 'text-warning' },
+        ].map(item => (
+          <div key={item.type} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/30">
+            <span className="text-lg">{item.icon}</span>
+            <div className="flex-1">
+              <p className={`text-xs font-semibold ${item.color}`}>{item.type}</p>
+              <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ============ STATION SETTINGS ============
+
+export const StationSettingsScreen: React.FC = () => {
+  const [stations, setStations] = useState([
+    { id: '1', name: 'Grelha', type: 'kitchen' as const, emoji: '🔥', lateMinutes: 15, active: true },
+    { id: '2', name: 'Frios', type: 'kitchen' as const, emoji: '🥗', lateMinutes: 10, active: true },
+    { id: '3', name: 'Confeitaria', type: 'kitchen' as const, emoji: '🍰', lateMinutes: 20, active: true },
+    { id: '4', name: 'Bar Principal', type: 'bar' as const, emoji: '🍸', lateMinutes: 8, active: true },
+    { id: '5', name: 'Fritura', type: 'kitchen' as const, emoji: '🍟', lateMinutes: 12, active: false },
+  ]);
+
+  return (
+    <div className="space-y-4">
+      <GuidedHint text="Configure as estações de preparo do KDS — cada estação recebe tickets específicos" />
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-bold text-foreground">Estações de Preparo</h3>
+          <p className="text-[10px] text-muted-foreground">{stations.filter(s => s.active).length} ativas · {stations.length} total</p>
+        </div>
+        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-primary text-primary-foreground text-[10px] font-bold">
+          <span>+</span> Nova Estação
+        </button>
+      </div>
+
+      {/* Station list */}
+      <div className="space-y-2.5">
+        {stations.map(s => (
+          <div key={s.id} className={`flex items-center gap-3 p-3.5 rounded-2xl border transition-all ${s.active ? 'bg-card border-border' : 'bg-muted/30 border-border/50 opacity-60'}`}>
+            <span className="text-2xl">{s.emoji}</span>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-bold text-foreground">{s.name}</p>
+                <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${s.type === 'kitchen' ? 'bg-warning/10 text-warning' : 'bg-info/10 text-info'}`}>
+                  {s.type === 'kitchen' ? 'Cozinha' : 'Bar'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-[10px] text-muted-foreground">⏱ Alerta atraso: {s.lateMinutes}min</p>
+                <p className={`text-[10px] font-semibold ${s.active ? 'text-success' : 'text-muted-foreground'}`}>
+                  {s.active ? '● Ativa' : '○ Inativa'}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setStations(prev => prev.map(st => st.id === s.id ? { ...st, active: !st.active } : st))}
+              className={`w-10 h-6 rounded-full relative transition-colors ${s.active ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`w-4 h-4 bg-primary-foreground rounded-full absolute top-1 transition-transform ${s.active ? 'translate-x-5' : 'translate-x-1'}`} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ============ MAITRE DASHBOARD ============
+
+export const MaitreDashboardScreen: React.FC = () => {
+  const [view, setView] = useState<'reservations' | 'floor'>('reservations');
+
+  const reservations = [
+    { id: '1', name: 'Carlos Silva', guests: 4, time: '19:30', status: 'confirmed' as const, table: '07', phone: '(11) 9xxxx-1234', special: 'Alergia a nozes' },
+    { id: '2', name: 'Ana Santos', guests: 2, time: '20:00', status: 'pending' as const, table: null, phone: '(11) 9xxxx-5678', special: null },
+    { id: '3', name: 'Rodrigo Lima', guests: 6, time: '20:30', status: 'seated' as const, table: '12', phone: '(11) 9xxxx-9012', special: 'Aniversário' },
+    { id: '4', name: 'Julia Mendes', guests: 3, time: '21:00', status: 'confirmed' as const, table: '04', phone: '(11) 9xxxx-3456', special: null },
+    { id: '5', name: 'Pedro Costa', guests: 2, time: '21:30', status: 'cancelled' as const, table: null, phone: '(11) 9xxxx-7890', special: null },
+  ];
+
+  const tables = [
+    { id: '1', number: '01', capacity: 2, status: 'available' as const },
+    { id: '2', number: '02', capacity: 4, status: 'occupied' as const, waiter: 'João' },
+    { id: '3', number: '04', capacity: 4, status: 'reserved' as const },
+    { id: '4', number: '07', capacity: 4, status: 'occupied' as const, waiter: 'Maria' },
+    { id: '5', number: '08', capacity: 6, status: 'available' as const },
+    { id: '6', number: '10', capacity: 2, status: 'needs_cleaning' as const },
+    { id: '7', number: '12', capacity: 8, status: 'occupied' as const, waiter: 'Pedro' },
+    { id: '8', number: '15', capacity: 4, status: 'available' as const },
+  ];
+
+  const statusColors: Record<string, string> = {
+    confirmed: 'bg-success/10 text-success',
+    pending: 'bg-warning/10 text-warning',
+    seated: 'bg-primary/10 text-primary',
+    completed: 'bg-muted text-muted-foreground',
+    cancelled: 'bg-destructive/10 text-destructive',
+    available: 'bg-success/10 text-success',
+    occupied: 'bg-primary/10 text-primary',
+    reserved: 'bg-warning/10 text-warning',
+    needs_cleaning: 'bg-destructive/10 text-destructive',
+  };
+
+  const statusLabels: Record<string, string> = {
+    confirmed: 'Confirmado', pending: 'Pendente', seated: 'Sentado',
+    completed: 'Completo', cancelled: 'Cancelado',
+    available: 'Disponível', occupied: 'Ocupada', reserved: 'Reservada', needs_cleaning: 'Limpeza',
+  };
+
+  const stats = {
+    total: reservations.length,
+    confirmed: reservations.filter(r => r.status === 'confirmed').length,
+    seated: reservations.filter(r => r.status === 'seated').length,
+    available: tables.filter(t => t.status === 'available').length,
+  };
+
+  return (
+    <div className="space-y-4">
+      <GuidedHint text="Dashboard do Maitre com visão de reservas e planta do salão" />
+
+      {/* Stats row */}
+      <div className="grid grid-cols-4 gap-2">
+        {[
+          { label: 'Reservas', value: stats.total, color: 'text-foreground' },
+          { label: 'Confirmadas', value: stats.confirmed, color: 'text-success' },
+          { label: 'Sentados', value: stats.seated, color: 'text-primary' },
+          { label: 'Mesas livres', value: stats.available, color: 'text-info' },
+        ].map(s => (
+          <div key={s.label} className="bg-card rounded-xl border border-border p-3 text-center">
+            <p className={`text-xl font-bold ${s.color}`}>{s.value}</p>
+            <p className="text-[9px] text-muted-foreground">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* View toggle */}
+      <div className="flex gap-1 p-1 bg-muted rounded-xl">
+        {(['reservations', 'floor'] as const).map(v => (
+          <button key={v} onClick={() => setView(v)}
+            className={`flex-1 py-2 rounded-lg text-xs font-semibold transition-colors ${view === v ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'}`}>
+            {v === 'reservations' ? '📋 Reservas' : '🗺️ Planta'}
+          </button>
+        ))}
+      </div>
+
+      {view === 'reservations' ? (
+        <div className="space-y-2.5">
+          {reservations.map(r => (
+            <div key={r.id} className="flex items-center gap-3 p-3.5 rounded-2xl border border-border bg-card">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-primary">
+                {r.guests}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-xs font-bold text-foreground truncate">{r.name}</p>
+                  <span className={`px-1.5 py-0.5 rounded-full text-[8px] font-bold ${statusColors[r.status]}`}>
+                    {statusLabels[r.status]}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                  <span>🕐 {r.time}</span>
+                  {r.table && <span>🪑 Mesa {r.table}</span>}
+                  {r.special && <span className="text-warning">⚠️ {r.special}</span>}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-2">
+          {tables.map(t => (
+            <div key={t.id} className={`p-3 rounded-xl border text-center ${statusColors[t.status]} border-current/20`}>
+              <p className="text-lg font-bold">{t.number}</p>
+              <p className="text-[9px]">{t.capacity}p</p>
+              <p className="text-[8px] font-semibold mt-1">{statusLabels[t.status]}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============ RESTAURANT SETTINGS ============
+
+export const RestaurantSettingsScreen: React.FC = () => {
+  const [notifications, setNotifications] = useState(true);
+  const [sound, setSound] = useState(true);
+
+  return (
+    <div className="space-y-4">
+      <GuidedHint text="Configurações gerais do app — notificações, idioma, conta" />
+
+      {/* Notifications */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+            <Bell className="w-4 h-4 text-primary" /> Notificações
+          </h3>
+        </div>
+        {[
+          { label: 'Notificações push', desc: 'Receba alertas em tempo real', value: notifications, onChange: () => setNotifications(!notifications) },
+          { label: 'Sons de alerta', desc: 'Feedback sonoro para eventos', value: sound, onChange: () => setSound(!sound) },
+        ].map(item => (
+          <div key={item.label} className="flex items-center justify-between px-4 py-3 border-b border-border last:border-b-0">
+            <div>
+              <p className="text-xs font-medium text-foreground">{item.label}</p>
+              <p className="text-[10px] text-muted-foreground">{item.desc}</p>
+            </div>
+            <button onClick={item.onChange} className={`w-10 h-6 rounded-full relative transition-colors ${item.value ? 'bg-primary' : 'bg-muted'}`}>
+              <div className={`w-4 h-4 bg-primary-foreground rounded-full absolute top-1 transition-transform ${item.value ? 'translate-x-5' : 'translate-x-1'}`} />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Language */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+            <Globe className="w-4 h-4 text-primary" /> Idioma & Regional
+          </h3>
+        </div>
+        {[
+          { label: 'Idioma', value: 'Português (BR)' },
+          { label: 'Moeda', value: 'BRL (R$)' },
+          { label: 'Formato de data', value: 'DD/MM/AAAA' },
+        ].map(item => (
+          <div key={item.label} className="flex items-center justify-between px-4 py-3 border-b border-border last:border-b-0">
+            <p className="text-xs font-medium text-foreground">{item.label}</p>
+            <p className="text-xs text-primary font-semibold">{item.value}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Account */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden">
+        <div className="px-4 py-3 border-b border-border">
+          <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+            <Shield className="w-4 h-4 text-primary" /> Conta
+          </h3>
+        </div>
+        <button className="w-full flex items-center justify-between px-4 py-3 border-b border-border hover:bg-muted/30 transition-colors">
+          <p className="text-xs font-medium text-foreground">Sair da conta</p>
+          <span className="text-xs text-muted-foreground">→</span>
+        </button>
+        <button className="w-full flex items-center justify-between px-4 py-3 hover:bg-destructive/5 transition-colors">
+          <p className="text-xs font-medium text-destructive">Excluir conta</p>
+          <span className="text-xs text-destructive">→</span>
+        </button>
+      </div>
+
+      {/* App info */}
+      <div className="text-center py-4">
+        <p className="text-[10px] text-muted-foreground">NOOWE Restaurant v2.1.0</p>
+        <p className="text-[10px] text-muted-foreground/60">Build 2026.04</p>
+      </div>
+    </div>
+  );
+};

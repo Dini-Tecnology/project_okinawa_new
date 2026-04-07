@@ -36,7 +36,9 @@ export type RestaurantScreen =
   | 'config-hub' | 'config-profile' | 'config-service-types' | 'config-experience'
   | 'config-floor' | 'config-menu' | 'config-team' | 'config-kitchen'
   | 'config-payments' | 'config-features'
-  | 'config-language' | 'config-notifications';
+  | 'config-language' | 'config-notifications'
+  // Missing screens added for parity
+  | 'scanner' | 'station-settings' | 'maitre-dashboard' | 'restaurant-settings';
 
 export type StaffRole = 'owner' | 'manager' | 'maitre' | 'barman' | 'chef' | 'cook' | 'waiter';
 
@@ -211,6 +213,11 @@ export const SCREEN_INFO: Record<RestaurantScreen, { title: string; desc: string
   // Extra configs
   'config-language': { title: 'Idioma', desc: 'Idioma padrão do sistema e do cardápio digital' },
   'config-notifications': { title: 'Notificações', desc: 'Alertas push, sons e configurações' },
+  // Missing screens added for parity
+  scanner: { title: 'Scanner QR', desc: 'Escaneie QR codes de mesa para associação rápida' },
+  'station-settings': { title: 'Estações de Preparo', desc: 'Configure estações do KDS com nomes, tipos e alertas' },
+  'maitre-dashboard': { title: 'Dashboard do Maitre', desc: 'Reservas, mesas e check-in em visão consolidada' },
+  'restaurant-settings': { title: 'Configurações', desc: 'Notificações, idioma, conta e preferências do app' },
 };
 
 // ============ MOCK TEAM DATA ============
