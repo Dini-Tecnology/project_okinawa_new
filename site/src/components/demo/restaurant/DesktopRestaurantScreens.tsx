@@ -33,6 +33,7 @@ import {
   QrCodesScreen, TapToPayScreen, ReportsScreen, ReviewsMgmtScreen, ReservationsMgmtScreen,
   ClubDoorScreen, ClubQueueMgmtScreen, ClubPromoterScreen, ClubVipMgmtScreen,
   DriveThruMgmtScreen, FoodTruckMgmtScreen, ConfigLanguageScreen, ConfigNotificationsScreen,
+  QRScannerStaffScreen, StationSettingsScreen, MaitreDashboardScreen, RestaurantSettingsScreen as RestaurantSettingsExtScreen,
 } from './ExtendedScreens';
 import { WaiterTablesActions } from './WaiterTablesActions';
 import { useDemoI18n } from '@/components/demo/DemoI18n';
