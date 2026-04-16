@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "811246123909",
+    "project_id": "noowe-client",
+    "storage_bucket": "noowe-client.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811246123909:android:7cd05138d3a99d890322ec",
+        "android_client_info": {
+          "package_name": "com.noowe.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUXmi4hTVOk4hmxZlKfjJ6zjcbFZkHzds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

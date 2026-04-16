@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Okinawa Restaurante",
-    "slug": "okinawa-restaurant",
+    "name": "Noowe Restaurante",
+    "slug": "noowe-restaurant",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "scheme": "okinawa-restaurant",
+    "scheme": "noowe-restaurant",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",

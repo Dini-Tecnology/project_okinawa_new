@@ -179,7 +179,7 @@ export default function ManageConsentsScreen() {
         <Button
           mode="outlined"
           textColor={colors.destructive}
-          style={styles.deleteButton}
+          style={[styles.deleteButton, { borderColor: colors.error }]}
           onPress={() => {
             Alert.alert(
               'Excluir Conta',
@@ -226,5 +226,5 @@ const styles = StyleSheet.create({
   exportButton: { marginTop: 12 },
   footer: { marginBottom: 40 },
   footerText: { fontSize: 14, lineHeight: 18, marginBottom: 16 },
-  deleteButton: { borderColor: colors.error },
+  deleteButton: {},
 });

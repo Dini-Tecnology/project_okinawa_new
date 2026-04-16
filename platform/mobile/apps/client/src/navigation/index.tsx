@@ -25,6 +25,7 @@ import { socialAuthService } from '@/shared/services/social-auth';
 import { biometricAuthService } from '@/shared/services/biometric-auth';
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
+import { Platform } from 'react-native';
 import { captureException } from '@/shared/config/sentry';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import {
@@ -148,21 +149,57 @@ export const navigationRef = createNavigationContainerRef();
 // AUTH STACK (Passwordless-First)
 // ============================================
 
-/**
- * Modern authentication navigation stack.
- * Prioritizes Social Login and Phone OTP with biometric quick-login.
- */
-function AuthStack() {
-  const [authLoading, setAuthLoading] = useState(false);
-  const [biometricLoading, setBiometricLoading] = useState(false);
+type GoogleOAuthTriple = [
+  Parameters<typeof socialAuthService.signInWithGoogle>[0],
+  Parameters<typeof socialAuthService.signInWithGoogle>[1],
+  Parameters<typeof socialAuthService.signInWithGoogle>[2],
+];
 
-  // Google OAuth configuration
-  const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
-    // These would be configured in app.json / app.config.js
+/** expo-auth-session requires platform-specific client IDs; avoid mounting useAuthRequest without them. */
+function isGoogleOAuthConfigured(): boolean {
+  if (Platform.OS === 'android') {
+    return Boolean(process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID);
+  }
+  if (Platform.OS === 'ios') {
+    return Boolean(process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID);
+  }
+  return Boolean(process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
+}
+
+const noopGooglePromptAsync: GoogleOAuthTriple[2] = async () =>
+  ({ type: 'cancel' } as const);
+
+/**
+ * Only mounts Google.useAuthRequest when env is valid for the current platform (prevents Android crash).
+ */
+function AuthStackWithGoogleOAuth() {
+  const triple = Google.useAuthRequest({
     expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   });
+  return <AuthStackInner googleOAuth={triple} />;
+}
+
+function AuthStack() {
+  if (isGoogleOAuthConfigured()) {
+    return <AuthStackWithGoogleOAuth />;
+  }
+  return <AuthStackInner googleOAuth={null} />;
+}
+
+/**
+ * Modern authentication navigation stack.
+ * Prioritizes Social Login and Phone OTP with biometric quick-login.
+ */
+function AuthStackInner({ googleOAuth }: { googleOAuth: GoogleOAuthTriple | null }) {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
+  const googleRequest = googleOAuth?.[0] ?? null;
+  const googleResponse = googleOAuth?.[1] ?? null;
+  const googlePromptAsync = googleOAuth?.[2] ?? noopGooglePromptAsync;
+  const googleLoginEnabled = googleOAuth !== null;
 
   const handleAppleLogin = useCallback(async () => {
     setAuthLoading(true);
@@ -244,6 +281,7 @@ function AuthStack() {
             {...props}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
+            googleLoginEnabled={googleLoginEnabled}
             onPhoneLogin={() => handlePhoneLogin(props.navigation)}
             onBiometricLogin={handleBiometricLogin}
             loading={authLoading}
