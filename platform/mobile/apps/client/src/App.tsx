@@ -7,7 +7,6 @@ import Toast from 'react-native-toast-message';
 import { CartProvider } from '@/shared/contexts/CartContext';
 import { queryClient } from '@/shared/config/react-query';
 import { disableConsoleLogs } from '@/shared/utils/logger';
-import { initDeepLinking } from '@/shared/utils/deep-linking';
 import { pushNotificationService } from '@/shared/services/push-notifications';
 import Navigation from './navigation';
 import { theme } from './theme';
@@ -17,14 +16,10 @@ export default function App() {
     // Disable console logs in production
     disableConsoleLogs();
 
-    // Initialize deep linking
-    const cleanupDeepLinking = initDeepLinking();
-
     // Initialize push notifications
     pushNotificationService.initialize();
 
     return () => {
-      cleanupDeepLinking();
       pushNotificationService.cleanup();
     };
   }, []);

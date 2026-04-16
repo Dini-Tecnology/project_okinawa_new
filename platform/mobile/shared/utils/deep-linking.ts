@@ -1,7 +1,6 @@
 import * as Linking from 'expo-linking';
 import * as Sharing from 'expo-sharing';
-import { router } from 'expo-router';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import logger from './logger';
 
 /**
@@ -12,7 +11,7 @@ import logger from './logger';
  * - okinawa://menu/:restaurantId - View restaurant menu
  * - okinawa://order/:orderId - View order details
  * - okinawa://reservation/:reservationId - View reservation
- * - okinawa://qr/:tableId - Scan QR code and navigate to table
+ * - okinawa://qr/:tableId - Open QR scanner / table flow
  *
  * Universal Links:
  * - https://okinawa.app/restaurant/:id
@@ -25,6 +24,31 @@ export interface DeepLinkParams {
   path: string;
   params?: Record<string, string>;
 }
+
+type RootNavigateFn = (
+  name: string,
+  params?: Record<string, unknown>
+) => void;
+
+let rootNavigate: RootNavigateFn | null = null;
+let pendingUrl: string | null = null;
+
+/**
+ * Call from the root NavigationContainer `onReady` so deep links use the same
+ * stack as @react-navigation/native (not expo-router file routes).
+ */
+export const registerDeepLinkNavigation = (fn: RootNavigateFn): void => {
+  rootNavigate = fn;
+  if (pendingUrl) {
+    const url = pendingUrl;
+    pendingUrl = null;
+    handleDeepLink(url);
+  }
+};
+
+export const unregisterDeepLinkNavigation = (): void => {
+  rootNavigate = null;
+};
 
 /**
  * Parse deep link URL and extract path and params
@@ -45,44 +69,58 @@ export const parseDeepLink = (url: string): DeepLinkParams | null => {
 };
 
 /**
- * Handle deep link navigation
+ * Handle deep link navigation (React Navigation screen names / params)
  */
 export const handleDeepLink = (url: string): void => {
+  if (!rootNavigate) {
+    pendingUrl = url;
+    logger.info('Deep link queued until navigator is ready:', url);
+    return;
+  }
+
   const parsed = parseDeepLink(url);
   if (!parsed) {
     logger.warn('Invalid deep link:', url);
     return;
   }
 
-  const { path, params } = parsed;
+  const rawPath = parsed.path || '';
+  const path = rawPath.replace(/^\/+/, '');
+  const { params } = parsed;
   logger.info('Handling deep link:', { path, params });
 
-  // Route based on path
   if (path.startsWith('restaurant/')) {
     const restaurantId = path.split('/')[1];
-    router.push(`/restaurant/${restaurantId}`);
+    if (restaurantId) {
+      rootNavigate('Restaurant', { restaurantId });
+    }
   } else if (path.startsWith('menu/')) {
     const restaurantId = path.split('/')[1];
-    router.push(`/menu/${restaurantId}`);
+    if (restaurantId) {
+      rootNavigate('Menu', { restaurantId });
+    }
   } else if (path.startsWith('order/')) {
     const orderId = path.split('/')[1];
-    router.push(`/orders/${orderId}`);
+    if (orderId) {
+      rootNavigate('OrderStatus', { orderId });
+    }
   } else if (path.startsWith('reservation/')) {
     const reservationId = path.split('/')[1];
-    router.push(`/reservations/${reservationId}`);
+    if (reservationId) {
+      rootNavigate('ReservationDetail', { reservationId });
+    }
   } else if (path.startsWith('qr/')) {
     const tableId = path.split('/')[1];
-    router.push(`/qr/${tableId}`);
+    rootNavigate('QRScanner', tableId ? { tableId } : undefined);
   } else {
     logger.warn('Unknown deep link path:', path);
   }
 };
 
 /**
- * Initialize deep linking listeners
+ * Initialize deep linking listeners (call after registerDeepLinkNavigation)
  */
 export const initDeepLinking = (): (() => void) => {
-  // Handle initial URL (app opened from deep link)
   Linking.getInitialURL().then((url) => {
     if (url) {
       logger.info('App opened with URL:', url);
@@ -90,13 +128,11 @@ export const initDeepLinking = (): (() => void) => {
     }
   });
 
-  // Handle incoming URLs (app already running)
   const subscription = Linking.addEventListener('url', (event) => {
     logger.info('Received deep link:', event.url);
     handleDeepLink(event.url);
   });
 
-  // Return cleanup function
   return () => {
     subscription.remove();
   };
@@ -123,28 +159,21 @@ export const createDeepLink = (
 export const shareDeepLink = async (
   path: string,
   params?: Record<string, string>,
-  message?: string
+  _message?: string
 ): Promise<void> => {
   const url = createDeepLink(path, params);
   logger.info('Sharing deep link:', url);
 
   try {
-    // Check if sharing is available
     const isAvailable = await Sharing.isAvailableAsync();
-    
+
     if (isAvailable) {
-      // Use native share dialog
       await Sharing.shareAsync(url, {
         dialogTitle: 'Compartilhar Link',
         mimeType: 'text/plain',
       });
     } else {
-      // Fallback: Copy to clipboard and show alert
-      Alert.alert(
-        'Compartilhar',
-        `Link copiado: ${url}`,
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Compartilhar', `Link copiado: ${url}`, [{ text: 'OK' }]);
     }
   } catch (error) {
     logger.error('Failed to share deep link:', error);
@@ -153,20 +182,16 @@ export const shareDeepLink = async (
 };
 
 /**
- * Deep link configuration for expo-router
+ * Prefixes / screen names for configuring linking on the root navigator if needed.
  */
 export const deepLinkConfig = {
-  prefixes: [
-    'okinawa://',
-    'https://okinawa.app',
-    'https://*.okinawa.app',
-  ],
+  prefixes: ['okinawa://', 'https://okinawa.app', 'https://*.okinawa.app'],
   config: {
     screens: {
-      Restaurant: 'restaurant/:id',
+      Restaurant: 'restaurant/:restaurantId',
       Menu: 'menu/:restaurantId',
-      Order: 'orders/:orderId',
-      Reservation: 'reservations/:reservationId',
+      OrderStatus: 'order/:orderId',
+      ReservationDetail: 'reservation/:reservationId',
       QRScanner: 'qr/:tableId',
     },
   },
@@ -179,4 +204,6 @@ export default {
   createDeepLink,
   shareDeepLink,
   deepLinkConfig,
+  registerDeepLinkNavigation,
+  unregisterDeepLinkNavigation,
 };

@@ -28,13 +28,6 @@ vi.mock('expo-sharing', () => ({
   shareAsync: vi.fn().mockResolvedValue(undefined),
 }));
 
-// Mock expo-router
-vi.mock('expo-router', () => ({
-  router: {
-    push: vi.fn(),
-  },
-}));
-
 // Mock logger
 vi.mock('../logger', () => ({
   default: {

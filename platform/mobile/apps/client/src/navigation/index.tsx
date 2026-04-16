@@ -11,8 +11,11 @@
  * @module client/navigation
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  NavigationContainer,
+  createNavigationContainerRef,
+} from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Google from 'expo-auth-session/providers/google';
@@ -124,6 +127,11 @@ import { MaintenanceScreen } from '@/shared/screens/MaintenanceScreen';
 import { useMaintenanceCheck } from '@/shared/hooks/useMaintenanceCheck';
 import { onConsentRequired } from '@/shared/services/api';
 import ApiService from '@okinawa/shared/services/api';
+import {
+  initDeepLinking,
+  registerDeepLinkNavigation,
+  unregisterDeepLinkNavigation,
+} from '@/shared/utils/deep-linking';
 
 // Complete auth session for web-based OAuth
 WebBrowser.maybeCompleteAuthSession();
@@ -133,6 +141,8 @@ WebBrowser.maybeCompleteAuthSession();
 // ============================================
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+export const navigationRef = createNavigationContainerRef();
 
 // ============================================
 // AUTH STACK (Passwordless-First)
@@ -676,6 +686,7 @@ function MainStack() {
  * - Error logging to analytics services
  */
 export default function Navigation() {
+  const deepLinkCleanupRef = useRef<(() => void) | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [requiresConsent, setRequiresConsent] = useState(false);
@@ -702,6 +713,14 @@ export default function Navigation() {
     return () => {
       if (unsubscribe) unsubscribe();
       unsubscribeConsent();
+    };
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      deepLinkCleanupRef.current?.();
+      deepLinkCleanupRef.current = null;
+      unregisterDeepLinkNavigation();
     };
   }, []);
 
@@ -768,7 +787,17 @@ export default function Navigation() {
 
   return (
     <ErrorBoundary onError={handleNavigationError}>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          registerDeepLinkNavigation((name, params) => {
+            if (navigationRef.isReady()) {
+              navigationRef.navigate(name as never, params as never);
+            }
+          });
+          deepLinkCleanupRef.current = initDeepLinking();
+        }}
+      >
         {isAuthenticated ? <MainStack /> : <AuthStack />}
       </NavigationContainer>
     </ErrorBoundary>
