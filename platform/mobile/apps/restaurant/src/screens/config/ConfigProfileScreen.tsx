@@ -13,7 +13,6 @@
 
 import React, { useMemo, useEffect, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -21,6 +20,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   TextInput as RNTextInput,
   Switch,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import { useForm, Controller } from 'react-hook-form';

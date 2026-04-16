@@ -13,7 +13,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -22,6 +21,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   IconButton,
   Chip,
 } from 'react-native-paper';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';

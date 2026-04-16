@@ -5,7 +5,28 @@
 
 import React, { createContext, useContext, useState, useCallback, useMemo, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { OkinawaLightTheme, OkinawaDarkTheme, OkinawaTheme } from '../theme';
+import type { OkinawaTheme } from '../theme/okinawaThemes';
+
+// Lazy-require to break the require cycle:
+// ThemeContext → theme/index → ThemeContext (reported by Metro on Windows).
+// Using require() inside a getter ensures okinawaThemes.ts has finished
+// initialising before we read its exports.
+let _light: OkinawaTheme | undefined;
+let _dark: OkinawaTheme | undefined;
+
+function getLightTheme(): OkinawaTheme {
+  if (!_light) {
+    _light = require('../theme/okinawaThemes').OkinawaLightTheme;
+  }
+  return _light!;
+}
+
+function getDarkTheme(): OkinawaTheme {
+  if (!_dark) {
+    _dark = require('../theme/okinawaThemes').OkinawaDarkTheme;
+  }
+  return _dark!;
+}
 
 type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -28,6 +49,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   children,
   defaultMode = 'system',
 }) => {
+  console.log('[THEME] ✅ ThemeProvider rendering');
   const systemColorScheme = useColorScheme();
   const [themeMode, setThemeMode] = useState<ThemeMode>(defaultMode);
 
@@ -39,7 +61,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   }, [themeMode, systemColorScheme]);
 
   const theme = useMemo(() => {
-    return isDark ? OkinawaDarkTheme : OkinawaLightTheme;
+    return isDark ? getDarkTheme() : getLightTheme();
   }, [isDark]);
 
   const toggleTheme = useCallback(() => {

@@ -13,13 +13,13 @@
 
 import React, { useMemo } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

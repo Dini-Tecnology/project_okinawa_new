@@ -13,7 +13,6 @@
 
 import React, { useMemo, useEffect, useCallback, useState } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
@@ -22,6 +21,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   TextInput as RNTextInput,
   Modal,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@/shared/contexts/ThemeContext';

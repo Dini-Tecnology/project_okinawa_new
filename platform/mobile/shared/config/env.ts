@@ -16,6 +16,56 @@
 declare const __DEV__: boolean;
 
 /**
+ * Infer WebSocket URL from HTTP(S) API base (dev convenience).
+ */
+function inferWsUrlFromApiBase(apiBase: string): string {
+  if (apiBase.startsWith('https://')) {
+    return `wss://${apiBase.slice('https://'.length)}`;
+  }
+  if (apiBase.startsWith('http://')) {
+    return `ws://${apiBase.slice('http://'.length)}`;
+  }
+  return 'ws://localhost:3000';
+}
+
+/**
+ * Development API/WS URLs: Android emulator cannot reach host via "localhost".
+ * Prefer EXPO_PUBLIC_* from .env when set; otherwise localhost (iOS/simulator) or 10.0.2.2 (Android emulator).
+ */
+function resolveDevelopmentUrls(): { api: string; ws: string } {
+  const apiFromEnv =
+    typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_API_BASE_URL : undefined;
+  const wsFromEnv =
+    typeof process !== 'undefined' ? process.env.EXPO_PUBLIC_WS_URL : undefined;
+
+  if (apiFromEnv) {
+    return {
+      api: apiFromEnv,
+      ws: wsFromEnv ?? inferWsUrlFromApiBase(apiFromEnv),
+    };
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Platform } = require('react-native');
+    if (Platform.OS === 'android') {
+      const api = 'http://10.0.2.2:3000';
+      return {
+        api,
+        ws: wsFromEnv ?? 'ws://10.0.2.2:3000',
+      };
+    }
+  } catch {
+    // Jest / Node — default to localhost
+  }
+
+  return {
+    api: 'http://localhost:3000',
+    ws: wsFromEnv ?? 'ws://localhost:3000',
+  };
+}
+
+/**
  * Environment type definition
  */
 export type Environment = 'development' | 'staging' | 'production';
@@ -73,16 +123,18 @@ interface EnvironmentConfig {
   TERMS_OF_SERVICE_URL: string;
 }
 
+const developmentUrls = resolveDevelopmentUrls();
+
 /**
  * Development environment configuration
  */
 const developmentConfig: EnvironmentConfig = {
-  // API Configuration
-  API_BASE_URL: 'http://localhost:3000',
+  // API Configuration (Android emulator: 10.0.2.2; override via EXPO_PUBLIC_API_BASE_URL)
+  API_BASE_URL: developmentUrls.api,
   API_TIMEOUT_MS: 30000,
   
   // WebSocket Configuration
-  WS_URL: 'ws://localhost:3000',
+  WS_URL: developmentUrls.ws,
   WS_RECONNECT_INTERVAL_MS: 5000,
   
   // Authentication
@@ -187,61 +239,67 @@ function requireEnv(key: string, defaultValue?: string): string {
 }
 
 /**
- * Production environment configuration
+ * Production environment configuration factory.
  *
  * Values are read from EAS build environment variables.
  * Configure in eas.json under build.production.env or via `eas secret:create`.
+ *
+ * Kept as a function so `requireEnv` is not evaluated during dev/staging startup.
  */
-const productionConfig: EnvironmentConfig = {
-  API_BASE_URL: requireEnv('API_BASE_URL', 'https://api.noowebr.com'),
-  API_TIMEOUT_MS: 30000,
+function createProductionConfig(): EnvironmentConfig {
+  return {
+    API_BASE_URL: requireEnv('API_BASE_URL', 'https://api.noowebr.com'),
+    API_TIMEOUT_MS: 30000,
 
-  WS_URL: requireEnv('WS_URL', 'wss://api.noowebr.com'),
-  WS_RECONNECT_INTERVAL_MS: 5000,
+    WS_URL: requireEnv('WS_URL', 'wss://api.noowebr.com'),
+    WS_RECONNECT_INTERVAL_MS: 5000,
 
-  AUTH_TOKEN_EXPIRY_DAYS: 7,
-  AUTH_REFRESH_TOKEN_EXPIRY_DAYS: 30,
+    AUTH_TOKEN_EXPIRY_DAYS: 7,
+    AUTH_REFRESH_TOKEN_EXPIRY_DAYS: 30,
 
-  SENTRY_DSN: requireEnv('SENTRY_DSN'),
-  FIREBASE_PROJECT_ID: requireEnv('FIREBASE_PROJECT_ID'),
-  FIREBASE_APP_ID: requireEnv('FIREBASE_APP_ID'),
-  FIREBASE_API_KEY: requireEnv('FIREBASE_API_KEY'),
-  FIREBASE_MESSAGING_SENDER_ID: requireEnv('FIREBASE_MESSAGING_SENDER_ID'),
+    SENTRY_DSN: requireEnv('SENTRY_DSN'),
+    FIREBASE_PROJECT_ID: requireEnv('FIREBASE_PROJECT_ID'),
+    FIREBASE_APP_ID: requireEnv('FIREBASE_APP_ID'),
+    FIREBASE_API_KEY: requireEnv('FIREBASE_API_KEY'),
+    FIREBASE_MESSAGING_SENDER_ID: requireEnv('FIREBASE_MESSAGING_SENDER_ID'),
 
-  ANALYTICS_ENABLED: true,
-  ANALYTICS_DEBUG: false,
+    ANALYTICS_ENABLED: true,
+    ANALYTICS_DEBUG: false,
 
-  FEATURES: {
-    BIOMETRIC_AUTH: true,
-    PUSH_NOTIFICATIONS: true,
-    OFFLINE_MODE: true,
-    AI_FEATURES: true,
-    GEOLOCATION: true,
-  },
+    FEATURES: {
+      BIOMETRIC_AUTH: true,
+      PUSH_NOTIFICATIONS: true,
+      OFFLINE_MODE: true,
+      AI_FEATURES: true,
+      GEOLOCATION: true,
+    },
 
-  APP_STORE_URL: requireEnv('APP_STORE_URL', 'https://apps.apple.com/app/noowe/id0000000000'),
-  PLAY_STORE_URL: requireEnv('PLAY_STORE_URL', 'https://play.google.com/store/apps/details?id=com.noowe.client'),
+    APP_STORE_URL: requireEnv('APP_STORE_URL', 'https://apps.apple.com/app/noowe/id0000000000'),
+    PLAY_STORE_URL: requireEnv('PLAY_STORE_URL', 'https://play.google.com/store/apps/details?id=com.noowe.client'),
 
-  SUPPORT_EMAIL: 'help@noowebr.com',
-  SUPPORT_PHONE: '+55 11 0000-0000',
-  PRIVACY_POLICY_URL: requireEnv('PRIVACY_POLICY_URL', 'https://noowebr.com/privacy'),
-  TERMS_OF_SERVICE_URL: requireEnv('TERMS_OF_SERVICE_URL', 'https://noowebr.com/terms'),
-};
+    SUPPORT_EMAIL: 'help@noowebr.com',
+    SUPPORT_PHONE: '+55 11 0000-0000',
+    PRIVACY_POLICY_URL: requireEnv('PRIVACY_POLICY_URL', 'https://noowebr.com/privacy'),
+    TERMS_OF_SERVICE_URL: requireEnv('TERMS_OF_SERVICE_URL', 'https://noowebr.com/terms'),
+  };
+}
 
-/**
- * Environment configuration map
- */
-const configs: Record<Environment, EnvironmentConfig> = {
-  development: developmentConfig,
-  staging: stagingConfig,
-  production: productionConfig,
-};
+let productionConfigCache: EnvironmentConfig | null = null;
+
+function getProductionConfig(): EnvironmentConfig {
+  if (!productionConfigCache) {
+    productionConfigCache = createProductionConfig();
+  }
+  return productionConfigCache;
+}
 
 /**
  * Get the current environment configuration
  */
 export const getEnvConfig = (): EnvironmentConfig => {
-  return configs[CURRENT_ENV];
+  if (CURRENT_ENV === 'development') return developmentConfig;
+  if (CURRENT_ENV === 'staging') return stagingConfig;
+  return getProductionConfig();
 };
 
 /**

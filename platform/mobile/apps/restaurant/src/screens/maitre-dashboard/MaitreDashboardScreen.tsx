@@ -13,7 +13,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -24,9 +23,10 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Divider,
   SegmentedButtons,
 } from 'react-native-paper';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { t } from '@/shared/i18n';
 import ApiService from '@/shared/services/api';

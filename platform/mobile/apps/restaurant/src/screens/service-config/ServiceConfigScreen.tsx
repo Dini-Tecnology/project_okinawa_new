@@ -13,7 +13,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, Switch, ActivityIndicator } from 'react-native';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -24,6 +23,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   SegmentedButtons,
   RadioButton,
 } from 'react-native-paper';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';

@@ -8,9 +8,8 @@
  * @module restaurant/screens/club
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -18,6 +17,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Platform,
   TextInput as RNTextInput,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   Button,
@@ -92,11 +92,13 @@ function triggerHaptic(type: 'success' | 'error' | 'warning') {
 function ScanResultDisplay({
   result,
   colors,
+  styles,
   onCheckIn,
   isCheckingIn,
 }: {
   result: ScanResult;
   colors: ReturnType<typeof useColors>;
+  styles: ReturnType<typeof createStyles>;
   onCheckIn: () => void;
   isCheckingIn: boolean;
 }) {
@@ -227,6 +229,7 @@ function ScanResultDisplay({
 
 export default function DoorControlScreen({ route }: DoorControlScreenProps) {
   const colors = useColors();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const queryClient = useQueryClient();
 
   const restaurantId = route?.params?.restaurantId || '';
@@ -423,6 +426,7 @@ export default function DoorControlScreen({ route }: DoorControlScreenProps) {
           <ScanResultDisplay
             result={scanResult}
             colors={colors}
+            styles={styles}
             onCheckIn={handleCheckIn}
             isCheckingIn={checkInMutation.isPending}
           />
@@ -480,96 +484,97 @@ export default function DoorControlScreen({ route }: DoorControlScreenProps) {
 // STYLES
 // ============================================
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  content: {
-    padding: 16,
-    gap: 16,
-    paddingBottom: 40,
-  },
-  header: {
-    paddingVertical: 4,
-  },
-  occupancyCard: {
-    borderRadius: 16,
-  },
-  occupancyContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-  },
-  occupancyItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  occupancyDivider: {
-    width: 1,
-    height: 40,
-    backgroundColor: colors.muted,
-    marginHorizontal: 16,
-  },
-  scanBtn: {
-    borderRadius: 16,
-  },
-  scanBtnContent: {
-    height: 64,
-  },
-  scanBtnLabel: {
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  resultCard: {
-    borderRadius: 16,
-  },
-  resultContent: {
-    alignItems: 'center',
-    gap: 12,
-    padding: 24,
-  },
-  statusBadge: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  statusIcon: {
-    color: colors.premiumCardForeground,
-    fontSize: 32,
-    fontWeight: '800',
-  },
-  guestInfo: {
-    width: '100%',
-    gap: 8,
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-  },
-  guestRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  checkInBtn: {
-    borderRadius: 12,
-    marginTop: 12,
-  },
-  clearBtn: {
-    alignSelf: 'center',
-  },
-  searchCard: {
-    borderRadius: 16,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-  },
-  searchInput: {
-    flex: 1,
-  },
-});
+const createStyles = (colors: ReturnType<typeof useColors>) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    content: {
+      padding: 16,
+      gap: 16,
+      paddingBottom: 40,
+    },
+    header: {
+      paddingVertical: 4,
+    },
+    occupancyCard: {
+      borderRadius: 16,
+    },
+    occupancyContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: 16,
+    },
+    occupancyItem: {
+      flex: 1,
+      alignItems: 'center',
+    },
+    occupancyDivider: {
+      width: 1,
+      height: 40,
+      backgroundColor: colors.muted,
+      marginHorizontal: 16,
+    },
+    scanBtn: {
+      borderRadius: 16,
+    },
+    scanBtnContent: {
+      height: 64,
+    },
+    scanBtnLabel: {
+      fontSize: 18,
+      fontWeight: '700',
+    },
+    resultCard: {
+      borderRadius: 16,
+    },
+    resultContent: {
+      alignItems: 'center',
+      gap: 12,
+      padding: 24,
+    },
+    statusBadge: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    statusIcon: {
+      color: colors.premiumCardForeground,
+      fontSize: 32,
+      fontWeight: '800',
+    },
+    guestInfo: {
+      width: '100%',
+      gap: 8,
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.borderLight,
+    },
+    guestRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    checkInBtn: {
+      borderRadius: 12,
+      marginTop: 12,
+    },
+    clearBtn: {
+      alignSelf: 'center',
+    },
+    searchCard: {
+      borderRadius: 16,
+    },
+    searchRow: {
+      flexDirection: 'row',
+      gap: 8,
+      alignItems: 'center',
+    },
+    searchInput: {
+      flex: 1,
+    },
+  });

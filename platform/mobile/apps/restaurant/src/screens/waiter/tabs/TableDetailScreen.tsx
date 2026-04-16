@@ -9,7 +9,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   Text,
   ScrollView,
@@ -17,6 +16,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   TextInput,
   StyleSheet,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { useI18n } from '@/shared/hooks/useI18n';

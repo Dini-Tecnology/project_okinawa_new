@@ -10,7 +10,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -20,6 +19,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Modal,
   Pressable,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   IconButton,

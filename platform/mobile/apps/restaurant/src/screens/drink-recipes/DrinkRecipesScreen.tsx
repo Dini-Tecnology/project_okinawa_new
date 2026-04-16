@@ -17,7 +17,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   FlatList,
   StyleSheet,
@@ -26,10 +25,11 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Image,
   ScrollView as HScrollView,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Searchbar, Chip } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { t } from '@/shared/i18n';
 
 // ============================================

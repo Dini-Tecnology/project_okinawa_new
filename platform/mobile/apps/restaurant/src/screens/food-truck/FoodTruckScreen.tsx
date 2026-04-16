@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -10,6 +9,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Switch,
   Platform,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Card, Button, Badge, IconButton } from 'react-native-paper';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors, useOkinawaTheme } from '@okinawa/shared/contexts/ThemeContext';

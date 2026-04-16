@@ -13,13 +13,13 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   StyleSheet,
   Alert,
   RefreshControl,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   Card,

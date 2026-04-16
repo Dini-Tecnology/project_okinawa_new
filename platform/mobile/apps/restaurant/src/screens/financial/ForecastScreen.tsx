@@ -11,7 +11,6 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Chip,
@@ -19,6 +18,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   ActivityIndicator,
   IconButton,
 } from 'react-native-paper';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
@@ -26,7 +26,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 
 const screenWidth = Dimensions.get('window').width;

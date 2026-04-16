@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { format } from 'date-fns';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@okinawa/shared/theme';
+import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 

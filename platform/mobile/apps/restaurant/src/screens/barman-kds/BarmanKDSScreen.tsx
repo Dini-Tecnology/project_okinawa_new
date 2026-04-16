@@ -10,7 +10,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, RefreshControl, Alert } from 'react-native';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Text,
   Card,
   Button,
@@ -19,9 +18,10 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   IconButton,
   SegmentedButtons,
 } from 'react-native-paper';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { t } from '@/shared/i18n';
 
 interface DrinkItem {

@@ -107,9 +107,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "78d5da5d-5049-4569-b08e-6113c5ef5092"
       }
     },
-    "owner": "okinawa"
+    "owner": "dini-technologies"
   }
 }

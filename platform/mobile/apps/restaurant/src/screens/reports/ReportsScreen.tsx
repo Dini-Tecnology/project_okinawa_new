@@ -14,7 +14,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -23,6 +22,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Chip } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';

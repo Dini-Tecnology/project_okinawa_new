@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "546300193679",
+    "project_id": "noowe-restaurant",
+    "storage_bucket": "noowe-restaurant.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:546300193679:android:82915ac53790c7a9f9f9fa",
+        "android_client_info": {
+          "package_name": "com.noowe.restaurant"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATfqttBAv6KZksZUEA2IWqMsLj-yE-U58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -13,7 +13,6 @@
 
 import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -22,6 +21,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Card, IconButton } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';

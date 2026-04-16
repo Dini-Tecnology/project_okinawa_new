@@ -25,6 +25,8 @@ interface WelcomeScreenProps {
   navigation: any;
   onAppleLogin: () => void;
   onGoogleLogin: () => void;
+  /** When false, Google sign-in is hidden (e.g. missing OAuth client IDs in env). */
+  googleLoginEnabled?: boolean;
   onPhoneLogin: () => void;
   onBiometricLogin: () => void;
   loading?: boolean;
@@ -35,6 +37,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   navigation,
   onAppleLogin,
   onGoogleLogin,
+  googleLoginEnabled = true,
   onPhoneLogin,
   onBiometricLogin,
   loading = false,
@@ -140,27 +143,32 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               disabled={loading || biometricLoading}
               variant="primary"
             />
-            <SocialLoginButton
-              provider="google"
-              onPress={onGoogleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-            />
+            {googleLoginEnabled && (
+              <SocialLoginButton
+                provider="google"
+                onPress={onGoogleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+              />
+            )}
           </>
         ) : (
           <>
-            <SocialLoginButton
-              provider="google"
-              onPress={onGoogleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-              variant="primary"
-            />
+            {googleLoginEnabled && (
+              <SocialLoginButton
+                provider="google"
+                onPress={onGoogleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+                variant="primary"
+              />
+            )}
             <SocialLoginButton
               provider="apple"
               onPress={onAppleLogin}
               loading={loading}
               disabled={loading || biometricLoading}
+              variant={googleLoginEnabled ? 'outlined' : 'primary'}
             />
           </>
         )}

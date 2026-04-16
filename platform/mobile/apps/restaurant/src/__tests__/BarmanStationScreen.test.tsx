@@ -29,7 +29,7 @@ vi.mock('@/shared/i18n', () => ({
   t: (key: string) => key,
 }));
 
-vi.mock('@/shared/theme', () => ({
+vi.mock('@/shared/contexts/ThemeContext', () => ({
   useColors: () => ({
     background: '#FFFFFF',
     backgroundSecondary: '#F9FAFB',

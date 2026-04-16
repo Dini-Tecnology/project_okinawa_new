@@ -7,7 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import type { Reservation, ReservationStatus } from '../../types';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {
@@ -271,7 +271,7 @@ export default function ReservationDetailScreen() {
               mode="outlined"
               onPress={() => handleStatusChange('no_show')}
               style={styles.actionButton}
-              textColor=colors.foregroundMuted
+              textColor={colors.foregroundMuted}
               icon="account-off"
               accessibilityRole="button"
               accessibilityLabel={t('reservations.markNoShow')}
@@ -282,7 +282,7 @@ export default function ReservationDetailScreen() {
               mode="outlined"
               onPress={() => handleStatusChange('cancelled')}
               style={styles.cancelButton}
-              textColor=colors.error
+              textColor={colors.error}
               icon="close-circle"
               accessibilityRole="button"
               accessibilityLabel={t('reservations.cancelReservation')}

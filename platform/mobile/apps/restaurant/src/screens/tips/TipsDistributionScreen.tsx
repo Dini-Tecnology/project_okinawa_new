@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface StaffTips {

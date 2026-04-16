@@ -11,7 +11,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   ScrollView,
   FlatList,
@@ -24,6 +23,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   Card,

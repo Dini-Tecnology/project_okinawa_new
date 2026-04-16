@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -217,20 +218,57 @@ const Drawer = createDrawerNavigator();
 // AUTH STACK (Passwordless-First)
 // ============================================
 
-/**
- * Modern authentication navigation stack for restaurant staff.
- * Prioritizes Social Login and Phone OTP with biometric quick-login.
- */
-function AuthStack() {
-  const [authLoading, setAuthLoading] = useState(false);
-  const [biometricLoading, setBiometricLoading] = useState(false);
+type GoogleOAuthTriple = [
+  Parameters<typeof socialAuthService.signInWithGoogle>[0],
+  Parameters<typeof socialAuthService.signInWithGoogle>[1],
+  Parameters<typeof socialAuthService.signInWithGoogle>[2],
+];
 
-  // Google OAuth configuration
-  const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
+/** expo-auth-session requires platform-specific client IDs; avoid mounting useAuthRequest without them. */
+function isGoogleOAuthConfigured(): boolean {
+  if (Platform.OS === 'android') {
+    return Boolean(process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID);
+  }
+  if (Platform.OS === 'ios') {
+    return Boolean(process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID);
+  }
+  return Boolean(process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID);
+}
+
+const noopGooglePromptAsync: GoogleOAuthTriple[2] = async () =>
+  ({ type: 'cancel' } as const);
+
+/**
+ * Only mounts Google.useAuthRequest when env is valid for the current platform (prevents Android crash).
+ */
+function AuthStackWithGoogleOAuth() {
+  const triple = Google.useAuthRequest({
     expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
   });
+  return <AuthStackInner googleOAuth={triple} />;
+}
+
+function AuthStack() {
+  if (isGoogleOAuthConfigured()) {
+    return <AuthStackWithGoogleOAuth />;
+  }
+  return <AuthStackInner googleOAuth={null} />;
+}
+
+/**
+ * Modern authentication navigation stack for restaurant staff.
+ * Prioritizes Social Login and Phone OTP with biometric quick-login.
+ */
+function AuthStackInner({ googleOAuth }: { googleOAuth: GoogleOAuthTriple | null }) {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
+
+  const googleRequest = googleOAuth?.[0] ?? null;
+  const googleResponse = googleOAuth?.[1] ?? null;
+  const googlePromptAsync = googleOAuth?.[2] ?? noopGooglePromptAsync;
+  const googleLoginEnabled = googleOAuth !== null;
 
   const handleAppleLogin = useCallback(async () => {
     setAuthLoading(true);
@@ -307,6 +345,7 @@ function AuthStack() {
             {...props}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
+            googleLoginEnabled={googleLoginEnabled}
             onPhoneLogin={() => handlePhoneLogin(props.navigation)}
             onBiometricLogin={handleBiometricLogin}
             loading={authLoading}
@@ -1082,6 +1121,7 @@ function MainDrawer() {
  * Wraps all navigation with ErrorBoundary for crash protection.
  */
 export default function Navigation() {
+  console.log('[NAV] ✅ Navigation component rendering');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [requiresConsent, setRequiresConsent] = useState(false);
@@ -1115,13 +1155,17 @@ export default function Navigation() {
    * Checks stored authentication state on app launch.
    */
   const checkAuth = async () => {
+    console.log('[NAV] ⏳ checkAuth starting...');
     try {
       const user = await authService.getStoredUser();
+      console.log('[NAV] ✅ checkAuth got user:', !!user);
       setIsAuthenticated(!!user);
     } catch (error) {
+      console.error('[NAV] ❌ checkAuth failed:', error);
       logger.error('Auth check failed:', error);
       setIsAuthenticated(false);
     } finally {
+      console.log('[NAV] ✅ checkAuth done, setting isLoading=false');
       setIsLoading(false);
     }
   };
@@ -1140,8 +1184,10 @@ export default function Navigation() {
 
   // Show nothing while checking auth (splash screen should be visible)
   if (isLoading) {
+    console.log('[NAV] ⏳ Still loading auth... returning null');
     return null;
   }
+  console.log('[NAV] ✅ Auth loaded. isAuthenticated:', isAuthenticated, 'requiresConsent:', requiresConsent, 'isInMaintenance:', isInMaintenance);
 
   // LGPD Sprint 2: Show re-consent screen when terms/privacy version changed (HTTP 451)
   if (requiresConsent && consentVersions) {

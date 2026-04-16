@@ -13,7 +13,6 @@
 
 import React, { useMemo, useCallback, useEffect } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -21,6 +20,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   RefreshControl,
   useWindowDimensions,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Card, Badge } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useQuery } from '@tanstack/react-query';

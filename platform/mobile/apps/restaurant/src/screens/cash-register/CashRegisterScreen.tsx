@@ -9,7 +9,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -19,6 +18,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Platform,
   ScrollView,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   Button,

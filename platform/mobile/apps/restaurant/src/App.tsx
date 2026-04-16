@@ -12,12 +12,13 @@
  * @module App
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, Component, ReactNode } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PaperProvider } from 'react-native-paper';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Navigation from './navigation';
 import { theme } from './theme';
 import socketService from './services/socket';
@@ -25,14 +26,62 @@ import { authService } from '@/shared/services/auth';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
 import { RestaurantProvider } from '@/shared/contexts/RestaurantContext';
 
+console.log('[APP] ✅ All imports resolved successfully');
+
+// Hide splash as early as possible at the module level.
+// This ensures the splash is dismissed even if React tree crashes during mount.
+SplashScreen.hideAsync()
+  .then(() => console.log('[APP] ✅ SplashScreen.hideAsync() succeeded'))
+  .catch((err) => console.warn('[APP] ⚠️ SplashScreen.hideAsync() failed:', err));
+
 // Configure React Query with sensible defaults for restaurant operations
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
-      staleTime: 5 * 60 * 1000, // 5 minutes - balance between freshness and API load
+      staleTime: 5 * 60 * 1000,
     },
   },
+});
+
+interface RootErrorState { hasError: boolean; error: Error | null }
+
+class RootErrorBoundary extends Component<{ children: ReactNode }, RootErrorState> {
+  state: RootErrorState = { hasError: false, error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error('[RootErrorBoundary]', error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={rootErrorStyles.container}>
+          <Text style={rootErrorStyles.title}>Algo deu errado</Text>
+          <Text style={rootErrorStyles.message}>{this.state.error?.message}</Text>
+          <TouchableOpacity
+            style={rootErrorStyles.button}
+            onPress={() => this.setState({ hasError: false, error: null })}
+          >
+            <Text style={rootErrorStyles.buttonText}>Tentar novamente</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const rootErrorStyles = StyleSheet.create({
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32, backgroundColor: '#fff' },
+  title: { fontSize: 22, fontWeight: '700', color: '#1F2937', marginBottom: 12 },
+  message: { fontSize: 14, color: '#6B7280', textAlign: 'center', marginBottom: 24 },
+  button: { backgroundColor: '#A855F7', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 8 },
+  buttonText: { color: '#fff', fontWeight: '600', fontSize: 16 },
 });
 
 /**
@@ -126,17 +175,20 @@ function AppContent() {
  * 5. PaperProvider - React Native Paper UI components
  */
 export default function App() {
+  console.log('[APP] ✅ App component rendering');
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <RestaurantProvider>
-            <PaperProvider theme={theme}>
-              <AppContent />
-            </PaperProvider>
-          </RestaurantProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <RootErrorBoundary>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider>
+            <RestaurantProvider>
+              <PaperProvider theme={theme}>
+                <AppContent />
+              </PaperProvider>
+            </RestaurantProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </RootErrorBoundary>
   );
 }

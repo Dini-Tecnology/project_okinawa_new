@@ -10,7 +10,6 @@
 
 import React, { useState, useMemo, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   ScrollView,
@@ -18,6 +17,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Alert,
   Modal,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import {
   Text,
   Card,
@@ -35,7 +35,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { formatCurrency } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { billSchema, validateForm } from '@okinawa/shared/validation/schemas';
 

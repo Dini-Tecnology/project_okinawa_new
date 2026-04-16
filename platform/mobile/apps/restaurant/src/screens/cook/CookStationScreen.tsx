@@ -20,7 +20,6 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   View,
   StyleSheet,
   FlatList,
@@ -30,6 +29,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
   Animated,
   useWindowDimensions,
 } from 'react-native';
+import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { Text, Card, Chip, IconButton, Button, Badge } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { format } from 'date-fns';
