@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 220" width="880" height="220">
+  <defs>
+    <!-- Orange ring: radial gradient for 3D torus effect -->
+    <radialGradient id="ogMain" cx="0.38" cy="0.32" r="0.62" fx="0.35" fy="0.28">
+      <stop offset="0%" stop-color="#FFB87A"/>
+      <stop offset="30%" stop-color="#FF9150"/>
+      <stop offset="60%" stop-color="#FF7030"/>
+      <stop offset="85%" stop-color="#E85520"/>
+      <stop offset="100%" stop-color="#C44018"/>
+    </radialGradient>
+    <!-- Orange ring shadow/depth layer -->
+    <radialGradient id="ogShadow" cx="0.65" cy="0.72" r="0.55">
+      <stop offset="0%" stop-color="#D04A18" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#D04A18" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Teal ring: radial gradient for 3D torus effect -->
+    <radialGradient id="tgMain" cx="0.42" cy="0.30" r="0.62" fx="0.38" fy="0.26">
+      <stop offset="0%" stop-color="#52DDB8"/>
+      <stop offset="25%" stop-color="#2FB898"/>
+      <stop offset="55%" stop-color="#1A9478"/>
+      <stop offset="80%" stop-color="#0D7060"/>
+      <stop offset="100%" stop-color="#084A40"/>
+    </radialGradient>
+    <!-- Teal ring shadow/depth -->
+    <radialGradient id="tgShadow" cx="0.62" cy="0.70" r="0.50">
+      <stop offset="0%" stop-color="#064038" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#064038" stop-opacity="0"/>
+    </radialGradient>
+    
+    <!-- Overlap blend -->
+    <linearGradient id="blendOv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#CC7828"/>
+      <stop offset="35%" stop-color="#8A8838"/>
+      <stop offset="70%" stop-color="#3A8858"/>
+      <stop offset="100%" stop-color="#1A7858"/>
+    </linearGradient>
+    
+    <!-- Masks for donut holes -->
+    <mask id="mL">
+      <rect width="880" height="220" fill="white"/>
+      <circle cx="290" cy="110" r="50" fill="black"/>
+    </mask>
+    <mask id="mR">
+      <rect width="880" height="220" fill="white"/>
+      <circle cx="400" cy="110" r="50" fill="black"/>
+    </mask>
+    <mask id="mBoth">
+      <rect width="880" height="220" fill="white"/>
+      <circle cx="290" cy="110" r="50" fill="black"/>
+      <circle cx="400" cy="110" r="50" fill="black"/>
+    </mask>
+    
+    <!-- Clip for overlap intersection -->
+    <clipPath id="clipInter">
+      <circle cx="290" cy="110" r="95"/>
+    </clipPath>
+    <clipPath id="clipInter2">
+      <circle cx="400" cy="110" r="95"/>
+    </clipPath>
+    
+    <!-- Clip for non-overlap parts -->
+    <clipPath id="noTeal">
+      <path d="M0,0 H880 V220 H0 Z M400,110 m-95,0 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0" clip-rule="evenodd"/>
+    </clipPath>
+    <clipPath id="noOrange">
+      <path d="M0,0 H880 V220 H0 Z M290,110 m-95,0 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0" clip-rule="evenodd"/>
+    </clipPath>
+  </defs>
+
+  <!-- ══════ LETTER N ══════ -->
+  <!-- Using Montserrat Black-style bold geometric N -->
+  <path d="M12,195 L12,25 L54,25 L54,130 L142,25 L142,25 L180,25 L180,195 L142,195 L142,90 L54,195 Z" fill="#2D3436"/>
+
+  <!-- ══════ OVERLAPPING RINGS ══════ -->
+  
+  <!-- ORANGE RING: non-overlap portion only -->
+  <g clip-path="url(#noTeal)">
+    <circle cx="290" cy="110" r="95" fill="url(#ogMain)" mask="url(#mL)"/>
+    <circle cx="290" cy="110" r="95" fill="url(#ogShadow)" mask="url(#mL)"/>
+  </g>
+  
+  <!-- TEAL RING: non-overlap portion only -->
+  <g clip-path="url(#noOrange)">
+    <circle cx="400" cy="110" r="95" fill="url(#tgMain)" mask="url(#mR)"/>
+    <circle cx="400" cy="110" r="95" fill="url(#tgShadow)" mask="url(#mR)"/>
+  </g>
+  
+  <!-- OVERLAP ZONE: blended gradient with depth -->
+  <g clip-path="url(#clipInter2)">
+    <g clip-path="url(#clipInter)">
+      <rect x="195" y="15" width="300" height="190" fill="url(#blendOv)" mask="url(#mBoth)"/>
+    </g>
+  </g>
+
+  <!-- ══════ LETTER W ══════ -->
+  <path d="M520,25 L556,25 L587,150 L620,25 L656,25 L689,150 L720,25 L756,25 L706,195 L672,195 L638,75 L604,195 L570,195 Z" fill="#2D3436"/>
+
+  <!-- ══════ LETTER E ══════ -->
+  <path d="M785,25 L875,25 L875,58 L822,58 L822,95 L868,95 L868,128 L822,128 L822,162 L875,162 L875,195 L785,195 Z" fill="#2D3436"/>
+</svg>

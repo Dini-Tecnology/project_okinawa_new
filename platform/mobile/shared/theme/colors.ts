@@ -7,84 +7,84 @@
  */
 
 export const colorPalette = {
-  // Primary - Warm Sophisticated Orange
+  // Primary - Website brand orange
   primary: {
-    50: '#FFF7ED',
-    100: '#FFEDD5',
-    200: '#FED7AA',
-    300: '#FDBA74',
-    400: '#FB923C',
-    500: '#F97316',
-    600: '#EA580C', // Main brand color
-    700: '#C2410C',
-    800: '#9A3412',
-    900: '#7C2D12',
+    50: '#FFF4F0',
+    100: '#FFE0D6',
+    200: '#FFC1AD',
+    300: '#FFA184',
+    400: '#FF764D',
+    500: '#FF5724', // Main brand color (site --primary)
+    600: '#E63600',
+    700: '#B82C00',
+    800: '#8A2100',
+    900: '#5C1600',
   },
   
-  // Secondary - Teal (Trust, Fresh, Innovation)
+  // Secondary - Website brand teal
   secondary: {
-    50: '#F0FDFA',
-    100: '#CCFBF1',
-    200: '#99F6E4',
-    300: '#5EEAD4',
-    400: '#2DD4BF',
-    500: '#14B8A6',
-    600: '#0D9488',
-    700: '#0F766E',
-    800: '#115E59',
-    900: '#134E4A',
+    50: '#EDF7F6',
+    100: '#D0E9E6',
+    200: '#A1D3CD',
+    300: '#72BDB4',
+    400: '#288A81',
+    500: '#186860',
+    600: '#0E4E48',
+    700: '#0B3F3A',
+    800: '#08302C',
+    900: '#05201D',
   },
   
-  // Accent - Warm Gold (Premium, Special Moments)
+  // Accent - Website warning/accent amber
   accent: {
-    50: '#FFFBEB',
-    100: '#FEF3C7',
-    200: '#FDE68A',
-    300: '#FCD34D',
-    400: '#FBBF24',
-    500: '#F59E0B',
-    600: '#D97706',
-    700: '#B45309',
-    800: '#92400E',
-    900: '#78350F',
+    50: '#FFF8E8',
+    100: '#FFEEC2',
+    200: '#FFDE85',
+    300: '#FFCD47',
+    400: '#F7B22A',
+    500: '#F59F0A',
+    600: '#D98609',
+    700: '#AD6B07',
+    800: '#825005',
+    900: '#563503',
   },
   
-  // Neutral - Gray scale
+  // Neutral - aligned with site tokens
   neutral: {
     0: '#FFFFFF',
-    50: '#F9FAFB',
-    100: '#F3F4F6',
+    50: '#F9FAFA',
+    100: '#F4F4F6',
     200: '#E5E7EB',
     300: '#D1D5DB',
-    400: '#9CA3AF',
-    500: '#6B7280',
-    600: '#4B5563',
-    700: '#374151',
-    800: '#1F2937',
-    900: '#111827',
-    950: '#0D1117',
+    400: '#A2A9B6',
+    500: '#757C8A',
+    600: '#5A6170',
+    700: '#424956',
+    800: '#2D323D',
+    900: '#1F2229',
+    950: '#0F1114',
   },
   
   // Status colors
   success: {
-    light: '#34D399',
-    main: '#10B981',
-    dark: '#059669',
+    light: '#49C485',
+    main: '#20AC6B',
+    dark: '#17824F',
   },
   warning: {
-    light: '#FBBF24',
-    main: '#F59E0B',
-    dark: '#D97706',
+    light: '#F7B22A',
+    main: '#F59F0A',
+    dark: '#D98609',
   },
   error: {
-    light: '#F87171',
-    main: '#EF4444',
-    dark: '#DC2626',
+    light: '#F36C6C',
+    main: '#EF4343',
+    dark: '#CF2F2F',
   },
   info: {
-    light: '#60A5FA',
-    main: '#3B82F6',
-    dark: '#2563EB',
+    light: '#41B8EC',
+    main: '#0DA2E7',
+    dark: '#0A82B9',
   },
 };
 
@@ -107,16 +107,16 @@ export const lightTheme = {
   cardBorder: colorPalette.neutral[200],
   
   // Primary Actions
-  primary: colorPalette.primary[600],
+  primary: colorPalette.primary[500],
   primaryLight: colorPalette.primary[400],
-  primaryDark: colorPalette.primary[700],
+  primaryDark: colorPalette.primary[600],
   primaryForeground: colorPalette.neutral[0],
-  primaryGlow: 'rgba(234, 88, 12, 0.25)',
+  primaryGlow: 'rgba(255, 87, 36, 0.25)',
   
   // Secondary Actions
-  secondary: colorPalette.secondary[600],
+  secondary: colorPalette.secondary[500],
   secondaryLight: colorPalette.secondary[400],
-  secondaryDark: colorPalette.secondary[700],
+  secondaryDark: colorPalette.secondary[600],
   secondaryForeground: colorPalette.neutral[0],
   
   // Accent
@@ -366,11 +366,11 @@ export const darkTheme = {
 
 // Gradients
 export const gradients = {
-  primary: ['#EA580C', '#F59E0B'],
-  primarySubtle: ['rgba(234, 88, 12, 0.8)', 'rgba(245, 158, 11, 0.8)'],
-  secondary: ['#0D9488', '#14B8A6'],
-  accent: ['#D97706', '#FBBF24'],
-  hero: ['#EA580C', '#0D9488'],
+  primary: ['#FF5724', '#F59F0A'],
+  primarySubtle: ['rgba(255, 87, 36, 0.8)', 'rgba(245, 159, 10, 0.8)'],
+  secondary: ['#186860', '#288A81'],
+  accent: ['#D98609', '#F7B22A'],
+  hero: ['#FF5724', '#186860'],
   glass: ['rgba(255, 255, 255, 0.4)', 'rgba(255, 255, 255, 0)'],
   glassDark: ['rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0)'],
   cardShine: ['rgba(255, 255, 255, 0)', 'rgba(255, 255, 255, 0.1)', 'rgba(255, 255, 255, 0)'],

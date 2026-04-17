@@ -137,6 +137,12 @@ import {
 // Complete auth session for web-based OAuth
 WebBrowser.maybeCompleteAuthSession();
 
+/**
+ * Temporary auth bypass for UI validation in development.
+ * Set to false to restore normal auth gating.
+ */
+const AUTH_BYPASS_ENABLED = true;
+
 // ============================================
 // NAVIGATOR INSTANCES
 // ============================================
@@ -725,8 +731,8 @@ function MainStack() {
  */
 export default function Navigation() {
   const deepLinkCleanupRef = useRef<(() => void) | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(AUTH_BYPASS_ENABLED);
+  const [isLoading, setIsLoading] = useState(!AUTH_BYPASS_ENABLED);
   const [requiresConsent, setRequiresConsent] = useState(false);
   const [consentVersions, setConsentVersions] = useState<{
     currentTermsVersion: string;
@@ -735,6 +741,12 @@ export default function Navigation() {
   const { isInMaintenance, message: maintenanceMessage, estimatedEnd, clearMaintenance } = useMaintenanceCheck();
 
   useEffect(() => {
+    if (AUTH_BYPASS_ENABLED) {
+      setIsAuthenticated(true);
+      setIsLoading(false);
+      return;
+    }
+
     checkAuth();
 
     // Listen for auth state changes
@@ -836,7 +848,7 @@ export default function Navigation() {
           deepLinkCleanupRef.current = initDeepLinking();
         }}
       >
-        {isAuthenticated ? <MainStack /> : <AuthStack />}
+        {AUTH_BYPASS_ENABLED || isAuthenticated ? <MainStack /> : <AuthStack />}
       </NavigationContainer>
     </ErrorBoundary>
   );

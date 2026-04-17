@@ -21,6 +21,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH * 0.7;
+const LOCATION_TIMEOUT_MS = 4000;
 
 // Skeleton component for loading states
 const SkeletonCard = () => {
@@ -94,13 +95,21 @@ export default function HomeScreen() {
         try {
           const { status } = await Location.requestForegroundPermissionsAsync();
           if (status === 'granted') {
-            const location = await Location.getCurrentPositionAsync({
-              accuracy: Location.Accuracy.Balanced,
-            });
-            userLocation.current = {
-              lat: location.coords.latitude,
-              lng: location.coords.longitude,
-            };
+            const location = await Promise.race([
+              Location.getCurrentPositionAsync({
+                accuracy: Location.Accuracy.Balanced,
+              }),
+              new Promise<never>((_, reject) => {
+                setTimeout(() => reject(new Error('Location timeout')), LOCATION_TIMEOUT_MS);
+              }),
+            ]);
+
+            if (location?.coords) {
+              userLocation.current = {
+                lat: location.coords.latitude,
+                lng: location.coords.longitude,
+              };
+            }
           } else {
             logger.warn('Location permission denied, using fallback');
           }
