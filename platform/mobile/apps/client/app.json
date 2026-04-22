@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.noowe.client",
-      "minimumOsVersion": "14.0",
+      "minimumOsVersion": "15.1",
       "associatedDomains": ["applinks:noowebr.com", "applinks:*.noowebr.com"],
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
