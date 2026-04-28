@@ -9,7 +9,7 @@ import { Order } from '@/modules/orders/entities/order.entity';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { WalletType, TransactionType } from '@common/enums';
 import { CashbackService } from '@/modules/loyalty/cashback.service';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { FinancialTransactionService } from '@/modules/financial/financial-transaction.service';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 

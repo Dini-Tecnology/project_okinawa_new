@@ -4,7 +4,7 @@ import { DataSource, Repository } from 'typeorm';
 import { LoyaltyService } from './loyalty.service';
 import { LoyaltyProgram } from './entities/loyalty-program.entity';
 import { StampCard } from './entities/stamp-card.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { BadRequestException } from '@nestjs/common';
 
 describe('LoyaltyService', () => {

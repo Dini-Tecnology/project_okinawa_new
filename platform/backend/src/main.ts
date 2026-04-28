@@ -17,7 +17,6 @@ import compression from 'compression';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
-import { configureRedisAdapter } from './config/socket-redis-adapter.config';
 
 async function bootstrap() {
   // Initialize Sentry BEFORE creating the app
@@ -42,9 +41,6 @@ async function bootstrap() {
   const nodeEnv = configService.get<string>('NODE_ENV') || 'development';
   const isProduction = nodeEnv === 'production';
   const swaggerEnabled = configService.get<string>('SWAGGER_ENABLED') === 'true';
-
-  // Socket.IO Redis adapter for horizontal scaling
-  await configureRedisAdapter(app);
 
   // Security middleware
   // CSP: In production, remove unsafe-inline; in dev, allow it for Swagger UI

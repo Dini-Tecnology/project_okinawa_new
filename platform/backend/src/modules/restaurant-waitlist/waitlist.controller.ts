@@ -17,7 +17,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { WaitlistService } from './waitlist.service';
-import { WaitlistGateway } from './waitlist.gateway';
+import { WaitlistGateway } from './waitlist.realtime';
 import {
   JoinWaitlistDto,
   CallGuestDto,

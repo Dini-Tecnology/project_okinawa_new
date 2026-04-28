@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, In } from 'typeorm';
 import { ServiceCall, ServiceCallStatus } from './entities/service-call.entity';
 import { CreateCallDto } from './dto/create-call.dto';
-import { CallsGateway } from './calls.gateway';
+import { CallsGateway } from './calls.realtime';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 import { NotificationType } from '@/modules/notifications/entities/notification.entity';
 

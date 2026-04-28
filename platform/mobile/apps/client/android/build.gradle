@@ -25,6 +25,17 @@ apply plugin: "com.facebook.react.rootproject"
 
 allprojects {
     repositories {
+        // expo-camera vendors cameraview here; it is no longer on Google's Maven repo, and Gradle 8
+        // may not apply this module's own repositories block during resolution.
+        def expoCameraMavenCandidates = [
+            new File(rootDir, '../node_modules/expo-camera/android/maven'),
+            new File(rootDir, '../../../node_modules/expo-camera/android/maven'),
+        ]
+        expoCameraMavenCandidates.each { dir ->
+            if (dir.exists()) {
+                maven { url dir }
+            }
+        }
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
             url(new File(['node', '--print', "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim(), '../android'))

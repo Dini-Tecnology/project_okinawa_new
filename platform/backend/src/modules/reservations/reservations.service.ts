@@ -12,7 +12,7 @@ import { UpdateReservationDto } from './dto/update-reservation.dto';
 import { ReservationStatus } from '@common/enums';
 import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 import { ORDERS } from '@common/constants/limits';
-import { ReservationsGateway } from './reservations.gateway';
+import { ReservationsGateway } from './reservations.realtime';
 import { TablesService } from '@/modules/tables/tables.service';
 import { TableStatus } from '@/modules/tables/entities/restaurant-table.entity';
 import { NotificationsService } from '@/modules/notifications/notifications.service';

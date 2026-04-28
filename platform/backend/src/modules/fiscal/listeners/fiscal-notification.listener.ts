@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
 import { NotificationType } from '@/modules/notifications/entities/notification.entity';

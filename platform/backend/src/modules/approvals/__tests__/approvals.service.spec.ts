@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotFoundException, ConflictException } from '@nestjs/common';
 import { ApprovalsService } from '../approvals.service';
-import { ApprovalsGateway } from '../approvals.gateway';
+import { ApprovalsGateway } from '../approvals.realtime';
 import { Approval, ApprovalType, ApprovalStatus } from '../entities/approval.entity';
 import { CreateApprovalDto } from '../dto/create-approval.dto';
 import { ResolveApprovalDto } from '../dto/resolve-approval.dto';

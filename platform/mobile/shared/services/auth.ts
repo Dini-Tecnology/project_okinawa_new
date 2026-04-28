@@ -1,13 +1,15 @@
 /**
  * Auth Service
- * 
+ *
  * Handles authentication operations including login, register, social auth,
  * and session management. Enhanced for passwordless-first flow.
+ * Auth, session refresh, and profile sync use Supabase only.
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiService from './api';
 import { secureStorage } from './secure-storage';
+import { supabaseAuthAdapter } from './supabase-auth';
 import logger from '../utils/logger';
 
 // Auth state change listeners
@@ -19,7 +21,7 @@ export const authService = {
    * Traditional email/password login
    */
   async login(email: string, password: string) {
-    const data = await ApiService.login(email, password);
+    const data = await supabaseAuthAdapter.login(email, password);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
     return data;
@@ -29,7 +31,7 @@ export const authService = {
    * User registration with email/password
    */
   async register(email: string, password: string, full_name: string) {
-    const data = await ApiService.register({ email, password, full_name });
+    const data = await supabaseAuthAdapter.register(email, password, full_name);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
     return data;
@@ -40,41 +42,16 @@ export const authService = {
    */
   async socialLogin(provider: 'apple' | 'google', idToken: string, deviceInfo?: Record<string, string>) {
     try {
-      const response = await ApiService.post('/auth/social', {
-        provider,
-        id_token: idToken,
-        device_info: deviceInfo,
-      });
+      void deviceInfo;
+      const data = await supabaseAuthAdapter.socialLogin(provider, idToken);
 
-      const data = response.data;
-
-      if (data.status === 'authenticated') {
+      if (data.authenticated) {
         await this.storeAuthData(data);
         this.notifyAuthStateChange(true);
         return { success: true, authenticated: true, user: data.user };
       }
 
-      if (data.status === 'pending_phone_verification') {
-        return {
-          success: true,
-          authenticated: false,
-          status: 'pending_phone_verification',
-          tempToken: data.temp_token,
-          userPreview: data.user_preview,
-        };
-      }
-
-      if (data.status === 'phone_verification_required') {
-        return {
-          success: true,
-          authenticated: false,
-          status: 'phone_verification_required',
-          tempToken: data.temp_token,
-          user: data.user,
-        };
-      }
-
-      return { success: false, error: 'Unknown auth status' };
+      return { success: false, error: 'Supabase did not return an authenticated session' };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Social login failed:', error);
@@ -87,30 +64,26 @@ export const authService = {
    */
   async phoneLogin(phoneNumber: string, otpCode: string, deviceInfo?: Record<string, string>) {
     try {
-      const response = await ApiService.post('/auth/phone/verify-otp', {
-        phone_number: phoneNumber,
-        otp_code: otpCode,
-        device_info: deviceInfo,
-      });
+      void deviceInfo;
+      const data = await supabaseAuthAdapter.verifyPhoneOtp(phoneNumber, otpCode);
 
-      const data = response.data;
-
-      if (data.success && data.status === 'authenticated') {
+      if (data.access_token && data.profileComplete) {
         await this.storeAuthData(data);
         this.notifyAuthStateChange(true);
         return { success: true, authenticated: true, user: data.user };
       }
 
-      if (data.status === 'registration_required') {
+      if (data.access_token) {
+        await this.storeAuthData(data);
         return {
           success: true,
           authenticated: false,
           status: 'registration_required',
-          tempToken: data.temp_token,
+          tempToken: data.user?.id,
         };
       }
 
-      return { success: false, error: data.message || 'Verification failed' };
+      return { success: false, error: 'Verification failed' };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Phone login failed:', error);
@@ -126,27 +99,23 @@ export const authService = {
     email?: string;
     birthDate?: string;
   }) {
+    void tempToken;
+
     try {
-      const response = await ApiService.post('/auth/phone/complete-registration', {
-        temp_token: tempToken,
+      const data = await supabaseAuthAdapter.updateProfile({
         full_name: profileData.fullName,
         email: profileData.email,
         birth_date: profileData.birthDate,
       });
 
-      const data = response.data;
+      await this.storeAuthData({ user: data });
+      this.notifyAuthStateChange(true);
 
-      if (data.success) {
-        await this.storeAuthData(data);
-        this.notifyAuthStateChange(true);
-        return {
-          success: true,
-          user: data.user,
-          biometricEnrollmentToken: data.biometric_enrollment_token,
-        };
-      }
-
-      return { success: false, error: data.message };
+      return {
+        success: true,
+        user: data,
+        biometricEnrollmentToken: data.id,
+      };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       logger.error('Complete registration failed:', error);
@@ -155,7 +124,7 @@ export const authService = {
   },
 
   /**
-   * Biometric quick login
+   * Biometric quick login (still backed by API when enabled server-side)
    */
   async biometricLogin(biometricToken: string, deviceInfo?: Record<string, string>) {
     try {
@@ -191,7 +160,7 @@ export const authService = {
    */
   async logout() {
     try {
-      await ApiService.logout();
+      await supabaseAuthAdapter.logout();
     } catch (error) {
       logger.warn('Logout API call failed:', error);
     } finally {
@@ -201,14 +170,11 @@ export const authService = {
   },
 
   /**
-   * Get current user from API
+   * Get current user from Supabase
    */
   async getCurrentUser() {
-    const token = await AsyncStorage.getItem('access_token');
-    if (!token) return null;
-
     try {
-      return await ApiService.getCurrentUser();
+      return await supabaseAuthAdapter.getCurrentUser();
     } catch (error) {
       await this.logout();
       return null;
@@ -286,24 +252,15 @@ export const authService = {
    * Check if user is authenticated
    */
   async isAuthenticated(): Promise<boolean> {
-    const token = await AsyncStorage.getItem('access_token');
-    return !!token;
+    return supabaseAuthAdapter.isAuthenticated();
   },
 
   /**
-   * Refresh access token using refresh token
+   * Refresh access token using Supabase session
    */
   async refreshToken(): Promise<boolean> {
     try {
-      const refreshToken = await AsyncStorage.getItem('refresh_token');
-      if (!refreshToken) return false;
-
-      const response = await ApiService.post('/auth/refresh', {
-        refresh_token: refreshToken,
-      });
-
-      await this.storeAuthData(response.data);
-      return true;
+      return await supabaseAuthAdapter.refreshToken();
     } catch (error) {
       logger.error('Token refresh failed:', error);
       await this.clearAuthData();

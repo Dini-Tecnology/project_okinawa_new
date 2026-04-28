@@ -1,4 +1,4 @@
-import { Socket } from 'socket.io';
+import { WsSocket } from '@common/legacy/ws-noop';
 
 export interface SocketUser {
   id: string;
@@ -7,6 +7,6 @@ export interface SocketUser {
   restaurant_id?: string;
 }
 
-export interface AuthenticatedSocket extends Socket {
+export interface AuthenticatedSocket extends WsSocket {
   user?: SocketUser;
 }

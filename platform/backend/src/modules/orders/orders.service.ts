@@ -21,7 +21,7 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderStatus, OrderType } from '@common/enums';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
 import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 import { OrderCalculatorHelper } from './helpers';

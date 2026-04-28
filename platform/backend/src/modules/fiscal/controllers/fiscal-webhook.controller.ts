@@ -16,7 +16,7 @@ import { Public } from '@/common/decorators/public.decorator';
 import { FiscalDocument } from '../entities/fiscal-document.entity';
 import { FiscalConfig } from '../entities/fiscal-config.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EventsGateway } from '../../events/events.gateway';
+import { EventsGateway } from '../../events/events.realtime';
 
 /**
  * FiscalWebhookController -- receives callbacks from Focus NFe.

@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ServiceConfigService } from './service-config.service';
 import { ServiceConfigController } from './service-config.controller';
-import { ServiceConfigGateway } from './service-config.gateway';
+import { ServiceConfigGateway } from './service-config.realtime';
 import { RestaurantConfig } from './entities/restaurant-config.entity';
 
 @Module({

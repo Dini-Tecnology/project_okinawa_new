@@ -13,7 +13,7 @@ import {
 } from './entities/promotion.entity';
 import { CreatePromotionDto } from './dto/create-promotion.dto';
 import { ValidatePromotionDto } from './dto/validate-promotion.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 export interface PromotionValidationResult {
   valid: boolean;

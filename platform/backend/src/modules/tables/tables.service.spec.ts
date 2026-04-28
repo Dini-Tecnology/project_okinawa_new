@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { TablesService } from './tables.service';
 import { RestaurantTable } from './entities/restaurant-table.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('TablesService', () => {

@@ -15,7 +15,7 @@ import { RestaurantTable, TableStatus } from '../tables/entities/restaurant-tabl
 import { BatchGenerateQRDto } from './dto/batch-generate-qr.dto';
 import { StartSessionDto, EndSessionDto } from './dto/table-session.dto';
 import { AuthenticatedRequest } from '@common/interfaces/authenticated-user.interface';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 @ApiTags('qr-code')
 @Controller('qr-code')

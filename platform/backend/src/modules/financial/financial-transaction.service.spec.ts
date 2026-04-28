@@ -7,7 +7,7 @@ import {
   TransactionType,
   TransactionCategory,
 } from './entities/financial-transaction.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { NotFoundException } from '@nestjs/common';
 
 describe('FinancialTransactionService', () => {

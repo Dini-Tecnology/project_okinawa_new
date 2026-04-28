@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { WaitlistEntry } from './entities';
 import { WaitlistService } from './waitlist.service';
 import { WaitlistController } from './waitlist.controller';
-import { WaitlistGateway } from './waitlist.gateway';
+import { WaitlistGateway } from './waitlist.realtime';
 import { TablesModule } from '../tables/tables.module';
 
 @Module({

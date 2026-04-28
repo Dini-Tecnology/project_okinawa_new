@@ -5,7 +5,7 @@ export * from './guest-list.service';
 export * from './vip-table-reservations.service';
 export * from './vip-table-tabs.service';
 export * from './queue.service';
-export * from './queue.gateway';
+export * from './queue.realtime';
 export * from './lineup.service';
 export * from './occupancy.service';
 export * from './birthday-entry.service';

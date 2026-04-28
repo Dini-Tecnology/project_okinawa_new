@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ApprovalsService } from './approvals.service';
 import { ApprovalsController } from './approvals.controller';
-import { ApprovalsGateway } from './approvals.gateway';
+import { ApprovalsGateway } from './approvals.realtime';
 import { Approval } from './entities/approval.entity';
 
 @Module({

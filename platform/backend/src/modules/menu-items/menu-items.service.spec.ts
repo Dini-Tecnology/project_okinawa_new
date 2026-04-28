@@ -5,7 +5,7 @@ import { MenuItemsService } from './menu-items.service';
 import { MenuItem } from './entities/menu-item.entity';
 import { MenuCategory } from './entities/menu-category.entity';
 import { MenuItemCustomizationGroup } from './entities/menu-item-customization-group.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { NotFoundException } from '@nestjs/common';
 
 describe('MenuItemsService', () => {

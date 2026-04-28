@@ -6,7 +6,7 @@ import { TabsService } from './tabs.service';
 import { TabMembersService } from './tab-members.service';
 import { TabPaymentsService } from './tab-payments.service';
 import { TabsController } from './tabs.controller';
-import { TabsGateway } from './tabs.gateway';
+import { TabsGateway } from './tabs.realtime';
 import { Tab, TabMember, TabItem, TabPayment, HappyHourSchedule, WaiterCall } from './entities';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.entity';

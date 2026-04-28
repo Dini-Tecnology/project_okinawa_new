@@ -5,7 +5,7 @@ import { Cron } from '@nestjs/schedule';
 import { FireSchedule } from '../entities/fire-schedule.entity';
 import { Order } from '@/modules/orders/entities/order.entity';
 import { OrderItem } from '@/modules/orders/entities/order-item.entity';
-import { OrdersGateway } from '@/modules/orders/orders.gateway';
+import { OrdersGateway } from '@/modules/orders/orders.realtime';
 
 /**
  * Course firing order — drinks and appetizers fire immediately,

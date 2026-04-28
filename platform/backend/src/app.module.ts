@@ -13,7 +13,6 @@ import { validationSchema, validationOptions } from './config/validation.config'
 import { i18nConfig } from './config/i18n.config';
 
 // Modules
-import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { RestaurantsModule } from './modules/restaurants/restaurants.module';
 import { OrdersModule } from './modules/orders/orders.module';
@@ -114,7 +113,6 @@ import { CustomerCrmModule } from './modules/customer-crm/customer-crm.module';
     IdentityModule,
 
     // Feature modules
-    AuthModule,
     UsersModule,
     RestaurantsModule,
     OrdersModule,

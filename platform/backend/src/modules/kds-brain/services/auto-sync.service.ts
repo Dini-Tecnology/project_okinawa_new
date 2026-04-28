@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { OrderItem } from '@/modules/orders/entities/order-item.entity';
 import { CookStation } from '../entities/cook-station.entity';
-import { OrdersGateway } from '@/modules/orders/orders.gateway';
+import { OrdersGateway } from '@/modules/orders/orders.realtime';
 import { OrderItemStatus } from '@/common/enums';
 import { AutoFireService } from './auto-fire.service';
 

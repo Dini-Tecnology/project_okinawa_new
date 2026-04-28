@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CallsService } from './calls.service';
 import { CallsController } from './calls.controller';
-import { CallsGateway } from './calls.gateway';
+import { CallsGateway } from './calls.realtime';
 import { ServiceCall } from './entities/service-call.entity';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
 

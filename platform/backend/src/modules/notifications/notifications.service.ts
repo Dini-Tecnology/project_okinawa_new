@@ -5,7 +5,7 @@ import { Notification, NotificationType, RelatedType } from './entities/notifica
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { MarkAsReadDto } from './dto/mark-as-read.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { PAGINATION } from '@common/constants/limits';
 
 // Re-export for consumers

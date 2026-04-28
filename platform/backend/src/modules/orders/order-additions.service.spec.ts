@@ -10,7 +10,7 @@ import { OrderAdditionsService } from './order-additions.service';
 import { Order } from './entities/order.entity';
 import { OrderItem } from './entities/order-item.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { OrderCalculatorHelper } from './helpers';
 import { OrdersService } from './orders.service';
 import { OrderStatus, UserRole as UserRoleEnum } from '@common/enums';

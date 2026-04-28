@@ -5,7 +5,7 @@ import { TipsService } from './tips.service';
 import { Tip } from './entities/tip.entity';
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { NotFoundException } from '@nestjs/common';
 
 describe('TipsService', () => {

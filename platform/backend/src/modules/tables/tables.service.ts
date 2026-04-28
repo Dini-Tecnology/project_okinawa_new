@@ -5,7 +5,7 @@ import { RestaurantTable, TableStatus } from './entities/restaurant-table.entity
 import { CreateTableDto } from './dto/create-table.dto';
 import { UpdateTableDto } from './dto/update-table.dto';
 import { UpdateTableStatusDto } from './dto/update-table-status.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
 
 @Injectable()

@@ -11,7 +11,7 @@ import { AddPointsDto } from './dto/add-points.dto';
 import { RedeemRewardDto } from './dto/redeem-reward.dto';
 import { UpdateLoyaltyProgramDto } from './dto/update-loyalty-program.dto';
 import { AddStampDto } from './dto/add-stamp.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { PAGINATION } from '@common/constants/limits';
 
 export interface LoyaltyTierInfo {

@@ -7,7 +7,7 @@ import { TableQrCode } from '../tables/entities/table-qr-code.entity';
 import { TableSession } from '../tables/entities/table-session.entity';
 import { QrScanLog } from '../tables/entities/qr-scan-log.entity';
 import { RestaurantTable } from '../tables/entities/restaurant-table.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 describe('QrCodeController', () => {
   let controller: QrCodeController;

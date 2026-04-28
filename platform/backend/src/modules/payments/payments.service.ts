@@ -12,7 +12,7 @@ import { ProcessPaymentDto } from './dto/process-payment.dto';
 import { WalletType, TransactionType } from '@common/enums';
 import { OrdersService } from '@/modules/orders/orders.service';
 import { CashbackService } from '@/modules/loyalty/cashback.service';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import {
   FinancialTransactionService,
 } from '@/modules/financial/financial-transaction.service';

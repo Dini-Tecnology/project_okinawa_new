@@ -7,7 +7,7 @@ import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
 import { CreateTipDto } from './dto/create-tip.dto';
 import { DistributeTipsDto } from './dto/distribute-tips.dto';
 import { UpdateTipDto } from './dto/update-tip.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 @Injectable()
 export class TipsService {

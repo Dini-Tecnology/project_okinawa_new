@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { PlatformConnection } from '@/modules/integrations/entities/platform-connection.entity';
 import { ExternalMenuMapping } from '@/modules/integrations/entities/external-menu-mapping.entity';
-import { OrdersGateway } from '@/modules/orders/orders.gateway';
+import { OrdersGateway } from '@/modules/orders/orders.realtime';
 import { FinancialEventListenerService } from '@/modules/financial/services/financial-event-listener.service';
 import { KDS_MESSAGES } from '@/common/i18n/kds-brain.i18n';
 

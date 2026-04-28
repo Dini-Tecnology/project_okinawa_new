@@ -10,7 +10,7 @@ import {
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { FinancialReportQueryDto } from './dto/financial-report-query.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { PAGINATION } from '@common/constants/limits';
 
 @Injectable()

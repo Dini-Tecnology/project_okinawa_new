@@ -9,7 +9,7 @@ import { Repository, Between, DeepPartial } from 'typeorm';
 import { Approval, ApprovalStatus } from './entities/approval.entity';
 import { CreateApprovalDto } from './dto/create-approval.dto';
 import { ResolveApprovalDto } from './dto/resolve-approval.dto';
-import { ApprovalsGateway } from './approvals.gateway';
+import { ApprovalsGateway } from './approvals.realtime';
 
 @Injectable()
 export class ApprovalsService {

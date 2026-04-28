@@ -10,7 +10,7 @@ import { LoyaltyProgram } from './entities/loyalty-program.entity';
 import { Wallet } from '../payments/entities/wallet.entity';
 import { WalletTransaction } from '../payments/entities/wallet-transaction.entity';
 import { WalletType, TransactionType } from '@common/enums';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 @Injectable()
 export class CashbackService {

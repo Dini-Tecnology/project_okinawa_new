@@ -12,7 +12,7 @@ import { OrderItem } from '@/modules/orders/entities/order-item.entity';
 import { Order } from '@/modules/orders/entities/order.entity';
 import { CookStation } from '../entities/cook-station.entity';
 import { PrepAnalytics } from '../entities/prep-analytics.entity';
-import { OrdersGateway } from '@/modules/orders/orders.gateway';
+import { OrdersGateway } from '@/modules/orders/orders.realtime';
 import { OrderItemStatus, OrderStatus } from '@/common/enums';
 import { KDS_MESSAGES } from '@/common/i18n/kds-brain.i18n';
 import { BrainPriorityService } from './brain-priority.service';

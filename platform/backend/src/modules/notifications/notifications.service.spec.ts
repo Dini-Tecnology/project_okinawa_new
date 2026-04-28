@@ -3,7 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NotificationsService, NotificationType } from './notifications.service';
 import { Notification } from './entities/notification.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { NotFoundException } from '@nestjs/common';
 
 describe('NotificationsService', () => {

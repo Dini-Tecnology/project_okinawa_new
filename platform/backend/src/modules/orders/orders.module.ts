@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
-import { OrdersGateway } from './orders.gateway';
+import { OrdersGateway } from './orders.realtime';
 import { OrderGuestsService } from './order-guests.service';
 import { OrderGuestsController } from './order-guests.controller';
 import { KdsService } from './kds.service';

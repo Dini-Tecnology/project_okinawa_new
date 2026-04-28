@@ -9,7 +9,7 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { CreateCustomizationGroupDto } from './dto/create-customization-group.dto';
 import { UpdateCustomizationGroupDto } from './dto/update-customization-group.dto';
 import { PaginationDto, paginate, toPaginationDto } from '@/common/dto/pagination.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 
 @Injectable()
 export class MenuItemsService {

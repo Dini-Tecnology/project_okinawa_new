@@ -32,7 +32,7 @@ import { VipTableTabsService } from './vip-table-tabs.service';
 import { VipTableTabsController } from './vip-table-tabs.controller';
 import { QueueService } from './queue.service';
 import { QueueController } from './queue.controller';
-import { QueueGateway } from './queue.gateway';
+import { QueueGateway } from './queue.realtime';
 import { LineupService } from './lineup.service';
 import { LineupController } from './lineup.controller';
 import { OccupancyService } from './occupancy.service';

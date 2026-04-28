@@ -16,7 +16,7 @@ import { OrderItem } from './entities/order-item.entity';
 import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { AddItemsToOrderDto } from './dto/add-items-to-order.dto';
 import { OrderStatus } from '@common/enums';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { OrderCalculatorHelper } from './helpers';
 import { OrdersService } from './orders.service';
 

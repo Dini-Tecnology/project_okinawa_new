@@ -11,7 +11,7 @@ import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { OwnerResponseDto } from './dto/owner-response.dto';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { UserRole as UserRoleEnum } from '@/common/enums';
 import { PAGINATION } from '@common/constants/limits';
 

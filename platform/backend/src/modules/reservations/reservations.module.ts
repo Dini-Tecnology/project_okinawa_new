@@ -4,7 +4,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ReservationsService } from './reservations.service';
 import { ReservationsController } from './reservations.controller';
-import { ReservationsGateway } from './reservations.gateway';
+import { ReservationsGateway } from './reservations.realtime';
 import { Reservation } from './entities/reservation.entity';
 import { ReservationGuest } from './entities/reservation-guest.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';

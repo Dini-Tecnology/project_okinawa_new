@@ -11,7 +11,7 @@ import { UpdateKitchenConfigDto } from './dto/update-kitchen-config.dto';
 import { UpdatePaymentConfigDto } from './dto/update-payment-config.dto';
 import { UpdateTeamConfigDto } from './dto/update-team-config.dto';
 import { UpdateFeaturesDto } from './dto/update-features.dto';
-import { ServiceConfigGateway } from './service-config.gateway';
+import { ServiceConfigGateway } from './service-config.realtime';
 import { ServiceTypeFeatures, getServiceTypeFeatures } from './service-type.registry';
 
 @Injectable()

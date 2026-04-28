@@ -8,7 +8,7 @@ import { MenuItem } from '@/modules/menu-items/entities/menu-item.entity';
 import { RestaurantTable } from '@/modules/tables/entities/restaurant-table.entity';
 import { Profile } from '@/modules/users/entities/profile.entity';
 import { WaitlistEntry } from '@/modules/restaurant-waitlist/entities/waitlist-entry.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { LoyaltyService } from '@/modules/loyalty/loyalty.service';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { OrderStatus, OrderType } from '@common/enums';

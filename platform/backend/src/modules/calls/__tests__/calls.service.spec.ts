@@ -7,7 +7,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { CallsService } from '../calls.service';
-import { CallsGateway } from '../calls.gateway';
+import { CallsGateway } from '../calls.realtime';
 import {
   ServiceCall,
   CallType,

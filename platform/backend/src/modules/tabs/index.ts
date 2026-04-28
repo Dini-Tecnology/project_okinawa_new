@@ -4,6 +4,6 @@ export * from './tabs.service';
 export * from './tab-members.service';
 export * from './tab-payments.service';
 export * from './tabs.controller';
-export * from './tabs.gateway';
+export * from './tabs.realtime';
 export * from './waiter-calls.service';
 export * from './happy-hour.service';

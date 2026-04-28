@@ -4,7 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { ReservationsService } from './reservations.service';
 import { Reservation } from './entities/reservation.entity';
 import { Restaurant } from '@/modules/restaurants/entities/restaurant.entity';
-import { ReservationsGateway } from './reservations.gateway';
+import { ReservationsGateway } from './reservations.realtime';
 import { NotFoundException } from '@nestjs/common';
 import { ReservationStatus } from '@common/enums';
 import { NotificationsService } from '@/modules/notifications/notifications.service';

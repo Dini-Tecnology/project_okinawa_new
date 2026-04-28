@@ -1,0 +1,356 @@
+{
+  "generatedAt": "2026-04-27T20:26:20.162Z",
+  "activeMigrationsDir": "D:\\1Projetos-BRNDev\\project_okinawa_new\\platform\\backend\\src\\database\\migrations",
+  "legacyMigrationsDir": "D:\\1Projetos-BRNDev\\project_okinawa_new\\platform\\backend\\src\\migrations",
+  "migrations": [
+    {
+      "file": "1701000000001-CreateInitialTables.ts",
+      "timestamp": 1701000000001,
+      "active": true
+    },
+    {
+      "file": "1701000000002-AddNotesToTables.ts",
+      "timestamp": 1701000000002,
+      "active": true
+    },
+    {
+      "file": "1704000000001-CreateTableQRCodeAndSessionTables.ts",
+      "timestamp": 1704000000001,
+      "active": true
+    },
+    {
+      "file": "1706500000000-AddPubBarClubServiceTypes.ts",
+      "timestamp": 1706500000000,
+      "active": true
+    },
+    {
+      "file": "1706500001000-CreateTabsAndClubTables.ts",
+      "timestamp": 1706500001000,
+      "active": true
+    },
+    {
+      "file": "1733580000001-CreateOrderGuestsTable.ts",
+      "timestamp": 1733580000001,
+      "active": true
+    },
+    {
+      "file": "1733580000002-CreateReservationGuestsTable.ts",
+      "timestamp": 1733580000002,
+      "active": true
+    },
+    {
+      "file": "1733580000003-CreatePaymentSplitsTable.ts",
+      "timestamp": 1733580000003,
+      "active": true
+    },
+    {
+      "file": "1733580000004-CreateFavoritesTable.ts",
+      "timestamp": 1733580000004,
+      "active": true
+    },
+    {
+      "file": "1733600000001-CreateSecurityTables.ts",
+      "timestamp": 1733600000001,
+      "active": true
+    },
+    {
+      "file": "1764695661021-AddMissingColumns.ts",
+      "timestamp": 1764695661021,
+      "active": true
+    },
+    {
+      "file": "1764699174742-CreateMissingTables.ts",
+      "timestamp": 1764699174742,
+      "active": true
+    },
+    {
+      "file": "1764722642842-CreateFinancialTransactionsTable.ts",
+      "timestamp": 1764722642842,
+      "active": true
+    },
+    {
+      "file": "1764723106487-CreateHrTables.ts",
+      "timestamp": 1764723106487,
+      "active": true
+    },
+    {
+      "file": "1764734502648-CreateWebhookTables.ts",
+      "timestamp": 1764734502648,
+      "active": true
+    },
+    {
+      "file": "1764735634555-AddCategoryIdToMenuItems.ts",
+      "timestamp": 1764735634555,
+      "active": true
+    },
+    {
+      "file": "1764735918819-CreatePasswordResetToken.ts",
+      "timestamp": 1764735918819,
+      "active": true
+    },
+    {
+      "file": "1764800000000-AddOrderTypeAndIndexes.ts",
+      "timestamp": 1764800000000,
+      "active": true
+    },
+    {
+      "file": "1764800100000-FixCascadePolicies.ts",
+      "timestamp": 1764800100000,
+      "active": true
+    },
+    {
+      "file": "1764900000001-AddCasualDiningColumns.ts",
+      "timestamp": 1764900000001,
+      "active": true
+    },
+    {
+      "file": "1764950000001-CreateApprovalsTable.ts",
+      "timestamp": 1764950000001,
+      "active": true
+    },
+    {
+      "file": "1764960000001-CreateInventoryItemsTable.ts",
+      "timestamp": 1764960000001,
+      "active": true
+    },
+    {
+      "file": "1765000000001-CreateDrinkRecipesTable.ts",
+      "timestamp": 1765000000001,
+      "active": true
+    },
+    {
+      "file": "1765000000002-CreateWaitlistEntriesTable.ts",
+      "timestamp": 1765000000002,
+      "active": true
+    },
+    {
+      "file": "1765100000001-AddGroupBookingToReservations.ts",
+      "timestamp": 1765100000001,
+      "active": true
+    },
+    {
+      "file": "1765100000002-AddOpenForAdditionsOrderStatus.ts",
+      "timestamp": 1765100000002,
+      "active": true
+    },
+    {
+      "file": "1765100000003-CreateServiceCallsTable.ts",
+      "timestamp": 1765100000003,
+      "active": true
+    },
+    {
+      "file": "1765200000001-CreatePromoterTables.ts",
+      "timestamp": 1765200000001,
+      "active": true
+    },
+    {
+      "file": "1765300000001-CreateUserConsentsTable.ts",
+      "timestamp": 1765300000001,
+      "active": true
+    },
+    {
+      "file": "1765400000001-KdsBrainSprint1CookStations.ts",
+      "timestamp": 1765400000001,
+      "active": true
+    },
+    {
+      "file": "1765400000002-KdsBrainSprint1MenuItemFields.ts",
+      "timestamp": 1765400000002,
+      "active": true
+    },
+    {
+      "file": "1765400000003-KdsBrainSprint1OrderFields.ts",
+      "timestamp": 1765400000003,
+      "active": true
+    },
+    {
+      "file": "1765400000004-KdsBrainSprint2FireSchedule.ts",
+      "timestamp": 1765400000004,
+      "active": true
+    },
+    {
+      "file": "1765400000005-KdsBrainSprint3Integrations.ts",
+      "timestamp": 1765400000005,
+      "active": true
+    },
+    {
+      "file": "1765400000006-KdsBrainSprint4Analytics.ts",
+      "timestamp": 1765400000006,
+      "active": true
+    },
+    {
+      "file": "1765500000001-CreateCashRegisterTables.ts",
+      "timestamp": 1765500000001,
+      "active": true
+    },
+    {
+      "file": "1765500000002-FinancialBrainSprint1Gateway.ts",
+      "timestamp": 1765500000002,
+      "active": true
+    },
+    {
+      "file": "1765500000003-FinancialBrainSprint2CostControl.ts",
+      "timestamp": 1765500000003,
+      "active": true
+    },
+    {
+      "file": "1765500000004-FinancialBrainSprint3Fiscal.ts",
+      "timestamp": 1765500000004,
+      "active": true
+    },
+    {
+      "file": "1765500000005-FinancialBrainSprint4Forecast.ts",
+      "timestamp": 1765500000005,
+      "active": true
+    },
+    {
+      "file": "1765600000001-GapSprint1TableFields.ts",
+      "timestamp": 1765600000001,
+      "active": true
+    },
+    {
+      "file": "1765600000002-GapSprint2StockCRM.ts",
+      "timestamp": 1765600000002,
+      "active": true
+    },
+    {
+      "file": "1765600000003-GapSprint3LoyaltyReservations.ts",
+      "timestamp": 1765600000003,
+      "active": true
+    },
+    {
+      "file": "1765700000001-CreateStockMovements.ts",
+      "timestamp": 1765700000001,
+      "active": true
+    },
+    {
+      "file": "1765700000002-CreateSuppliersAndConversions.ts",
+      "timestamp": 1765700000002,
+      "active": true
+    },
+    {
+      "file": "1765700000003-CreateSupplierItemMappings.ts",
+      "timestamp": 1765700000003,
+      "active": true
+    },
+    {
+      "file": "1765700000004-CreateInventoryCount.ts",
+      "timestamp": 1765700000004,
+      "active": true
+    },
+    {
+      "file": "1765800000001-EncryptSensitiveFields.ts",
+      "timestamp": 1765800000001,
+      "active": true
+    },
+    {
+      "file": "1765800000002-AddIdempotencyKeys.ts",
+      "timestamp": 1765800000002,
+      "active": true
+    },
+    {
+      "file": "1765800000003-AddWalletTransactionIdempotencyKey.ts",
+      "timestamp": 1765800000003,
+      "active": true
+    },
+    {
+      "file": "1765900000001-AddDrinkRecipeCostFields.ts",
+      "timestamp": 1765900000001,
+      "active": true
+    },
+    {
+      "file": "1765900000002-AddMaxQuantityToStockItems.ts",
+      "timestamp": 1765900000002,
+      "active": true
+    },
+    {
+      "file": "1766000000001-AuthSimplifiedFixes.ts",
+      "timestamp": 1766000000001,
+      "active": true
+    },
+    {
+      "file": "1706370000000-CreateOTPTokensTable.ts",
+      "timestamp": 1706370000000,
+      "active": false
+    },
+    {
+      "file": "1706370100000-CreateBiometricTokensTable.ts",
+      "timestamp": 1706370100000,
+      "active": false
+    },
+    {
+      "file": "1710000004000-CreateServiceCallsTable.ts",
+      "timestamp": 1710000004000,
+      "active": false
+    },
+    {
+      "file": "1710000005000-CreateAddressesTable.ts",
+      "timestamp": 1710000005000,
+      "active": false
+    },
+    {
+      "file": "1733593200000-AddDeletedAtToProfile.ts",
+      "timestamp": 1733593200000,
+      "active": false
+    },
+    {
+      "file": "1733593300000-AddDatabaseIndexes.ts",
+      "timestamp": 1733593300000,
+      "active": false
+    },
+    {
+      "file": "1733593400000-AddMissingForeignKeyIndexes.ts",
+      "timestamp": 1733593400000,
+      "active": false
+    },
+    {
+      "file": "1733593500000-AddEntityConstraintsAndIndexes.ts",
+      "timestamp": 1733593500000,
+      "active": false
+    },
+    {
+      "file": "1733700000000-OrdersTablePartitioning.ts",
+      "timestamp": 1733700000000,
+      "active": false
+    },
+    {
+      "file": "1742745600000-CreateRestaurantConfigTable.ts",
+      "timestamp": 1742745600000,
+      "active": false
+    },
+    {
+      "file": "1743292800000-CreatePromotionsAndStampCards.ts",
+      "timestamp": 1743292800000,
+      "active": false
+    },
+    {
+      "file": "1743379200000-CreateAddressesTable.ts",
+      "timestamp": 1743379200000,
+      "active": false
+    },
+    {
+      "file": "1743379300000-CreateReceiptsTable.ts",
+      "timestamp": 1743379300000,
+      "active": false
+    },
+    {
+      "file": "1743379400000-CreateMenuItemCustomizationsTable.ts",
+      "timestamp": 1743379400000,
+      "active": false
+    },
+    {
+      "file": "1743379500000-AddGeofenceToRestaurants.ts",
+      "timestamp": 1743379500000,
+      "active": false
+    },
+    {
+      "file": "AddCompositeIndexes.ts",
+      "timestamp": null,
+      "active": false
+    }
+  ],
+  "warnings": [
+    "Only src/database/migrations is referenced by TypeORM runtime and CLI config.",
+    "src/migrations is treated as legacy input for review, not as an executable chain."
+  ]
+}

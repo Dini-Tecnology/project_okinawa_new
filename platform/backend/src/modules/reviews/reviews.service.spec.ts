@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import { ReviewsService } from './reviews.service';
 import { Review } from './entities/review.entity';
 import { UserRole } from '@/modules/user-roles/entities/user-role.entity';
-import { EventsGateway } from '@/modules/events/events.gateway';
+import { EventsGateway } from '@/modules/events/events.realtime';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 describe('ReviewsService', () => {

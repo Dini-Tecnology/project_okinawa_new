@@ -5,7 +5,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { StockItem } from '../entities/stock-item.entity';
 import { StockMovement, StockMovementType } from '../entities/stock-movement.entity';
 import { RecipeService } from '../../cost-control/services/recipe.service';
-import { EventsGateway } from '../../events/events.gateway';
+import { EventsGateway } from '../../events/events.realtime';
 
 export interface MovementFilters {
   ingredient_id?: string;

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Okinawa Restaurante",
+    "name": "Noowe Restaurante",
     "slug": "okinawa-restaurant",
     "version": "1.0.0",
     "orientation": "default",
@@ -91,9 +91,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "your-project-id"
+        "projectId": "744e4a02-0a92-4dfb-bf5a-ea0e68169afe"
       }
     },
-    "owner": "okinawa"
+    "owner": "dini-technologies"
   }
 }
