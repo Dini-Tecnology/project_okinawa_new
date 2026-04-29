@@ -1210,7 +1210,7 @@ export default function Navigation() {
 
   return (
     <ErrorBoundary onError={handleNavigationError}>
-      <NavigationContainer>
+      <NavigationContainer independent>
         {isAuthenticated ? <MainStack /> : <AuthStack />}
       </NavigationContainer>
     </ErrorBoundary>

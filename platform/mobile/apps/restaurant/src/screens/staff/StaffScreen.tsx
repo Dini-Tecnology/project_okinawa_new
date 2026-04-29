@@ -182,14 +182,15 @@ export default function StaffScreen({ navigation }: any) {
       <Card.Content>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
-            <Avatar.Image
-              size={48}
-              source={
-                item.profile.avatar_url
-                  ? { uri: item.profile.avatar_url }
-                  : require('@/shared/assets/default-avatar.png')
-              }
-            />
+            {item.profile.avatar_url ? (
+              <Avatar.Image size={48} source={{ uri: item.profile.avatar_url }} />
+            ) : (
+              <Avatar.Icon
+                size={48}
+                icon="account"
+                style={{ backgroundColor: colors.backgroundTertiary }}
+              />
+            )}
             <View style={styles.info}>
               <Text variant="titleMedium" style={styles.name}>{item.profile.full_name}</Text>
               <Text variant="bodySmall" style={styles.email}>

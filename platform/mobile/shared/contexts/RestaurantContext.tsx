@@ -21,64 +21,16 @@
 
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react';
 import { secureStorage } from '../services/secure-storage';
-import ApiService from '../services/api';
+import {
+  fetchMyRestaurantRolesGrouped,
+  fetchRestaurantFromSupabase,
+  fetchStaffMemberForCurrentUser,
+  resolveInitialRestaurantId,
+} from '../services/restaurant-data-supabase';
+import { isSupabaseConfigured } from '../services/supabase';
+import type { Restaurant, StaffMember, UserRestaurantRole } from '../types/restaurant-domain';
 
-// ============================================================
-// TYPE DEFINITIONS
-// ============================================================
-
-/**
- * Restaurant entity representing the authenticated restaurant
- */
-export interface Restaurant {
-  id: string;
-  name: string;
-  description?: string;
-  cuisine_type?: string[];
-  address?: string;
-  city?: string;
-  state?: string;
-  postal_code?: string;
-  phone?: string;
-  email?: string;
-  logo_url?: string;
-  cover_image_url?: string;
-  is_active: boolean;
-  service_type?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-/**
- * Staff member with role information
- * Updated to support multiple roles per restaurant
- */
-export interface StaffMember {
-  id: string;
-  user_id: string;
-  restaurant_id: string;
-  /** Primary role (highest priority) */
-  role: 'owner' | 'manager' | 'chef' | 'waiter' | 'barman' | 'maitre' | 'cashier' | 'host';
-  /** All roles the user has in this restaurant */
-  roles: Array<'owner' | 'manager' | 'chef' | 'waiter' | 'barman' | 'maitre' | 'cashier' | 'host'>;
-  status: 'active' | 'inactive' | 'on_break';
-  permissions?: string[];
-}
-
-/**
- * Restaurant role assignment for multi-restaurant support
- */
-export interface UserRestaurantRole {
-  restaurant: {
-    id: string;
-    name: string;
-    logo_url?: string;
-    service_type?: string;
-  };
-  roles: Array<'owner' | 'manager' | 'chef' | 'waiter' | 'barman' | 'maitre' | 'cashier' | 'host'>;
-  is_primary: boolean;
-  last_accessed?: Date;
-}
+export type { Restaurant, StaffMember, UserRestaurantRole, StaffRole } from '../types/restaurant-domain';
 
 /**
  * Context value interface for restaurant state
@@ -160,13 +112,16 @@ export const RestaurantProvider: React.FC<RestaurantProviderProps> = ({ children
       setIsLoading(true);
       setError(null);
 
-      // Try to get stored restaurant ID
+      if (!isSupabaseConfigured()) {
+        console.warn('[RestaurantContext] Supabase not configured; restaurant bootstrap skipped');
+        return;
+      }
+
       const storedId = await secureStorage.getItem(STORAGE_KEY_RESTAURANT_ID);
-      
+
       if (storedId) {
         await loadRestaurantData(storedId);
       } else {
-        // No stored ID - try to get from user's staff assignments
         await loadFromUserProfile();
       }
     } catch (err) {
@@ -183,17 +138,12 @@ export const RestaurantProvider: React.FC<RestaurantProviderProps> = ({ children
    */
   const loadFromUserProfile = async () => {
     try {
-      const profile = await ApiService.getStaffProfile();
-      
-      if (profile?.restaurant_id) {
-        await loadRestaurantData(profile.restaurant_id);
-      } else if (profile?.restaurants && profile.restaurants.length > 0) {
-        // User has multiple restaurants - use the first one
-        await loadRestaurantData(profile.restaurants[0].id);
+      const initialId = await resolveInitialRestaurantId();
+      if (initialId) {
+        await loadRestaurantData(initialId);
       }
     } catch (err) {
-      console.error('[RestaurantContext] Failed to load user profile:', err);
-      throw err;
+      console.warn('[RestaurantContext] Could not resolve restaurant from Supabase profile:', err);
     }
   };
 
@@ -203,21 +153,21 @@ export const RestaurantProvider: React.FC<RestaurantProviderProps> = ({ children
    */
   const loadRestaurantData = async (id: string) => {
     try {
-      // Fetch restaurant details
-      const restaurantData = await ApiService.getRestaurant(id);
+      const restaurantData = await fetchRestaurantFromSupabase(id);
+      if (!restaurantData) {
+        throw new Error(`Restaurant not found: ${id}`);
+      }
       setRestaurant(restaurantData);
       setRestaurantIdState(id);
 
-      // Store the restaurant ID for future sessions
       await secureStorage.setItem(STORAGE_KEY_RESTAURANT_ID, id);
 
-      // Fetch current staff member info
       try {
-        const staffData = await ApiService.getStaffMember(id, 'me');
+        const staffData = await fetchStaffMemberForCurrentUser(id);
         setStaffMember(staffData);
       } catch (staffErr) {
-        // Staff info is optional - user might be owner without staff record
         console.warn('[RestaurantContext] Could not load staff member:', staffErr);
+        setStaffMember(null);
       }
     } catch (err) {
       console.error('[RestaurantContext] Failed to load restaurant:', err);
@@ -259,7 +209,7 @@ export const RestaurantProvider: React.FC<RestaurantProviderProps> = ({ children
    */
   const fetchUserRestaurants = useCallback(async (): Promise<UserRestaurantRole[]> => {
     try {
-      const restaurants = await ApiService.getMyRestaurants();
+      const restaurants = await fetchMyRestaurantRolesGrouped();
       setUserRestaurants(restaurants);
       return restaurants;
     } catch (err) {

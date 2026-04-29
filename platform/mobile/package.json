@@ -8,7 +8,8 @@
     "shared"
   ],
   "overrides": {
-    "expo": "51.0.39"
+    "expo": "51.0.39",
+    "react-native-reanimated": "3.10.1"
   },
   "scripts": {
     "postinstall": "patch-package",
@@ -56,10 +57,12 @@
     "@sentry/react-native": "^7.7.0",
     "@shopify/flash-list": "1.7.3",
     "@tanstack/react-query": "^5.90.12",
+    "expo-camera": "~15.0.16",
     "expo-device": "~6.0.2",
     "expo-linking": "~6.3.1",
     "expo-local-authentication": "~14.0.1",
     "expo-notifications": "~0.28.19",
+    "react-native-reanimated": "3.10.1",
     "react-native-toast-message": "^2.3.3"
   }
 }
