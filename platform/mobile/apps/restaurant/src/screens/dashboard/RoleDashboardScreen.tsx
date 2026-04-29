@@ -131,8 +131,14 @@ function SkeletonCard({ colors }: { colors: ReturnType<typeof useColors> }) {
   return (
     <View
       style={{
-        width: '48%',
-        margin: '1%',
+        width: '50%',
+        paddingHorizontal: 6,
+        marginBottom: 12,
+      }}
+    >
+      <View
+      style={{
+        flex: 1,
         backgroundColor: colors.card,
         borderRadius: 20,
         padding: 16,
@@ -144,6 +150,7 @@ function SkeletonCard({ colors }: { colors: ReturnType<typeof useColors> }) {
       <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.backgroundTertiary }} />
       <View style={{ width: '40%', height: 12, borderRadius: 4, backgroundColor: colors.backgroundTertiary }} />
       <View style={{ width: '70%', height: 16, borderRadius: 4, backgroundColor: colors.backgroundTertiary }} />
+    </View>
     </View>
   );
 }
@@ -265,7 +272,7 @@ export default function RoleDashboardScreen() {
           },
           {
             key: 'orders',
-            icon: 'receipt-text',
+            icon: 'receipt',
             label: t('roleDashboard.totalOrders'),
             value: metrics.total_orders,
             color: colors.primary,
@@ -315,7 +322,7 @@ export default function RoleDashboardScreen() {
           },
           {
             key: 'activeOrders',
-            icon: 'receipt-text',
+            icon: 'receipt',
             label: t('roleDashboard.activeOrders'),
             value: metrics.active_orders,
             color: colors.primary,
@@ -480,7 +487,7 @@ export default function RoleDashboardScreen() {
             {t('roleDashboard.title')}
           </Text>
         </LinearGradient>
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, marginTop: 12 }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, marginTop: 12 }}>
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <SkeletonCard key={i} colors={colors} />
           ))}
@@ -551,11 +558,11 @@ export default function RoleDashboardScreen() {
       </LinearGradient>
 
       {/* KPI Grid */}
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 12, paddingBottom: 24, marginTop: -8 }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 16, paddingBottom: 24, marginTop: -8 }}>
         {kpiCards.map((card) => (
           <TouchableOpacity
             key={card.key}
-            style={{ width: '48%', margin: '1%' }}
+            style={{ width: '50%', paddingHorizontal: 6, marginBottom: 12 }}
             activeOpacity={card.navigateTo ? 0.7 : 1}
             onPress={() => {
               if (card.navigateTo) {
@@ -567,6 +574,7 @@ export default function RoleDashboardScreen() {
           >
             <View
               style={{
+                width: '100%',
                 backgroundColor: colors.card,
                 borderRadius: 20,
                 padding: 16,

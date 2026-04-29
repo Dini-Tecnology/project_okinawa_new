@@ -97,11 +97,16 @@ export default function DashboardScreen() {
     grid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
-      paddingHorizontal: 12,
+      paddingHorizontal: 16,
+    },
+    statCell: {
+      width: '50%',
+      paddingHorizontal: 6,
+      marginBottom: 12,
     },
     statCard: {
-      width: '48%',
-      margin: 8,
+      width: '100%',
+      minHeight: 138,
       elevation: 2,
       backgroundColor: colors.card,
     },
@@ -109,6 +114,11 @@ export default function DashboardScreen() {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 12,
+      minHeight: 106,
+    },
+    statTextCol: {
+      flex: 1,
+      minWidth: 0,
     },
     card: {
       margin: 16,
@@ -161,6 +171,12 @@ export default function DashboardScreen() {
     statText: {
       color: colors.foreground,
     },
+    statValue: {
+      color: colors.foreground,
+      fontSize: 44,
+      lineHeight: 48,
+      fontWeight: '700',
+    },
     statLabel: {
       color: colors.foregroundSecondary,
     },
@@ -203,47 +219,71 @@ export default function DashboardScreen() {
         {t('restaurantNav.dashboard')}
       </Text>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — cada Card dentro de célula 50% para largura estável (Paper Card não expande bem só com %) */}
       <View style={styles.grid}>
-        <Card style={styles.statCard}>
-          <Card.Content style={styles.statContent}>
-            <IconButton icon="receipt-text" size={32} iconColor={colors.primary} />
-            <View>
-              <Text variant="displaySmall" style={styles.statText}>{stats?.today_orders || 0}</Text>
-              <Text variant="bodyMedium" style={styles.statLabel}>{t('financial.todayOrders')}</Text>
-            </View>
-          </Card.Content>
-        </Card>
+        <View style={styles.statCell}>
+          <Card style={styles.statCard}>
+            <Card.Content style={styles.statContent}>
+              <IconButton icon="receipt" size={32} iconColor={colors.primary} style={{ margin: 0 }} />
+              <View style={styles.statTextCol}>
+                <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+                  {stats?.today_orders || 0}
+                </Text>
+                <Text variant="bodyMedium" style={styles.statLabel} numberOfLines={2}>
+                  {t('financial.todayOrders')}
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </View>
 
-        <Card style={styles.statCard}>
-          <Card.Content style={styles.statContent}>
-            <IconButton icon="cash" size={32} iconColor={colors.success} />
-            <View>
-              <Text variant="displaySmall" style={styles.statText}>R$ {stats?.today_revenue.toFixed(0) || 0}</Text>
-              <Text variant="bodyMedium" style={styles.statLabel}>{t('financial.todayRevenue')}</Text>
-            </View>
-          </Card.Content>
-        </Card>
+        <View style={styles.statCell}>
+          <Card style={styles.statCard}>
+            <Card.Content style={styles.statContent}>
+              <IconButton icon="cash" size={32} iconColor={colors.success} style={{ margin: 0 }} />
+              <View style={styles.statTextCol}>
+                <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+                  R$ {stats?.today_revenue.toFixed(0) || 0}
+                </Text>
+                <Text variant="bodyMedium" style={styles.statLabel} numberOfLines={2}>
+                  {t('financial.todayRevenue')}
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </View>
 
-        <Card style={styles.statCard}>
-          <Card.Content style={styles.statContent}>
-            <IconButton icon="clock-fast" size={32} iconColor={colors.warning} />
-            <View>
-              <Text variant="displaySmall" style={styles.statText}>{stats?.active_orders || 0}</Text>
-              <Text variant="bodyMedium" style={styles.statLabel}>{t('orders.activeOrders')}</Text>
-            </View>
-          </Card.Content>
-        </Card>
+        <View style={styles.statCell}>
+          <Card style={styles.statCard}>
+            <Card.Content style={styles.statContent}>
+              <IconButton icon="clock-fast" size={32} iconColor={colors.warning} style={{ margin: 0 }} />
+              <View style={styles.statTextCol}>
+                <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+                  {stats?.active_orders || 0}
+                </Text>
+                <Text variant="bodyMedium" style={styles.statLabel} numberOfLines={2}>
+                  {t('orders.activeOrders')}
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </View>
 
-        <Card style={styles.statCard}>
-          <Card.Content style={styles.statContent}>
-            <IconButton icon="calendar-check" size={32} iconColor={colors.info} />
-            <View>
-              <Text variant="displaySmall" style={styles.statText}>{stats?.pending_reservations || 0}</Text>
-              <Text variant="bodyMedium" style={styles.statLabel}>{t('reservations.pendingReservations')}</Text>
-            </View>
-          </Card.Content>
-        </Card>
+        <View style={styles.statCell}>
+          <Card style={styles.statCard}>
+            <Card.Content style={styles.statContent}>
+              <IconButton icon="calendar-check" size={32} iconColor={colors.info} style={{ margin: 0 }} />
+              <View style={styles.statTextCol}>
+                <Text style={styles.statValue} numberOfLines={1} adjustsFontSizeToFit>
+                  {stats?.pending_reservations || 0}
+                </Text>
+                <Text variant="bodyMedium" style={styles.statLabel} numberOfLines={2}>
+                  {t('reservations.pendingReservations')}
+                </Text>
+              </View>
+            </Card.Content>
+          </Card>
+        </View>
       </View>
 
       {/* Tables Status */}

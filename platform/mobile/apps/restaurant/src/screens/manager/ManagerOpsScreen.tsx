@@ -368,7 +368,7 @@ export default function ManagerOpsScreen({ navigation }: any) {
       <View style={styles.kpiGrid}>
         <Card style={styles.kpiCard}>
           <View style={styles.kpiContent}>
-            <IconButton icon="receipt-text" size={24} iconColor={colors.primary} />
+            <IconButton icon="receipt" size={24} iconColor={colors.primary} />
             <Text variant="headlineSmall" style={styles.kpiValue}>
               {metrics?.active_orders || 0}
             </Text>

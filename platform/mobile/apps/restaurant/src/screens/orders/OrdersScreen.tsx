@@ -387,7 +387,7 @@ export default function OrdersScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <IconButton icon="receipt-text-outline" size={48} iconColor={colors.foregroundMuted} />
+              <IconButton icon="receipt" size={48} iconColor={colors.foregroundMuted} />
               <Text variant="headlineSmall" style={{ color: colors.foreground }}>{t('empty.orders')}</Text>
               <Text variant="bodyMedium" style={styles.emptyText}>
                 {filter === 'active' ? t('orders.noActiveOrders') :

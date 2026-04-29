@@ -297,7 +297,7 @@ export default function TableDetailScreen() {
               {t('tables.currentOrder')}
             </Text>
             <View style={styles.orderInfo}>
-              <IconButton icon="receipt-text" size={24} style={styles.smallIcon} iconColor={colors.mutedForeground} />
+              <IconButton icon="receipt" size={24} style={styles.smallIcon} iconColor={colors.mutedForeground} />
               <Text variant="bodyLarge" style={styles.orderText}>#{table.current_order_id.slice(0, 8)}</Text>
             </View>
             <Button
