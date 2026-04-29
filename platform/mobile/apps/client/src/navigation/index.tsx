@@ -391,7 +391,7 @@ function MainTabs() {
         component={OrdersScreen}
         options={{
           tabBarLabel: 'Orders',
-          tabBarIcon: tabIcon('receipt-text'),
+          tabBarIcon: tabIcon('receipt'),
         }}
       />
       <Tab.Screen
