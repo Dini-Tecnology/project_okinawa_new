@@ -7,7 +7,7 @@ import { ptBR } from 'date-fns/locale';
 import ApiService from '@/shared/services/api';
 import type { Reservation, ReservationStatus } from '../../types';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type RouteParams = {

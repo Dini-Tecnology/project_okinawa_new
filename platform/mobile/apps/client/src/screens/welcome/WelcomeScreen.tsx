@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Dimensions } from 'react-native';
 import { Text, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useColors } from '@okinawa/shared/theme';
+import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 const { width, height } = Dimensions.get('window');

@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import ApiService from '@/shared/services/api';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
 import { useI18n } from '@/shared/hooks/useI18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 type QRCodeType = 'table' | 'menu' | 'invite' | 'payment' | 'unknown';

@@ -24,7 +24,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 } from 'react-native';
 import { Text, Chip, Divider } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { t } from '@/shared/i18n';
 
 // ============================================

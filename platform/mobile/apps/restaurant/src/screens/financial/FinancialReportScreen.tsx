@@ -26,7 +26,7 @@ import ApiService from '@/shared/services/api';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { formatCurrency, getCurrencySymbol } from '@okinawa/shared/utils/formatters';
 import { getLanguage } from '@okinawa/shared/i18n';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 

@@ -7,6 +7,9 @@
     "apps/*",
     "shared"
   ],
+  "overrides": {
+    "expo": "51.0.39"
+  },
   "scripts": {
     "postinstall": "patch-package",
     "client": "cd apps/client && npm start",
@@ -51,7 +54,7 @@
     "@react-native-firebase/analytics": "^23.5.0",
     "@react-native-firebase/app": "^23.5.0",
     "@sentry/react-native": "^7.7.0",
-    "@shopify/flash-list": "^2.2.0",
+    "@shopify/flash-list": "1.7.3",
     "@tanstack/react-query": "^5.90.12",
     "expo-device": "~6.0.2",
     "expo-linking": "~6.3.1",

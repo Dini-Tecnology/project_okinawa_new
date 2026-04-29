@@ -106,10 +106,10 @@ export default function ManageConsentsScreen() {
   return (
     <ScreenContainer>
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.header, { color: colors.text }]}>
+      <Text style={[styles.header, { color: colors.foreground }]}>
         Gerenciar Consentimentos
       </Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+      <Text style={[styles.subtitle, { color: colors.foregroundSecondary }]}>
         Você pode revogar consentimentos opcionais a qualquer momento, conforme a LGPD.
       </Text>
 
@@ -119,8 +119,8 @@ export default function ManageConsentsScreen() {
           <View key={type}>
             <View style={styles.row}>
               <View style={styles.labelContainer}>
-                <Text style={[styles.label, { color: colors.text }]}>{info.label}</Text>
-                <Text style={[styles.description, { color: colors.textSecondary }]}>
+                <Text style={[styles.label, { color: colors.foreground }]}>{info.label}</Text>
+                <Text style={[styles.description, { color: colors.foregroundSecondary }]}>
                   {info.description}
                 </Text>
                 {!info.revocable && (
@@ -144,10 +144,10 @@ export default function ManageConsentsScreen() {
 
       {/* Export Data Section */}
       <View style={styles.exportSection}>
-        <Text style={[styles.exportTitle, { color: colors.text }]}>
+        <Text style={[styles.exportTitle, { color: colors.foreground }]}>
           Exportar Meus Dados
         </Text>
-        <Text style={[styles.description, { color: colors.textSecondary }]}>
+        <Text style={[styles.description, { color: colors.foregroundSecondary }]}>
           Solicite uma cópia de todos os seus dados pessoais, conforme previsto pela LGPD.
         </Text>
         <Button
@@ -173,13 +173,13 @@ export default function ManageConsentsScreen() {
       <Divider style={{ marginVertical: 16 }} />
 
       <View style={styles.footer}>
-        <Text style={[styles.footerText, { color: colors.textSecondary }]}>
+        <Text style={[styles.footerText, { color: colors.foregroundSecondary }]}>
           Para revogar os Termos de Uso ou Política de Privacidade, é necessário excluir sua conta.
         </Text>
         <Button
           mode="outlined"
           textColor={colors.destructive}
-          style={styles.deleteButton}
+          style={[styles.deleteButton, { borderColor: colors.error }]}
           onPress={() => {
             Alert.alert(
               'Excluir Conta',
@@ -226,5 +226,5 @@ const styles = StyleSheet.create({
   exportButton: { marginTop: 12 },
   footer: { marginBottom: 40 },
   footerText: { fontSize: 14, lineHeight: 18, marginBottom: 16 },
-  deleteButton: { borderColor: colors.error },
+  deleteButton: {},
 });

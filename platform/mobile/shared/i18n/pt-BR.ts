@@ -37,6 +37,20 @@ export const ptBR = {
     comingSoon: 'Em breve',
     featureInDevelopment: 'Funcionalidade em desenvolvimento',
     all: 'Todos',
+    genericError: 'Algo deu errado. Tente novamente.',
+  },
+
+  // Filtros de cozinha (Home / Explorar — chaves curtas cuisine.*)
+  cuisine: {
+    japanese: 'Japonesa',
+    italian: 'Italiana',
+    brazilian: 'Brasileira',
+    mexican: 'Mexicana',
+    chinese: 'Chinesa',
+    indian: 'Indiana',
+    sushi: 'Sushi',
+    vegan: 'Vegana',
+    fastFood: 'Fast food',
   },
 
   // Auth
@@ -62,11 +76,16 @@ export const ptBR = {
     biometricLogin: 'Entrar com biometria',
     useBiometrics: 'Usar biometria para login',
     welcomeBack: 'Bem-vindo de volta',
+    welcomeMessage: 'Sua experiência gastronômica, reinventada',
+    orContinueWith: 'ou continue com',
+    continueWithPhone: 'Continuar com telefone',
+    useEmailPassword: 'Usar e-mail e senha',
+    termsPrefix: 'Ao continuar, você concorda com nossos',
     loginFailed: 'Falha no login',
     registerFailed: 'Falha no cadastro',
     noAccount: 'Não tem uma conta? Cadastre-se',
     hasAccount: 'Já tem uma conta? Entre',
-    useBiometricLogin: 'Use {type} para entrar',
+    useBiometricLogin: 'Use {{type}} para entrar',
     usePassword: 'Usar senha',
     biometricLoginSuccess: 'Login com biometria realizado!',
     loginWithEmailFirst: 'Faça login com email e senha primeiro',
@@ -74,8 +93,8 @@ export const ptBR = {
     biometricFailed: 'Autenticação biométrica falhou',
     biometricEnabled: 'Autenticação biométrica ativada!',
     biometricDisabled: 'Autenticação biométrica desativada',
-    loginWith: 'Entrar com {type}',
-    enableBiometric: 'Ativar {type} para logins futuros',
+    loginWith: 'Entrar com {{type}}',
+    enableBiometric: 'Ativar {{type}} para logins futuros',
     logoutConfirm: 'Tem certeza que deseja sair?',
     birthDate: 'Data de nascimento',
     birthDateRequired: 'Data de nascimento é obrigatória',
@@ -106,6 +125,16 @@ export const ptBR = {
     profileDescription: 'Nos conte um pouco sobre você',
     emailOptional: 'E-mail (opcional)',
     emailHelper: 'Adicione um e-mail para recuperação de conta e recibos',
+    invalidPhoneNumber: 'Informe um número de telefone válido',
+    otpSendFailed: 'Não foi possível enviar o código',
+    invalidOTP: 'Código de verificação inválido',
+    otpVerifyFailed: 'Não foi possível verificar o código',
+    enterPhoneNumber: 'Informe seu telefone',
+    phoneDescription: 'Enviaremos um código para verificar seu número',
+    continue: 'Continuar',
+    enterCode: 'Informe o código de verificação',
+    codeSentTo: 'Código enviado para {{phone}}',
+    verifying: 'Verificando...',
   },
 
   // Navigation
@@ -121,6 +150,13 @@ export const ptBR = {
     favorites: 'Favoritos',
     wallet: 'Carteira',
     help: 'Ajuda',
+  },
+
+  explore: {
+    noRestaurants: 'Nenhum restaurante encontrado por aqui',
+    searchPlaceholder: 'Buscar restaurantes ou pratos...',
+    list: 'Lista',
+    map: 'Mapa',
   },
 
   // Restaurant App Navigation
@@ -605,6 +641,15 @@ export const ptBR = {
     wallet: 'Carteira',
     walletDesc: 'Saldo e transações',
     addressesDesc: 'Endereços de entrega salvos',
+    dietaryPreferences: 'Preferências alimentares',
+    dietary: {
+      vegetarian: 'Vegetariano',
+      vegan: 'Vegano',
+      gluten_free: 'Sem glúten',
+      lactose_free: 'Sem lactose',
+      kosher: 'Kosher',
+      halal: 'Halal',
+    },
   },
 
   // Notifications
@@ -1195,6 +1240,26 @@ export const ptBR = {
     scanToJoin: 'Escaneie para entrar na mesa',
     scanToPay: 'Escaneie para pagar',
     invalidQR: 'Código QR inválido',
+  },
+
+  // Scanner (app cliente — tela QRScannerScreen)
+  scanner: {
+    tableAssociated: 'Mesa {{table}} associada com sucesso',
+    tableError: 'Não foi possível associar a mesa. Tente de novo.',
+    menuFound: 'Cardápio encontrado!',
+    inviteAccepted: 'Convite aceito!',
+    inviteError: 'Não foi possível aceitar o convite.',
+    paymentReady: 'Pagamento pronto para concluir.',
+    unknownCode: 'Código não reconhecido',
+    cameraPermission: 'Permissão da câmera',
+    cameraPermissionMessage: 'Precisamos da câmera para escanear QR codes.',
+    allowCamera: 'Permitir câmera',
+    openSettings: 'Abrir configurações',
+    scanQR: 'Escanear QR Code',
+    pointCamera: 'Aponte a câmera para o código',
+    continue: 'Continuar',
+    scanAgain: 'Escanear de novo',
+    supportedTypes: 'Mesas, cardápios, convites e pagamento',
   },
 
   // Service Configuration
@@ -2002,6 +2067,42 @@ export const ptBR = {
     notes: 'Observa\u00E7\u00F5es',
   },
 
+  // Fila virtual (app cliente — VirtualQueueScreen)
+  queue: {
+    joined: 'Você entrou na fila',
+    joinedMessage: 'Avisaremos quando for sua vez.',
+    joinError: 'Não foi possível entrar na fila.',
+    leaveTitle: 'Sair da fila',
+    leaveMessage: 'Deseja realmente sair da fila?',
+    leave: 'Sair',
+    leaveError: 'Não foi possível sair da fila.',
+    confirmed: 'Presença confirmada',
+    confirmedMessage: 'O restaurante foi avisado.',
+    confirmError: 'Não foi possível confirmar.',
+    waiting: 'Aguardando',
+    called: 'Chamado',
+    seated: 'Acomodado',
+    cancelled: 'Cancelado',
+    estimatedWait: 'Tempo estimado',
+    yourTurn: 'É a sua vez!',
+    position: 'Posição',
+    partyOf: 'Grupo de',
+    confirmArrival: 'Confirmar chegada',
+    leaveQueue: 'Sair da fila',
+    joinQueue: 'Entrar na fila',
+    joinDescription: 'Escolha o tamanho do grupo e a preferência de mesa.',
+    enterQueue: 'Entrar na fila virtual',
+    history: 'Histórico',
+    queue: 'Fila',
+    partySize: 'Quantidade de pessoas',
+    tablePreference: 'Preferência de mesa',
+    anyTable: 'Qualquer',
+    indoor: 'Interno',
+    outdoor: 'Externo / varanda',
+    bar: 'Bar',
+    join: 'Entrar',
+  },
+
   waitlistBar: {
     title: 'Pedir na Espera',
     hint: 'Pe\u00E7a drinks \u2014 tudo vai pra comanda da mesa',
@@ -2325,11 +2426,41 @@ export const ptBR = {
 
   // Club (EPIC - Promoter Dashboard)
   club: {
+    joinQueue: 'Entrar na fila',
     areas: {
       selectArea: 'Selecione a Área',
       pista: 'Pista',
       vip: 'VIP',
       rooftop: 'Rooftop',
+    },
+    queueSection: {
+      leave: 'Sair da fila',
+      leaveConfirm: 'Deseja sair da fila do clube?',
+      yourTurn: 'É a sua vez!',
+      atDoor: 'Comparecer na porta',
+      joining: 'Entrando na fila...',
+      position: 'Sua posição',
+      waitTime: 'Tempo de espera',
+      myQr: 'Meu QR',
+    },
+    door: {
+      title: 'Controle de porta',
+      valid: 'Ingresso válido',
+      invalid: 'Ingresso inválido',
+      alreadyUsed: 'Ingresso já utilizado',
+      guestInfo: 'Dados do convidado',
+      admitted: 'Admitido',
+      capacity: 'Capacidade',
+      scan: 'Escanear ingresso',
+      scanResult: 'Resultado da leitura',
+      manualSearch: 'Busca manual',
+    },
+    ticket: {
+      type: 'Tipo',
+      quantity: 'Quantidade',
+    },
+    birthday: {
+      title: 'Aniversariante',
     },
     promoter: {
       title: 'Meu Dashboard',

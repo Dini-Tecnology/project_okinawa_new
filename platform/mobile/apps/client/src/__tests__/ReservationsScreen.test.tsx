@@ -44,7 +44,7 @@ vi.mock('@/shared/hooks/useI18n', () => ({
   }),
 }));
 
-vi.mock('@okinawa/shared/theme', () => ({
+vi.mock('@okinawa/shared/contexts/ThemeContext', () => ({
   useColors: () => ({
     background: '#FFFFFF',
     foreground: '#111827',

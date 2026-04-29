@@ -12,7 +12,6 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Google from 'expo-auth-session/providers/google';
@@ -22,8 +21,10 @@ import { socialAuthService } from '@/shared/services/social-auth';
 import { biometricAuthService } from '@/shared/services/biometric-auth';
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
+import { isGoogleNativeOAuthConfigured } from '@/shared/utils/googleOAuthEnv';
 import { captureException } from '@/shared/config/sentry';
 import { useColors } from '@/shared/contexts/ThemeContext';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import {
   defaultScreenOptions,
   fadeScreenOptions,
@@ -138,22 +139,47 @@ const Tab = createBottomTabNavigator();
 // AUTH STACK (Passwordless-First)
 // ============================================
 
-/**
- * Modern authentication navigation stack.
- * Prioritizes Social Login and Phone OTP with biometric quick-login.
- */
-function AuthStack() {
-  const [authLoading, setAuthLoading] = useState(false);
-  const [biometricLoading, setBiometricLoading] = useState(false);
+const noopGooglePrompt: Parameters<typeof socialAuthService.signInWithGoogle>[2] = async () => ({
+  type: 'cancel',
+});
 
-  // Google OAuth configuration
+interface AuthStackBodyProps {
+  googleLoginAvailable: boolean;
+  googleRequest: Parameters<typeof socialAuthService.signInWithGoogle>[0];
+  googleResponse: Parameters<typeof socialAuthService.signInWithGoogle>[1];
+  googlePromptAsync: Parameters<typeof socialAuthService.signInWithGoogle>[2];
+}
+
+function AuthStackWithGoogleConfigured() {
   const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
-    // These would be configured in app.json / app.config.js
     expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     scopes: ['openid', 'profile', 'email'],
   });
+
+  return (
+    <AuthStackBody
+      googleLoginAvailable
+      googleRequest={googleRequest}
+      googleResponse={googleResponse}
+      googlePromptAsync={googlePromptAsync}
+    />
+  );
+}
+
+/**
+ * OAuth stack screens. When `googleLoginAvailable` is false, the Google hook is not mounted
+ * (otherwise Expo throws on native if `iosClientId` / `androidClientId` is missing).
+ */
+function AuthStackBody({
+  googleLoginAvailable,
+  googleRequest,
+  googleResponse,
+  googlePromptAsync,
+}: AuthStackBodyProps) {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
 
   const handleAppleLogin = useCallback(async () => {
     setAuthLoading(true);
@@ -233,6 +259,7 @@ function AuthStack() {
         {(props) => (
           <WelcomeScreen
             {...props}
+            googleLoginAvailable={googleLoginAvailable}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
             onPhoneLogin={() => handlePhoneLogin(props.navigation)}
@@ -299,6 +326,21 @@ function AuthStack() {
   );
 }
 
+/** Entry auth stack — skips mounting Google OAuth until env client ids exist for this platform. */
+function AuthStack() {
+  if (isGoogleNativeOAuthConfigured()) {
+    return <AuthStackWithGoogleConfigured />;
+  }
+  return (
+    <AuthStackBody
+      googleLoginAvailable={false}
+      googleRequest={null}
+      googleResponse={null}
+      googlePromptAsync={noopGooglePrompt}
+    />
+  );
+}
+
 // ============================================
 // MAIN TAB NAVIGATOR
 // ============================================
@@ -310,6 +352,11 @@ function AuthStack() {
  */
 function MainTabs() {
   const colors = useColors();
+
+  const tabIcon =
+    (name: React.ComponentProps<typeof MaterialCommunityIcons>['name']) =>
+    ({ color, size }: { color: string; size: number }) =>
+      <MaterialCommunityIcons name={name} size={size} color={color} />;
   
   return (
     <Tab.Navigator
@@ -326,22 +373,34 @@ function MainTabs() {
       <Tab.Screen
         name="Home"
         component={HomeScreen}
-        options={{ tabBarLabel: 'Home' }}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: tabIcon('home-outline'),
+        }}
       />
       <Tab.Screen
         name="Explore"
         component={ExploreScreen}
-        options={{ tabBarLabel: 'Explore' }}
+        options={{
+          tabBarLabel: 'Explore',
+          tabBarIcon: tabIcon('compass-outline'),
+        }}
       />
       <Tab.Screen
         name="Orders"
         component={OrdersScreen}
-        options={{ tabBarLabel: 'Orders' }}
+        options={{
+          tabBarLabel: 'Orders',
+          tabBarIcon: tabIcon('receipt-text'),
+        }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{ tabBarLabel: 'Profile' }}
+        options={{
+          tabBarLabel: 'Profile',
+          tabBarIcon: tabIcon('account-outline'),
+        }}
       />
     </Tab.Navigator>
   );
@@ -769,9 +828,8 @@ export default function Navigation() {
 
   return (
     <ErrorBoundary onError={handleNavigationError}>
-      <NavigationContainer>
-        {isAuthenticated ? <MainStack /> : <AuthStack />}
-      </NavigationContainer>
+      {/* Expo Router já fornece NavigationContainer na raiz; outro aqui aninhava e quebrava o runtime. */}
+      {isAuthenticated ? <MainStack /> : <AuthStack />}
     </ErrorBoundary>
   );
 }

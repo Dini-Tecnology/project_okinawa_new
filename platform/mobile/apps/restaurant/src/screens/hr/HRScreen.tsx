@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { Text, Card, SegmentedButtons, DataTable, Button, Chip } from 'react-native-paper';
 import ApiService from '@/shared/services/api';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 
 interface HRSummary {

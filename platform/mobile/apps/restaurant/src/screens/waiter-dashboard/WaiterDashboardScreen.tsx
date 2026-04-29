@@ -13,7 +13,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ApiService from '@/shared/services/api';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { t } from '@okinawa/shared/i18n';
 
 interface Table {

@@ -26,7 +26,7 @@ import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
 } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useColors } from '@/shared/theme';
+import { useColors } from '@/shared/contexts/ThemeContext';
 import { useRestaurant } from '@/shared/contexts/RestaurantContext';
 import { t } from '@/shared/i18n';
 import ApiService from '@/shared/services/api';

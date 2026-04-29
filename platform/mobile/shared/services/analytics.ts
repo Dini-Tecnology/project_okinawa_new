@@ -1,4 +1,37 @@
-import analytics from '@react-native-firebase/analytics';
+import { NativeModules } from 'react-native';
+
+type FirebaseAnalytics = ReturnType<
+  typeof import('@react-native-firebase/analytics').default
+>;
+
+let firebaseAnalyticsFactory: (() => FirebaseAnalytics) | null = null;
+let firebaseUnavailableLogged = false;
+
+function getFirebaseAnalytics(): FirebaseAnalytics | null {
+  if (NativeModules.RNFBAppModule == null) {
+    if (__DEV__ && !firebaseUnavailableLogged) {
+      firebaseUnavailableLogged = true;
+      console.warn(
+        '[Analytics] React Native Firebase não está disponível (Expo Go ou módulo nativo não ligado). ' +
+          'Use `npx expo run:ios` / EAS dev build para Analytics nativo, ou os eventos serão ignorados.',
+      );
+    }
+    return null;
+  }
+  if (!firebaseAnalyticsFactory) {
+    try {
+      firebaseAnalyticsFactory = require('@react-native-firebase/analytics')
+        .default as () => FirebaseAnalytics;
+    } catch {
+      return null;
+    }
+  }
+  try {
+    return firebaseAnalyticsFactory();
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Firebase Analytics Service
@@ -12,7 +45,9 @@ class AnalyticsService {
    */
   async logEvent(eventName: string, params?: { [key: string]: any }) {
     try {
-      await analytics().logEvent(eventName, params);
+      const analytics = getFirebaseAnalytics();
+      if (!analytics) return;
+      await analytics.logEvent(eventName, params);
     } catch (error) {
       console.error('Analytics error:', error);
     }
@@ -25,7 +60,9 @@ class AnalyticsService {
    */
   async logScreenView(screenName: string, screenClass?: string) {
     try {
-      await analytics().logScreenView({
+      const analytics = getFirebaseAnalytics();
+      if (!analytics) return;
+      await analytics.logScreenView({
         screen_name: screenName,
         screen_class: screenClass || screenName,
       });
@@ -40,7 +77,9 @@ class AnalyticsService {
    */
   async setUserId(userId: string | null) {
     try {
-      await analytics().setUserId(userId);
+      const analytics = getFirebaseAnalytics();
+      if (!analytics) return;
+      await analytics.setUserId(userId);
     } catch (error) {
       console.error('Analytics set user ID error:', error);
     }
@@ -52,7 +91,9 @@ class AnalyticsService {
    */
   async setUserProperties(properties: { [key: string]: string }) {
     try {
-      await analytics().setUserProperties(properties);
+      const analytics = getFirebaseAnalytics();
+      if (!analytics) return;
+      await analytics.setUserProperties(properties);
     } catch (error) {
       console.error('Analytics set user properties error:', error);
     }

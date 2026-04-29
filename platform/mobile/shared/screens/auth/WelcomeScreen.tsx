@@ -27,6 +27,8 @@ interface WelcomeScreenProps {
   onGoogleLogin: () => void;
   onPhoneLogin: () => void;
   onBiometricLogin: () => void;
+  /** When false, Google SSO button is hidden (e.g. native OAuth env not configured yet). */
+  googleLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
 }
@@ -37,6 +39,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onGoogleLogin,
   onPhoneLogin,
   onBiometricLogin,
+  googleLoginAvailable = true,
   loading = false,
   biometricLoading = false,
 }) => {
@@ -140,27 +143,32 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
               disabled={loading || biometricLoading}
               variant="primary"
             />
-            <SocialLoginButton
-              provider="google"
-              onPress={onGoogleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-            />
+            {googleLoginAvailable && (
+              <SocialLoginButton
+                provider="google"
+                onPress={onGoogleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+              />
+            )}
           </>
         ) : (
           <>
-            <SocialLoginButton
-              provider="google"
-              onPress={onGoogleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-              variant="primary"
-            />
+            {googleLoginAvailable && (
+              <SocialLoginButton
+                provider="google"
+                onPress={onGoogleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+                variant="primary"
+              />
+            )}
             <SocialLoginButton
               provider="apple"
               onPress={onAppleLogin}
               loading={loading}
               disabled={loading || biometricLoading}
+              variant={googleLoginAvailable ? undefined : 'primary'}
             />
           </>
         )}

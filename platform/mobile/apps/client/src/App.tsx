@@ -11,6 +11,7 @@ import { initDeepLinking } from '@/shared/utils/deep-linking';
 import { pushNotificationService } from '@/shared/services/push-notifications';
 import Navigation from './navigation';
 import { theme } from './theme';
+import { ThemeProvider } from '@/shared/contexts/ThemeContext';
 
 export default function App() {
   useEffect(() => {
@@ -33,11 +34,13 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <CartProvider>
-          <PaperProvider theme={theme}>
-            <Navigation />
-            <StatusBar style="auto" />
-            <Toast />
-          </PaperProvider>
+          <ThemeProvider>
+            <PaperProvider theme={theme}>
+              <Navigation />
+              <StatusBar style="auto" />
+              <Toast />
+            </PaperProvider>
+          </ThemeProvider>
         </CartProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

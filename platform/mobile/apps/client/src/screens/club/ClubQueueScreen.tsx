@@ -397,7 +397,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
             <View
               style={[
                 styles.qrPlaceholder,
-                { borderColor: colors.border },
+                { backgroundColor: colors.card, borderColor: colors.border },
               ]}
             >
               <Text style={{ fontSize: 48 }}>📱</Text>
@@ -419,7 +419,7 @@ export default function ClubQueueScreen({ route }: ClubQueueScreenProps) {
           onPress={handleAtDoor}
           style={[styles.atDoorBtn, { backgroundColor: colors.success }]}
           contentStyle={styles.atDoorBtnContent}
-          labelStyle={styles.atDoorBtnLabel}
+          labelStyle={[styles.atDoorBtnLabel, { color: colors.premiumCardForeground }]}
           accessibilityLabel={t('club.queueSection.atDoor')}
         >
           {t('club.queueSection.atDoor')}
@@ -515,7 +515,6 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 12,
     borderWidth: 2,
-    backgroundColor: colors.card,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -529,7 +528,6 @@ const styles = StyleSheet.create({
   atDoorBtnLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: colors.premiumCardForeground,
   },
   leaveBtn: {
     borderRadius: 12,

@@ -22,6 +22,7 @@ import { socialAuthService } from '@/shared/services/social-auth';
 import { biometricAuthService } from '@/shared/services/biometric-auth';
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
+import { isGoogleNativeOAuthConfigured } from '@/shared/utils/googleOAuthEnv';
 import { captureException } from '@/shared/config/sentry';
 import { useColors } from '@/shared/contexts/ThemeContext';
 import { useAuth } from '@/shared/hooks/useAuth';
@@ -217,21 +218,43 @@ const Drawer = createDrawerNavigator();
 // AUTH STACK (Passwordless-First)
 // ============================================
 
-/**
- * Modern authentication navigation stack for restaurant staff.
- * Prioritizes Social Login and Phone OTP with biometric quick-login.
- */
-function AuthStack() {
-  const [authLoading, setAuthLoading] = useState(false);
-  const [biometricLoading, setBiometricLoading] = useState(false);
+const noopGooglePrompt: Parameters<typeof socialAuthService.signInWithGoogle>[2] = async () => ({
+  type: 'cancel',
+});
 
-  // Google OAuth configuration
+interface AuthStackBodyProps {
+  googleLoginAvailable: boolean;
+  googleRequest: Parameters<typeof socialAuthService.signInWithGoogle>[0];
+  googleResponse: Parameters<typeof socialAuthService.signInWithGoogle>[1];
+  googlePromptAsync: Parameters<typeof socialAuthService.signInWithGoogle>[2];
+}
+
+function AuthStackWithGoogleConfigured() {
   const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
     expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
     androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
     scopes: ['openid', 'profile', 'email'],
   });
+
+  return (
+    <AuthStackBody
+      googleLoginAvailable
+      googleRequest={googleRequest}
+      googleResponse={googleResponse}
+      googlePromptAsync={googlePromptAsync}
+    />
+  );
+}
+
+function AuthStackBody({
+  googleLoginAvailable,
+  googleRequest,
+  googleResponse,
+  googlePromptAsync,
+}: AuthStackBodyProps) {
+  const [authLoading, setAuthLoading] = useState(false);
+  const [biometricLoading, setBiometricLoading] = useState(false);
 
   const handleAppleLogin = useCallback(async () => {
     setAuthLoading(true);
@@ -306,6 +329,7 @@ function AuthStack() {
         {(props) => (
           <WelcomeScreen
             {...props}
+            googleLoginAvailable={googleLoginAvailable}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
             onPhoneLogin={() => handlePhoneLogin(props.navigation)}
@@ -364,6 +388,20 @@ function AuthStack() {
         options={{ title: 'Login with Email' }}
       />
     </Stack.Navigator>
+  );
+}
+
+function AuthStack() {
+  if (isGoogleNativeOAuthConfigured()) {
+    return <AuthStackWithGoogleConfigured />;
+  }
+  return (
+    <AuthStackBody
+      googleLoginAvailable={false}
+      googleRequest={null}
+      googleResponse={null}
+      googlePromptAsync={noopGooglePrompt}
+    />
   );
 }
 
