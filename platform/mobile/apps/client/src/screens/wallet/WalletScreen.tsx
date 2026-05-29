@@ -38,14 +38,14 @@ export default function WalletScreen() {
           backgroundColor: colors.background,
         },
         scrollContent: {
-          paddingBottom: 24,
+          paddingBottom: 88,
         },
         header: {
           flexDirection: 'row',
           alignItems: 'center',
           paddingHorizontal: 16,
           paddingTop: 8,
-          paddingBottom: 28,
+          paddingBottom: 88,
           gap: 8,
         },
         backRow: {

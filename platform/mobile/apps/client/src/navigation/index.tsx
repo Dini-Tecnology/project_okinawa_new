@@ -25,6 +25,7 @@ import { isGoogleNativeOAuthConfigured } from '@/shared/utils/googleOAuthEnv';
 import { captureException } from '@/shared/config/sentry';
 import { isAuthSkipped } from '@/shared/config/skip-auth';
 import { ClientTabBar } from '../components/navigation/ClientTabBar';
+import { liquidGlassTabNavigatorScreenOptions } from '@okinawa/shared/components/LiquidGlassBottomNav';
 import {
   defaultScreenOptions,
   fadeScreenOptions,
@@ -403,7 +404,7 @@ function MainTabs() {
   return (
     <Tab.Navigator
       tabBar={(props) => <ClientTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
+      screenOptions={liquidGlassTabNavigatorScreenOptions}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Início' }} />
       <Tab.Screen name="MenuTab" component={MenuTabScreen} options={{ title: 'Cardápio' }} />

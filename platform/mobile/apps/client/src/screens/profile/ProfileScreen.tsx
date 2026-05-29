@@ -122,7 +122,7 @@ const createStyles = (colors: any) =>
     content: {
       paddingHorizontal: 18,
       paddingTop: 18,
-      paddingBottom: 32,
+      paddingBottom: 88,
     },
     title: {
       fontSize: 24,

@@ -1,123 +1,53 @@
-import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Text } from 'react-native-paper';
+import React, { useContext } from 'react';
+import { View, StyleSheet } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
+import ClientLiquidGlassNav from '@okinawa/shared/components/ClientLiquidGlassNav';
 
-type TabIconName = React.ComponentProps<typeof Ionicons>['name'];
-
-const TAB_CONFIG: Record<
-  string,
-  { label: string; icon: TabIconName; iconFocused: TabIconName }
-> = {
-  Home: { label: 'Início', icon: 'home-outline', iconFocused: 'home' },
-  MenuTab: { label: 'Cardápio', icon: 'restaurant-outline', iconFocused: 'restaurant' },
-  Orders: { label: 'Pedidos', icon: 'receipt-outline', iconFocused: 'receipt' },
-  WalletTab: { label: 'Carteira', icon: 'wallet-outline', iconFocused: 'wallet' },
-  Profile: { label: 'Perfil', icon: 'person-outline', iconFocused: 'person' },
+const ROUTE_TO_TAB: Record<string, string> = {
+  Home: 'home',
+  MenuTab: 'menu',
+  Orders: 'orders',
+  WalletTab: 'wallet',
+  Profile: 'profile',
 };
 
-export function ClientTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const colors = useColors();
-  const insets = useSafeAreaInsets();
+const TAB_TO_ROUTE: Record<string, string> = {
+  home: 'Home',
+  menu: 'MenuTab',
+  orders: 'Orders',
+  wallet: 'WalletTab',
+  profile: 'Profile',
+};
+
+export function ClientTabBar({ state, navigation }: BottomTabBarProps) {
+  const onHeightChange = useContext(BottomTabBarHeightCallbackContext);
+  const activeRoute = state.routes[state.index]?.name ?? 'Home';
+  const activeTab = ROUTE_TO_TAB[activeRoute] ?? 'home';
 
   return (
     <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-          paddingBottom: Math.max(insets.bottom, 8),
-        },
-      ]}
+      style={styles.wrap}
+      pointerEvents="box-none"
+      onLayout={(event) => onHeightChange?.(event.nativeEvent.layout.height)}
     >
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const isFocused = state.index === index;
-        const config = TAB_CONFIG[route.name] ?? {
-          label: options.title ?? route.name,
-          icon: 'ellipse-outline' as TabIconName,
-          iconFocused: 'ellipse' as TabIconName,
-        };
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        const tint = isFocused ? colors.primary : colors.foregroundMuted;
-
-        return (
-          <TouchableOpacity
-            key={route.key}
-            accessibilityRole="button"
-            accessibilityState={isFocused ? { selected: true } : {}}
-            accessibilityLabel={config.label}
-            onPress={onPress}
-            style={styles.tab}
-            activeOpacity={0.7}
-          >
-            <Ionicons
-              name={isFocused ? config.iconFocused : config.icon}
-              size={24}
-              color={tint}
-            />
-            <Text
-              variant="labelSmall"
-              style={[styles.label, { color: tint }]}
-              numberOfLines={1}
-            >
-              {config.label}
-            </Text>
-            {isFocused && (
-              <View style={[styles.indicator, { backgroundColor: colors.primary }]} />
-            )}
-          </TouchableOpacity>
-        );
-      })}
+      <ClientLiquidGlassNav
+        activeTab={activeTab}
+        onNavigate={(tab) => {
+          const route = TAB_TO_ROUTE[tab];
+          if (route) navigation.navigate(route);
+        }}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -2 },
-        shadowOpacity: 0.06,
-        shadowRadius: 8,
-      },
-      android: { elevation: 8 },
-    }),
-  },
-  tab: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
-    minHeight: 52,
-  },
-  indicator: {
-    width: 28,
-    height: 3,
-    borderRadius: 2,
-    marginTop: 4,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '500',
+  wrap: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'transparent',
   },
 });

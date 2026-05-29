@@ -53,7 +53,7 @@ export default function HomeScreen() {
           backgroundColor: colors.background,
         },
         scrollContent: {
-          paddingBottom: 24,
+          paddingBottom: 88,
         },
         header: {
           flexDirection: 'row',

@@ -200,7 +200,7 @@ function createStyles(colors: {
     },
     listContent: {
       paddingHorizontal: 16,
-      paddingBottom: 24,
+      paddingBottom: 88,
       gap: 14,
     },
     menuItem: {

@@ -49,7 +49,14 @@ export {
 // NAVIGATION COMPONENTS
 // ============================================
 export { default as LiquidGlassNav } from './LiquidGlassNav';
+export {
+  default as LiquidGlassBottomNav,
+  LIQUID_GLASS_BOTTOM_NAV_OFFSET,
+  liquidGlassTabNavigatorScreenOptions,
+} from './LiquidGlassBottomNav';
+export type { LiquidGlassNavItem, LiquidGlassBottomNavProps } from './LiquidGlassBottomNav';
 export { default as RestaurantLiquidGlassNav } from './RestaurantLiquidGlassNav';
+export { default as ClientLiquidGlassNav } from './ClientLiquidGlassNav';
 
 // ============================================
 // DOMAIN COMPONENTS

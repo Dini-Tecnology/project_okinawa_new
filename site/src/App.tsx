@@ -27,6 +27,7 @@ const AdminSimulationLeads = lazy(() => import("./pages/AdminSimulationLeads"));
 const DemoClient = lazy(() => import("./pages/DemoClient"));
 const DemoRestaurant = lazy(() => import("./pages/DemoRestaurant"));
 const GuidedSimulation = lazy(() => import("./pages/GuidedSimulation"));
+const MobilePreviewV2 = lazy(() => import("./pages/MobilePreviewV2"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const SiteTerms = lazy(() => import("./pages/SiteTerms"));
 const SitePrivacy = lazy(() => import("./pages/SitePrivacy"));
@@ -82,6 +83,7 @@ const App = () => (
                       </Route>
                       <Route path="/admin/feedback" element={<AdminFeedback />} />
                       <Route path="/admin/simulation" element={<AdminSimulationLeads />} />
+                      <Route path="/mobile-v2" element={<MobilePreviewV2 />} />
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </div>

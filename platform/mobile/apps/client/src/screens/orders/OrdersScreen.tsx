@@ -67,7 +67,7 @@ export default function OrdersScreen() {
         scroll: { flex: 1 },
         content: {
           paddingHorizontal: 16,
-          paddingBottom: 24,
+          paddingBottom: 88,
           gap: 20,
         },
         sectionLabel: {
