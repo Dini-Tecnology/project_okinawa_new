@@ -12,6 +12,7 @@ import { pushNotificationService } from '@/shared/services/push-notifications';
 import Navigation from './navigation';
 import { theme } from './theme';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
+import { AnalyticsProvider } from '@/shared/contexts/AnalyticsContext';
 
 export default function App() {
   useEffect(() => {
@@ -34,13 +35,15 @@ export default function App() {
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
         <CartProvider>
-          <ThemeProvider>
-            <PaperProvider theme={theme}>
-              <Navigation />
-              <StatusBar style="auto" />
-              <Toast />
-            </PaperProvider>
-          </ThemeProvider>
+          <AnalyticsProvider>
+            <ThemeProvider>
+              <PaperProvider theme={theme}>
+                <Navigation />
+                <StatusBar style="auto" />
+                <Toast />
+              </PaperProvider>
+            </ThemeProvider>
+          </AnalyticsProvider>
         </CartProvider>
       </QueryClientProvider>
     </SafeAreaProvider>

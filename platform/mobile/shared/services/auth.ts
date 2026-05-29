@@ -11,6 +11,11 @@ import ApiService from './api';
 import { secureStorage } from './secure-storage';
 import { supabaseAuthAdapter } from './supabase-auth';
 import logger from '../utils/logger';
+import {
+  DEV_GUEST_ACCESS_TOKEN,
+  DEV_GUEST_USER,
+  isAuthSkipped,
+} from '../config/skip-auth';
 
 // Auth state change listeners
 type AuthStateListener = (authenticated: boolean) => void;
@@ -18,9 +23,33 @@ const authStateListeners: AuthStateListener[] = [];
 
 export const authService = {
   /**
+   * Dev bypass: fake session so navigation opens MainStack (requires EXPO_PUBLIC_SKIP_AUTH).
+   */
+  async enterDevGuestMode() {
+    if (!isAuthSkipped()) {
+      throw new Error('enterDevGuestMode is only available when EXPO_PUBLIC_SKIP_AUTH is enabled');
+    }
+
+    const data = {
+      access_token: DEV_GUEST_ACCESS_TOKEN,
+      refresh_token: 'dev-bypass-refresh',
+      user: { ...DEV_GUEST_USER },
+    };
+
+    await this.storeAuthData(data);
+    this.notifyAuthStateChange(true);
+    logger.info('[Auth] Dev guest session — UI exploration mode');
+    return data;
+  },
+
+  /**
    * Traditional email/password login
    */
   async login(email: string, password: string) {
+    if (isAuthSkipped()) {
+      return this.enterDevGuestMode();
+    }
+
     const data = await supabaseAuthAdapter.login(email, password);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
@@ -31,6 +60,10 @@ export const authService = {
    * User registration with email/password
    */
   async register(email: string, password: string, full_name: string) {
+    if (isAuthSkipped()) {
+      return this.enterDevGuestMode();
+    }
+
     const data = await supabaseAuthAdapter.register(email, password, full_name);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
@@ -160,7 +193,9 @@ export const authService = {
    */
   async logout() {
     try {
-      await supabaseAuthAdapter.logout();
+      if (!isAuthSkipped()) {
+        await supabaseAuthAdapter.logout();
+      }
     } catch (error) {
       logger.warn('Logout API call failed:', error);
     } finally {
@@ -173,6 +208,10 @@ export const authService = {
    * Get current user from Supabase
    */
   async getCurrentUser() {
+    if (isAuthSkipped()) {
+      return this.getStoredUser();
+    }
+
     try {
       return await supabaseAuthAdapter.getCurrentUser();
     } catch (error) {

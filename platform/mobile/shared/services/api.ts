@@ -10,6 +10,8 @@ import {
 } from './supabase-api';
 import { getSupabaseClient } from './supabase';
 import logger from '../utils/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isAuthSkipped } from '../config/skip-auth';
 
 // React Native global __DEV__ type declaration
 declare const __DEV__: boolean;
@@ -150,6 +152,11 @@ class ApiService {
         }
 
         if (error.response?.status === 401 && !originalRequest._retry) {
+          // Dev guest session: never refresh/log out on API 401
+          if (isAuthSkipped()) {
+            return Promise.reject(error);
+          }
+
           if (this.refreshing) {
             return new Promise((resolve, reject) => {
               this.failedQueue.push({ resolve, reject });
@@ -174,7 +181,9 @@ class ApiService {
 
             if (this.refreshRetryCount > MAX_REFRESH_RETRIES) {
               logger.warn('Max token refresh retries exceeded, forcing logout');
-              await secureStorage.clearAll();
+              if (!isAuthSkipped()) {
+                await secureStorage.clearAll();
+              }
               this.processQueue(new Error('Session expired'));
               this.refreshing = false;
               throw new Error('Session expired - too many refresh attempts');
@@ -208,8 +217,9 @@ class ApiService {
             this.processQueue(refreshError instanceof Error ? refreshError : new Error(String(refreshError)));
             this.refreshing = false;
 
-            // Clear tokens and redirect to login
-            await secureStorage.clearAll();
+            if (!isAuthSkipped()) {
+              await secureStorage.clearAll();
+            }
 
             throw refreshError;
           }
@@ -289,6 +299,11 @@ class ApiService {
   }
 
   async getCurrentUser() {
+    if (isAuthSkipped()) {
+      const userStr = await AsyncStorage.getItem('user');
+      return userStr ? JSON.parse(userStr) : null;
+    }
+
     const user = await supabaseAuthAdapter.getCurrentUser();
     if (user) {
       await secureStorage.setUser(user);

@@ -1,431 +1,336 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, Image, Linking } from 'react-native';
-import { Text, Card, Button, Chip, Divider, List, IconButton } from 'react-native-paper';
+import React, { useCallback, useMemo } from 'react';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import { Text } from 'react-native-paper';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import ApiService from '@/shared/services/api';
-import MapView, { Marker } from 'react-native-maps';
-import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useScreenTracking } from '@/shared/hooks/useAnalytics';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
-import logger from '@okinawa/shared/utils/logger';
-import { SERVICE_TYPE_CONFIGS, ServiceType } from '../../contexts/ServiceTypeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import { resolveRestaurantDetail } from '../../constants/restaurantDetailMocks';
 
-interface Restaurant {
-  id: string;
-  name: string;
-  description: string;
-  address: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  phone: string;
-  email: string;
-  logo_url?: string;
-  banner_url?: string;
-  location?: {
-    type: string;
-    coordinates: [number, number];
-  };
-  service_type: string;
-  cuisine_types?: string[];
-  opening_hours?: any;
-  rating?: number;
-  total_reviews?: number;
-  is_active: boolean;
-}
+const HERO_HEIGHT = Dimensions.get('window').width * 0.55;
 
 export default function RestaurantScreen() {
   useScreenTracking('Restaurant Details');
 
   const route = useRoute();
-  const navigation = useNavigation();
-  const { restaurantId } = route.params as { restaurantId: string };
+  const navigation = useNavigation<any>();
   const colors = useColors();
+  const insets = useSafeAreaInsets();
+  const { restaurantId } = (route.params ?? {}) as { restaurantId?: string };
+  const restaurant = useMemo(() => resolveRestaurantDetail(restaurantId), [restaurantId]);
 
-  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
-  const [loading, setLoading] = useState(false);
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        scroll: { flex: 1, backgroundColor: colors.background },
+        scrollContent: { paddingBottom: 32 },
+        hero: {
+          width: '100%',
+          height: HERO_HEIGHT,
+          backgroundColor: colors.backgroundTertiary,
+        },
+        backBtn: {
+          position: 'absolute',
+          left: 16,
+          width: 40,
+          height: 40,
+          borderRadius: 20,
+          backgroundColor: '#FFFFFF',
+          alignItems: 'center',
+          justifyContent: 'center',
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.12,
+          shadowRadius: 6,
+          elevation: 3,
+        },
+        body: {
+          paddingHorizontal: 16,
+          paddingTop: 20,
+        },
+        title: {
+          fontSize: 26,
+          fontWeight: '800',
+          color: colors.foreground,
+          letterSpacing: -0.5,
+          marginBottom: 8,
+        },
+        tagline: {
+          fontSize: 15,
+          lineHeight: 22,
+          color: colors.foregroundSecondary,
+          marginBottom: 14,
+        },
+        metaRow: {
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          gap: 14,
+          marginBottom: 10,
+        },
+        metaItem: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 4,
+        },
+        metaText: {
+          fontSize: 14,
+          fontWeight: '600',
+          color: colors.foreground,
+        },
+        hoursRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          marginBottom: 16,
+        },
+        hoursText: {
+          fontSize: 14,
+          color: colors.foregroundSecondary,
+        },
+        tagsWrap: {
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: 8,
+          marginBottom: 16,
+        },
+        tag: {
+          paddingHorizontal: 14,
+          paddingVertical: 8,
+          borderRadius: 20,
+          backgroundColor: colors.backgroundTertiary,
+        },
+        tagText: {
+          fontSize: 13,
+          fontWeight: '500',
+          color: colors.foregroundSecondary,
+        },
+        hintBanner: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          paddingHorizontal: 14,
+          paddingVertical: 12,
+          borderRadius: 14,
+          backgroundColor: '#FFF3EE',
+          marginBottom: 20,
+        },
+        hintText: {
+          flex: 1,
+          fontSize: 14,
+          fontWeight: '500',
+          color: colors.primary,
+          lineHeight: 20,
+        },
+        primaryRow: {
+          flexDirection: 'row',
+          gap: 10,
+          marginBottom: 16,
+        },
+        primaryBtn: {
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          paddingVertical: 14,
+          borderRadius: 16,
+        },
+        primaryBtnFilled: {
+          backgroundColor: colors.primary,
+        },
+        primaryBtnOutline: {
+          backgroundColor: colors.card,
+          borderWidth: 1.5,
+          borderColor: colors.border,
+        },
+        primaryBtnTextFilled: {
+          color: colors.primaryForeground,
+          fontSize: 15,
+          fontWeight: '700',
+        },
+        primaryBtnTextOutline: {
+          color: colors.foreground,
+          fontSize: 15,
+          fontWeight: '700',
+        },
+        secondaryRow: {
+          flexDirection: 'row',
+          gap: 10,
+        },
+        secondaryBtn: {
+          flex: 1,
+          alignItems: 'center',
+          paddingVertical: 14,
+          borderRadius: 16,
+          backgroundColor: colors.backgroundTertiary,
+        },
+        secondaryLabel: {
+          marginTop: 8,
+          fontSize: 12,
+          fontWeight: '600',
+          color: colors.foreground,
+          textAlign: 'center',
+        },
+      }),
+    [colors],
+  );
 
-  const analytics = useAnalytics();
+  const navParams = useMemo(
+    () => ({
+      restaurantId: restaurant.id,
+      restaurantName: restaurant.name,
+      tableNumber: restaurant.defaultTable.number,
+    }),
+    [restaurant],
+  );
 
-  // Service-type feature gating: determine which CTA buttons to show
-  const serviceFeatures = useMemo(() => {
-    const type = restaurant?.service_type as ServiceType | undefined;
-    if (!type || !SERVICE_TYPE_CONFIGS[type]) {
-      return { reservations: true, digitalTab: false, ticketPurchase: false, virtualQueue: false };
-    }
-    const features = SERVICE_TYPE_CONFIGS[type].features;
-    return {
-      reservations: features.reservations,
-      digitalTab: features.digitalTab,
-      ticketPurchase: features.ticketPurchase,
-      virtualQueue: features.virtualQueue,
-    };
-  }, [restaurant?.service_type]);
+  const openMenu = useCallback(() => {
+    navigation.navigate('MenuTab');
+  }, [navigation]);
 
-  useEffect(() => {
-    loadRestaurant();
-  }, []);
+  const openReserve = useCallback(() => {
+    navigation.navigate('RestaurantReserve', navParams);
+  }, [navigation, navParams]);
 
-  const loadRestaurant = async () => {
-    setLoading(true);
-    try {
-      const data = await ApiService.getRestaurant(restaurantId);
-      setRestaurant(data);
+  const openQR = useCallback(() => {
+    navigation.navigate('RestaurantQRScan', navParams);
+  }, [navigation, navParams]);
 
-      if (data) {
-        await analytics.logRestaurantView(data.id, data.name);
-      }
-    } catch (error) {
-      logger.error('Failed to load restaurant:', error);
-      await analytics.logError('Failed to load restaurant', 'RESTAURANT_LOAD_ERROR', false);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const openQueue = useCallback(() => {
+    navigation.navigate('RestaurantVirtualQueue', navParams);
+  }, [navigation, navParams]);
 
-  const handleCall = async () => {
-    if (restaurant?.phone) {
-      await analytics.logEvent('restaurant_call', {
-        restaurant_id: restaurantId,
-        restaurant_name: restaurant.name,
-      });
-
-      Linking.openURL(`tel:${restaurant.phone}`);
-    }
-  };
-
-  const handleEmail = async () => {
-    if (restaurant?.email) {
-      await analytics.logEvent('restaurant_email', {
-        restaurant_id: restaurantId,
-        restaurant_name: restaurant.name,
-      });
-
-      Linking.openURL(`mailto:${restaurant.email}`);
-    }
-  };
-
-  const handleDirections = async () => {
-    if (restaurant?.location) {
-      await analytics.logEvent('restaurant_directions', {
-        restaurant_id: restaurantId,
-        restaurant_name: restaurant.name,
-      });
-
-      const [lng, lat] = restaurant.location.coordinates;
-      const url = `https://maps.google.com/?q=${lat},${lng}`;
-      Linking.openURL(url);
-    }
-  };
-
-  const renderOpeningHours = () => {
-    if (!restaurant?.opening_hours) return null;
-
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-    return days.map((day) => {
-      const hours = restaurant.opening_hours[day.toLowerCase()];
-      return (
-        <View key={day} style={styles.hoursRow}>
-          <Text variant="bodyMedium" style={styles.dayText}>
-            {day}
-          </Text>
-          <Text variant="bodyMedium" style={[styles.hoursText, { color: colors.foregroundMuted }]}>
-            {hours || 'Closed'}
-          </Text>
-        </View>
-      );
-    });
-  };
-
-  const styles = createStyles(colors);
-
-  if (!restaurant) {
-    return (
-      <ScreenContainer>
-      <View style={styles.loading}>
-        <Text style={{ color: colors.foreground }}>Loading...</Text>
-      </View>
-    
-      </ScreenContainer>
-    );
-  }
+  const openCallTeam = useCallback(() => {
+    navigation.navigate('RestaurantCallTeam', navParams);
+  }, [navigation, navParams]);
 
   return (
-    <ScreenContainer>
-    <ScrollView style={styles.container}>
-      {restaurant.banner_url && (
-        <Image source={{ uri: restaurant.banner_url }} style={styles.banner} accessibilityLabel={`${restaurant.name} banner`} />
-      )}
+    <ScreenContainer edges={['bottom']}>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View>
+          <Image
+            source={{ uri: restaurant.imageUrl }}
+            style={styles.hero}
+            resizeMode="cover"
+            accessibilityLabel={`Interior do ${restaurant.name}`}
+          />
+          <TouchableOpacity
+            style={[styles.backBtn, { top: insets.top + 8 }]}
+            onPress={() => navigation.goBack()}
+            accessibilityRole="button"
+            accessibilityLabel="Voltar"
+          >
+            <Ionicons name="arrow-back" size={22} color={colors.foreground} />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.header}>
-        {restaurant.logo_url && (
-          <Image source={{ uri: restaurant.logo_url }} style={styles.logo} accessibilityLabel={`${restaurant.name} logo`} />
-        )}
-        <View style={styles.headerInfo}>
-          <Text variant="headlineMedium" style={{ color: colors.foreground }}>{restaurant.name}</Text>
-          {restaurant.rating && (
-            <View style={styles.rating}>
-              <Text variant="titleMedium" style={styles.ratingText}>
-                ⭐ {restaurant.rating.toFixed(1)}
-              </Text>
-              <Text variant="bodySmall" style={styles.reviewCount}>
-                ({restaurant.total_reviews} reviews)
+        <View style={styles.body}>
+          <Text style={styles.title}>{restaurant.name}</Text>
+          <Text style={styles.tagline}>{restaurant.tagline}</Text>
+
+          <View style={styles.metaRow}>
+            <View style={styles.metaItem}>
+              <Ionicons name="star" size={16} color="#FBBF24" />
+              <Text style={styles.metaText}>
+                {restaurant.rating} ({restaurant.reviewCount})
               </Text>
             </View>
-          )}
-        </View>
-      </View>
+            <View style={styles.metaItem}>
+              <Ionicons name="location-outline" size={16} color={colors.foregroundMuted} />
+              <Text style={styles.metaText}>{restaurant.distanceM}m</Text>
+            </View>
+            <Text style={styles.metaText}>{restaurant.priceLevel}</Text>
+          </View>
 
-      <View style={styles.chips}>
-        <Chip icon="silverware-fork-knife" style={styles.chip}>
-          {restaurant.service_type.replace('_', ' ')}
-        </Chip>
-        {restaurant.cuisine_types?.map((cuisine, index) => (
-          <Chip key={index} style={styles.chip}>
-            {cuisine}
-          </Chip>
-        ))}
-      </View>
+          <View style={styles.hoursRow}>
+            <Ionicons name="time-outline" size={16} color={colors.foregroundMuted} />
+            <Text style={styles.hoursText}>{restaurant.hoursLabel}</Text>
+          </View>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text variant="titleMedium" style={styles.sectionTitle}>
-            About
-          </Text>
-          <Text variant="bodyMedium" style={{ color: colors.foreground }}>{restaurant.description}</Text>
-        </Card.Content>
-      </Card>
+          <View style={styles.tagsWrap}>
+            {restaurant.amenities.map((tag) => (
+              <View key={tag} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
+              </View>
+            ))}
+          </View>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text variant="titleMedium" style={styles.sectionTitle}>
-            Contact Information
-          </Text>
+          <View style={styles.hintBanner}>
+            <Ionicons name="flash" size={20} color={colors.primary} />
+            <Text style={styles.hintText}>Explore o cardápio ou faça uma reserva</Text>
+          </View>
 
-          <List.Item
-            title={restaurant.phone}
-            description="Phone"
-            titleStyle={{ color: colors.foreground }}
-            descriptionStyle={{ color: colors.foregroundMuted }}
-            left={(props) => <List.Icon {...props} icon="phone" color={colors.foregroundMuted} />}
-            right={(props) => (
-              <IconButton {...props} icon="phone-outgoing" onPress={handleCall} accessibilityLabel="Call restaurant" accessibilityRole="button" />
-            )}
-          />
-
-          <List.Item
-            title={restaurant.email}
-            description="Email"
-            titleStyle={{ color: colors.foreground }}
-            descriptionStyle={{ color: colors.foregroundMuted }}
-            left={(props) => <List.Icon {...props} icon="email" color={colors.foregroundMuted} />}
-            right={(props) => (
-              <IconButton {...props} icon="email-send" onPress={handleEmail} accessibilityLabel="Send email to restaurant" accessibilityRole="button" />
-            )}
-          />
-
-          <Divider />
-
-          <List.Item
-            title={`${restaurant.address}, ${restaurant.city}`}
-            description={`${restaurant.state} ${restaurant.zip_code}`}
-            titleStyle={{ color: colors.foreground }}
-            descriptionStyle={{ color: colors.foregroundMuted }}
-            left={(props) => <List.Icon {...props} icon="map-marker" color={colors.foregroundMuted} />}
-            right={(props) => (
-              <IconButton {...props} icon="directions" onPress={handleDirections} accessibilityLabel="Get directions to restaurant" accessibilityRole="button" />
-            )}
-          />
-        </Card.Content>
-      </Card>
-
-      {restaurant.location && (
-        <Card style={styles.card}>
-          <Card.Content>
-            <Text variant="titleMedium" style={styles.sectionTitle}>
-              Location
-            </Text>
-            <MapView
-              style={styles.map}
-              initialRegion={{
-                latitude: restaurant.location.coordinates[1],
-                longitude: restaurant.location.coordinates[0],
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
-              }}
+          <View style={styles.primaryRow}>
+            <TouchableOpacity
+              style={[styles.primaryBtn, styles.primaryBtnFilled]}
+              onPress={openMenu}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Ver cardápio"
             >
-              <Marker
-                coordinate={{
-                  latitude: restaurant.location.coordinates[1],
-                  longitude: restaurant.location.coordinates[0],
-                }}
-                title={restaurant.name}
-              />
-            </MapView>
-          </Card.Content>
-        </Card>
-      )}
+              <Ionicons name="restaurant" size={20} color={colors.primaryForeground} />
+              <Text style={styles.primaryBtnTextFilled}>Ver Cardápio</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.primaryBtn, styles.primaryBtnOutline]}
+              onPress={openReserve}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Reservar mesa"
+            >
+              <Ionicons name="calendar-outline" size={20} color={colors.foreground} />
+              <Text style={styles.primaryBtnTextOutline}>Reservar Mesa</Text>
+            </TouchableOpacity>
+          </View>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <Text variant="titleMedium" style={styles.sectionTitle}>
-            Opening Hours
-          </Text>
-          {renderOpeningHours()}
-        </Card.Content>
-      </Card>
-
-      <View style={styles.actions}>
-        {/* Always visible: View Menu */}
-        <Button
-          mode="contained"
-          onPress={() => (navigation as any).navigate('Menu', { restaurantId: restaurant.id })}
-          style={styles.menuButton}
-          icon="silverware"
-        >
-          View Menu
-        </Button>
-
-        {/* Service-type gated CTAs */}
-        {serviceFeatures.reservations && (
-          <Button
-            mode="outlined"
-            onPress={() => (navigation as any).navigate('Reservation', { restaurantId: restaurant.id })}
-            style={styles.reservationButton}
-            icon="calendar"
-          >
-            Fazer Reserva
-          </Button>
-        )}
-
-        {serviceFeatures.digitalTab && (
-          <Button
-            mode="outlined"
-            onPress={() => (navigation as any).navigate('Tab', { restaurantId: restaurant.id })}
-            style={styles.reservationButton}
-            icon="glass-cocktail"
-          >
-            Abrir Tab
-          </Button>
-        )}
-
-        {serviceFeatures.ticketPurchase && (
-          <Button
-            mode="outlined"
-            onPress={() => (navigation as any).navigate('TicketPurchase', { restaurantId: restaurant.id })}
-            style={styles.reservationButton}
-            icon="ticket"
-          >
-            Comprar Entrada
-          </Button>
-        )}
-
-        {serviceFeatures.virtualQueue && (
-          <Button
-            mode="outlined"
-            onPress={() => (navigation as any).navigate('Waitlist', { restaurantId: restaurant.id })}
-            style={styles.reservationButton}
-            icon="account-clock"
-          >
-            Entrar na Fila
-          </Button>
-        )}
-      </View>
-    </ScrollView>
-  
+          <View style={styles.secondaryRow}>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={openQR}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Escanear QR"
+            >
+              <Ionicons name="qr-code-outline" size={26} color={colors.primary} />
+              <Text style={styles.secondaryLabel}>Escanear QR</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={openQueue}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Fila virtual"
+            >
+              <Ionicons name="timer-outline" size={26} color={colors.primary} />
+              <Text style={styles.secondaryLabel}>Fila Virtual</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.secondaryBtn}
+              onPress={openCallTeam}
+              activeOpacity={0.85}
+              accessibilityRole="button"
+              accessibilityLabel="Chamar garçom"
+            >
+              <Ionicons name="hand-left-outline" size={26} color={colors.primary} />
+              <Text style={styles.secondaryLabel}>Chamar Garçom</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </ScreenContainer>
   );
 }
-
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loading: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-  },
-  banner: {
-    width: '100%',
-    height: 200,
-  },
-  header: {
-    flexDirection: 'row',
-    padding: 20,
-    backgroundColor: colors.card,
-    alignItems: 'center',
-    gap: 15,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-  },
-  headerInfo: {
-    flex: 1,
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginTop: 5,
-  },
-  ratingText: {
-    color: colors.primary,
-  },
-  reviewCount: {
-    color: colors.foregroundMuted,
-  },
-  chips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    padding: 16,
-    gap: 8,
-    backgroundColor: colors.card,
-  },
-  chip: {
-    marginRight: 5,
-  },
-  card: {
-    margin: 16,
-    marginTop: 0,
-    backgroundColor: colors.card,
-  },
-  sectionTitle: {
-    marginBottom: 15,
-    color: colors.foreground,
-  },
-  map: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-  },
-  hoursRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  dayText: {
-    fontWeight: '500',
-    color: colors.foreground,
-  },
-  hoursText: {
-    color: colors.foregroundMuted,
-  },
-  actions: {
-    padding: 16,
-    gap: 10,
-    paddingBottom: 30,
-  },
-  menuButton: {
-    backgroundColor: colors.primary,
-  },
-  reservationButton: {
-    borderColor: colors.primary,
-  },
-});

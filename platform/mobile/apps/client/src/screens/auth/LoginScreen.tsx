@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { TextInput, Button, Text, HelperText, IconButton, Switch } from 'react-native-paper';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
+import { Text, HelperText } from 'react-native-paper';
 import { authService } from '@/shared/services/auth';
 import { useBiometricAuth } from '@/shared/hooks/useBiometricAuth';
 import { secureStorage } from '@/shared/services/secure-storage';
@@ -10,75 +18,104 @@ import { useAnalyticsContext } from '@/shared/contexts/AnalyticsContext';
 import { useI18n } from '@/shared/hooks/useI18n';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import logger from '@okinawa/shared/utils/logger';
-import { loginSchema, validateForm, type LoginFormData } from '@/shared/validation/schemas';
+import { loginSchema, validateForm } from '@/shared/validation/schemas';
 import Haptic from '@/shared/utils/haptics';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import { AuthScreenHeader } from '../../components/auth/AuthScreenHeader';
+import { AuthTextField } from '../../components/auth/AuthTextField';
+import { SocialAuthChips } from '../../components/auth/SocialAuthChips';
+import { AUTH_BRAND } from '../../components/auth/authScreenTheme';
+import { DEV_GUEST_USER, isAuthSkipped } from '@/shared/config/skip-auth';
 
-export default function LoginScreen({ navigation }: any) {
+interface LoginScreenProps {
+  navigation: any;
+  onAppleLogin?: () => void;
+  onGoogleLogin?: () => void;
+  onBiometricLogin?: () => void;
+  loading?: boolean;
+  biometricLoading?: boolean;
+}
+
+export default function LoginScreen({
+  navigation,
+  onAppleLogin,
+  onGoogleLogin,
+  onBiometricLogin,
+  loading: externalLoading = false,
+  biometricLoading = false,
+}: LoginScreenProps) {
   useScreenTracking('Login');
   const { t } = useI18n();
   const colors = useColors();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [biometricEnabled, setBiometricEnabled] = useState(false);
 
   const analytics = useAnalytics();
   const { setUser } = useAnalyticsContext();
 
-  const {
-    isAvailable,
-    isEnrolled,
-    biometricType,
-    authenticate,
-    getBiometricDisplayName,
-  } = useBiometricAuth();
+  const { isAvailable, isEnrolled, biometricType } = useBiometricAuth();
+  const biometricIcon =
+    biometricType === 'FaceID' ? 'face-recognition' : 'fingerprint';
+
+  const isBusy = loading || externalLoading || biometricLoading;
 
   useEffect(() => {
-    loadBiometricPreference();
-  }, []);
+    if (isAuthSkipped()) return;
 
-  const loadBiometricPreference = async () => {
-    try {
-      const enabled = await secureStorage.getBiometricEnabled();
-      setBiometricEnabled(enabled);
-
-      if (enabled && isAvailable && isEnrolled) {
-        handleBiometricLogin();
+    const tryQuickBiometric = async () => {
+      try {
+        const enabled = await secureStorage.getBiometricEnabled();
+        if (enabled && isAvailable && isEnrolled && onBiometricLogin) {
+          onBiometricLogin();
+        }
+      } catch (err) {
+        logger.error('Error loading biometric preference:', err);
       }
-    } catch (err) {
-      logger.error('Error loading biometric preference:', err);
-    }
-  };
+    };
+    tryQuickBiometric();
+  }, [isAvailable, isEnrolled, onBiometricLogin]);
 
   const validateFields = useCallback((): boolean => {
     const result = validateForm(loginSchema, { email, password });
-    
+
     if (!result.success) {
       setFieldErrors(result.errors);
       Haptic.errorNotification();
       return false;
     }
-    
+
     setFieldErrors({});
     return true;
   }, [email, password]);
 
   const handleLogin = async () => {
-    // Validate with Zod before submitting
-    if (!validateFields()) {
-      return;
-    }
-
     setLoading(true);
     setError('');
 
     try {
-      const result = await authService.login(email, password);
+      if (isAuthSkipped()) {
+        await authService.enterDevGuestMode();
+        try {
+          await analytics.logLogin('email');
+          await setUser(DEV_GUEST_USER.id, { account_type: 'customer' });
+        } catch {
+          // Analytics optional in dev bypass
+        }
+        Haptic.successNotification();
+        return;
+      }
 
+      if (!validateFields()) {
+        return;
+      }
+
+      const result = await authService.login(email, password);
+      const biometricEnabled = await secureStorage.getBiometricEnabled();
       if (biometricEnabled) {
         await secureStorage.setUserEmail(email);
       }
@@ -93,68 +130,13 @@ export default function LoginScreen({ navigation }: any) {
 
       Haptic.successNotification();
       showSuccessToast(t('auth.loginSuccess'));
-      navigation.replace('Main');
     } catch (err: any) {
       setError(err.response?.data?.message || t('auth.loginFailed'));
       showErrorToast(err);
       Haptic.errorNotification();
-
       await analytics.logError('Login failed', err.code || 'LOGIN_ERROR', false);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleBiometricLogin = async () => {
-    setLoading(true);
-    setError('');
-
-    try {
-      const result = await authenticate(
-        t('auth.useBiometricLogin', { type: getBiometricDisplayName() }),
-        t('auth.usePassword')
-      );
-
-      if (result.success) {
-        const savedEmail = await secureStorage.getUserEmail();
-        if (savedEmail) {
-          const token = await secureStorage.getAccessToken();
-          if (token) {
-            await analytics.logLogin(biometricType === 'FaceID' ? 'face_id' : 'fingerprint');
-
-            showSuccessToast(t('auth.biometricLoginSuccess'));
-            navigation.replace('Main');
-          } else {
-            setError(t('auth.loginWithEmailFirst'));
-            showErrorToast(new Error(t('auth.loginWithEmailFirst')));
-          }
-        } else {
-          setError(t('auth.noSavedCredentials'));
-          showErrorToast(new Error(t('auth.noSavedCredentials')));
-        }
-      } else {
-        setError(result.error || t('auth.biometricFailed'));
-
-        await analytics.logError('Biometric login failed', 'BIOMETRIC_FAILED', false);
-      }
-    } catch (err: any) {
-      setError(err.message || t('auth.biometricFailed'));
-      showErrorToast(err);
-
-      await analytics.logError(err.message, 'BIOMETRIC_ERROR', false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleBiometric = async (value: boolean) => {
-    setBiometricEnabled(value);
-    await secureStorage.setBiometricEnabled(value);
-
-    if (value) {
-      showSuccessToast(t('auth.biometricEnabled'));
-    } else {
-      showSuccessToast(t('auth.biometricDisabled'));
     }
   };
 
@@ -162,127 +144,169 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <ScreenContainer hasKeyboard>
-    <View style={styles.container}>
-      <Text variant="headlineLarge" style={styles.title}>
-        {t('auth.welcomeBack')}
-      </Text>
-
-      <TextInput
-        label={t('auth.email')}
-        value={email}
-        onChangeText={(text) => {
-          setEmail(text);
-          if (fieldErrors.email) {
-            setFieldErrors((prev) => ({ ...prev, email: '' }));
-          }
-        }}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={styles.input}
-        error={!!fieldErrors.email}
-        accessibilityLabel="Email address"
-        accessibilityHint="Enter your email to log in"
-      />
-      {fieldErrors.email ? <HelperText type="error">{fieldErrors.email}</HelperText> : null}
-
-      <TextInput
-        label={t('auth.password')}
-        value={password}
-        onChangeText={(text) => {
-          setPassword(text);
-          if (fieldErrors.password) {
-            setFieldErrors((prev) => ({ ...prev, password: '' }));
-          }
-        }}
-        secureTextEntry
-        style={styles.input}
-        error={!!fieldErrors.password}
-        accessibilityLabel="Password"
-        accessibilityHint="Enter your password to log in"
-      />
-      {fieldErrors.password ? <HelperText type="error">{fieldErrors.password}</HelperText> : null}
-
-      {error ? <HelperText type="error">{error}</HelperText> : null}
-
-      <Button
-        mode="contained"
-        onPress={handleLogin}
-        loading={loading}
-        style={styles.button}
-        accessibilityLabel="Log in"
-        accessibilityRole="button"
+      <KeyboardAvoidingView
+        style={styles.flex}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        {t('auth.login')}
-      </Button>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <AuthScreenHeader
+            title={t('auth.welcomeToNoowe')}
+            subtitle={t('auth.loginSubtitle')}
+          />
 
-      {isAvailable && isEnrolled && (
-        <>
-          <Button
-            mode="outlined"
-            onPress={handleBiometricLogin}
-            loading={loading}
-            style={styles.biometricButton}
-            icon={biometricType === 'FaceID' ? 'face-recognition' : 'fingerprint'}
-            accessibilityLabel={`Log in with ${getBiometricDisplayName()}`}
+          <AuthTextField
+            label={t('auth.email')}
+            icon="email-outline"
+            value={email}
+            onChangeText={(text) => {
+              setEmail(text);
+              if (fieldErrors.email) {
+                setFieldErrors((prev) => ({ ...prev, email: '' }));
+              }
+            }}
+            placeholder={t('auth.emailPlaceholder')}
+            error={fieldErrors.email}
+            accessibilityLabel="Email address"
+            accessibilityHint="Enter your email to log in"
+            inputProps={{
+              keyboardType: 'email-address',
+              autoCapitalize: 'none',
+              autoCorrect: false,
+            }}
+          />
+
+          <AuthTextField
+            label={t('auth.password')}
+            icon="lock-outline"
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              if (fieldErrors.password) {
+                setFieldErrors((prev) => ({ ...prev, password: '' }));
+              }
+            }}
+            placeholder={t('auth.passwordPlaceholder')}
+            error={fieldErrors.password}
+            secureTextEntry={!showPassword}
+            showPasswordToggle
+            showPassword={showPassword}
+            onTogglePassword={() => setShowPassword((v) => !v)}
+            accessibilityLabel="Password"
+            accessibilityHint="Enter your password to log in"
+          />
+
+          {error ? <HelperText type="error" style={styles.errorText}>{error}</HelperText> : null}
+
+          <TouchableOpacity
+            style={[styles.primaryButton, isBusy && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={isBusy}
+            accessibilityLabel="Log in"
             accessibilityRole="button"
           >
-            {t('auth.loginWith', { type: getBiometricDisplayName() })}
-          </Button>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" />
+            ) : (
+              <Text style={styles.primaryButtonText}>{t('auth.login')}</Text>
+            )}
+          </TouchableOpacity>
 
-          <View style={styles.biometricToggle}>
-            <Text style={{ color: colors.foreground }}>{t('auth.enableBiometric', { type: getBiometricDisplayName() })}</Text>
-            <Switch
-              value={biometricEnabled}
-              onValueChange={toggleBiometric}
-              accessibilityLabel={`Enable ${getBiometricDisplayName()} login`}
-              accessibilityRole="switch"
-              accessibilityState={{ checked: biometricEnabled }}
-            />
+          <View style={styles.dividerRow}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>{t('auth.or')}</Text>
+            <View style={styles.dividerLine} />
           </View>
-        </>
-      )}
 
-      <Button
-        onPress={() => navigation.navigate('Register')}
-        accessibilityLabel="Go to registration"
-        accessibilityRole="button"
-      >
-        {t('auth.noAccount')}
-      </Button>
-    </View>
-  
+          <SocialAuthChips
+            onGoogleLogin={onGoogleLogin}
+            onAppleLogin={onAppleLogin}
+            onBiometricLogin={onBiometricLogin}
+            showBiometric
+            biometricLoading={biometricLoading}
+            biometricIcon={biometricIcon}
+            disabled={isBusy}
+          />
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>{t('auth.noAccountQuestion')} </Text>
+            <TouchableOpacity
+              onPress={() => navigation.navigate('Register')}
+              accessibilityLabel="Go to registration"
+              accessibilityRole="link"
+            >
+              <Text style={styles.footerLink}>{t('auth.signUp')}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </ScreenContainer>
   );
 }
 
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: colors.background,
-  },
-  title: {
-    marginBottom: 30,
-    textAlign: 'center',
-    color: colors.foreground,
-  },
-  input: {
-    marginBottom: 15,
-    backgroundColor: colors.card,
-  },
-  button: {
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  biometricButton: {
-    marginBottom: 15,
-  },
-  biometricToggle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 15,
-    paddingHorizontal: 10,
-  },
-});
+const createStyles = (colors: ReturnType<typeof useColors>) =>
+  StyleSheet.create({
+    flex: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: 48,
+      paddingBottom: 32,
+    },
+    errorText: {
+      marginBottom: 8,
+    },
+    primaryButton: {
+      backgroundColor: colors.primary,
+      borderRadius: AUTH_BRAND.borderRadius,
+      paddingVertical: 16,
+      alignItems: 'center',
+      marginTop: 8,
+      marginBottom: 28,
+    },
+    primaryButtonText: {
+      color: '#FFFFFF',
+      fontSize: 17,
+      fontWeight: '700',
+    },
+    buttonDisabled: {
+      opacity: 0.7,
+    },
+    dividerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 24,
+    },
+    dividerLine: {
+      flex: 1,
+      height: StyleSheet.hairlineWidth,
+      backgroundColor: AUTH_BRAND.inputBorder,
+    },
+    dividerText: {
+      marginHorizontal: 16,
+      fontSize: 14,
+      color: colors.mutedForeground ?? colors.foregroundSecondary,
+    },
+    footer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+    },
+    footerText: {
+      fontSize: 15,
+      color: colors.mutedForeground ?? colors.foregroundSecondary,
+    },
+    footerLink: {
+      fontSize: 15,
+      fontWeight: '600',
+      color: colors.primary,
+      textDecorationLine: 'underline',
+    },
+  });

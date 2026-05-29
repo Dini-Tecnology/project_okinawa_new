@@ -49,13 +49,20 @@ vi.mock('@/shared/hooks/useBiometricAuth', () => ({
   }),
 }));
 
-vi.mock('@/shared/services/storage', () => ({
+vi.mock('@/shared/services/secure-storage', () => ({
   secureStorage: {
     getBiometricEnabled: vi.fn().mockResolvedValue(false),
     setBiometricEnabled: vi.fn(),
     setUserEmail: vi.fn(),
     getUserEmail: vi.fn(),
     getAccessToken: vi.fn(),
+  },
+}));
+
+vi.mock('../../constants/branding', () => ({
+  CLIENT_BRANDING: {
+    icon: 1,
+    logoFull: 2,
   },
 }));
 
@@ -93,6 +100,8 @@ vi.mock('@okinawa/shared/contexts/ThemeContext', () => ({
     primary: '#EA580C',
     border: '#E5E7EB',
     foregroundSecondary: '#6B7280',
+    mutedForeground: '#6B7280',
+    error: '#DC2626',
   }),
 }));
 
@@ -142,7 +151,7 @@ describe('Client LoginScreen', () => {
 
   it('renders the welcome title', () => {
     render(<LoginScreen {...defaultProps} />);
-    expect(screen.getByText('auth.welcomeBack')).toBeTruthy();
+    expect(screen.getByText('auth.welcomeToNoowe')).toBeTruthy();
   });
 
   it('renders email and password inputs', () => {
@@ -158,7 +167,7 @@ describe('Client LoginScreen', () => {
 
   it('renders the register navigation link', () => {
     render(<LoginScreen {...defaultProps} />);
-    expect(screen.getByText('auth.noAccount')).toBeTruthy();
+    expect(screen.getByText('auth.signUp')).toBeTruthy();
   });
 
   // ---- Form interaction ----
@@ -234,10 +243,10 @@ describe('Client LoginScreen', () => {
 
   // ---- Navigation ----
 
-  it('navigates to Register screen when "no account" is pressed', () => {
+  it('navigates to Register screen when sign up is pressed', () => {
     render(<LoginScreen {...defaultProps} />);
 
-    fireEvent.press(screen.getByText('auth.noAccount'));
+    fireEvent.press(screen.getByText('auth.signUp'));
 
     expect(defaultProps.navigation.navigate).toHaveBeenCalledWith('Register');
   });

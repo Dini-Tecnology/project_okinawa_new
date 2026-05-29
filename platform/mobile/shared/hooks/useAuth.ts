@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/auth';
+import { isAuthSkipped } from '../config/skip-auth';
 
 interface User {
   id: string;
@@ -25,14 +26,25 @@ export const useAuth = () => {
   const checkAuthStatus = async () => {
     try {
       const token = await AsyncStorage.getItem('access_token');
-      if (token) {
-        const currentUser = await authService.getCurrentUser();
-        setUser(currentUser);
-        setIsAuthenticated(true);
+      if (!token) return;
+
+      if (isAuthSkipped()) {
+        const storedUser = await authService.getStoredUser();
+        if (storedUser) {
+          setUser(storedUser);
+          setIsAuthenticated(true);
+        }
+        return;
       }
+
+      const currentUser = await authService.getCurrentUser();
+      setUser(currentUser);
+      setIsAuthenticated(true);
     } catch (error) {
       console.error('Failed to check auth status:', error);
-      await logout();
+      if (!isAuthSkipped()) {
+        await logout();
+      }
     } finally {
       setLoading(false);
     }

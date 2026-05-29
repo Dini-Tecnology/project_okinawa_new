@@ -23,8 +23,8 @@ import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
 import { isGoogleNativeOAuthConfigured } from '@/shared/utils/googleOAuthEnv';
 import { captureException } from '@/shared/config/sentry';
-import { useColors } from '@/shared/contexts/ThemeContext';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { isAuthSkipped } from '@/shared/config/skip-auth';
+import { ClientTabBar } from '../components/navigation/ClientTabBar';
 import {
   defaultScreenOptions,
   fadeScreenOptions,
@@ -43,14 +43,28 @@ import {
 } from '@/shared/screens/auth';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
+import { CLIENT_BRANDING } from '../constants/branding';
 
 // ============================================
 // MAIN SCREENS (Bottom Tab Navigation)
 // ============================================
 import HomeScreen from '../screens/home/HomeScreen';
 import ExploreScreen from '../screens/home/ExploreScreen';
+import MenuTabScreen from '../screens/menu/MenuTabScreen';
+import MenuItemDetailScreen from '../screens/menu/MenuItemDetailScreen';
 import OrdersScreen from '../screens/orders/OrdersScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import {
+  LoyaltyProgramScreen,
+  ProfileFavoritesScreen,
+  ProfileNotificationsScreen,
+  ProfilePaymentMethodsScreen,
+  ProfileReservationsScreen,
+  ProfileSettingsScreen,
+  ProfileSupportScreen,
+  VisitHistoryScreen,
+} from '../screens/profile/ProfileSubscreens';
+import WalletScreen from '../screens/wallet/WalletScreen';
 
 // ============================================
 // SECONDARY SCREENS (Stack Navigation)
@@ -58,6 +72,10 @@ import ProfileScreen from '../screens/profile/ProfileScreen';
 import MenuScreen from '../screens/menu/MenuScreen';
 import CartScreen from '../screens/cart/CartScreen';
 import RestaurantScreen from '../screens/restaurant/RestaurantScreen';
+import RestaurantQRScanScreen from '../screens/restaurant/RestaurantQRScanScreen';
+import RestaurantVirtualQueueScreen from '../screens/restaurant/RestaurantVirtualQueueScreen';
+import RestaurantCallTeamScreen from '../screens/restaurant/RestaurantCallTeamScreen';
+import RestaurantReserveScreen from '../screens/restaurant/RestaurantReserveScreen';
 import UnifiedPaymentScreen from '../screens/payment/UnifiedPaymentScreen';
 import CheckoutScreen from '../screens/payment/CheckoutScreen';
 import PaymentSuccessScreen from '../screens/payment/PaymentSuccessScreen';
@@ -66,7 +84,6 @@ import SplitPaymentScreen from '../screens/payment/SplitPaymentScreen';
 // ============================================
 // EPIC 3 — Missing Screens
 // ============================================
-import NotificationsScreen from '../screens/notifications/NotificationsScreen';
 import AddressesScreen from '../screens/profile/AddressesScreen';
 import LoyaltyDetailScreen from '../screens/loyalty/LoyaltyDetailScreen';
 import CouponsScreen from '../screens/promotions/CouponsScreen';
@@ -81,7 +98,7 @@ import TabPaymentScreen from '../screens/pub-bar/TabPaymentScreen';
 // MISSING SCREENS — Navigation Registration
 // ============================================
 import OrderStatusScreen from '../screens/orders/OrderStatusScreen';
-import WalletScreen from '../screens/wallet/WalletScreen';
+import OrderTrackingScreen from '../screens/orders/OrderTrackingScreen';
 import ReservationsScreen from '../screens/reservations/ReservationsScreen';
 import ReservationDetailScreen from '../screens/reservations/ReservationDetailScreen';
 import CreateReservationScreen from '../screens/reservations/CreateReservationScreen';
@@ -134,6 +151,7 @@ WebBrowser.maybeCompleteAuthSession();
 // ============================================
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const ProfileStackNavigator = createStackNavigator();
 
 // ============================================
 // AUTH STACK (Passwordless-First)
@@ -181,7 +199,15 @@ function AuthStackBody({
   const [authLoading, setAuthLoading] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
+  const enterDevGuestIfSkipped = useCallback(async (): Promise<boolean> => {
+    if (!isAuthSkipped()) return false;
+    await authService.enterDevGuestMode();
+    return true;
+  }, []);
+
   const handleAppleLogin = useCallback(async () => {
+    if (await enterDevGuestIfSkipped()) return;
+
     setAuthLoading(true);
     try {
       const result = await socialAuthService.signInWithApple();
@@ -194,9 +220,11 @@ function AuthStackBody({
     } finally {
       setAuthLoading(false);
     }
-  }, []);
+  }, [enterDevGuestIfSkipped]);
 
   const handleGoogleLogin = useCallback(async () => {
+    if (await enterDevGuestIfSkipped()) return;
+
     setAuthLoading(true);
     try {
       const result = await socialAuthService.signInWithGoogle(
@@ -206,19 +234,23 @@ function AuthStackBody({
       );
       if (result.success && result.idToken) {
         await authService.socialLogin('google', result.idToken);
+      } else if (result.error) {
+        logger.warn('Google login:', result.error);
       }
     } catch (error) {
       logger.error('Google login failed:', error);
     } finally {
       setAuthLoading(false);
     }
-  }, [googleRequest, googleResponse, googlePromptAsync]);
+  }, [googleRequest, googleResponse, googlePromptAsync, enterDevGuestIfSkipped]);
 
   const handlePhoneLogin = useCallback((navigation: any) => {
     navigation.navigate('PhoneAuth');
   }, []);
 
   const handleBiometricLogin = useCallback(async () => {
+    if (await enterDevGuestIfSkipped()) return;
+
     setBiometricLoading(true);
     try {
       const result = await biometricAuthService.authenticate();
@@ -231,7 +263,7 @@ function AuthStackBody({
     } finally {
       setBiometricLoading(false);
     }
-  }, []);
+  }, [enterDevGuestIfSkipped]);
 
   const handleAuthSuccess = useCallback((result: any) => {
     // Auth state will be updated by authService, triggering navigation change
@@ -253,12 +285,29 @@ function AuthStackBody({
   }, []);
 
   return (
-    <Stack.Navigator screenOptions={fadeScreenOptions}>
-      {/* Welcome Screen - Entry Point */}
+    <Stack.Navigator screenOptions={fadeScreenOptions} initialRouteName="Login">
+      {/* Email / social login — entry point */}
+      <Stack.Screen name="Login" options={{ headerShown: false }}>
+        {(props) => (
+          <LoginScreen
+            {...props}
+            onAppleLogin={handleAppleLogin}
+            onGoogleLogin={handleGoogleLogin}
+            onBiometricLogin={handleBiometricLogin}
+            loading={authLoading}
+            biometricLoading={biometricLoading}
+          />
+        )}
+      </Stack.Screen>
+
+      {/* Passwordless welcome (phone OTP, etc.) */}
       <Stack.Screen name="Welcome" options={{ headerShown: false }}>
         {(props) => (
           <WelcomeScreen
             {...props}
+            logoIconSource={CLIENT_BRANDING.icon}
+            logoFullSource={CLIENT_BRANDING.logoFull}
+            brandTitle="NOOWE"
             googleLoginAvailable={googleLoginAvailable}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
@@ -311,17 +360,18 @@ function AuthStackBody({
         )}
       </Stack.Screen>
 
-      {/* Legacy Email/Password (Fallback) */}
-      <Stack.Screen 
-        name="Login" 
-        component={LoginScreen} 
-        options={{ title: 'Login with Email' }}
-      />
-      <Stack.Screen 
-        name="Register" 
-        component={RegisterScreen} 
-        options={{ title: 'Create Account' }}
-      />
+      <Stack.Screen name="Register" options={{ headerShown: false }}>
+        {(props) => (
+          <RegisterScreen
+            {...props}
+            onAppleLogin={handleAppleLogin}
+            onGoogleLogin={handleGoogleLogin}
+            onBiometricLogin={handleBiometricLogin}
+            loading={authLoading}
+            biometricLoading={biometricLoading}
+          />
+        )}
+      </Stack.Screen>
     </Stack.Navigator>
   );
 }
@@ -333,7 +383,7 @@ function AuthStack() {
   }
   return (
     <AuthStackBody
-      googleLoginAvailable={false}
+      googleLoginAvailable
       googleRequest={null}
       googleResponse={null}
       googlePromptAsync={noopGooglePrompt}
@@ -347,62 +397,49 @@ function AuthStack() {
 
 /**
  * Main bottom tab navigation for authenticated users.
- * Provides access to Home, Explore, Orders, and Profile screens.
- * Uses semantic theme colors for consistent styling.
+ * Início, Cardápio, Pedidos, Carteira e Perfil.
  */
 function MainTabs() {
-  const colors = useColors();
-
-  const tabIcon =
-    (name: React.ComponentProps<typeof MaterialCommunityIcons>['name']) =>
-    ({ color, size }: { color: string; size: number }) =>
-      <MaterialCommunityIcons name={name} size={size} color={color} />;
-  
   return (
     <Tab.Navigator
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.foregroundMuted,
-        tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.border,
-        },
-      }}
+      tabBar={(props) => <ClientTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
     >
+      <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Início' }} />
+      <Tab.Screen name="MenuTab" component={MenuTabScreen} options={{ title: 'Cardápio' }} />
+      <Tab.Screen name="Orders" component={OrdersScreen} options={{ title: 'Pedidos' }} />
       <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarLabel: 'Home',
-          tabBarIcon: tabIcon('home-outline'),
-        }}
+        name="WalletTab"
+        component={WalletScreen}
+        options={{ title: 'Carteira' }}
       />
-      <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
-        options={{
-          tabBarLabel: 'Explore',
-          tabBarIcon: tabIcon('compass-outline'),
-        }}
-      />
-      <Tab.Screen
-        name="Orders"
-        component={OrdersScreen}
-        options={{
-          tabBarLabel: 'Orders',
-          tabBarIcon: tabIcon('receipt'),
-        }}
-      />
-      <Tab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarLabel: 'Profile',
-          tabBarIcon: tabIcon('account-outline'),
-        }}
-      />
+      <Tab.Screen name="Profile" component={ProfileTabStack} options={{ title: 'Perfil' }} />
     </Tab.Navigator>
+  );
+}
+
+function ProfileTabStack() {
+  return (
+    <ProfileStackNavigator.Navigator screenOptions={{ headerShown: false }}>
+      <ProfileStackNavigator.Screen name="ProfileHome" component={ProfileScreen} />
+      <ProfileStackNavigator.Screen
+        name="ProfileNotifications"
+        component={ProfileNotificationsScreen}
+      />
+      <ProfileStackNavigator.Screen name="VisitHistory" component={VisitHistoryScreen} />
+      <ProfileStackNavigator.Screen
+        name="ProfileReservations"
+        component={ProfileReservationsScreen}
+      />
+      <ProfileStackNavigator.Screen name="LoyaltyProgram" component={LoyaltyProgramScreen} />
+      <ProfileStackNavigator.Screen
+        name="ProfilePaymentMethods"
+        component={ProfilePaymentMethodsScreen}
+      />
+      <ProfileStackNavigator.Screen name="ProfileFavorites" component={ProfileFavoritesScreen} />
+      <ProfileStackNavigator.Screen name="ProfileSettings" component={ProfileSettingsScreen} />
+      <ProfileStackNavigator.Screen name="ProfileSupport" component={ProfileSupportScreen} />
+    </ProfileStackNavigator.Navigator>
   );
 }
 
@@ -423,14 +460,44 @@ function MainStack() {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Explore"
+        component={ExploreScreen}
+        options={scaleFadeScreenOptions}
+      />
+      <Stack.Screen
         name="Restaurant"
         component={RestaurantScreen}
-        options={{ title: 'Restaurant Details', ...scaleFadeScreenOptions }}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="RestaurantQRScan"
+        component={RestaurantQRScanScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="RestaurantVirtualQueue"
+        component={RestaurantVirtualQueueScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="RestaurantCallTeam"
+        component={RestaurantCallTeamScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
+      />
+      <Stack.Screen
+        name="RestaurantReserve"
+        component={RestaurantReserveScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
       />
       <Stack.Screen
         name="Menu"
         component={MenuScreen}
         options={{ title: 'Menu' }}
+      />
+      <Stack.Screen
+        name="MenuItemDetail"
+        component={MenuItemDetailScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
       />
       <Stack.Screen
         name="Cart"
@@ -465,11 +532,6 @@ function MainStack() {
 
       {/* EPIC 3 — Missing Screens */}
       <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{ title: 'Notifications', headerShown: false }}
-      />
-      <Stack.Screen
         name="Addresses"
         component={AddressesScreen}
         options={{ title: 'Addresses', ...scaleFadeScreenOptions }}
@@ -502,6 +564,11 @@ function MainStack() {
         name="OrderStatus"
         component={OrderStatusScreen}
         options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="OrderTracking"
+        component={OrderTrackingScreen}
+        options={{ headerShown: false, ...scaleFadeScreenOptions }}
       />
       <Stack.Screen
         name="SharedOrder"
@@ -771,6 +838,12 @@ export default function Navigation() {
    */
   const checkAuth = async () => {
     try {
+      // Dev bypass: always show login/register first; entry happens on button tap
+      if (isAuthSkipped()) {
+        setIsAuthenticated(false);
+        return;
+      }
+
       const user = await authService.getStoredUser();
       setIsAuthenticated(!!user);
     } catch (error) {

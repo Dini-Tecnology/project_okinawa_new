@@ -10,7 +10,7 @@
  */
 
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
-import { View, StyleSheet, Image, Platform, Animated } from 'react-native';
+import { View, StyleSheet, Image, ImageSourcePropType, Platform, Animated } from 'react-native';
 import { Text, Button, Divider, ActivityIndicator } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ScreenContainer } from '../../components/ScreenContainer';
@@ -31,6 +31,11 @@ interface WelcomeScreenProps {
   googleLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
+  /** Optional app icon (e.g. NOOWE client `icon.png`). */
+  logoIconSource?: ImageSourcePropType;
+  /** Optional full wordmark (e.g. `logo-completa-client.png`). */
+  logoFullSource?: ImageSourcePropType;
+  brandTitle?: string;
 }
 
 export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
@@ -42,6 +47,9 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   googleLoginAvailable = true,
   loading = false,
   biometricLoading = false,
+  logoIconSource,
+  logoFullSource,
+  brandTitle = 'NOOWE',
 }) => {
   useScreenTracking('Welcome');
   const { t } = useI18n();
@@ -104,9 +112,22 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       {/* Logo and Branding */}
       <View style={styles.header}>
         <View style={styles.logoContainer}>
-          <Text style={styles.logoText}>🍽️</Text>
+          {logoIconSource ? (
+            <Image source={logoIconSource} style={styles.logoImage} resizeMode="contain" />
+          ) : (
+            <Text style={styles.logoText}>🍽️</Text>
+          )}
         </View>
-        <Text style={styles.title}>Okinawa</Text>
+        {logoFullSource ? (
+          <Image
+            source={logoFullSource}
+            style={styles.logoFull}
+            resizeMode="contain"
+            accessibilityLabel={brandTitle}
+          />
+        ) : (
+          <Text style={styles.title}>{brandTitle}</Text>
+        )}
         <Text style={styles.subtitle}>
           {t('auth.welcomeMessage') || 'Your dining experience, reimagined'}
         </Text>
@@ -238,6 +259,15 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   logoText: {
     fontSize: 40,
+  },
+  logoImage: {
+    width: 48,
+    height: 48,
+  },
+  logoFull: {
+    width: 180,
+    height: 48,
+    marginBottom: 8,
   },
   title: {
     fontSize: 32,

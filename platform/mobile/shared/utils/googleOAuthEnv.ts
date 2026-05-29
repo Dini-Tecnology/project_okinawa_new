@@ -11,10 +11,10 @@ export function isGoogleNativeOAuthConfigured(): boolean {
   const expoWeb = process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID;
 
   if (Platform.OS === 'ios') {
-    return Boolean(ios?.trim());
+    return Boolean(ios?.trim() || expoWeb?.trim());
   }
   if (Platform.OS === 'android') {
-    return Boolean(android?.trim());
+    return Boolean(android?.trim() || expoWeb?.trim());
   }
   return Boolean(
     expoWeb?.trim() || ios?.trim() || android?.trim()

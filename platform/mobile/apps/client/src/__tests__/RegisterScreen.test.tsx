@@ -67,7 +67,22 @@ vi.mock('@okinawa/shared/contexts/ThemeContext', () => ({
     card: '#F9FAFB',
     primary: '#EA580C',
     border: '#E5E7EB',
+    mutedForeground: '#6B7280',
+    error: '#DC2626',
   }),
+}));
+
+vi.mock('@/shared/hooks/useBiometricAuth', () => ({
+  useBiometricAuth: () => ({
+    biometricType: 'TouchID',
+  }),
+}));
+
+vi.mock('../../constants/branding', () => ({
+  CLIENT_BRANDING: {
+    icon: 1,
+    logoFull: 2,
+  },
 }));
 
 const mockValidateForm = vi.fn(() => ({ success: true, errors: {} }));
@@ -123,7 +138,7 @@ describe('Client RegisterScreen', () => {
   it('renders register button and has-account link', () => {
     render(<RegisterScreen {...defaultProps} />);
     expect(screen.getByText('auth.register')).toBeTruthy();
-    expect(screen.getByText('auth.hasAccount')).toBeTruthy();
+    expect(screen.getByText('auth.signIn')).toBeTruthy();
   });
 
   // ---- Field interactions ----
@@ -233,9 +248,9 @@ describe('Client RegisterScreen', () => {
 
   // ---- Navigation ----
 
-  it('navigates to Login screen when "has account" link is pressed', () => {
+  it('navigates to Login screen when sign in link is pressed', () => {
     render(<RegisterScreen {...defaultProps} />);
-    fireEvent.press(screen.getByText('auth.hasAccount'));
+    fireEvent.press(screen.getByText('auth.signIn'));
     expect(defaultProps.navigation.navigate).toHaveBeenCalledWith('Login');
   });
 });
