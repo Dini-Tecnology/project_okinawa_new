@@ -17,7 +17,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { PaperProvider } from 'react-native-paper';
-import { AppState, AppStateStatus } from 'react-native';
+import { Appearance, AppState, AppStateStatus } from 'react-native';
 import Navigation from './navigation';
 import { theme } from './theme';
 import socketService from './services/socket';
@@ -43,6 +43,11 @@ const queryClient = new QueryClient({
  */
 function AppContent() {
   useEffect(() => {
+    Appearance.setColorScheme('light');
+    const appearanceSubscription = Appearance.addChangeListener(() => {
+      Appearance.setColorScheme('light');
+    });
+
     // Initialize WebSocket connection when app starts
     initializeWebSocket();
 
@@ -51,6 +56,7 @@ function AppContent() {
 
     // Cleanup on unmount
     return () => {
+      appearanceSubscription.remove();
       subscription.remove();
       socketService.disconnect();
     };
@@ -110,7 +116,7 @@ function AppContent() {
   return (
     <>
       <Navigation />
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </>
   );
 }
@@ -129,7 +135,7 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
+        <ThemeProvider defaultMode="light">
           <RestaurantProvider>
             <PaperProvider theme={theme}>
               <AppContent />

@@ -212,3 +212,103 @@ export const WAITER_TABLES = [
   { id: 12, status: 'new_order' as const, message: 'Novo pedido' },
   { id: 3, status: 'payment' as const, message: 'Aguardando pagamento' },
 ];
+
+/** Pedidos mockados — Estação do Barman (entrada / fila) */
+export interface BarmanBarOrder {
+  table: string;
+  meta: string;
+  status: string;
+  tone: 'info' | 'warning' | 'success' | 'danger';
+  action: string;
+  actionTone: 'success' | 'warning';
+  items: [string, string][];
+}
+
+export const BARMAN_STATION_ORDERS: BarmanBarOrder[] = [
+  {
+    table: 'Mesa 12',
+    meta: '1 drink · agora',
+    status: 'Confirmado',
+    tone: 'info',
+    action: 'Iniciar preparo',
+    actionTone: 'warning',
+    items: [['1x Gin Tônica Aurora', '2min']],
+  },
+  {
+    table: 'Mesa 5',
+    meta: '2 drinks · 1min',
+    status: 'Confirmado',
+    tone: 'info',
+    action: 'Iniciar preparo',
+    actionTone: 'warning',
+    items: [['1x Negroni Clássico', '3min'], ['1x Água com Gás', '1min']],
+  },
+  {
+    table: 'Mesa 3',
+    meta: '1 drink · 2min',
+    status: 'Confirmado',
+    tone: 'info',
+    action: 'Iniciar preparo',
+    actionTone: 'warning',
+    items: [['1x Caipirinha Premium', '2min']],
+  },
+];
+
+/** Pedidos mockados — KDS Bar (preparo e prontos) */
+export const BARMAN_KDS_ORDERS: BarmanBarOrder[] = [
+  {
+    table: 'Mesa 5',
+    meta: '2 drinks · 3min',
+    status: 'Preparando',
+    tone: 'warning',
+    action: 'Marcar pronto',
+    actionTone: 'success',
+    items: [['1x Negroni Clássico', '3min'], ['1x Gin Tônica Aurora', '2min']],
+  },
+  {
+    table: 'Mesa 8',
+    meta: '3 drinks · 5min',
+    status: 'Preparando',
+    tone: 'warning',
+    action: 'Marcar pronto',
+    actionTone: 'success',
+    items: [['2x Espresso Martini', '4min'], ['1x Moscow Mule', '2min']],
+  },
+  {
+    table: 'Mesa 3',
+    meta: '1 drink · 1min',
+    status: 'Confirmado',
+    tone: 'info',
+    action: 'Iniciar preparo',
+    actionTone: 'warning',
+    items: [['1x Caipirinha Premium', '2min']],
+  },
+  {
+    table: 'Mesa 10',
+    meta: '1 drink · pronto',
+    status: 'Pronto',
+    tone: 'success',
+    action: 'Garçom notificado',
+    actionTone: 'success',
+    items: [['1x Old Fashioned', '—']],
+  },
+  {
+    table: 'Mesa 7',
+    meta: '2 drinks · 4min',
+    status: 'Preparando',
+    tone: 'warning',
+    action: 'Marcar pronto',
+    actionTone: 'success',
+    items: [['1x Negroni Clássico', '3min'], ['1x Spritz Veneziano', '2min']],
+  },
+];
+
+/** Itens para a tela stack BarKDS */
+export const BAR_KDS_LIST_MOCK = [
+  { label: 'Mesa 5 · Negroni Clássico', subtitle: '3 min · Preparando' },
+  { label: 'Mesa 12 · Gin Tônica Aurora', subtitle: '1 min · Novo' },
+  { label: 'Mesa 8 · Espresso Martini (2x)', subtitle: '4 min · Preparando' },
+  { label: 'Mesa 10 · Old Fashioned', subtitle: 'Pronto · aguardando garçom' },
+  { label: 'Mesa 3 · Caipirinha Premium', subtitle: '2 min · Confirmado' },
+  { label: 'Mesa 7 · Spritz Veneziano', subtitle: '2 min · Preparando' },
+] as const;

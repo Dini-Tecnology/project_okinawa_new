@@ -71,6 +71,7 @@ import RestaurantProfileScreen from '../screens/v2/RestaurantProfileScreen';
 import BusinessHoursScreen from '../screens/v2/BusinessHoursScreen';
 import NotificationSettingsScreen from '../screens/v2/NotificationSettingsScreen';
 import PaymentSettingsScreen from '../screens/v2/PaymentSettingsScreen';
+import { RestaurantRoleProvider } from '../contexts/RestaurantRoleContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -275,35 +276,37 @@ function MainTabs() {
 
 function MainStack() {
   return (
-    <Stack.Navigator screenOptions={{ ...defaultScreenOptions, headerShown: false }}>
-      <Stack.Screen name="Tabs" component={MainTabs} />
-      <Stack.Screen name="Menu" component={MenuScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Reservations" component={ReservationsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Staff" component={StaffScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Tips" component={TipsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Financial" component={FinancialScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Reports" component={ReportsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Reviews" component={ReviewsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Promotions" component={PromotionsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Loyalty" component={LoyaltyScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="RoleDashboard" component={RoleDashboardScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Waiter" component={WaiterScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Maitre" component={MaitreScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="BarKDS" component={BarKDSScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="QRGenerator" component={QRGeneratorScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="QRBatch" component={QRBatchScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="OrderPayment" component={OrderPaymentScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="ServiceConfig" component={ServiceConfigScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Waitlist" component={WaitlistScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="Calls" component={CallsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="CasualDining" component={CasualDiningScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="RestaurantProfile" component={RestaurantProfileScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="BusinessHours" component={BusinessHoursScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="PaymentSettings" component={PaymentSettingsScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={scaleFadeScreenOptions} />
-      <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} options={scaleFadeScreenOptions} />
-    </Stack.Navigator>
+    <RestaurantRoleProvider>
+      <Stack.Navigator screenOptions={{ ...defaultScreenOptions, headerShown: false }}>
+        <Stack.Screen name="Tabs" component={MainTabs} />
+        <Stack.Screen name="Menu" component={MenuScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Reservations" component={ReservationsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Staff" component={StaffScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Tips" component={TipsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Financial" component={FinancialScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Reports" component={ReportsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Reviews" component={ReviewsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Promotions" component={PromotionsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Loyalty" component={LoyaltyScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="RoleDashboard" component={RoleDashboardScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Waiter" component={WaiterScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Maitre" component={MaitreScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="BarKDS" component={BarKDSScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="QRGenerator" component={QRGeneratorScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="QRBatch" component={QRBatchScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="OrderPayment" component={OrderPaymentScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="ServiceConfig" component={ServiceConfigScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Waitlist" component={WaitlistScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Calls" component={CallsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="CasualDining" component={CasualDiningScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="RestaurantProfile" component={RestaurantProfileScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="BusinessHours" component={BusinessHoursScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="PaymentSettings" component={PaymentSettingsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} options={scaleFadeScreenOptions} />
+      </Stack.Navigator>
+    </RestaurantRoleProvider>
   );
 }
 

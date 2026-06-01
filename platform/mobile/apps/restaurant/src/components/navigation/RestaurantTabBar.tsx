@@ -3,6 +3,15 @@ import { View, StyleSheet } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
 import RestaurantLiquidGlassNav from '@okinawa/shared/components/RestaurantLiquidGlassNav';
+import {
+  ChefRoleView,
+  BarmanRoleView,
+  CookRoleView,
+  MaitreRoleView,
+  ManagerRoleView,
+  WaiterRoleView,
+  useRestaurantRole,
+} from '../../contexts/RestaurantRoleContext';
 
 const ROUTE_TO_TAB: Record<string, string> = {
   Hub: 'dashboard',
@@ -22,8 +31,50 @@ const TAB_TO_ROUTE: Record<string, string> = {
 
 export function RestaurantTabBar({ state, navigation }: BottomTabBarProps) {
   const onHeightChange = useContext(BottomTabBarHeightCallbackContext);
+  const {
+    role,
+    managerView,
+    setManagerView,
+    maitreView,
+    setMaitreView,
+    chefView,
+    setChefView,
+    barmanView,
+    setBarmanView,
+    cookView,
+    setCookView,
+    waiterView,
+    setWaiterView,
+  } = useRestaurantRole();
   const activeRoute = state.routes[state.index]?.name ?? 'Hub';
-  const activeTab = ROUTE_TO_TAB[activeRoute] ?? 'dashboard';
+  const variant =
+    role === 'manager'
+      ? 'manager'
+      : role === 'maitre'
+        ? 'maitre'
+        : role === 'chef'
+          ? 'chef'
+          : role === 'barman'
+            ? 'barman'
+            : role === 'cook'
+              ? 'cook'
+              : role === 'waiter'
+                ? 'waiter'
+                : 'default';
+  const activeTab =
+    variant === 'manager'
+      ? managerView
+      : variant === 'maitre'
+        ? maitreView
+        : variant === 'chef'
+          ? chefView
+          : variant === 'barman'
+            ? barmanView
+            : variant === 'cook'
+              ? cookView
+              : variant === 'waiter'
+                ? waiterView
+            : ROUTE_TO_TAB[activeRoute] ?? 'dashboard';
 
   return (
     <View
@@ -32,10 +83,58 @@ export function RestaurantTabBar({ state, navigation }: BottomTabBarProps) {
       onLayout={(event) => onHeightChange?.(event.nativeEvent.layout.height)}
     >
       <RestaurantLiquidGlassNav
+        variant={variant}
         activeTab={activeTab}
         onNavigate={(tab) => {
+          if (variant === 'manager') {
+            setManagerView(tab as ManagerRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
+          if (variant === 'maitre') {
+            setMaitreView(tab as MaitreRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
+          if (variant === 'chef') {
+            setChefView(tab as ChefRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
+          if (variant === 'barman') {
+            setBarmanView(tab as BarmanRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
+          if (variant === 'cook') {
+            setCookView(tab as CookRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
+          if (variant === 'waiter') {
+            setWaiterView(tab as WaiterRoleView);
+            if (state.routes.some((item) => item.name === 'Hub')) {
+              navigation.navigate('Hub');
+            }
+            return;
+          }
           const route = TAB_TO_ROUTE[tab];
-          if (route) navigation.navigate(route);
+          if (!route) return;
+          if (state.routes.some((item) => item.name === route)) {
+            navigation.navigate(route);
+            return;
+          }
+          navigation.getParent()?.navigate(route);
         }}
       />
     </View>
