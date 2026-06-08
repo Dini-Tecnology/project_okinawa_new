@@ -1,8 +1,10 @@
 const path = require('path');
-const { getDefaultConfig } = require('expo/metro-config');
 
 function createMetroConfig(appRoot) {
   const mobileRoot = path.resolve(appRoot, '../..');
+  const { getDefaultConfig } = require(require.resolve('expo/metro-config', {
+    paths: [appRoot],
+  }));
   const config = getDefaultConfig(appRoot);
 
   config.watchFolders = [...(config.watchFolders || []), mobileRoot];
@@ -16,6 +18,7 @@ function createMetroConfig(appRoot) {
     extraNodeModules: {
       ...(config.resolver?.extraNodeModules || {}),
       '@': mobileRoot,
+      '@okinawa/shared': path.resolve(mobileRoot, 'shared'),
     },
   };
 

@@ -1302,7 +1302,7 @@ PODS:
     - React-utils (= 0.74.5)
   - RNCAsyncStorage (2.2.0):
     - React-Core
-  - RNDateTimePicker (9.1.0):
+  - RNDateTimePicker (8.0.1):
     - React-Core
   - RNGestureHandler (2.20.2):
     - DoubleConversion
@@ -1501,7 +1501,7 @@ DEPENDENCIES:
   - React-utils (from `../../../node_modules/react-native/ReactCommon/react/utils`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../../../node_modules/@react-native-async-storage/async-storage`)"
-  - "RNDateTimePicker (from `../../../node_modules/@react-native-community/datetimepicker`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
   - RNReactNativeHapticFeedback (from `../../../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../../../node_modules/react-native-reanimated`)
@@ -1677,7 +1677,7 @@ EXTERNAL SOURCES:
   RNCAsyncStorage:
     :path: "../../../node_modules/@react-native-async-storage/async-storage"
   RNDateTimePicker:
-    :path: "../../../node_modules/@react-native-community/datetimepicker"
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNGestureHandler:
     :path: "../../../node_modules/react-native-gesture-handler"
   RNReactNativeHapticFeedback:
@@ -1772,7 +1772,7 @@ SPEC CHECKSUMS:
   React-utils: 9fa4e5d0b5e6c6c85c958f19d6ef854337886417
   ReactCommon: 9f285823dbe955099978d9bff65a7653ca029256
   RNCAsyncStorage: b44e8a4e798c3e1f56bffccd0f591f674fb9198f
-  RNDateTimePicker: a4679e6488003e5fb68502b50ffb1b74b8b31ca0
+  RNDateTimePicker: dde7ca9005d716f3efa9a63004b441679bca9a41
   RNGestureHandler: 4ed68e3ad5ef719da597621a4fa282194e9e0a8e
   RNReactNativeHapticFeedback: c118a475df6ff2826b0ec64522ad559deb884901
   RNReanimated: b212e12a3ba71c2fd880c03cc3eee40946031e53

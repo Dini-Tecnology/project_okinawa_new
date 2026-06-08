@@ -12,6 +12,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Google from 'expo-auth-session/providers/google';
@@ -153,6 +154,31 @@ WebBrowser.maybeCompleteAuthSession();
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const ProfileStackNavigator = createStackNavigator();
+
+function BootFallback() {
+  return (
+    <View style={bootStyles.container}>
+      <ActivityIndicator size="large" color="#FF6B35" />
+      <Text style={bootStyles.label}>Carregando Noowe...</Text>
+    </View>
+  );
+}
+
+const bootStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+  },
+  label: {
+    marginTop: 16,
+    color: '#1A1A1A',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
 
 // ============================================
 // AUTH STACK (Passwordless-First)
@@ -871,7 +897,7 @@ export default function Navigation() {
 
   // Show nothing while checking auth (splash screen should be visible)
   if (isLoading) {
-    return null;
+    return <BootFallback />;
   }
 
   // LGPD Sprint 2: Show re-consent screen when terms/privacy version changed (HTTP 451)

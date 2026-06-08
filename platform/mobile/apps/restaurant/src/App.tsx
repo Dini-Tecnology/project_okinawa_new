@@ -24,6 +24,7 @@ import socketService from './services/socket';
 import { authService } from '@/shared/services/auth';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
 import { RestaurantProvider } from '@/shared/contexts/RestaurantContext';
+import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 
 // Configure React Query with sensible defaults for restaurant operations
 const queryClient = new QueryClient({
@@ -133,16 +134,18 @@ function AppContent() {
  */
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider defaultMode="light">
-          <RestaurantProvider>
-            <PaperProvider theme={theme}>
-              <AppContent />
-            </PaperProvider>
-          </RestaurantProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <ThemeProvider defaultMode="light">
+            <RestaurantProvider>
+              <PaperProvider theme={theme}>
+                <AppContent />
+              </PaperProvider>
+            </RestaurantProvider>
+          </ThemeProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

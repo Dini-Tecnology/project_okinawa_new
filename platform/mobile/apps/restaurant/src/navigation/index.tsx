@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Google from 'expo-auth-session/providers/google';
@@ -77,6 +78,32 @@ WebBrowser.maybeCompleteAuthSession();
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+
+function BootFallback() {
+  return (
+    <View style={bootStyles.container}>
+      <ActivityIndicator size="large" color="#A855F7" />
+      <Text style={bootStyles.label}>Carregando Noowe Restaurante...</Text>
+    </View>
+  );
+}
+
+const bootStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+  },
+  label: {
+    marginTop: 16,
+    color: '#1A1A1A',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+});
 
 const noopGooglePrompt: Parameters<typeof socialAuthService.signInWithGoogle>[2] = async () => ({
   type: 'cancel',
@@ -262,8 +289,14 @@ function AuthStack() {
 function MainTabs() {
   return (
     <Tab.Navigator
+      initialRouteName="Hub"
+      backBehavior="initialRoute"
       tabBar={(props) => <RestaurantTabBar {...props} />}
-      screenOptions={liquidGlassTabNavigatorScreenOptions}
+      screenOptions={{
+        ...liquidGlassTabNavigatorScreenOptions,
+        sceneContainerStyle: { backgroundColor: '#FFFFFF' },
+        sceneStyle: { backgroundColor: '#FFFFFF' },
+      }}
     >
       <Tab.Screen name="Hub" component={OwnerHubScreen} options={{ title: 'Início' }} />
       <Tab.Screen name="Orders" component={OrdersScreen} options={{ title: 'Pedidos' }} />
@@ -277,7 +310,14 @@ function MainTabs() {
 function MainStack() {
   return (
     <RestaurantRoleProvider>
-      <Stack.Navigator screenOptions={{ ...defaultScreenOptions, headerShown: false }}>
+      <Stack.Navigator
+        initialRouteName="Tabs"
+        screenOptions={{
+          ...defaultScreenOptions,
+          headerShown: false,
+          cardStyle: { backgroundColor: '#FFFFFF' },
+        }}
+      >
         <Stack.Screen name="Tabs" component={MainTabs} />
         <Stack.Screen name="Menu" component={MenuScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Reservations" component={ReservationsScreen} options={scaleFadeScreenOptions} />
@@ -354,7 +394,7 @@ export default function Navigation() {
     captureException(error, { extra: { componentStack: errorInfo.componentStack } });
   };
 
-  if (isLoading) return null;
+  if (isLoading) return <BootFallback />;
 
   if (requiresConsent && consentVersions) {
     return (
@@ -381,8 +421,17 @@ export default function Navigation() {
   }
 
   return (
-    <ErrorBoundary onError={handleNavigationError}>
-      {isAuthenticated ? <MainStack /> : <AuthStack />}
-    </ErrorBoundary>
+    <View style={styles.appSurface}>
+      <ErrorBoundary onError={handleNavigationError}>
+        {isAuthenticated ? <MainStack key="restaurant-main" /> : <AuthStack key="restaurant-auth" />}
+      </ErrorBoundary>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  appSurface: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+});

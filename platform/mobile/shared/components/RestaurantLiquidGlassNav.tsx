@@ -21,6 +21,7 @@ const navItems: LiquidGlassNavItem[] = [
 ];
 
 interface RestaurantLiquidGlassNavProps {
+  variant?: string;
   activeTab: string;
   onNavigate: (screen: string) => void;
 }

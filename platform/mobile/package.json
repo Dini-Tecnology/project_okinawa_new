@@ -8,8 +8,11 @@
     "shared"
   ],
   "overrides": {
-    "expo": "51.0.39",
-    "react-native-reanimated": "3.10.1",
+    "@okinawa/client": {
+      "expo": "51.0.39",
+      "react-native-reanimated": "3.10.1",
+      "@react-native-community/datetimepicker": "8.0.1"
+    },
     "@react-native-community/datetimepicker": "8.0.1"
   },
   "scripts": {
@@ -63,7 +66,6 @@
     "expo-linking": "~6.3.1",
     "expo-local-authentication": "~14.0.1",
     "expo-notifications": "~0.28.19",
-    "react-native-reanimated": "3.10.1",
     "react-native-toast-message": "^2.3.3"
   }
 }

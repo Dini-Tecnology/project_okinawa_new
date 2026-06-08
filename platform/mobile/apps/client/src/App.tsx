@@ -13,6 +13,7 @@ import Navigation from './navigation';
 import { theme } from './theme';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
 import { AnalyticsProvider } from '@/shared/contexts/AnalyticsContext';
+import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 
 export default function App() {
   useEffect(() => {
@@ -32,20 +33,22 @@ export default function App() {
   }, []);
 
   return (
-    <SafeAreaProvider>
-      <QueryClientProvider client={queryClient}>
-        <CartProvider>
-          <AnalyticsProvider>
-            <ThemeProvider>
-              <PaperProvider theme={theme}>
-                <Navigation />
-                <StatusBar style="auto" />
-                <Toast />
-              </PaperProvider>
-            </ThemeProvider>
-          </AnalyticsProvider>
-        </CartProvider>
-      </QueryClientProvider>
-    </SafeAreaProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <QueryClientProvider client={queryClient}>
+          <CartProvider>
+            <AnalyticsProvider>
+              <ThemeProvider>
+                <PaperProvider theme={theme}>
+                  <Navigation />
+                  <StatusBar style="auto" />
+                  <Toast />
+                </PaperProvider>
+              </ThemeProvider>
+            </AnalyticsProvider>
+          </CartProvider>
+        </QueryClientProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

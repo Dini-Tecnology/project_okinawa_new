@@ -2,6 +2,7 @@
   "expo": {
     "name": "Noowe Restaurante",
     "slug": "okinawa-restaurant",
+    "newArchEnabled": true,
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -15,6 +16,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
+      "deploymentTarget": "15.1",
       "bundleIdentifier": "com.noowe.restaurant",
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
