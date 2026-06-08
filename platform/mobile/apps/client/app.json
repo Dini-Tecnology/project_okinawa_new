@@ -8,9 +8,9 @@
     "userInterfaceStyle": "automatic",
     "scheme": "okinawa-client",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo-completa-client.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FFF"
+      "backgroundColor": "#FFFFFF"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -49,7 +49,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FF6B35"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.noowe.client",
       "minSdkVersion": 24,

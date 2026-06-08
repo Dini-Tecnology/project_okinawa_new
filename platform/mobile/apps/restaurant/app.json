@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "scheme": "okinawa-restaurant",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/logo-completa-restaurant.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFFFFF"
     },
@@ -49,7 +49,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#A855F7"
+        "backgroundColor": "#FFFFFF"
       },
       "package": "com.noowe.restaurant",
       "intentFilters": [

@@ -2,12 +2,21 @@ const path = require('path');
 
 function createMetroConfig(appRoot) {
   const mobileRoot = path.resolve(appRoot, '../..');
+
+  // Monorepo: alinha serverRoot e rewrite do entry point com a raiz do workspace,
+  // para que expo-router/entry resolva em mobile/node_modules (e não em apps/*/node_modules).
+  process.env.EXPO_USE_METRO_WORKSPACE_ROOT = '1';
+
   const { getDefaultConfig } = require(require.resolve('expo/metro-config', {
     paths: [appRoot],
   }));
   const config = getDefaultConfig(appRoot);
 
   config.watchFolders = [...(config.watchFolders || []), mobileRoot];
+  config.server = {
+    ...config.server,
+    unstable_serverRoot: mobileRoot,
+  };
   config.resolver = {
     ...config.resolver,
     nodeModulesPaths: [
