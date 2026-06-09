@@ -197,7 +197,10 @@ function requireEnv(key: string, defaultValue?: string): string {
     // expo-constants not available (e.g., in tests)
   }
   if (defaultValue !== undefined) return defaultValue;
-  console.warn(`[ENV] Missing required env var: ${key}. Set it in eas.json or app.config.`);
+  // productionConfig is defined at module load; skip noisy warnings in local dev.
+  if (!__DEV__) {
+    console.warn(`[ENV] Missing required env var: ${key}. Set it in eas.json or app.config.`);
+  }
   return '';
 }
 

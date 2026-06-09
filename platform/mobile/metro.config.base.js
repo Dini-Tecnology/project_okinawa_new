@@ -1,4 +1,11 @@
+const fs = require('fs');
 const path = require('path');
+
+function resolvePackageDir(appRoot, mobileRoot, packageName) {
+  const appPackage = path.join(appRoot, 'node_modules', packageName);
+  if (fs.existsSync(appPackage)) return appPackage;
+  return path.join(mobileRoot, 'node_modules', packageName);
+}
 
 function createMetroConfig(appRoot) {
   const mobileRoot = path.resolve(appRoot, '../..');
@@ -28,6 +35,9 @@ function createMetroConfig(appRoot) {
       ...(config.resolver?.extraNodeModules || {}),
       '@': mobileRoot,
       '@okinawa/shared': path.resolve(mobileRoot, 'shared'),
+      // Evita carregar duas cópias de react-native-svg no bundle (RNSVGRect duplicado).
+      'react-native-svg': resolvePackageDir(appRoot, mobileRoot, 'react-native-svg'),
+      'lucide-react-native': resolvePackageDir(appRoot, mobileRoot, 'lucide-react-native'),
     },
   };
 

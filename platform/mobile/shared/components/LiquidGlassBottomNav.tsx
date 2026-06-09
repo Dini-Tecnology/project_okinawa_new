@@ -59,7 +59,6 @@ const LiquidGlassBottomNav: React.FC<LiquidGlassBottomNavProps> = ({
   const shellBackground = colors.card;
   const shellBorder = isDark ? colors.border : colors.border;
   const inactiveIconColor = colors.foregroundMuted;
-  const homeIndicatorColor = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
 
   const handlePressIn = (index: number) => {
     Animated.spring(scaleValues[index], {
@@ -130,13 +129,6 @@ const LiquidGlassBottomNav: React.FC<LiquidGlassBottomNavProps> = ({
           fontWeight: '500',
           letterSpacing: 0.3,
         },
-        homeIndicator: {
-          alignSelf: 'center',
-          width: 80,
-          height: 3,
-          borderRadius: 2,
-          marginTop: 4,
-        },
       }),
     [colors],
   );
@@ -191,12 +183,11 @@ const LiquidGlassBottomNav: React.FC<LiquidGlassBottomNavProps> = ({
           );
         })}
       </View>
-      <View style={[styles.homeIndicator, { backgroundColor: homeIndicatorColor }]} />
     </View>
   );
 };
 
 /** Approximate total height for screen content padding (bar + safe area). */
-export const LIQUID_GLASS_BOTTOM_NAV_OFFSET = 88;
+export const LIQUID_GLASS_BOTTOM_NAV_OFFSET = 81;
 
 export default LiquidGlassBottomNav;

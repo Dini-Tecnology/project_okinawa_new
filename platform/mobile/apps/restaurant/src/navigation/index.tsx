@@ -83,7 +83,7 @@ function BootFallback() {
   return (
     <View style={bootStyles.container}>
       <ActivityIndicator size="large" color="#A855F7" />
-      <Text style={bootStyles.label}>Carregando Noowe Restaurante...</Text>
+      <Text style={bootStyles.label}>Carregando Noowe Restaurant...</Text>
     </View>
   );
 }

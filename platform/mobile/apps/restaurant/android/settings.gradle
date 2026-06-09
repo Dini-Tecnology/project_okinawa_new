@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Noowe Restaurante'
+rootProject.name = 'Noowe Restaurant'
 
 dependencyResolutionManagement {
   versionCatalogs {
