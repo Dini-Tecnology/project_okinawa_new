@@ -16,7 +16,6 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.noowe.client",
-      "minimumOsVersion": "15.1",
       "associatedDomains": ["applinks:noowebr.com", "applinks:*.noowebr.com"],
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
@@ -52,8 +51,6 @@
         "backgroundColor": "#FF6B35"
       },
       "package": "com.noowe.client",
-      "minSdkVersion": 24,
-      "targetSdkVersion": 34,
       "intentFilters": [
         {
           "action": "VIEW",
@@ -84,6 +81,20 @@
       "bundler": "metro"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "15.1",
+            "newArchEnabled": true
+          },
+          "android": {
+            "minSdkVersion": 24,
+            "targetSdkVersion": 34,
+            "newArchEnabled": true
+          }
+        }
+      ],
       "expo-router",
       [
         "expo-camera",

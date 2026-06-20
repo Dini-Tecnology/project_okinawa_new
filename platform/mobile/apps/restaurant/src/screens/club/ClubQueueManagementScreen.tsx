@@ -9,8 +9,8 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import {
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import {
   View,
   StyleSheet,
   FlatList,

@@ -4,9 +4,8 @@
  * Handles phone-based OTP authentication via WhatsApp and SMS through Supabase Auth.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { secureStorage } from './secure-storage';
 import { supabaseAuthAdapter } from './supabase-auth';
+import { authService } from './auth';
 import logger from '../utils/logger';
 
 export type OTPChannel = 'whatsapp' | 'sms';
@@ -109,16 +108,10 @@ class OTPAuthService {
       const data = await supabaseAuthAdapter.verifyPhoneOtp(request.phoneNumber, request.code);
 
       if (data.access_token) {
-        await Promise.all([
-          secureStorage.setAccessToken(data.access_token),
-          data.refresh_token ? secureStorage.setRefreshToken(data.refresh_token) : Promise.resolve(),
-          data.user && secureStorage.setUser(data.user),
-          AsyncStorage.multiSet([
-            ['access_token', data.access_token],
-            ['refresh_token', data.refresh_token || ''],
-            ['user', JSON.stringify(data.user || {})],
-          ]),
-        ]);
+        await authService.storeAuthData(data);
+        if (data.profileComplete) {
+          authService.notifyAuthStateChange(true);
+        }
       }
 
       return {
@@ -188,12 +181,8 @@ class OTPAuthService {
         marketing_consent: data.marketingConsent,
       });
 
-      await Promise.all([
-        secureStorage.setUser(profile),
-        AsyncStorage.multiSet([
-          ['user', JSON.stringify(profile)],
-        ]),
-      ]);
+      await authService.storeAuthData({ user: profile });
+      authService.notifyAuthStateChange(true);
 
       return {
         success: true,

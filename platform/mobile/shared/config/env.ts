@@ -221,11 +221,12 @@ const productionConfig: EnvironmentConfig = {
   AUTH_TOKEN_EXPIRY_DAYS: 7,
   AUTH_REFRESH_TOKEN_EXPIRY_DAYS: 30,
 
-  SENTRY_DSN: requireEnv('SENTRY_DSN'),
-  FIREBASE_PROJECT_ID: requireEnv('FIREBASE_PROJECT_ID'),
-  FIREBASE_APP_ID: requireEnv('FIREBASE_APP_ID'),
-  FIREBASE_API_KEY: requireEnv('FIREBASE_API_KEY'),
-  FIREBASE_MESSAGING_SENDER_ID: requireEnv('FIREBASE_MESSAGING_SENDER_ID'),
+  // Valores opcionais via EAS secrets / extra; defaults evitam spam em builds locais sem .env
+  SENTRY_DSN: requireEnv('SENTRY_DSN', ''),
+  FIREBASE_PROJECT_ID: requireEnv('FIREBASE_PROJECT_ID', ''),
+  FIREBASE_APP_ID: requireEnv('FIREBASE_APP_ID', ''),
+  FIREBASE_API_KEY: requireEnv('FIREBASE_API_KEY', ''),
+  FIREBASE_MESSAGING_SENDER_ID: requireEnv('FIREBASE_MESSAGING_SENDER_ID', ''),
 
   ANALYTICS_ENABLED: true,
   ANALYTICS_DEBUG: false,

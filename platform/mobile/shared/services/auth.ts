@@ -10,17 +10,48 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ApiService from './api';
 import { secureStorage } from './secure-storage';
 import { supabaseAuthAdapter } from './supabase-auth';
+import { getSupabaseClient } from './supabase';
 import logger from '../utils/logger';
 
 // Auth state change listeners
 type AuthStateListener = (authenticated: boolean) => void;
 const authStateListeners: AuthStateListener[] = [];
+let authSubscriptionInitialized = false;
 
 export const authService = {
+  initialize() {
+    if (authSubscriptionInitialized) return;
+    authSubscriptionInitialized = true;
+
+    getSupabaseClient().auth.onAuthStateChange((event, session) => {
+      void (async () => {
+        try {
+          if (event === 'SIGNED_OUT') {
+            await this.clearAuthData();
+            this.notifyAuthStateChange(false);
+            return;
+          }
+
+          if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+            await this.storeAuthData({
+              access_token: session?.access_token,
+              refresh_token: session?.refresh_token,
+              user: session?.user as unknown as Record<string, unknown> | undefined,
+            });
+            this.notifyAuthStateChange(Boolean(session?.access_token));
+          }
+        } catch (error) {
+          logger.error('Failed to sync Supabase auth state:', error);
+        }
+      })();
+    });
+  },
+
   /**
    * Traditional email/password login
    */
   async login(email: string, password: string) {
+    this.initialize();
     const data = await supabaseAuthAdapter.login(email, password);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
@@ -31,6 +62,7 @@ export const authService = {
    * User registration with email/password
    */
   async register(email: string, password: string, full_name: string) {
+    this.initialize();
     const data = await supabaseAuthAdapter.register(email, password, full_name);
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
@@ -173,6 +205,7 @@ export const authService = {
    * Get current user from Supabase
    */
   async getCurrentUser() {
+    this.initialize();
     try {
       return await supabaseAuthAdapter.getCurrentUser();
     } catch (error) {
@@ -211,8 +244,24 @@ export const authService = {
     }
 
     if (data.user) {
-      promises.push(AsyncStorage.setItem('user', JSON.stringify(data.user)));
-      promises.push(secureStorage.setUser(data.user));
+      let userForStorage = data.user;
+
+      try {
+        const userId = typeof data.user.id === 'string' ? data.user.id : undefined;
+        const context = await supabaseAuthAdapter.fetchUserContext(userId);
+        userForStorage = {
+          ...data.user,
+          account_type: context.account_type,
+          roles: context.roles,
+          restaurant_ids: context.restaurant_ids,
+        };
+        promises.push(AsyncStorage.setItem('user_context', JSON.stringify(context)));
+      } catch (error) {
+        logger.warn('Failed to fetch Supabase user context:', error);
+      }
+
+      promises.push(AsyncStorage.setItem('user', JSON.stringify(userForStorage)));
+      promises.push(secureStorage.setUser(userForStorage));
     }
 
     await Promise.all(promises);
@@ -223,7 +272,7 @@ export const authService = {
    */
   async clearAuthData() {
     await Promise.all([
-      AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user']),
+      AsyncStorage.multiRemove(['access_token', 'refresh_token', 'user', 'user_context']),
       secureStorage.clearAuth(),
     ]);
   },
@@ -252,6 +301,7 @@ export const authService = {
    * Check if user is authenticated
    */
   async isAuthenticated(): Promise<boolean> {
+    this.initialize();
     return supabaseAuthAdapter.isAuthenticated();
   },
 
