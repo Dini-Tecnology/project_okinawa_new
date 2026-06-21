@@ -1,0 +1,6 @@
+module Pods_OkinawaCliente {
+  umbrella header "Pods-OkinawaCliente-umbrella.h"
+
+  export *
+  module * { export * }
+}

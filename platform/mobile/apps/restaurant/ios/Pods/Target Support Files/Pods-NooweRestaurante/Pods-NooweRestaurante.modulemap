@@ -1,0 +1,6 @@
+module Pods_NooweRestaurante {
+  umbrella header "Pods-NooweRestaurante-umbrella.h"
+
+  export *
+  module * { export * }
+}
