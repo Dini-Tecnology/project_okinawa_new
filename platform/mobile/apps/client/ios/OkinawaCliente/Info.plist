@@ -4,6 +4,8 @@
   <dict>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+    <key>CFBundleAllowMixedLocalizations</key>
+    <true/>
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
@@ -27,7 +29,7 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>okinawa</string>
+          <string>okinawa-client</string>
           <string>com.noowe.client</string>
         </array>
       </dict>
@@ -59,6 +61,7 @@
     <string>Permite upload de fotos de perfil</string>
     <key>NSUserActivityTypes</key>
     <array>
+      <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
       <string>$(PRODUCT_BUNDLE_IDENTIFIER).expo.index_route</string>
     </array>
     <key>UILaunchStoryboardName</key>

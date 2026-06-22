@@ -7,6 +7,8 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
   <uses-permission android:name="android.permission.RECORD_AUDIO"/>
   <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+  <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+  <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
   <queries>
@@ -35,6 +37,7 @@
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="okinawa"/>
         <data android:scheme="com.noowe.client"/>
+        <data android:scheme="okinawa-client"/>
       </intent-filter>
       <intent-filter android:autoVerify="true" data-generated="true">
         <action android:name="android.intent.action.VIEW"/>
