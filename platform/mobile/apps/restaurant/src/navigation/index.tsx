@@ -12,11 +12,13 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import { authService } from '@/shared/services/auth';
 import { socialAuthService } from '@/shared/services/social-auth';
-import { biometricAuthService } from '@/shared/services/biometric-auth';
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
 import { logger } from '@/shared/utils/logger';
-import { isAuthSkipped } from '@/shared/config/skip-auth';
-import { isGoogleNativeOAuthConfigured } from '@/shared/utils/googleOAuthEnv';
+import {
+  isAppleAuthProviderConfigured,
+  isBiometricAuthConfigured,
+  isGoogleAuthProviderConfigured,
+} from '@/shared/config/auth-providers';
 import { captureException } from '@/shared/config/sentry';
 import {
   fadeScreenOptions,
@@ -111,12 +113,14 @@ const noopGooglePrompt: Parameters<typeof socialAuthService.signInWithGoogle>[2]
 
 interface AuthStackBodyProps {
   googleLoginAvailable: boolean;
+  appleLoginAvailable: boolean;
+  biometricLoginAvailable: boolean;
   googleRequest: Parameters<typeof socialAuthService.signInWithGoogle>[0];
   googleResponse: Parameters<typeof socialAuthService.signInWithGoogle>[1];
   googlePromptAsync: Parameters<typeof socialAuthService.signInWithGoogle>[2];
 }
 
-function AuthStackWithGoogleConfigured() {
+function AuthStackWithGoogleConfigured(props: Pick<AuthStackBodyProps, 'appleLoginAvailable' | 'biometricLoginAvailable'>) {
   const [googleRequest, googleResponse, googlePromptAsync] = Google.useAuthRequest({
     expoClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
     iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
@@ -127,6 +131,8 @@ function AuthStackWithGoogleConfigured() {
   return (
     <AuthStackBody
       googleLoginAvailable
+      appleLoginAvailable={props.appleLoginAvailable}
+      biometricLoginAvailable={props.biometricLoginAvailable}
       googleRequest={googleRequest}
       googleResponse={googleResponse}
       googlePromptAsync={googlePromptAsync}
@@ -136,6 +142,8 @@ function AuthStackWithGoogleConfigured() {
 
 function AuthStackBody({
   googleLoginAvailable,
+  appleLoginAvailable,
+  biometricLoginAvailable,
   googleRequest,
   googleResponse,
   googlePromptAsync,
@@ -143,14 +151,8 @@ function AuthStackBody({
   const [authLoading, setAuthLoading] = useState(false);
   const [biometricLoading, setBiometricLoading] = useState(false);
 
-  const enterDevGuestIfSkipped = useCallback(async (): Promise<boolean> => {
-    if (!isAuthSkipped()) return false;
-    await authService.enterDevGuestMode();
-    return true;
-  }, []);
-
   const handleAppleLogin = useCallback(async () => {
-    if (await enterDevGuestIfSkipped()) return;
+    if (!appleLoginAvailable) return;
     setAuthLoading(true);
     try {
       const result = await socialAuthService.signInWithApple();
@@ -162,10 +164,10 @@ function AuthStackBody({
     } finally {
       setAuthLoading(false);
     }
-  }, [enterDevGuestIfSkipped]);
+  }, [appleLoginAvailable]);
 
   const handleGoogleLogin = useCallback(async () => {
-    if (await enterDevGuestIfSkipped()) return;
+    if (!googleLoginAvailable) return;
     setAuthLoading(true);
     try {
       const result = await socialAuthService.signInWithGoogle(
@@ -181,30 +183,33 @@ function AuthStackBody({
     } finally {
       setAuthLoading(false);
     }
-  }, [googleRequest, googleResponse, googlePromptAsync, enterDevGuestIfSkipped]);
+  }, [googleLoginAvailable, googleRequest, googleResponse, googlePromptAsync]);
 
   const handlePhoneLogin = useCallback((navigation: any) => {
     navigation.navigate('PhoneAuth');
   }, []);
 
   const handleBiometricLogin = useCallback(async () => {
-    if (await enterDevGuestIfSkipped()) return;
+    if (!biometricLoginAvailable) return;
     setBiometricLoading(true);
     try {
-      await biometricAuthService.authenticate();
+      const result = await authService.biometricLogin('supabase-session');
+      if (!result.success) {
+        logger.warn('Biometric login failed:', result.error);
+      }
     } catch (error) {
       logger.error('Biometric login error:', error);
     } finally {
       setBiometricLoading(false);
     }
-  }, [enterDevGuestIfSkipped]);
+  }, [biometricLoginAvailable]);
 
   const handleAuthSuccess = useCallback((result: any) => {
     logger.info('Auth success:', { userId: result.user?.id });
   }, []);
 
   return (
-    <Stack.Navigator screenOptions={fadeScreenOptions} initialRouteName="Login">
+    <Stack.Navigator id="restaurant-auth-stack" screenOptions={fadeScreenOptions} initialRouteName="Login">
       <Stack.Screen name="Login" options={{ headerShown: false }}>
         {(props) => (
           <LoginScreen
@@ -212,6 +217,8 @@ function AuthStackBody({
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
             onBiometricLogin={handleBiometricLogin}
+            googleLoginAvailable={googleLoginAvailable}
+            appleLoginAvailable={appleLoginAvailable}
             loading={authLoading}
             biometricLoading={biometricLoading}
           />
@@ -224,6 +231,8 @@ function AuthStackBody({
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
             onBiometricLogin={handleBiometricLogin}
+            googleLoginAvailable={googleLoginAvailable}
+            appleLoginAvailable={appleLoginAvailable}
             loading={authLoading}
             biometricLoading={biometricLoading}
           />
@@ -237,6 +246,8 @@ function AuthStackBody({
             logoFullSource={RESTAURANT_BRANDING.logoFull}
             brandTitle="NOOWE Restaurant"
             googleLoginAvailable={googleLoginAvailable}
+            appleLoginAvailable={appleLoginAvailable}
+            biometricLoginAvailable={biometricLoginAvailable}
             onAppleLogin={handleAppleLogin}
             onGoogleLogin={handleGoogleLogin}
             onPhoneLogin={() => handlePhoneLogin(props.navigation)}
@@ -273,12 +284,22 @@ function AuthStackBody({
 }
 
 function AuthStack() {
-  if (isGoogleNativeOAuthConfigured()) {
-    return <AuthStackWithGoogleConfigured />;
+  const appleLoginAvailable = isAppleAuthProviderConfigured();
+  const biometricLoginAvailable = isBiometricAuthConfigured();
+
+  if (isGoogleAuthProviderConfigured()) {
+    return (
+      <AuthStackWithGoogleConfigured
+        appleLoginAvailable={appleLoginAvailable}
+        biometricLoginAvailable={biometricLoginAvailable}
+      />
+    );
   }
   return (
     <AuthStackBody
       googleLoginAvailable={false}
+      appleLoginAvailable={appleLoginAvailable}
+      biometricLoginAvailable={biometricLoginAvailable}
       googleRequest={null}
       googleResponse={null}
       googlePromptAsync={noopGooglePrompt}
@@ -289,6 +310,7 @@ function AuthStack() {
 function MainTabs() {
   return (
     <Tab.Navigator
+      id="restaurant-main-tabs"
       initialRouteName="Hub"
       backBehavior="initialRoute"
       tabBar={(props) => <RestaurantTabBar {...props} />}
@@ -311,6 +333,7 @@ function MainStack() {
   return (
     <RestaurantRoleProvider>
       <Stack.Navigator
+        id="restaurant-main-stack"
         initialRouteName="Tabs"
         screenOptions={{
           ...defaultScreenOptions,
@@ -375,11 +398,7 @@ export default function Navigation() {
 
   const checkAuth = async () => {
     try {
-      if (isAuthSkipped()) {
-        setIsAuthenticated(false);
-        return;
-      }
-      const user = await authService.getStoredUser();
+      const user = await authService.restoreSession();
       setIsAuthenticated(!!user);
     } catch (error) {
       logger.error('Auth check failed:', error);

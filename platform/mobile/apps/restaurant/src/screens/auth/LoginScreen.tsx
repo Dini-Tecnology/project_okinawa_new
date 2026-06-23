@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Text, HelperText } from 'react-native-paper';
 import { authService } from '@/shared/services/auth';
+import { biometricAuthService } from '@/shared/services/biometric-auth';
 import { useBiometricAuth } from '@/shared/hooks/useBiometricAuth';
 import { secureStorage } from '@/shared/services/secure-storage';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -22,13 +23,14 @@ import { AuthScreenHeader } from '../../components/auth/AuthScreenHeader';
 import { AuthTextField } from '../../components/auth/AuthTextField';
 import { SocialAuthChips } from '../../components/auth/SocialAuthChips';
 import { AUTH_BRAND } from '../../components/auth/authScreenTheme';
-import { isAuthSkipped } from '@/shared/config/skip-auth';
 
 interface LoginScreenProps {
   navigation: any;
   onAppleLogin?: () => void;
   onGoogleLogin?: () => void;
   onBiometricLogin?: () => void;
+  googleLoginAvailable?: boolean;
+  appleLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
 }
@@ -38,6 +40,8 @@ export default function LoginScreen({
   onAppleLogin,
   onGoogleLogin,
   onBiometricLogin,
+  googleLoginAvailable = false,
+  appleLoginAvailable = false,
   loading: externalLoading = false,
   biometricLoading = false,
 }: LoginScreenProps) {
@@ -49,29 +53,38 @@ export default function LoginScreen({
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [biometricQuickLoginAvailable, setBiometricQuickLoginAvailable] = useState(false);
 
   const { isAvailable, isEnrolled, biometricType } = useBiometricAuth();
   const biometricIcon =
     biometricType === 'FaceID' ? 'face-recognition' : 'fingerprint';
 
   const isBusy = loading || externalLoading || biometricLoading;
+  const hasSecondaryAuth = true;
 
   useEffect(() => {
-    if (isAuthSkipped()) return;
+    let active = true;
 
     const tryQuickBiometric = async () => {
       try {
-        const enabled = await secureStorage.getBiometricEnabled();
-        if (enabled && isAvailable && isEnrolled && onBiometricLogin) {
+        const canQuickLogin = Boolean(onBiometricLogin) && await biometricAuthService.canQuickLogin();
+        if (!active) return;
+        setBiometricQuickLoginAvailable(canQuickLogin);
+        if (canQuickLogin && onBiometricLogin) {
           onBiometricLogin();
         }
       } catch (err) {
         logger.error('Error loading biometric preference:', err);
+        if (active) setBiometricQuickLoginAvailable(false);
       }
     };
 
     tryQuickBiometric();
+    return () => {
+      active = false;
+    };
   }, [isAvailable, isEnrolled, onBiometricLogin]);
 
   const validateFields = useCallback((): boolean => {
@@ -90,14 +103,9 @@ export default function LoginScreen({
   const handleLogin = async () => {
     setLoading(true);
     setError('');
+    setInfoMessage('');
 
     try {
-      if (isAuthSkipped()) {
-        await authService.enterDevGuestMode();
-        Haptic.successNotification();
-        return;
-      }
-
       if (!validateFields()) {
         return;
       }
@@ -112,6 +120,29 @@ export default function LoginScreen({
       Haptic.successNotification();
     } catch (err: any) {
       setError(err.response?.data?.message || t('auth.loginFailed'));
+      Haptic.errorNotification();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError('');
+    setInfoMessage('');
+
+    if (!email) {
+      setError(t('auth.emailRequired') || 'Informe seu e-mail para redefinir a senha.');
+      Haptic.errorNotification();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authService.sendPasswordReset(email);
+      setInfoMessage(t('auth.passwordResetSent') || 'Enviamos um link de redefinição para seu e-mail.');
+      Haptic.successNotification();
+    } catch (err: any) {
+      setError(err.message || t('auth.resetPasswordFailed') || 'Não foi possível enviar o link de redefinição.');
       Haptic.errorNotification();
     } finally {
       setLoading(false);
@@ -178,6 +209,17 @@ export default function LoginScreen({
           />
 
           {error ? <HelperText type="error" style={styles.errorText}>{error}</HelperText> : null}
+          {infoMessage ? <HelperText type="info" style={styles.infoText}>{infoMessage}</HelperText> : null}
+
+          <TouchableOpacity
+            onPress={handleForgotPassword}
+            disabled={isBusy}
+            accessibilityLabel="Reset password"
+            accessibilityRole="button"
+            style={styles.forgotPasswordButton}
+          >
+            <Text style={styles.forgotPasswordText}>{t('auth.resetPassword')}</Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.primaryButton, isBusy && styles.buttonDisabled]}
@@ -193,21 +235,28 @@ export default function LoginScreen({
             )}
           </TouchableOpacity>
 
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('auth.or')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          {hasSecondaryAuth ? (
+            <>
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>{t('auth.or')}</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-          <SocialAuthChips
-            onGoogleLogin={onGoogleLogin}
-            onAppleLogin={onAppleLogin}
-            onBiometricLogin={onBiometricLogin}
-            showBiometric
-            biometricLoading={biometricLoading}
-            biometricIcon={biometricIcon}
-            disabled={isBusy}
-          />
+              <SocialAuthChips
+                onGoogleLogin={onGoogleLogin}
+                onAppleLogin={onAppleLogin}
+                onBiometricLogin={onBiometricLogin}
+                googleAvailable={googleLoginAvailable}
+                appleAvailable={appleLoginAvailable}
+                showBiometric
+                biometricAvailable={biometricQuickLoginAvailable}
+                biometricLoading={biometricLoading}
+                biometricIcon={biometricIcon}
+                disabled={isBusy}
+              />
+            </>
+          ) : null}
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.noAccountQuestion')} </Text>
@@ -239,6 +288,19 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
     },
     errorText: {
       marginBottom: 8,
+    },
+    infoText: {
+      marginBottom: 8,
+      color: colors.primary,
+    },
+    forgotPasswordButton: {
+      alignSelf: 'flex-end',
+      marginBottom: 12,
+    },
+    forgotPasswordText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: '600',
     },
     primaryButton: {
       backgroundColor: colors.primary,

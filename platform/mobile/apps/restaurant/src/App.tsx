@@ -36,6 +36,26 @@ const queryClient = new QueryClient({
   },
 });
 
+let webSocketDebugListenersBound = false;
+
+function bindWebSocketDebugListeners() {
+  if (webSocketDebugListenersBound) return;
+
+  socketService.on('connect', () => {
+    console.log('[WebSocket] Connected successfully');
+  });
+
+  socketService.on('disconnect', () => {
+    console.log('[WebSocket] Disconnected');
+  });
+
+  socketService.on('error', (error: any) => {
+    console.warn('[WebSocket] Error:', error);
+  });
+
+  webSocketDebugListenersBound = true;
+}
+
 /**
  * AppContent component
  * 
@@ -69,30 +89,27 @@ function AppContent() {
    */
   const initializeWebSocket = async () => {
     try {
-      const user = await authService.getStoredUser();
-      if (user) {
-        socketService.connect();
+      const user = await authService.getCurrentUser();
+      if (!user) return;
 
-        // Setup global socket event handlers for debugging
-        socketService.on('connect', () => {
-          console.log('[WebSocket] Connected successfully');
-        });
+      bindWebSocketDebugListeners();
+      const connected = await socketService.connect();
+      if (!connected) return;
 
-        socketService.on('disconnect', () => {
-          console.log('[WebSocket] Disconnected');
-        });
+      const legacyRestaurantId = (user as { restaurant_id?: unknown }).restaurant_id;
+      const restaurantIds = (user as { restaurant_ids?: unknown }).restaurant_ids;
+      const restaurantId =
+        typeof legacyRestaurantId === 'string'
+          ? legacyRestaurantId
+          : Array.isArray(restaurantIds) && typeof restaurantIds[0] === 'string'
+            ? restaurantIds[0]
+            : null;
 
-        socketService.on('error', (error: any) => {
-          console.error('[WebSocket] Error:', error);
-        });
-
-        // Join restaurant room for real-time updates
-        if (user.restaurant_id) {
-          socketService.joinRestaurantRoom(user.restaurant_id);
-        }
+      if (restaurantId) {
+        socketService.joinRestaurantRoom(restaurantId);
       }
     } catch (error) {
-      console.error('[WebSocket] Failed to initialize:', error);
+      console.warn('[WebSocket] Failed to initialize:', error);
     }
   };
 

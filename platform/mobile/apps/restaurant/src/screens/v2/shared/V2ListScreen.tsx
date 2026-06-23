@@ -1,10 +1,10 @@
-import React, { ReactNode, ComponentType } from 'react';
+import React, { ReactNode } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { V2Shell } from './V2Shell';
 
-type IconComponent = ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+type IconComponent = any;
 
 export interface V2ListItem {
   icon: IconComponent;

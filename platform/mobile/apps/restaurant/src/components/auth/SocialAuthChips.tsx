@@ -20,6 +20,7 @@ interface SocialChipConfig {
   icon: IconName;
   onPress?: () => void;
   visible: boolean;
+  enabled?: boolean;
   loading?: boolean;
 }
 
@@ -27,7 +28,10 @@ interface SocialAuthChipsProps {
   onGoogleLogin?: () => void;
   onAppleLogin?: () => void;
   onBiometricLogin?: () => void;
+  googleAvailable?: boolean;
+  appleAvailable?: boolean;
   showBiometric?: boolean;
+  biometricAvailable?: boolean;
   biometricLoading?: boolean;
   biometricIcon?: IconName;
   disabled?: boolean;
@@ -41,7 +45,10 @@ export function SocialAuthChips({
   onGoogleLogin,
   onAppleLogin,
   onBiometricLogin,
+  googleAvailable = false,
+  appleAvailable = false,
   showBiometric = true,
+  biometricAvailable = showBiometric,
   biometricLoading = false,
   biometricIcon = 'fingerprint',
   disabled = false,
@@ -57,6 +64,7 @@ export function SocialAuthChips({
       icon: 'google',
       onPress: onGoogleLogin,
       visible: true,
+      enabled: googleAvailable,
     },
     {
       key: 'apple',
@@ -66,6 +74,7 @@ export function SocialAuthChips({
       icon: 'apple',
       onPress: onAppleLogin,
       visible: true,
+      enabled: appleAvailable,
     },
     {
       key: 'biometric',
@@ -75,16 +84,21 @@ export function SocialAuthChips({
       icon: biometricIcon,
       onPress: onBiometricLogin,
       visible: showBiometric,
+      enabled: biometricAvailable,
       loading: biometricLoading,
     },
   ];
 
+  const visibleChips = chips.filter((chip) => chip.visible);
+  if (visibleChips.length === 0) return null;
+
   return (
     <View style={styles.row}>
-      {chips.filter((chip) => chip.visible).map((chip) => {
+      {visibleChips.map((chip) => {
         const chipDisabled =
           disabled ||
           !chip.onPress ||
+          chip.enabled === false ||
           (chip.key === 'biometric' && chip.loading);
 
         return (
@@ -98,6 +112,7 @@ export function SocialAuthChips({
             onPress={chip.onPress}
             disabled={chipDisabled}
             accessibilityLabel={t(chip.labelKey)}
+            accessibilityState={{ disabled: chipDisabled }}
           >
             {chip.loading ? (
               <ActivityIndicator size="small" color={chip.textColor} />

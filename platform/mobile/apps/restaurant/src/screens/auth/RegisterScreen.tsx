@@ -22,13 +22,14 @@ import { AuthTextField } from '../../components/auth/AuthTextField';
 import { SocialAuthChips } from '../../components/auth/SocialAuthChips';
 import { AUTH_BRAND } from '../../components/auth/authScreenTheme';
 import { AuthConsentCheckbox } from '../../components/auth/AuthConsentCheckbox';
-import { isAuthSkipped } from '@/shared/config/skip-auth';
 
 interface RegisterScreenProps {
   navigation: any;
   onAppleLogin?: () => void;
   onGoogleLogin?: () => void;
   onBiometricLogin?: () => void;
+  googleLoginAvailable?: boolean;
+  appleLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
 }
@@ -38,6 +39,8 @@ export default function RegisterScreen({
   onAppleLogin,
   onGoogleLogin,
   onBiometricLogin,
+  googleLoginAvailable = false,
+  appleLoginAvailable = false,
   loading: externalLoading = false,
   biometricLoading = false,
 }: RegisterScreenProps) {
@@ -55,6 +58,7 @@ export default function RegisterScreen({
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [showConsentError, setShowConsentError] = useState(false);
   const [showAgeError, setShowAgeError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -64,6 +68,7 @@ export default function RegisterScreen({
     biometricType === 'FaceID' ? 'face-recognition' : 'fingerprint';
 
   const isBusy = loading || externalLoading || biometricLoading;
+  const hasSecondaryAuth = true;
 
   const clearFieldError = useCallback((field: string) => {
     if (fieldErrors[field]) {
@@ -92,15 +97,10 @@ export default function RegisterScreen({
   const handleRegister = async () => {
     setLoading(true);
     setError('');
+    setInfoMessage('');
     setShowConsentError(false);
 
     try {
-      if (isAuthSkipped()) {
-        await authService.enterDevGuestMode();
-        Haptic.successNotification();
-        return;
-      }
-
       if (!validateFields()) return;
 
       if (!confirmedAge) {
@@ -115,7 +115,12 @@ export default function RegisterScreen({
         return;
       }
 
-      await authService.register(email, password, fullName);
+      const result = await authService.register(email, password, fullName);
+      if (result?.needsEmailConfirmation) {
+        setInfoMessage(t('auth.confirmEmailSent') || 'Enviamos um e-mail de confirmação para ativar sua conta.');
+        Haptic.successNotification();
+        return;
+      }
       Haptic.successNotification();
     } catch (err: any) {
       setError(err.response?.data?.message || t('auth.registerFailed'));
@@ -240,6 +245,7 @@ export default function RegisterScreen({
           />
 
           {error ? <HelperText type="error">{error}</HelperText> : null}
+          {infoMessage ? <HelperText type="info">{infoMessage}</HelperText> : null}
 
           <TouchableOpacity
             style={[styles.primaryButton, isBusy && styles.buttonDisabled]}
@@ -255,21 +261,27 @@ export default function RegisterScreen({
             )}
           </TouchableOpacity>
 
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('auth.or')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          {hasSecondaryAuth ? (
+            <>
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>{t('auth.or')}</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-          <SocialAuthChips
-            onGoogleLogin={onGoogleLogin}
-            onAppleLogin={onAppleLogin}
-            onBiometricLogin={onBiometricLogin}
-            showBiometric
-            biometricLoading={biometricLoading}
-            biometricIcon={biometricIcon}
-            disabled={isBusy}
-          />
+              <SocialAuthChips
+                onGoogleLogin={onGoogleLogin}
+                onAppleLogin={onAppleLogin}
+                onBiometricLogin={onBiometricLogin}
+                googleAvailable={googleLoginAvailable}
+                appleAvailable={appleLoginAvailable}
+                showBiometric={false}
+                biometricLoading={biometricLoading}
+                biometricIcon={biometricIcon}
+                disabled={isBusy}
+              />
+            </>
+          ) : null}
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.hasAccountQuestion')} </Text>
