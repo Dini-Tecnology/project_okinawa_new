@@ -481,7 +481,8 @@ cd ../platform/mobile && npm install
 # Start local Supabase (requires Supabase CLI)
 supabase start
 
-# Run database migrations
+# Run database migrations (migrations are in platform/supabase/migrations)
+cd platform
 supabase db push
 
 # Configure the Supabase Auth custom access token hook:
