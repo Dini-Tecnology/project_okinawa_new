@@ -5,6 +5,7 @@
 
 import type { Restaurant, StaffMember, StaffRole, UserRestaurantRole } from '../types/restaurant-domain';
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
+import { getOptionalSupabaseSessionUser } from './supabase-auth';
 
 const ROLE_PRIORITY: StaffRole[] = [
   'owner',
@@ -70,7 +71,12 @@ type UserRoleWithRestaurant = {
     name: string;
     logo_url: string | null;
     service_type: string | null;
-  } | null;
+  } | Array<{
+    id: string;
+    name: string;
+    logo_url: string | null;
+    service_type: string | null;
+  }> | null;
 };
 
 export async function fetchRestaurantFromSupabase(id: string): Promise<Restaurant | null> {
@@ -88,9 +94,7 @@ export async function fetchStaffMemberForCurrentUser(restaurantId: string): Prom
   if (!isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getOptionalSupabaseSessionUser();
   if (!user) return null;
 
   const { data: rows, error } = await supabase
@@ -123,9 +127,7 @@ export async function fetchMyRestaurantRolesGrouped(): Promise<UserRestaurantRol
   if (!isSupabaseConfigured()) return [];
 
   const supabase = getSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await getOptionalSupabaseSessionUser();
   if (!user) return [];
 
   const { data, error } = await supabase
@@ -157,7 +159,7 @@ export async function fetchMyRestaurantRolesGrouped(): Promise<UserRestaurantRol
   >();
 
   for (const row of data as UserRoleWithRestaurant[]) {
-    const r = row.restaurants;
+    const r = Array.isArray(row.restaurants) ? row.restaurants[0] : row.restaurants;
     if (!r?.id) continue;
 
     const normalized = normalizeStaffRole(row.role);

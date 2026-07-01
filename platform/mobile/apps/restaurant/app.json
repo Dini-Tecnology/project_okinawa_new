@@ -18,6 +18,7 @@
       "supportsTablet": true,
       "deploymentTarget": "15.1",
       "bundleIdentifier": "com.noowe.restaurant",
+      "associatedDomains": ["applinks:noowebr.com", "applinks:*.noowebr.com"],
       "privacyManifests": {
         "NSPrivacyAccessedAPITypes": [
           {
@@ -60,7 +61,7 @@
             {
               "scheme": "https",
               "host": "noowebr.com",
-              "pathPrefix": "/restaurant"
+              "pathPrefix": "/"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

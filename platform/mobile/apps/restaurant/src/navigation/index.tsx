@@ -33,6 +33,8 @@ import {
   PhoneAuthScreen,
   PhoneRegisterScreen,
   BiometricEnrollmentScreen,
+  AuthCallbackScreen,
+  ResetPasswordScreen,
 } from '@/shared/screens/auth';
 import { PrivacyPolicyScreen, TermsOfServiceScreen, ReConsentScreen } from '@/shared/screens/legal';
 import { MaintenanceScreen } from '@/shared/screens/MaintenanceScreen';
@@ -74,7 +76,7 @@ import RestaurantProfileScreen from '../screens/v2/RestaurantProfileScreen';
 import BusinessHoursScreen from '../screens/v2/BusinessHoursScreen';
 import NotificationSettingsScreen from '../screens/v2/NotificationSettingsScreen';
 import PaymentSettingsScreen from '../screens/v2/PaymentSettingsScreen';
-import { RestaurantRoleProvider } from '../contexts/RestaurantRoleContext';
+import { RestaurantRoleProvider, useRestaurantRole, RestaurantRole } from '../contexts/RestaurantRoleContext';
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -110,6 +112,50 @@ const bootStyles = StyleSheet.create({
 const noopGooglePrompt: Parameters<typeof socialAuthService.signInWithGoogle>[2] = async () => ({
   type: 'cancel',
 });
+
+/** Renders the screen only if the authenticated user's server role is allowed. */
+function withRoleGuard<P extends object>(
+  Component: React.ComponentType<P>,
+  allowedRoles: RestaurantRole[],
+): React.ComponentType<P> {
+  return function RoleGuardedScreen(props: P) {
+    const { serverRole, roleLoading } = useRestaurantRole();
+    if (roleLoading) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="large" color="#A855F7" />
+        </View>
+      );
+    }
+    // null means user has no role record — deny by default, never allow through
+    if (!serverRole || !allowedRoles.includes(serverRole)) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 }}>
+          <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 8 }}>
+            Acesso restrito
+          </Text>
+          <Text style={{ color: '#6B7280', textAlign: 'center' }}>
+            {serverRole
+              ? `Seu perfil (${serverRole}) não tem permissão para acessar esta área.`
+              : 'Sem permissão de acesso. Contacte o administrador do restaurante.'}
+          </Text>
+        </View>
+      );
+    }
+    return <Component {...props} />;
+  };
+}
+
+const GuardedFinancial = withRoleGuard(FinancialScreen, ['owner', 'manager']);
+const GuardedReports = withRoleGuard(ReportsScreen, ['owner', 'manager']);
+const GuardedStaff = withRoleGuard(StaffScreen, ['owner', 'manager']);
+const GuardedRestaurantProfile = withRoleGuard(RestaurantProfileScreen, ['owner', 'manager']);
+const GuardedBusinessHours = withRoleGuard(BusinessHoursScreen, ['owner', 'manager']);
+const GuardedNotificationSettings = withRoleGuard(NotificationSettingsScreen, ['owner', 'manager']);
+const GuardedPaymentSettings = withRoleGuard(PaymentSettingsScreen, ['owner', 'manager']);
+const GuardedWaiter = withRoleGuard(WaiterScreen, ['owner', 'manager', 'waiter', 'maitre']);
+const GuardedBarKDS = withRoleGuard(BarKDSScreen, ['owner', 'manager', 'barman', 'chef']);
+const GuardedMaitre = withRoleGuard(MaitreScreen, ['owner', 'manager', 'maitre']);
 
 interface AuthStackBodyProps {
   googleLoginAvailable: boolean;
@@ -223,6 +269,12 @@ function AuthStackBody({
             biometricLoading={biometricLoading}
           />
         )}
+      </Stack.Screen>
+      <Stack.Screen name="AuthCallback" options={{ headerShown: false }}>
+        {(props) => <AuthCallbackScreen {...props} />}
+      </Stack.Screen>
+      <Stack.Screen name="ResetPassword" options={{ headerShown: false }}>
+        {(props) => <ResetPasswordScreen {...props} />}
       </Stack.Screen>
       <Stack.Screen name="Register" options={{ headerShown: false }}>
         {(props) => (
@@ -344,17 +396,17 @@ function MainStack() {
         <Stack.Screen name="Tabs" component={MainTabs} />
         <Stack.Screen name="Menu" component={MenuScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Reservations" component={ReservationsScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="Staff" component={StaffScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Staff" component={GuardedStaff} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Tips" component={TipsScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="Financial" component={FinancialScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="Reports" component={ReportsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Financial" component={GuardedFinancial} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Reports" component={GuardedReports} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Reviews" component={ReviewsScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Promotions" component={PromotionsScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Loyalty" component={LoyaltyScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="RoleDashboard" component={RoleDashboardScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="Waiter" component={WaiterScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="Maitre" component={MaitreScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="BarKDS" component={BarKDSScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Waiter" component={GuardedWaiter} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="Maitre" component={GuardedMaitre} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="BarKDS" component={GuardedBarKDS} options={scaleFadeScreenOptions} />
         <Stack.Screen name="QRGenerator" component={QRGeneratorScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="QRBatch" component={QRBatchScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="OrderPayment" component={OrderPaymentScreen} options={scaleFadeScreenOptions} />
@@ -362,10 +414,10 @@ function MainStack() {
         <Stack.Screen name="Waitlist" component={WaitlistScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="Calls" component={CallsScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="CasualDining" component={CasualDiningScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="RestaurantProfile" component={RestaurantProfileScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="BusinessHours" component={BusinessHoursScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} options={scaleFadeScreenOptions} />
-        <Stack.Screen name="PaymentSettings" component={PaymentSettingsScreen} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="RestaurantProfile" component={GuardedRestaurantProfile} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="BusinessHours" component={GuardedBusinessHours} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="NotificationSettings" component={GuardedNotificationSettings} options={scaleFadeScreenOptions} />
+        <Stack.Screen name="PaymentSettings" component={GuardedPaymentSettings} options={scaleFadeScreenOptions} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} options={scaleFadeScreenOptions} />
         <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} options={scaleFadeScreenOptions} />
       </Stack.Navigator>

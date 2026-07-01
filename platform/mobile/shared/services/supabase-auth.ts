@@ -1,25 +1,185 @@
 import type { Session, User } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 import { getSupabaseClient } from './supabase';
 
 type SocialProvider = 'apple' | 'google';
 
-function normalizeUser(user: User | null) {
-  if (!user) return null;
-
-  return {
-    id: user.id,
-    email: user.email ?? '',
-    full_name: typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '',
-    avatar_url: typeof user.user_metadata?.avatar_url === 'string' ? user.user_metadata.avatar_url : undefined,
-  };
+export interface NormalizedAuthUser {
+  id: string;
+  email: string;
+  full_name: string;
+  avatar_url?: string | null;
+  phone?: string | null;
+  role: string;
+  roles: Array<{ role: string; restaurant_id?: string | null }>;
+  restaurant_ids: string[];
 }
 
-function normalizeSession(session: Session | null, user: User | null = session?.user ?? null) {
-  return {
-    access_token: session?.access_token,
-    refresh_token: session?.refresh_token,
-    user: normalizeUser(user) ?? undefined,
+function getRedirectUrl(path: string) {
+  return Linking.createURL(path);
+}
+
+function readAuthParamsFromUrl(url: string) {
+  const params: Record<string, string> = {};
+
+  try {
+    const parsed = Linking.parse(url);
+    Object.entries(parsed.queryParams ?? {}).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        if (value[0] !== undefined) params[key] = String(value[0]);
+      } else if (value !== undefined && value !== null) {
+        params[key] = String(value);
+      }
+    });
+  } catch {
+    // Continue with manual parsing below.
+  }
+
+  const collect = (segment?: string) => {
+    if (!segment) return;
+    const query = segment.includes('?') ? segment.split('?').pop() : segment;
+    if (!query) return;
+
+    new URLSearchParams(query).forEach((value, key) => {
+      if (value && params[key] === undefined) {
+        params[key] = value;
+      }
+    });
   };
+
+  collect(url.split('?')[1]?.split('#')[0]);
+  collect(url.split('#')[1]);
+
+  return params;
+}
+
+function decodeBase64Url(value: string) {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+  const base64 = value.replace(/-/g, '+').replace(/_/g, '/').replace(/=+$/, '');
+  let buffer = 0;
+  let bits = 0;
+  let output = '';
+
+  for (const char of base64) {
+    const index = alphabet.indexOf(char);
+    if (index < 0) continue;
+    buffer = (buffer << 6) | index;
+    bits += 6;
+    if (bits >= 8) {
+      bits -= 8;
+      output += String.fromCharCode((buffer >> bits) & 0xff);
+    }
+  }
+
+  try {
+    return decodeURIComponent(
+      output
+        .split('')
+        .map((char) => `%${char.charCodeAt(0).toString(16).padStart(2, '0')}`)
+        .join('')
+    );
+  } catch {
+    return output;
+  }
+}
+
+function readSessionClaims(session: Session | null): Record<string, unknown> {
+  if (!session?.access_token) return {};
+
+  try {
+    const payload = session.access_token.split('.')[1];
+    if (!payload) return {};
+    return JSON.parse(decodeBase64Url(payload));
+  } catch {
+    return {};
+  }
+}
+
+export function isMissingAuthSessionError(error: unknown) {
+  const authError = error as { name?: string; message?: string; status?: number; __isAuthError?: boolean };
+  const message = authError?.message ?? '';
+
+  return (
+    authError?.name === 'AuthSessionMissingError' ||
+    message.includes('Auth session missing') ||
+    Boolean(authError?.__isAuthError && authError?.status === 400 && message.toLowerCase().includes('session'))
+  );
+}
+
+export async function getOptionalSupabaseSessionUser() {
+  const supabase = getSupabaseClient();
+  const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+  if (sessionError) {
+    if (isMissingAuthSessionError(sessionError)) {
+      return { session: null, user: null };
+    }
+    throw sessionError;
+  }
+
+  const session = sessionData.session ?? null;
+  if (!session?.access_token) {
+    return { session: null, user: null };
+  }
+
+  const { data: userData, error: userError } = await supabase.auth.getUser();
+  if (userError) {
+    if (isMissingAuthSessionError(userError)) {
+      return { session: null, user: null };
+    }
+    throw userError;
+  }
+
+  return { session, user: userData.user ?? null };
+}
+
+function uniqueRoleRows(rows: Array<{ role: string; restaurant_id?: string | null }>) {
+  const seen = new Set<string>();
+  return rows.filter((row) => {
+    const key = `${row.role}:${row.restaurant_id ?? 'global'}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+async function loadProfile(userId: string) {
+  const { data, error } = await getSupabaseClient()
+    .from('profiles')
+    .select('id,email,full_name,avatar_url,phone,is_active,last_login_at')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) throw error;
+  return data as {
+    id: string;
+    email?: string | null;
+    full_name?: string | null;
+    avatar_url?: string | null;
+    phone?: string | null;
+  } | null;
+}
+
+async function loadRoles(userId: string) {
+  const [{ data: profileRoles, error: profileRolesError }, { data: restaurantRoles, error: restaurantRolesError }] =
+    await Promise.all([
+      getSupabaseClient().from('profile_roles').select('role_key,restaurant_id,is_active').eq('user_id', userId).eq('is_active', true),
+      getSupabaseClient().from('user_roles').select('role,restaurant_id,is_active').eq('user_id', userId).eq('is_active', true),
+    ]);
+
+  if (profileRolesError) throw profileRolesError;
+  if (restaurantRolesError) throw restaurantRolesError;
+
+  return uniqueRoleRows([
+    ...(((profileRoles as Array<{ role_key: string; restaurant_id?: string | null }> | null) ?? []).map((row) => ({
+      role: row.role_key,
+      restaurant_id: row.restaurant_id,
+    }))),
+    ...(((restaurantRoles as Array<{ role: string; restaurant_id?: string | null }> | null) ?? []).map((row) => ({
+      role: row.role,
+      restaurant_id: row.restaurant_id,
+    }))),
+  ]);
 }
 
 async function upsertProfile(user: User | null, extra?: Record<string, unknown>) {
@@ -51,6 +211,64 @@ async function upsertProfile(user: User | null, extra?: Record<string, unknown>)
   return data;
 }
 
+async function normalizeUser(user: User | null, session: Session | null): Promise<NormalizedAuthUser | null> {
+  if (!user) return null;
+
+  const claims = readSessionClaims(session);
+  const profile = await loadProfile(user.id).catch(() => null);
+  const dbRoles = await loadRoles(user.id).catch(() => []);
+  const claimRoles = ((claims.roles as string[] | undefined) ?? []).map((role) => ({ role }));
+  const claimRestaurantIds = (claims.restaurant_ids as string[] | undefined) ?? [];
+  const roles = uniqueRoleRows([...dbRoles, ...claimRoles]);
+  const restaurantIds = Array.from(
+    new Set([
+      ...roles.map((row) => row.restaurant_id).filter(Boolean),
+      ...claimRestaurantIds,
+    ] as string[])
+  );
+  const primaryRole =
+    (claims.app_role as string | undefined) ??
+    roles.find((row) => ['admin', 'owner', 'manager'].includes(row.role))?.role ??
+    roles[0]?.role ??
+    'customer';
+
+  return {
+    id: user.id,
+    email: user.email ?? profile?.email ?? '',
+    full_name:
+      profile?.full_name ??
+      (typeof user.user_metadata?.full_name === 'string' ? user.user_metadata.full_name : '') ??
+      '',
+    avatar_url:
+      profile?.avatar_url ??
+      (typeof user.user_metadata?.avatar_url === 'string' ? user.user_metadata.avatar_url : undefined),
+    phone: profile?.phone ?? user.phone ?? undefined,
+    role: primaryRole,
+    roles: roles.length > 0 ? roles : [{ role: 'customer' }],
+    restaurant_ids: restaurantIds,
+  };
+}
+
+async function normalizeSession(session: Session | null, user: User | null = session?.user ?? null) {
+  return {
+    access_token: session?.access_token,
+    refresh_token: session?.refresh_token,
+    user: (await normalizeUser(user, session)) ?? undefined,
+  };
+}
+
+async function throwFunctionError(error: unknown): Promise<never> {
+  const context = (error as { context?: unknown })?.context;
+  if (context instanceof Response) {
+    const body = await context.json().catch(() => null);
+    if (body?.error) {
+      throw new Error(String(body.error));
+    }
+  }
+
+  throw error instanceof Error ? error : new Error(String(error));
+}
+
 export const supabaseAuthAdapter = {
   async login(email: string, password: string) {
     const { data, error } = await getSupabaseClient().auth.signInWithPassword({ email, password });
@@ -63,21 +281,29 @@ export const supabaseAuthAdapter = {
   },
 
   async register(email: string, password: string, fullName: string) {
-    const { data, error } = await getSupabaseClient().auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-        },
+    const { data, error } = await getSupabaseClient().functions.invoke('register-with-resend', {
+      body: {
+        email,
+        password,
+        fullName,
+        emailRedirectTo: getRedirectUrl('auth/callback'),
       },
     });
-    if (error) throw error;
-    if (data.session && data.user) {
-      await upsertProfile(data.user, { full_name: fullName });
-    }
+    if (error) await throwFunctionError(error);
 
-    return normalizeSession(data.session, data.user);
+    return {
+      user: data?.user
+        ? {
+            id: data.user.id,
+            email: data.user.email ?? email,
+            full_name: fullName,
+            role: 'customer',
+            roles: [{ role: 'customer' }],
+            restaurant_ids: [],
+          }
+        : undefined,
+      needsEmailConfirmation: true,
+    };
   },
 
   async socialLogin(provider: SocialProvider, idToken: string) {
@@ -91,7 +317,7 @@ export const supabaseAuthAdapter = {
     }
 
     return {
-      ...normalizeSession(data.session, data.user),
+      ...(await normalizeSession(data.session, data.user)),
       success: true,
       authenticated: Boolean(data.session?.access_token),
     };
@@ -100,7 +326,7 @@ export const supabaseAuthAdapter = {
   async socialOAuthLogin(provider: SocialProvider, redirectTo?: string) {
     const { data, error } = await getSupabaseClient().auth.signInWithOAuth({
       provider,
-      options: redirectTo ? { redirectTo } : undefined,
+      options: { redirectTo: redirectTo ?? getRedirectUrl('auth/callback') },
     });
     if (error) throw error;
 
@@ -127,7 +353,7 @@ export const supabaseAuthAdapter = {
     if (error) throw error;
 
     const profile = await upsertProfile(data.user, { phone });
-    const sessionData = normalizeSession(data.session, data.user);
+    const sessionData = await normalizeSession(data.session, data.user);
 
     return {
       ...sessionData,
@@ -145,9 +371,8 @@ export const supabaseAuthAdapter = {
     accepted_terms_version?: string;
     accepted_privacy_version?: string;
   }) {
-    const { data: userData, error: userError } = await getSupabaseClient().auth.getUser();
-    if (userError) throw userError;
-    if (!userData.user) throw new Error('No authenticated Supabase user');
+    const { user } = await getOptionalSupabaseSessionUser();
+    if (!user) throw new Error('No authenticated Supabase user');
 
     const prefs =
       patch.accepted_terms_version !== undefined || patch.accepted_privacy_version !== undefined
@@ -170,7 +395,7 @@ export const supabaseAuthAdapter = {
         ...((patch.phone !== undefined && patch.phone !== '') ? { phone_verified: true } : {}),
         updated_at: new Date().toISOString(),
       })
-      .eq('id', userData.user.id)
+      .eq('id', user.id)
       .select()
       .single();
     if (error) throw error;
@@ -181,7 +406,10 @@ export const supabaseAuthAdapter = {
   async sendEmailOtp(email: string) {
     const { error } = await getSupabaseClient().auth.signInWithOtp({
       email,
-      options: { shouldCreateUser: true },
+      options: {
+        shouldCreateUser: true,
+        emailRedirectTo: getRedirectUrl('auth/callback'),
+      },
     });
     if (error) throw error;
   },
@@ -199,15 +427,70 @@ export const supabaseAuthAdapter = {
     return normalizeSession(data.session, data.user ?? null);
   },
 
+  async sendPasswordReset(email: string) {
+    const { error } = await getSupabaseClient().auth.resetPasswordForEmail(email, {
+      redirectTo: getRedirectUrl('auth/reset-password'),
+    });
+    if (error) throw error;
+  },
+
+  async exchangeCodeForSession(code: string) {
+    const { data, error } = await getSupabaseClient().auth.exchangeCodeForSession(code);
+    if (error) throw error;
+    if (data.user) {
+      await upsertProfile(data.user);
+    }
+
+    return normalizeSession(data.session, data.user ?? null);
+  },
+
+  async recoverSessionFromUrl(url: string) {
+    const params = readAuthParamsFromUrl(url);
+    const errorDescription = params.error_description ?? params.error;
+
+    if (errorDescription) {
+      throw new Error(errorDescription);
+    }
+
+    if (params.code) {
+      return supabaseAuthAdapter.exchangeCodeForSession(params.code);
+    }
+
+    if (params.access_token && params.refresh_token) {
+      const { data, error } = await getSupabaseClient().auth.setSession({
+        access_token: params.access_token,
+        refresh_token: params.refresh_token,
+      });
+      if (error) throw error;
+      if (data.user) {
+        await upsertProfile(data.user);
+      }
+
+      return normalizeSession(data.session, data.user ?? null);
+    }
+
+    return supabaseAuthAdapter.getSession();
+  },
+
+  async updatePassword(password: string) {
+    const { error } = await getSupabaseClient().auth.updateUser({ password });
+    if (error) throw error;
+  },
+
   async logout() {
     const { error } = await getSupabaseClient().auth.signOut();
     if (error) throw error;
   },
 
-  async getCurrentUser() {
-    const { data, error } = await getSupabaseClient().auth.getUser();
+  async getSession() {
+    const { data, error } = await getSupabaseClient().auth.getSession();
     if (error) throw error;
-    return normalizeUser(data.user);
+    return normalizeSession(data.session);
+  },
+
+  async getCurrentUser() {
+    const { session, user } = await getOptionalSupabaseSessionUser();
+    return normalizeUser(user, session);
   },
 
   async isAuthenticated(): Promise<boolean> {
@@ -225,5 +508,17 @@ export const supabaseAuthAdapter = {
     const { data, error } = await getSupabaseClient().auth.refreshSession();
     if (error) throw error;
     return normalizeSession(data.session);
+  },
+
+  onAuthStateChange(callback: (authenticated: boolean, user?: NormalizedAuthUser | null) => void) {
+    const { data } = getSupabaseClient().auth.onAuthStateChange((_event, session) => {
+      setTimeout(() => {
+        normalizeSession(session)
+          .then((payload) => callback(Boolean(payload.access_token), payload.user ?? null))
+          .catch(() => callback(false, null));
+      }, 0);
+    });
+
+    return () => data.subscription.unsubscribe();
   },
 };

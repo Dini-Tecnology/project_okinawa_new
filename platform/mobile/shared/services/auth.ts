@@ -7,50 +7,43 @@
  */
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ApiService from './api';
 import { secureStorage } from './secure-storage';
-import { supabaseAuthAdapter } from './supabase-auth';
+import { isMissingAuthSessionError, supabaseAuthAdapter } from './supabase-auth';
+import { biometricAuthService } from './biometric-auth';
 import logger from '../utils/logger';
-import {
-  DEV_GUEST_ACCESS_TOKEN,
-  DEV_GUEST_USER,
-  isAuthSkipped,
-} from '../config/skip-auth';
 
 // Auth state change listeners
 type AuthStateListener = (authenticated: boolean) => void;
 const authStateListeners: AuthStateListener[] = [];
+let supabaseAuthUnsubscribe: (() => void) | null = null;
+
+function ensureSupabaseAuthSubscription() {
+  if (supabaseAuthUnsubscribe) return;
+
+  try {
+    supabaseAuthUnsubscribe = supabaseAuthAdapter.onAuthStateChange(async (authenticated, user) => {
+      if (authenticated && user) {
+        await authService.storeAuthData({ user });
+      }
+      if (!authenticated) {
+        await authService.clearAuthData();
+      }
+      authService.notifyAuthStateChange(authenticated);
+    });
+  } catch (error) {
+    logger.warn('[Auth] Supabase auth listener not started:', error);
+  }
+}
 
 export const authService = {
-  /**
-   * Dev bypass: fake session so navigation opens MainStack (requires EXPO_PUBLIC_SKIP_AUTH).
-   */
-  async enterDevGuestMode() {
-    if (!isAuthSkipped()) {
-      throw new Error('enterDevGuestMode is only available when EXPO_PUBLIC_SKIP_AUTH is enabled');
-    }
-
-    const data = {
-      access_token: DEV_GUEST_ACCESS_TOKEN,
-      refresh_token: 'dev-bypass-refresh',
-      user: { ...DEV_GUEST_USER },
-    };
-
-    await this.storeAuthData(data);
-    this.notifyAuthStateChange(true);
-    logger.info('[Auth] Dev guest session — UI exploration mode');
-    return data;
-  },
-
   /**
    * Traditional email/password login
    */
   async login(email: string, password: string) {
-    if (isAuthSkipped()) {
-      return this.enterDevGuestMode();
-    }
-
     const data = await supabaseAuthAdapter.login(email, password);
+    if (!data.access_token || !data.user) {
+      throw new Error('Supabase did not return an authenticated session');
+    }
     await this.storeAuthData(data);
     this.notifyAuthStateChange(true);
     return data;
@@ -60,13 +53,11 @@ export const authService = {
    * User registration with email/password
    */
   async register(email: string, password: string, full_name: string) {
-    if (isAuthSkipped()) {
-      return this.enterDevGuestMode();
-    }
-
     const data = await supabaseAuthAdapter.register(email, password, full_name);
-    await this.storeAuthData(data);
-    this.notifyAuthStateChange(true);
+    if (data.access_token) {
+      await this.storeAuthData(data);
+    }
+    this.notifyAuthStateChange(Boolean(data.access_token));
     return data;
   },
 
@@ -161,25 +152,27 @@ export const authService = {
    */
   async biometricLogin(biometricToken: string, deviceInfo?: Record<string, string>) {
     try {
-      const response = await ApiService.post('/auth/biometric/authenticate', {
-        biometric_token: biometricToken,
-        device_info: deviceInfo,
-      });
+      void biometricToken;
+      void deviceInfo;
 
-      const data = response.data;
+      const biometricResult = await biometricAuthService.authenticateAndGetUserId();
+      if (!biometricResult.success) {
+        return { success: false, error: biometricResult.error };
+      }
 
-      await this.storeAuthData({
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        user: data.user,
-      });
+      const data = await supabaseAuthAdapter.getSession();
+      if (!data.access_token || data.user?.id !== biometricResult.userId) {
+        return { success: false, error: 'No valid Supabase session for this biometric profile' };
+      }
+
+      await this.storeAuthData(data);
 
       this.notifyAuthStateChange(true);
 
       return {
         success: true,
         user: data.user,
-        trustLevel: data.trust_level,
+        trustLevel: 'device_biometric',
       };
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -193,12 +186,11 @@ export const authService = {
    */
   async logout() {
     try {
-      if (!isAuthSkipped()) {
-        await supabaseAuthAdapter.logout();
-      }
+      await supabaseAuthAdapter.logout();
     } catch (error) {
       logger.warn('Logout API call failed:', error);
     } finally {
+      await biometricAuthService.disable().catch((error) => logger.warn('[Auth] Failed to disable biometric login:', error));
       await this.clearAuthData();
       this.notifyAuthStateChange(false);
     }
@@ -208,24 +200,69 @@ export const authService = {
    * Get current user from Supabase
    */
   async getCurrentUser() {
-    if (isAuthSkipped()) {
-      return this.getStoredUser();
-    }
-
     try {
       return await supabaseAuthAdapter.getCurrentUser();
     } catch (error) {
+      if (isMissingAuthSessionError(error)) {
+        await this.clearAuthData();
+        this.notifyAuthStateChange(false);
+        return null;
+      }
+
       await this.logout();
       return null;
     }
   },
 
   /**
-   * Get stored user from local storage
+   * Restore persisted Supabase session on app startup.
    */
-  async getStoredUser() {
-    const userStr = await AsyncStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+  async restoreSession() {
+    try {
+      const data = await supabaseAuthAdapter.getSession();
+      if (!data.access_token || !data.user) {
+        await this.clearAuthData();
+        this.notifyAuthStateChange(false);
+        return null;
+      }
+
+      await this.storeAuthData(data);
+      this.notifyAuthStateChange(true);
+      return data.user;
+    } catch (error) {
+      logger.warn('[Auth] Session restore failed:', error);
+      await this.clearAuthData();
+      this.notifyAuthStateChange(false);
+      return null;
+    }
+  },
+
+  async sendPasswordReset(email: string) {
+    return supabaseAuthAdapter.sendPasswordReset(email);
+  },
+
+  async exchangeCodeForSession(code: string) {
+    const data = await supabaseAuthAdapter.exchangeCodeForSession(code);
+    if (!data.access_token || !data.user) {
+      throw new Error('Supabase did not return an authenticated session');
+    }
+    await this.storeAuthData(data);
+    this.notifyAuthStateChange(true);
+    return data;
+  },
+
+  async recoverSessionFromUrl(url: string) {
+    const data = await supabaseAuthAdapter.recoverSessionFromUrl(url);
+    if (!data.access_token || !data.user) {
+      throw new Error('Supabase did not return an authenticated session');
+    }
+    await this.storeAuthData(data);
+    this.notifyAuthStateChange(true);
+    return data;
+  },
+
+  async updatePassword(password: string) {
+    return supabaseAuthAdapter.updatePassword(password);
   },
 
   /**
@@ -234,19 +271,17 @@ export const authService = {
   async storeAuthData(data: {
     access_token?: string;
     refresh_token?: string;
-    user?: Record<string, unknown>;
+    user?: object;
     biometric_enrollment_token?: string;
   }) {
     const promises: Promise<void>[] = [];
 
     if (data.access_token) {
       promises.push(secureStorage.setAccessToken(data.access_token));
-      promises.push(AsyncStorage.setItem('access_token', data.access_token));
     }
 
     if (data.refresh_token) {
       promises.push(secureStorage.setRefreshToken(data.refresh_token));
-      promises.push(AsyncStorage.setItem('refresh_token', data.refresh_token));
     }
 
     if (data.user) {
@@ -271,6 +306,7 @@ export const authService = {
    * Subscribe to auth state changes
    */
   onAuthStateChange(listener: AuthStateListener): () => void {
+    ensureSupabaseAuthSubscription();
     authStateListeners.push(listener);
     return () => {
       const index = authStateListeners.indexOf(listener);

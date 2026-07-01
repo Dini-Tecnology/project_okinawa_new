@@ -708,8 +708,8 @@ const TechExcellenceSlide = () => (
         <div className="space-y-3">
           {[
             { label: 'Mobile', value: 'React Native + Expo 51 + TypeScript' },
-            { label: 'Backend', value: 'NestJS + TypeORM + PostgreSQL + Redis' },
-            { label: 'Real-time', value: 'Socket.IO + WebSocket' },
+            { label: 'Backend', value: 'Supabase Auth + Postgres + RLS' },
+            { label: 'Real-time', value: 'Supabase Realtime + WebSocket' },
             { label: 'Design', value: 'Modern Chic + Glassmorphism + Haptics' },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-muted/50">

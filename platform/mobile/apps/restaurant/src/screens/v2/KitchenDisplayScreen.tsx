@@ -3,12 +3,13 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Info } from 'lucide-react-native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import ApiService from '@okinawa/shared/services/api';
 import { V2Shell } from './shared/V2Shell';
-import { KDS_ORDERS } from './shared/v2Mocks';
 import { V2_TONE } from './shared/v2Theme';
 import { V2StatusBadge } from './shared/V2StatusBadge';
 import { V2ConfirmDialog } from './shared/V2ConfirmDialog';
 import { V2DetailDialog } from './shared/V2DetailDialog';
+import { useKdsOrders } from './shared/useRestaurantOperations';
 import { kdsStatusLabel, kdsStatusTone } from './shared/v2Types';
 import type { KdsFilter, KdsOrder, KdsStatus } from './shared/v2Types';
 
@@ -26,9 +27,10 @@ const FILTER_TABS: { key: KdsFilter; label: string }[] = [
 export default function KitchenDisplayScreen() {
   const colors = useColors();
   const [activeTab, setActiveTab] = useState<KdsFilter>('queue');
-  const [orders, setOrders] = useState<KdsOrder[]>(KDS_ORDERS);
   const [pendingAction, setPendingAction] = useState<PendingKdsAction | null>(null);
   const [detailOrder, setDetailOrder] = useState<KdsOrder | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: orders, loading, error, refresh } = useKdsOrders();
 
   const counts = useMemo(() => ({
     queue: orders.filter((o) => o.status === 'queue').length,
@@ -41,13 +43,17 @@ export default function KitchenDisplayScreen() {
     [orders, activeTab],
   );
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!pendingAction) return;
     const newStatus: KdsStatus = pendingAction.action === 'start' ? 'preparing' : 'ready';
-    setOrders((prev) =>
-      prev.map((o) => (o.id === pendingAction.orderId ? { ...o, status: newStatus } : o)),
-    );
-    setPendingAction(null);
+    setIsSubmitting(true);
+    try {
+      await ApiService.updateOrderStatus(pendingAction.orderId, newStatus);
+      await refresh();
+      setPendingAction(null);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const pendingOrder = pendingAction ? orders.find((o) => o.id === pendingAction.orderId) : null;
@@ -80,6 +86,14 @@ export default function KitchenDisplayScreen() {
           );
         })}
       </View>
+
+      {loading ? (
+        <StateCard message="Carregando KDS..." />
+      ) : error ? (
+        <StateCard message={error} actionLabel="Tentar novamente" onAction={refresh} />
+      ) : filteredOrders.length === 0 ? (
+        <StateCard message="Nenhum item nesta etapa." />
+      ) : null}
 
       {filteredOrders.map((order) => (
         <View key={order.id} style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
@@ -133,8 +147,8 @@ export default function KitchenDisplayScreen() {
               ? `Marcar pedido da ${pendingOrder.table} como pronto?`
               : ''
         }
-        confirmLabel={pendingAction?.action === 'start' ? 'Iniciar' : 'Marcar pronto'}
-        onConfirm={handleConfirm}
+        confirmLabel={isSubmitting ? 'Salvando...' : pendingAction?.action === 'start' ? 'Iniciar' : 'Marcar pronto'}
+        onConfirm={() => void handleConfirm()}
         onCancel={() => setPendingAction(null)}
       />
 
@@ -144,6 +158,20 @@ export default function KitchenDisplayScreen() {
         onClose={() => setDetailOrder(null)}
       />
     </V2Shell>
+  );
+}
+
+function StateCard({ message, actionLabel, onAction }: { message: string; actionLabel?: string; onAction?: () => void }) {
+  const colors = useColors();
+  return (
+    <View style={[styles.stateCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Text style={{ color: colors.foregroundSecondary, textAlign: 'center' }}>{message}</Text>
+      {actionLabel && onAction ? (
+        <TouchableOpacity onPress={onAction} style={[styles.retryBtn, { backgroundColor: colors.primary }]}>
+          <Text style={{ color: '#FFF', fontWeight: '700' }}>{actionLabel}</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 
@@ -157,4 +185,6 @@ const styles = StyleSheet.create({
   detailBtn: { padding: 6, borderRadius: 8 },
   itemRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   action: { marginTop: 12, backgroundColor: '#F59E0B', borderRadius: 14, paddingVertical: 12, alignItems: 'center' },
+  stateCard: { borderWidth: 1, borderRadius: 14, padding: 16, marginBottom: 12, alignItems: 'center', gap: 10 },
+  retryBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 },
 });

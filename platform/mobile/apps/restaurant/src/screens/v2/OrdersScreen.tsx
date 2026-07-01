@@ -3,10 +3,11 @@ import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { Text } from 'react-native-paper';
 import { Clock, Check, ChefHat, Truck, X, Info } from 'lucide-react-native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import ApiService from '@okinawa/shared/services/api';
 import { V2Shell } from './shared/V2Shell';
-import { TAB_ORDERS } from './shared/v2Mocks';
 import { V2ConfirmDialog } from './shared/V2ConfirmDialog';
 import { V2DetailDialog } from './shared/V2DetailDialog';
+import { shortOrderId, useRestaurantOrders } from './shared/useRestaurantOperations';
 import type { OrderFilter, OrderStatus, TabOrder } from './shared/v2Types';
 
 type PendingAction = {
@@ -37,30 +38,35 @@ function nextStatus(action: PendingAction['action']): OrderStatus | null {
 export default function OrdersScreen() {
   const colors = useColors();
   const [activeTab, setActiveTab] = useState<OrderFilter>('all');
-  const [orders, setOrders] = useState<TabOrder[]>(TAB_ORDERS);
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [detailOrder, setDetailOrder] = useState<TabOrder | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: orders, loading, error, refresh } = useRestaurantOrders();
 
   const filteredOrders = useMemo(() => {
     if (activeTab === 'all') return orders;
     return orders.filter((o) => o.status === activeTab);
   }, [orders, activeTab]);
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!pendingAction) return;
     const { orderId, action } = pendingAction;
 
-    if (action === 'cancel' || action === 'deliver') {
-      setOrders((prev) => prev.filter((o) => o.id !== orderId));
-    } else {
-      const newStatus = nextStatus(action);
-      if (newStatus) {
-        setOrders((prev) =>
-          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
-        );
+    setIsSubmitting(true);
+    try {
+      if (action === 'cancel') {
+        await ApiService.updateOrderStatus(orderId, 'cancelled');
+      } else if (action === 'deliver') {
+        await ApiService.updateOrderStatus(orderId, 'delivered');
+      } else {
+        const newStatus = nextStatus(action);
+        if (newStatus) await ApiService.updateOrderStatus(orderId, newStatus);
       }
+      await refresh();
+      setPendingAction(null);
+    } finally {
+      setIsSubmitting(false);
     }
-    setPendingAction(null);
   };
 
   const pendingOrder = pendingAction ? orders.find((o) => o.id === pendingAction.orderId) : null;
@@ -92,6 +98,14 @@ export default function OrdersScreen() {
         ))}
       </View>
 
+      {loading ? (
+        <StateCard message="Carregando pedidos..." />
+      ) : error ? (
+        <StateCard message={error} actionLabel="Tentar novamente" onAction={refresh} />
+      ) : filteredOrders.length === 0 ? (
+        <StateCard message="Nenhum pedido nesta fila." />
+      ) : null}
+
       {filteredOrders.map((order) => (
         <View
           key={order.id}
@@ -104,7 +118,7 @@ export default function OrdersScreen() {
           ]}
         >
           <View style={styles.row}>
-            <Text style={{ fontWeight: '700', fontSize: 16, color: colors.foreground }}>{order.id}</Text>
+            <Text style={{ fontWeight: '700', fontSize: 16, color: colors.foreground }}>{shortOrderId(order.id)}</Text>
             <Text style={{ color: colors.foregroundSecondary }}>{order.table}</Text>
             <View style={styles.timeRow}>
               <Clock size={14} color={colors.foregroundSecondary} />
@@ -166,12 +180,12 @@ export default function OrdersScreen() {
         title={dialogConfig?.title ?? ''}
         message={
           pendingAction?.action === 'accept' && pendingOrder
-            ? `Aceitar pedido ${pendingOrder.id}?`
+            ? `Aceitar pedido ${shortOrderId(pendingOrder.id)}?`
             : dialogConfig?.message ?? ''
         }
-        confirmLabel={dialogConfig?.confirmLabel}
+        confirmLabel={isSubmitting ? 'Salvando...' : dialogConfig?.confirmLabel}
         destructive={dialogConfig?.destructive}
-        onConfirm={handleConfirm}
+        onConfirm={() => void handleConfirm()}
         onCancel={() => setPendingAction(null)}
       />
 
@@ -181,6 +195,20 @@ export default function OrdersScreen() {
         onClose={() => setDetailOrder(null)}
       />
     </V2Shell>
+  );
+}
+
+function StateCard({ message, actionLabel, onAction }: { message: string; actionLabel?: string; onAction?: () => void }) {
+  const colors = useColors();
+  return (
+    <View style={[styles.stateCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Text style={{ color: colors.foregroundSecondary, textAlign: 'center' }}>{message}</Text>
+      {actionLabel && onAction ? (
+        <TouchableOpacity onPress={onAction} style={[styles.retryBtn, { backgroundColor: colors.primary }]}>
+          <Text style={styles.btnText}>{actionLabel}</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
   );
 }
 
@@ -196,4 +224,6 @@ const styles = StyleSheet.create({
   iconBtn: { padding: 8, borderRadius: 12, backgroundColor: '#FEE2E2' },
   btn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 },
   btnText: { color: '#FFF', fontWeight: '600', fontSize: 13 },
+  stateCard: { borderWidth: 1, borderRadius: 14, padding: 16, marginBottom: 12, alignItems: 'center', gap: 10 },
+  retryBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 },
 });

@@ -1,6 +1,9 @@
 module.exports = {
   preset: 'react-native',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  transform: {
+    '^.+\\.(ts|tsx)$': 'ts-jest',
+  },
   transformIgnorePatterns: [
     'node_modules/(?!(react-native|@react-native|@react-navigation|expo|@expo|react-native-paper|react-native-vector-icons|@shopify/flash-list|@react-native-firebase|@sentry/react-native|expo-.*|@tanstack/react-query)/)',
   ],

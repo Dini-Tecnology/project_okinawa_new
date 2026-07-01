@@ -159,11 +159,14 @@ export const registerSchema = z.object({
   message: 'Email or phone number is required',
   path: ['email'],
 }).refine((data) => {
-  // If password is provided, confirmPassword must match
-  if (data.password && data.confirmPassword) {
-    return data.password === data.confirmPassword;
-  }
-  return true;
+  if (!data.password) return true;
+  return Boolean(data.confirmPassword);
+}, {
+  message: 'Password confirmation is required',
+  path: ['confirmPassword'],
+}).refine((data) => {
+  if (!data.password || !data.confirmPassword) return true;
+  return data.password === data.confirmPassword;
 }, {
   message: "Passwords don't match",
   path: ['confirmPassword'],

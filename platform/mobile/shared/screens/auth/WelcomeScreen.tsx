@@ -29,6 +29,8 @@ interface WelcomeScreenProps {
   onBiometricLogin: () => void;
   /** When false, Google SSO button is hidden (e.g. native OAuth env not configured yet). */
   googleLoginAvailable?: boolean;
+  appleLoginAvailable?: boolean;
+  biometricLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
   /** Optional app icon (e.g. NOOWE client `icon.png`). */
@@ -45,6 +47,8 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
   onPhoneLogin,
   onBiometricLogin,
   googleLoginAvailable = true,
+  appleLoginAvailable = false,
+  biometricLoginAvailable = false,
   loading = false,
   biometricLoading = false,
   logoIconSource,
@@ -70,10 +74,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       duration: 600,
       useNativeDriver: true,
     }).start();
-  }, []);
+  }, [biometricLoginAvailable, onBiometricLogin]);
 
   const checkBiometricQuickLogin = async () => {
     try {
+      if (!biometricLoginAvailable) {
+        setCanQuickLogin(false);
+        return;
+      }
+
       const canLogin = await biometricAuthService.canQuickLogin();
       setCanQuickLogin(canLogin);
       
@@ -157,13 +166,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
       <View style={styles.socialButtons}>
         {isIOS ? (
           <>
-            <SocialLoginButton
-              provider="apple"
-              onPress={onAppleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-              variant="primary"
-            />
+            {appleLoginAvailable && (
+              <SocialLoginButton
+                provider="apple"
+                onPress={onAppleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+                variant="primary"
+              />
+            )}
             {googleLoginAvailable && (
               <SocialLoginButton
                 provider="google"
@@ -184,13 +195,15 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
                 variant="primary"
               />
             )}
-            <SocialLoginButton
-              provider="apple"
-              onPress={onAppleLogin}
-              loading={loading}
-              disabled={loading || biometricLoading}
-              variant={googleLoginAvailable ? undefined : 'primary'}
-            />
+            {appleLoginAvailable && (
+              <SocialLoginButton
+                provider="apple"
+                onPress={onAppleLogin}
+                loading={loading}
+                disabled={loading || biometricLoading}
+                variant={googleLoginAvailable ? undefined : 'primary'}
+              />
+            )}
           </>
         )}
       </View>

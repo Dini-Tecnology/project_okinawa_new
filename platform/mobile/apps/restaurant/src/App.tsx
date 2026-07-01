@@ -25,6 +25,7 @@ import { authService } from '@/shared/services/auth';
 import { ThemeProvider } from '@/shared/contexts/ThemeContext';
 import { RestaurantProvider } from '@/shared/contexts/RestaurantContext';
 import { ErrorBoundary } from '@/shared/components/ErrorBoundary';
+import { initDeepLinking } from '@/shared/utils/deep-linking';
 
 // Configure React Query with sensible defaults for restaurant operations
 const queryClient = new QueryClient({
@@ -68,6 +69,7 @@ function AppContent() {
     const appearanceSubscription = Appearance.addChangeListener(() => {
       Appearance.setColorScheme('light');
     });
+    const cleanupDeepLinking = initDeepLinking();
 
     // Initialize WebSocket connection when app starts
     initializeWebSocket();
@@ -78,6 +80,7 @@ function AppContent() {
     // Cleanup on unmount
     return () => {
       appearanceSubscription.remove();
+      cleanupDeepLinking();
       subscription.remove();
       socketService.disconnect();
     };

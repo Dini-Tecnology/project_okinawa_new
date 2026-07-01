@@ -1,4 +1,6 @@
-import React, { createContext, ReactNode, useContext, useMemo, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react';
+import { getSupabaseClient } from '@okinawa/shared/services/supabase';
+import { getOptionalSupabaseSessionUser } from '@okinawa/shared/services/supabase-auth';
 
 export type RestaurantRole =
   | 'owner'
@@ -59,6 +61,11 @@ export type WaiterRoleView =
 
 interface RestaurantRoleContextValue {
   role: RestaurantRole;
+  /** Real role from server — cannot be changed by the user. */
+  serverRole: RestaurantRole | null;
+  restaurantId: string | null;
+  roleLoading: boolean;
+  /** Owners/managers can switch to another role view for supervision purposes. */
   setRole: (role: RestaurantRole) => void;
   managerView: ManagerRoleView;
   setManagerView: (view: ManagerRoleView) => void;
@@ -76,8 +83,13 @@ interface RestaurantRoleContextValue {
 
 const RestaurantRoleContext = createContext<RestaurantRoleContextValue | undefined>(undefined);
 
+const SUPERVISORY_ROLES: RestaurantRole[] = ['owner', 'manager'];
+
 export function RestaurantRoleProvider({ children }: { children: ReactNode }) {
-  const [role, setRole] = useState<RestaurantRole>('owner');
+  const [serverRole, setServerRole] = useState<RestaurantRole | null>(null);
+  const [restaurantId, setRestaurantId] = useState<string | null>(null);
+  const [roleLoading, setRoleLoading] = useState(true);
+  const [role, setRoleState] = useState<RestaurantRole>('owner');
   const [managerView, setManagerView] = useState<ManagerRoleView>('manager-ops');
   const [maitreView, setMaitreView] = useState<MaitreRoleView>('maitre-reservations');
   const [chefView, setChefView] = useState<ChefRoleView>('chef-kds');
@@ -85,9 +97,60 @@ export function RestaurantRoleProvider({ children }: { children: ReactNode }) {
   const [cookView, setCookView] = useState<CookRoleView>('cook-station');
   const [waiterView, setWaiterView] = useState<WaiterRoleView>('waiter');
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadRole() {
+      try {
+        const { user } = await getOptionalSupabaseSessionUser();
+        if (!user) return;
+
+        const { data, error } = await getSupabaseClient()
+          .from('user_roles')
+          .select('role, restaurant_id')
+          .eq('user_id', user.id)
+          .eq('is_active', true)
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .maybeSingle();
+
+        if (cancelled) return;
+        if (error) {
+          console.warn('[RestaurantRoleContext] Failed to load role:', error.message);
+          return;
+        }
+
+        if (data) {
+          const loaded = data.role as RestaurantRole;
+          setServerRole(loaded);
+          setRoleState(loaded);
+          setRestaurantId(data.restaurant_id as string);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.warn('[RestaurantRoleContext] Unexpected error:', err);
+        }
+      } finally {
+        if (!cancelled) setRoleLoading(false);
+      }
+    }
+
+    void loadRole();
+    return () => { cancelled = true; };
+  }, []);
+
+  const setRole = (newRole: RestaurantRole) => {
+    // Only supervisory roles can impersonate another role view.
+    if (serverRole && !SUPERVISORY_ROLES.includes(serverRole)) return;
+    setRoleState(newRole);
+  };
+
   const value = useMemo(
     () => ({
       role,
+      serverRole,
+      restaurantId,
+      roleLoading,
       setRole,
       managerView,
       setManagerView,
@@ -102,7 +165,8 @@ export function RestaurantRoleProvider({ children }: { children: ReactNode }) {
       waiterView,
       setWaiterView,
     }),
-    [role, managerView, maitreView, chefView, barmanView, cookView, waiterView],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [role, serverRole, restaurantId, roleLoading, managerView, maitreView, chefView, barmanView, cookView, waiterView],
   );
 
   return (

@@ -4,18 +4,36 @@ import { Text } from 'react-native-paper';
 import { QrCode, CheckCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
+import ApiService from '@okinawa/shared/services/api';
 import { V2Shell } from './shared/V2Shell';
-import { FLOOR_TABLES } from './shared/v2Mocks';
+import { useRestaurantTables } from './shared/useRestaurantOperations';
 
 export default function TablesScreen() {
   const colors = useColors();
   const navigation = useNavigation<any>();
   const [selected, setSelected] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { data: tables, loading, error, refresh } = useRestaurantTables();
+  const selectedTable = tables.find((table) => table.id === selected);
 
   const statusBg = (status: string) => {
     if (status === 'occupied') return `${colors.primary}15`;
     if (status === 'reserved') return '#8B5CF615';
+    if (status === 'cleaning') return '#F59E0B15';
+    if (status === 'payment') return '#0EA5E915';
+    if (status === 'blocked') return '#EF444415';
     return '#22C55E15';
+  };
+
+  const updateSelectedStatus = async (status: string) => {
+    if (!selected) return;
+    setIsSubmitting(true);
+    try {
+      await ApiService.updateTableStatus(selected, status);
+      await refresh();
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -32,10 +50,20 @@ export default function TablesScreen() {
         <Legend dotColor={colors.primary} label="Ocupada" muted={colors.foregroundSecondary} />
         <Legend dotColor="#8B5CF6" label="Reservada" muted={colors.foregroundSecondary} />
         <Legend dotColor="#22C55E" label="Livre" muted={colors.foregroundSecondary} />
+        <Legend dotColor="#F59E0B" label="Limpeza" muted={colors.foregroundSecondary} />
         <Legend dotColor={colors.primary} label="Selecionada" muted={colors.foregroundSecondary} ring />
       </View>
+
+      {loading ? (
+        <StateCard message="Carregando mesas..." />
+      ) : error ? (
+        <StateCard message={error} actionLabel="Tentar novamente" onAction={refresh} />
+      ) : tables.length === 0 ? (
+        <StateCard message="Nenhuma mesa cadastrada." />
+      ) : null}
+
       <View style={styles.grid}>
-        {FLOOR_TABLES.map((table) => {
+        {tables.map((table) => {
           const isSelected = selected === table.id;
           return (
             <Pressable
@@ -61,7 +89,7 @@ export default function TablesScreen() {
                   <CheckCircle size={16} color={colors.primary} style={styles.checkIcon} />
                 )}
                 {table.hasQR && <QrCode size={12} color={colors.foregroundSecondary} style={styles.qrIcon} />}
-                <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground }}>{table.id}</Text>
+                <Text style={{ fontSize: 22, fontWeight: '700', color: colors.foreground }}>{table.label}</Text>
                 <Text style={{ fontSize: 11, color: colors.foregroundSecondary }}>{table.section}</Text>
                 {table.status === 'occupied' && (
                   <Text style={{ fontSize: 10, color: colors.foregroundSecondary, marginTop: 4 }}>{table.guests} · {table.time}</Text>
@@ -75,14 +103,43 @@ export default function TablesScreen() {
                     <Text style={{ fontSize: 10, color: colors.foregroundSecondary }}>Livre</Text>
                   </View>
                 )}
+                {table.status === 'cleaning' && (
+                  <Text style={{ fontSize: 10, color: colors.foregroundSecondary, marginTop: 4 }}>Limpeza</Text>
+                )}
               </View>
             </Pressable>
           );
         })}
       </View>
-      {selected && (
+      {selectedTable && (
         <View style={[styles.detail, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <Text style={{ fontWeight: '700', color: colors.foreground }}>Mesa {selected}</Text>
+          <Text style={{ fontWeight: '700', color: colors.foreground }}>Mesa {selectedTable.label}</Text>
+          <Text style={{ marginTop: 4, color: colors.foregroundSecondary }}>
+            {selectedTable.section} · {selectedTable.status}
+          </Text>
+          <View style={styles.statusActions}>
+            <Pressable
+              disabled={isSubmitting}
+              style={[styles.statusBtn, { borderColor: colors.border }]}
+              onPress={() => void updateSelectedStatus('available')}
+            >
+              <Text style={{ color: colors.foreground, fontWeight: '600' }}>Livre</Text>
+            </Pressable>
+            <Pressable
+              disabled={isSubmitting}
+              style={[styles.statusBtn, { borderColor: colors.border }]}
+              onPress={() => void updateSelectedStatus('occupied')}
+            >
+              <Text style={{ color: colors.foreground, fontWeight: '600' }}>Ocupada</Text>
+            </Pressable>
+            <Pressable
+              disabled={isSubmitting}
+              style={[styles.statusBtn, { borderColor: colors.border }]}
+              onPress={() => void updateSelectedStatus('cleaning')}
+            >
+              <Text style={{ color: colors.foreground, fontWeight: '600' }}>Limpeza</Text>
+            </Pressable>
+          </View>
           <Pressable style={[styles.genBtn, { backgroundColor: colors.primary }]} onPress={() => navigation.navigate('QRGenerator')}>
             <QrCode size={16} color="#FFF" />
             <Text style={{ color: '#FFF', fontWeight: '600' }}>Gerar QR Code</Text>
@@ -90,6 +147,20 @@ export default function TablesScreen() {
         </View>
       )}
     </V2Shell>
+  );
+}
+
+function StateCard({ message, actionLabel, onAction }: { message: string; actionLabel?: string; onAction?: () => void }) {
+  const colors = useColors();
+  return (
+    <View style={[styles.stateCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <Text style={{ color: colors.foregroundSecondary, textAlign: 'center' }}>{message}</Text>
+      {actionLabel && onAction ? (
+        <Pressable onPress={onAction} style={[styles.retryBtn, { backgroundColor: colors.primary }]}>
+          <Text style={{ color: '#FFF', fontWeight: '700' }}>{actionLabel}</Text>
+        </Pressable>
+      ) : null}
+    </View>
   );
 }
 
@@ -129,4 +200,8 @@ const styles = StyleSheet.create({
   freeRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   detail: { marginTop: 20, padding: 16, borderRadius: 16, borderWidth: 1 },
   genBtn: { marginTop: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, borderRadius: 12 },
+  statusActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
+  statusBtn: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8 },
+  stateCard: { borderWidth: 1, borderRadius: 14, padding: 16, marginBottom: 12, alignItems: 'center', gap: 10 },
+  retryBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12 },
 });

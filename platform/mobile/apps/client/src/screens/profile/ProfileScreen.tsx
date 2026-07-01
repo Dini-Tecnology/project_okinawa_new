@@ -1,10 +1,11 @@
 import React, { useCallback, useMemo } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Alert, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Text } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import { authService } from '@/shared/services/auth';
 
 type IconName = React.ComponentProps<typeof Ionicons>['name'];
 
@@ -42,6 +43,19 @@ export default function ProfileScreen() {
     },
     [navigation],
   );
+
+  const handleLogout = useCallback(() => {
+    Alert.alert('Sair da conta', 'Deseja encerrar sua sessão neste dispositivo?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: () => {
+          void authService.logout();
+        },
+      },
+    ]);
+  }, []);
 
   return (
     <ScreenContainer edges={['top']}>
@@ -101,6 +115,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity
           style={styles.logoutRow}
+          onPress={handleLogout}
           activeOpacity={0.72}
           accessibilityRole="button"
           accessibilityLabel="Sair"

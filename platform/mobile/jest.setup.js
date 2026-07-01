@@ -84,10 +84,10 @@ jest.mock('react-native-maps', () => ({
   __esModule: true,
   default: 'MapView',
   Marker: 'Marker',
-}));
+}), { virtual: true });
 
 // Mock Vector Icons
-jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => 'Icon');
+jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => 'Icon', { virtual: true });
 
 // Mock Camera
 jest.mock('expo-camera', () => ({

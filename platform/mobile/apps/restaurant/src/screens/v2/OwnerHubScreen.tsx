@@ -1,5 +1,6 @@
 import React, { ComponentType } from 'react';
 import {
+  Alert,
   View,
   ScrollView,
   TouchableOpacity,
@@ -26,14 +27,18 @@ import {
   Users,
   BarChart,
   ChefHat,
+  LogOut,
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useColors } from '@okinawa/shared/contexts/ThemeContext';
 import { ScreenContainer } from '@okinawa/shared/components/ScreenContainer';
+import { authService } from '@/shared/services/auth';
 import { V2_TONE, V2Tone } from './shared/v2Theme';
-import { BARMAN_KDS_ORDERS, BARMAN_STATION_ORDERS, HUB_ORDERS, OWNER_ROLES } from './shared/v2Mocks';
 import { V2StatusBadge } from './shared/V2StatusBadge';
-import { hubStatusTone } from './shared/v2Types';
+import { orderStatusLabel, orderStatusTone } from './shared/v2Types';
+import { shortOrderId, useDashboardSnapshot, useKdsOrders, useRestaurantOrders } from './shared/useRestaurantOperations';
+import { supabaseApiAdapter } from '@okinawa/shared/services/supabase-api';
+import type { TabOrder } from './shared/v2Types';
 import {
   ChefRoleView,
   BarmanRoleView,
@@ -43,6 +48,16 @@ import {
   WaiterRoleView,
   useRestaurantRole,
 } from '../../contexts/RestaurantRoleContext';
+
+const OWNER_ROLES = [
+  { id: 'owner', label: 'Dono', title: 'Dashboard Executivo', hint: 'Visão completa do restaurante' },
+  { id: 'manager', label: 'Gerente', title: 'Operação do Turno', hint: 'Pedidos, equipe e sala' },
+  { id: 'maitre', label: 'Maître', title: 'Sala e Reservas', hint: 'Fila, reservas e mesas' },
+  { id: 'chef', label: 'Chef', title: 'Chef Executivo', hint: 'KDS, tempos e qualidade' },
+  { id: 'barman', label: 'Barman', title: 'Bar KDS', hint: 'Drinks e bebidas' },
+  { id: 'cook', label: 'Cozinheiro', title: 'Estação de Preparo', hint: 'Fila da sua praça' },
+  { id: 'waiter', label: 'Garçom', title: 'Atendimento', hint: 'Mesas e chamados' },
+] as const;
 
 type RoleId = (typeof OWNER_ROLES)[number]['id'];
 
@@ -87,6 +102,19 @@ export default function OwnerHubScreen() {
     navigation.navigate(screen);
   };
 
+  const handleSignOut = () => {
+    Alert.alert('Sair da conta', 'Deseja encerrar sua sessão neste dispositivo?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: () => {
+          void authService.logout();
+        },
+      },
+    ]);
+  };
+
   return (
     <ScreenContainer edges={['top']}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -97,6 +125,15 @@ export default function OwnerHubScreen() {
               <Text style={[styles.headerTitle, { color: colors.foreground }]}>{headerTitle}</Text>
               <Text style={[styles.headerHint, { color: colors.foregroundSecondary }]}>{selectedRole.hint}</Text>
             </View>
+            <TouchableOpacity
+              onPress={handleSignOut}
+              style={[styles.signOutButton, { borderColor: colors.border, backgroundColor: colors.backgroundSecondary }]}
+              accessibilityRole="button"
+              accessibilityLabel="Sair da conta"
+            >
+              <LogOut size={16} color={colors.error} strokeWidth={2.4} />
+              <Text style={[styles.signOutText, { color: colors.error }]}>Sair</Text>
+            </TouchableOpacity>
           </View>
           <View style={[styles.rolePicker, { borderColor: colors.border, backgroundColor: colors.backgroundSecondary }]}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.roleScrollContent}>
@@ -350,65 +387,6 @@ const MANAGER_CONFIG = [
   ['Pagamentos', 'Taxa, gorjeta, split, métodos', CreditCardIcon, 'danger'],
 ] as const;
 
-const CHEF_KDS_ORDERS = [
-  {
-    table: 'Mesa 2',
-    meta: '2 itens · 1min',
-    status: 'Confirmado',
-    tone: 'info' as const,
-    action: 'Iniciar preparo',
-    actionTone: 'warning' as const,
-    items: [['2x Carpaccio de Wagyu', '7min'], ['1x Creme Brûlée', '5min']],
-  },
-  {
-    table: 'Mesa 7',
-    meta: '3 itens · 10min',
-    status: 'Preparando',
-    tone: 'warning' as const,
-    action: 'Marcar pronto',
-    actionTone: 'success' as const,
-    items: [['1x Petit Gâteau', '15min'], ['1x Tartare de Atum', '8min'], ['1x Risoto de Funghi', '22min']],
-  },
-  {
-    table: 'Mesa 2',
-    meta: '2 itens · 12min',
-    status: 'Preparando',
-    tone: 'warning' as const,
-    action: 'Marcar pronto',
-    actionTone: 'success' as const,
-    items: [['2x Polvo à Lagareiro', '20min'], ['1x Água com Gás San Pellegrino', '1min']],
-  },
-] as const;
-
-const COOK_KDS_ORDERS = [
-  {
-    table: 'Mesa 1',
-    meta: '3 itens · 29min',
-    status: 'Preparando',
-    tone: 'warning' as const,
-    action: 'Marcar pronto',
-    actionTone: 'success' as const,
-    items: [['1x Tartare de Atum', '8min'], ['1x Filé ao Molho de Vinho', '25min'], ['2x Gin Tônica Aurora', '3min']],
-  },
-  {
-    table: 'Mesa 3',
-    meta: '3 itens · 14min',
-    status: 'Confirmado',
-    tone: 'info' as const,
-    action: 'Iniciar preparo',
-    actionTone: 'warning' as const,
-    items: [['2x Carpaccio de Wagyu', '7min'], ['1x Risoto de Funghi', '22min'], ['2x Negroni Clássico', '3min']],
-  },
-  {
-    table: 'Mesa 8',
-    meta: '4 itens · 24min',
-    status: 'Preparando',
-    tone: 'warning' as const,
-    action: 'Marcar pronto',
-    actionTone: 'success' as const,
-    items: [['4x Ceviche Peruano', '10min'], ['4x Polvo à Lagareiro', '20min'], ['4x Crème Brûlée', '5min']],
-  },
-] as const;
 
 const CHEF_APPROVALS = [
   ['Carlos & Maria', "Chef's Table", '05/04 — 20h', '2 convidados', 'Sem glúten', 'Aniversário de casamento'],
@@ -446,13 +424,29 @@ const BARMAN_RECIPES = [
   ['Moscow Mule', 'Caneca de cobre · 2min', 'R$ 36', 'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=160'],
 ] as const;
 
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 function DashboardTab({ onNavigate, colors }: { onNavigate: (s: string) => void; colors: ReturnType<typeof useColors> }) {
+  const { data: snapshot, loading: snapshotLoading, error: snapshotError, refresh: refreshSnapshot } = useDashboardSnapshot();
+  const { data: recentOrders, loading: ordersLoading, error: ordersError, refresh: refreshOrders } = useRestaurantOrders();
   const quickActions: { title: string; detail: string; screen: string; icon: IconComponent }[] = [
     { title: 'Cardápio', detail: 'Gerenciar itens', screen: 'Menu', icon: UtensilsCrossed },
     { title: 'Equipe', detail: 'Staff e turnos', screen: 'Staff', icon: Users },
     { title: 'Financeiro', detail: 'Receita e custos', screen: 'Financial', icon: CreditCardIcon },
     { title: 'Relatórios', detail: 'Métricas', screen: 'Reports', icon: BarChart },
   ];
+  const occupancy = snapshot?.tables.total
+    ? Math.round((snapshot.tables.occupied / snapshot.tables.total) * 100)
+    : 0;
+  const averageTicket = snapshot?.orders_today
+    ? snapshot.revenue_today / snapshot.orders_today
+    : 0;
 
   return (
     <View style={styles.section}>
@@ -462,11 +456,14 @@ function DashboardTab({ onNavigate, colors }: { onNavigate: (s: string) => void;
         </Text>
       </View>
       <View style={styles.metricGrid}>
-        <Metric value="R$ 13.736" label="Receita Hoje" tone="success" />
-        <Metric value="10" label="Pedidos Ativos" tone="danger" />
-        <Metric value="72%" label="Ocupação" tone="warning" />
-        <Metric value="R$ 259" label="Ticket Médio" tone="info" />
+        <Metric value={snapshotLoading ? '...' : formatCurrency(snapshot?.revenue_today ?? 0)} label="Receita Hoje" tone="success" />
+        <Metric value={snapshotLoading ? '...' : String(snapshot?.active_orders ?? 0)} label="Pedidos Ativos" tone="danger" />
+        <Metric value={snapshotLoading ? '...' : `${occupancy}%`} label="Ocupação" tone="warning" />
+        <Metric value={snapshotLoading ? '...' : formatCurrency(averageTicket)} label="Ticket Médio" tone="info" />
       </View>
+      {snapshotError ? (
+        <InlineNotice message={snapshotError} actionLabel="Recarregar" onPress={() => void refreshSnapshot()} colors={colors} />
+      ) : null}
       <SectionTitle title="Ações rápidas" subtitle="Atalhos para o que importa agora" colors={colors} />
       <View style={styles.metricGrid}>
         {quickActions.map((action) => (
@@ -481,9 +478,17 @@ function DashboardTab({ onNavigate, colors }: { onNavigate: (s: string) => void;
         ))}
       </View>
       <SectionTitle title="Pedidos recentes" colors={colors} />
-      {HUB_ORDERS.slice(0, 3).map((order) => (
-        <CompactOrder key={`${order.table}-${order.name}`} order={order} colors={colors} />
-      ))}
+      {ordersLoading ? (
+        <InlineNotice message="Carregando pedidos recentes..." colors={colors} />
+      ) : ordersError ? (
+        <InlineNotice message={ordersError} actionLabel="Recarregar" onPress={() => void refreshOrders()} colors={colors} />
+      ) : recentOrders.length === 0 ? (
+        <InlineNotice message="Nenhum pedido recente." colors={colors} />
+      ) : (
+        recentOrders.slice(0, 3).map((order) => (
+          <CompactOrder key={order.id} order={order} colors={colors} />
+        ))
+      )}
     </View>
   );
 }
@@ -570,35 +575,53 @@ function CookQueueView({
   colors: ReturnType<typeof useColors>;
   mode: 'station' | 'kds';
 }) {
+  const { data: orders, loading } = useKdsOrders();
+  const queueCount = orders.filter((o) => o.status === 'queue').length;
+  const preparingCount = orders.filter((o) => o.status === 'preparing').length;
+  const readyCount = orders.filter((o) => o.status === 'ready').length;
+
   return (
     <View style={styles.section}>
       <View style={styles.threeMetricGrid}>
-        <CompactMetric value="1" label="Fila" tone="warning" />
-        <CompactMetric value="2" label="Preparando" tone="danger" />
-        <CompactMetric value="0" label="Prontos" tone="success" />
+        <CompactMetric value={String(queueCount)} label="Fila" tone="warning" />
+        <CompactMetric value={String(preparingCount)} label="Preparando" tone="danger" />
+        <CompactMetric value={String(readyCount)} label="Prontos" tone="success" />
       </View>
-      {COOK_KDS_ORDERS.map((order) => (
-        <View key={`${mode}-${order.table}`} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
-          <View style={styles.managerOrderHeader}>
-            <View>
-              <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{order.table}</Text>
-              <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.meta}</Text>
-            </View>
-            <StatusChip label={order.status} tone={order.tone} />
-          </View>
-          <View style={{ marginTop: 10, gap: 6 }}>
-            {order.items.map(([name, time]) => (
-              <View key={name} style={styles.chefItemRow}>
-                <Text style={[styles.staffRole, { color: colors.foreground }]}>{name}</Text>
-                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{time}</Text>
+      {loading && <Text style={[styles.staffRole, { color: colors.foregroundSecondary, textAlign: 'center', marginTop: 12 }]}>Carregando fila…</Text>}
+      {orders.map((order) => {
+        const isReady = order.status === 'ready';
+        const isPreparing = order.status === 'preparing';
+        const tone = isReady ? 'success' : isPreparing ? 'warning' : 'info';
+        const actionLabel = isReady ? 'Pronto ✓' : isPreparing ? 'Marcar pronto' : 'Iniciar preparo';
+        const actionColor = isPreparing ? '#22C55E' : '#F59E0B';
+        return (
+          <View key={`${mode}-${order.id}`} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <View style={styles.managerOrderHeader}>
+              <View>
+                <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{order.table}</Text>
+                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.meta}</Text>
               </View>
-            ))}
+              <StatusChip label={tone === 'success' ? 'Pronto' : tone === 'warning' ? 'Preparando' : 'Fila'} tone={tone} />
+            </View>
+            <View style={{ marginTop: 10, gap: 6 }}>
+              {order.items.map(([name, time]) => (
+                <View key={name} style={styles.chefItemRow}>
+                  <Text style={[styles.staffRole, { color: colors.foreground }]}>{name}</Text>
+                  <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{time}</Text>
+                </View>
+              ))}
+            </View>
+            {!isReady && (
+              <TouchableOpacity
+                style={[styles.wideAction, { backgroundColor: actionColor }]}
+                onPress={() => void supabaseApiAdapter.updateOrderStatus(order.id, isPreparing ? 'ready' : 'preparing')}
+              >
+                <Text style={[styles.wideActionText, { color: '#FFF' }]}>{actionLabel}</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <TouchableOpacity style={[styles.wideAction, { backgroundColor: order.actionTone === 'success' ? '#22C55E' : '#F59E0B' }]}>
-            <Text style={[styles.wideActionText, { color: order.actionTone === 'success' ? '#FFF' : '#111827' }]}>{order.action}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        );
+      })}
       <ProfileActive colors={colors} roleName="Cozinheiro" />
     </View>
   );
@@ -611,10 +634,20 @@ function BarmanQueueView({
   colors: ReturnType<typeof useColors>;
   mode: 'station' | 'kds';
 }) {
-  const orders = mode === 'kds' ? BARMAN_KDS_ORDERS : BARMAN_STATION_ORDERS;
-  const queueCount = orders.filter((o) => o.status === 'Confirmado').length;
-  const preparingCount = orders.filter((o) => o.status === 'Preparando').length;
-  const readyCount = orders.filter((o) => o.status === 'Pronto').length;
+  const [barOrders, setBarOrders] = React.useState<any[]>([]);
+  const [loadingBar, setLoadingBar] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    supabaseApiAdapter.getBarQueue().then((data) => {
+      if (!cancelled) setBarOrders(Array.isArray(data) ? data : []);
+    }).catch(() => {}).finally(() => { if (!cancelled) setLoadingBar(false); });
+    return () => { cancelled = true; };
+  }, []);
+
+  const queueCount = barOrders.filter((o) => o.status === 'confirmed' || o.status === 'pending').length;
+  const preparingCount = barOrders.filter((o) => o.status === 'preparing').length;
+  const readyCount = barOrders.filter((o) => o.status === 'ready').length;
 
   return (
     <View style={styles.section}>
@@ -636,43 +669,38 @@ function BarmanQueueView({
         <CompactMetric value={String(preparingCount)} label="Preparando" tone="danger" />
         <CompactMetric value={String(readyCount)} label="Prontos" tone="success" />
       </View>
-      {orders.map((order) => (
-        <View
-          key={`${mode}-${order.table}-${order.meta}`}
-          style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}
-        >
-          <View style={styles.managerOrderHeader}>
-            <View>
-              <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{order.table}</Text>
-              <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.meta}</Text>
-            </View>
-            <StatusChip label={order.status} tone={order.tone} />
-          </View>
-          <View style={{ marginTop: 10, gap: 6 }}>
-            {order.items.map(([name, time]) => (
-              <View key={name} style={styles.chefItemRow}>
-                <Text style={[styles.staffRole, { color: colors.foreground }]}>{name}</Text>
-                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{time}</Text>
-              </View>
-            ))}
-          </View>
-          <TouchableOpacity
-            style={[
-              styles.wideAction,
-              { backgroundColor: order.actionTone === 'success' ? '#22C55E' : '#F59E0B' },
-            ]}
+      {loadingBar && <Text style={[styles.staffRole, { color: colors.foregroundSecondary, textAlign: 'center', marginTop: 12 }]}>Carregando bar…</Text>}
+      {barOrders.map((item) => {
+        const isPreparing = item.status === 'preparing';
+        const isReady = item.status === 'ready';
+        const tone = isReady ? 'success' : isPreparing ? 'warning' : 'info';
+        const actionLabel = isReady ? 'Pronto ✓' : isPreparing ? 'Marcar pronto' : 'Iniciar preparo';
+        const actionColor = isPreparing ? '#22C55E' : '#F59E0B';
+        const tableLabel = item.table_label ?? `Item ${item.id?.slice(0, 6) ?? '?'}`;
+        const meta = `${item.quantity ?? 1}x ${item.item_name ?? 'Bebida'}${item.elapsed_minutes != null ? ` · ${item.elapsed_minutes}min` : ''}`;
+        return (
+          <View
+            key={item.id}
+            style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}
           >
-            <Text
-              style={[
-                styles.wideActionText,
-                { color: order.actionTone === 'success' ? '#FFF' : '#111827' },
-              ]}
-            >
-              {order.action}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+            <View style={styles.managerOrderHeader}>
+              <View>
+                <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{tableLabel}</Text>
+                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{meta}</Text>
+              </View>
+              <StatusChip label={isReady ? 'Pronto' : isPreparing ? 'Preparando' : 'Fila'} tone={tone} />
+            </View>
+            {!isReady && (
+              <TouchableOpacity
+                style={[styles.wideAction, { backgroundColor: actionColor }]}
+                onPress={() => void supabaseApiAdapter.updateOrderItemStatus(item.id, isPreparing ? 'ready' : 'preparing')}
+              >
+                <Text style={[styles.wideActionText, { color: '#FFF' }]}>{actionLabel}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        );
+      })}
       <ProfileActive colors={colors} roleName="Barman" />
     </View>
   );
@@ -701,35 +729,54 @@ function BarmanStockView({ colors }: { colors: ReturnType<typeof useColors> }) {
 }
 
 function ChefKdsView({ colors }: { colors: ReturnType<typeof useColors> }) {
+  const { data: orders, loading } = useKdsOrders();
+  const queueCount = orders.filter((o) => o.status === 'queue').length;
+  const preparingCount = orders.filter((o) => o.status === 'preparing').length;
+  const readyCount = orders.filter((o) => o.status === 'ready').length;
+
   return (
     <View style={styles.section}>
       <View style={styles.threeMetricGrid}>
-        <CompactMetric value="10" label="Fila" tone="warning" />
-        <CompactMetric value="5" label="Preparando" tone="danger" />
-        <CompactMetric value="0" label="Prontos" tone="success" />
+        <CompactMetric value={String(queueCount)} label="Fila" tone="warning" />
+        <CompactMetric value={String(preparingCount)} label="Preparando" tone="danger" />
+        <CompactMetric value={String(readyCount)} label="Prontos" tone="success" />
       </View>
-      {CHEF_KDS_ORDERS.map((order) => (
-        <View key={`${order.table}-${order.meta}`} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
-          <View style={styles.managerOrderHeader}>
-            <View>
-              <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{order.table}</Text>
-              <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.meta}</Text>
-            </View>
-            <StatusChip label={order.status} tone={order.tone} />
-          </View>
-          <View style={{ marginTop: 10, gap: 6 }}>
-            {order.items.map(([name, time]) => (
-              <View key={name} style={styles.chefItemRow}>
-                <Text style={[styles.staffRole, { color: colors.foreground }]}>{name}</Text>
-                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{time}</Text>
+      {loading && <Text style={[styles.staffRole, { color: colors.foregroundSecondary, textAlign: 'center', marginTop: 12 }]}>Carregando KDS…</Text>}
+      {orders.map((order) => {
+        const isReady = order.status === 'ready';
+        const isPreparing = order.status === 'preparing';
+        const tone = isReady ? 'success' : isPreparing ? 'warning' : 'info';
+        const actionLabel = isReady ? 'Pronto ✓' : isPreparing ? 'Marcar pronto' : 'Iniciar preparo';
+        const actionColor = isReady ? '#22C55E' : isPreparing ? '#22C55E' : '#F59E0B';
+        const actionTextColor = '#FFF';
+        return (
+          <View key={order.id} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+            <View style={styles.managerOrderHeader}>
+              <View>
+                <Text style={[styles.reservationTitle, { color: colors.foreground }]}>{order.table}</Text>
+                <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.meta}</Text>
               </View>
-            ))}
+              <StatusChip label={tone === 'success' ? 'Pronto' : tone === 'warning' ? 'Preparando' : 'Fila'} tone={tone} />
+            </View>
+            <View style={{ marginTop: 10, gap: 6 }}>
+              {order.items.map(([name, time]) => (
+                <View key={name} style={styles.chefItemRow}>
+                  <Text style={[styles.staffRole, { color: colors.foreground }]}>{name}</Text>
+                  <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{time}</Text>
+                </View>
+              ))}
+            </View>
+            {!isReady && (
+              <TouchableOpacity
+                style={[styles.wideAction, { backgroundColor: actionColor }]}
+                onPress={() => void supabaseApiAdapter.updateOrderStatus(order.id, isPreparing ? 'ready' : 'preparing')}
+              >
+                <Text style={[styles.wideActionText, { color: actionTextColor }]}>{actionLabel}</Text>
+              </TouchableOpacity>
+            )}
           </View>
-          <TouchableOpacity style={[styles.wideAction, { backgroundColor: order.actionTone === 'success' ? '#22C55E' : '#F59E0B' }]}>
-            <Text style={[styles.wideActionText, { color: order.actionTone === 'success' ? '#FFF' : '#111827' }]}>{order.action}</Text>
-          </TouchableOpacity>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 }
@@ -1058,6 +1105,8 @@ function ManagerDashboardTab({
 }
 
 function ManagerOrdersView({ colors }: { colors: ReturnType<typeof useColors> }) {
+  const { data: orders, loading, error, refresh } = useRestaurantOrders();
+
   return (
     <View style={styles.section}>
       <View style={styles.filterRow}>
@@ -1067,26 +1116,33 @@ function ManagerOrdersView({ colors }: { colors: ReturnType<typeof useColors> })
           </View>
         ))}
       </View>
-      {HUB_ORDERS.concat(HUB_ORDERS.slice(0, 1)).map((order, index) => (
-        <View key={`${order.name}-${index}`} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
+      {loading ? (
+        <InlineNotice message="Carregando pedidos..." colors={colors} />
+      ) : error ? (
+        <InlineNotice message={error} actionLabel="Recarregar" onPress={() => void refresh()} colors={colors} />
+      ) : orders.length === 0 ? (
+        <InlineNotice message="Nenhum pedido ativo." colors={colors} />
+      ) : orders.map((order) => (
+        <View key={order.id} style={[styles.managerOrderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
           <View style={styles.orderRow}>
             <View style={styles.tableNumberBubble}>
-              <Text style={styles.tableNumberText}>{order.table}</Text>
+              <Text style={styles.tableNumberText}>{order.table.replace('Mesa ', '')}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <View style={styles.managerOrderHeader}>
-                <Text style={[styles.approvalTitle, { color: colors.foreground }]}>{order.name}</Text>
-                <StatusChip label={index < 2 ? 'Preparando' : 'Confirmado'} tone={index < 2 ? 'warning' : 'info'} />
+                <Text style={[styles.approvalTitle, { color: colors.foreground }]}>{order.customerName || shortOrderId(order.id)}</Text>
+                <StatusChip label={orderStatusLabel(order.status)} tone={orderStatusTone(order.status)} />
               </View>
-              <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.items} · {order.value} · {order.time}</Text>
+              <Text style={[styles.staffRole, { color: colors.foregroundSecondary }]}>{order.items.length} itens · {formatCurrency(order.total)} · {order.time}</Text>
               <View style={styles.orderItemChips}>
-                <Text style={styles.orderItemChip}>1x Ceviche Peruano</Text>
-                <Text style={styles.orderItemChip}>2x Tartare de Atum</Text>
+                {order.items.slice(0, 2).map((item) => (
+                  <Text key={item} style={styles.orderItemChip}>{item}</Text>
+                ))}
               </View>
             </View>
           </View>
-          <TouchableOpacity style={[styles.wideAction, { backgroundColor: index < 2 ? '#35B36F' : '#F6A21A' }]}>
-            <Text style={[styles.wideActionText, { color: index < 2 ? '#FFF' : '#111827' }]}>{index < 2 ? 'Marcar pronto' : 'Preparar'}</Text>
+          <TouchableOpacity style={[styles.wideAction, { backgroundColor: order.status === 'preparing' ? '#35B36F' : '#F6A21A' }]}>
+            <Text style={[styles.wideActionText, { color: order.status === 'preparing' ? '#FFF' : '#111827' }]}>{order.status === 'preparing' ? 'Marcar pronto' : 'Preparar'}</Text>
           </TouchableOpacity>
         </View>
       ))}
@@ -1748,16 +1804,43 @@ function QuickAction({
   );
 }
 
-function CompactOrder({ order, colors }: { order: (typeof HUB_ORDERS)[number]; colors: ReturnType<typeof useColors> }) {
+function InlineNotice({
+  message,
+  actionLabel,
+  onPress,
+  colors,
+}: {
+  message: string;
+  actionLabel?: string;
+  onPress?: () => void;
+  colors: ReturnType<typeof useColors>;
+}) {
+  return (
+    <View style={[styles.inlineNotice, { borderColor: colors.border, backgroundColor: colors.card }]}>
+      <Text style={{ color: colors.foregroundSecondary, flex: 1 }}>{message}</Text>
+      {actionLabel && onPress ? (
+        <TouchableOpacity onPress={onPress} style={[styles.inlineNoticeBtn, { backgroundColor: colors.primary }]}>
+          <Text style={{ color: '#FFF', fontWeight: '700', fontSize: 12 }}>{actionLabel}</Text>
+        </TouchableOpacity>
+      ) : null}
+    </View>
+  );
+}
+
+function CompactOrder({ order, colors }: { order: TabOrder; colors: ReturnType<typeof useColors> }) {
   return (
     <View style={[styles.orderCard, { borderColor: colors.border, backgroundColor: colors.card }]}>
       <View style={styles.orderRow}>
-        <Image source={{ uri: order.avatar }} style={styles.avatar} />
-        <View style={{ flex: 1 }}>
-          <Text style={{ fontWeight: '700', color: colors.foreground }}>{order.name}</Text>
-          <Text style={{ fontSize: 12, color: colors.foregroundSecondary }}>Mesa {order.table} · {order.items}</Text>
+        <View style={[styles.orderInitials, { backgroundColor: `${colors.primary}18` }]}>
+          <Text style={{ color: colors.primary, fontWeight: '800', fontSize: 12 }}>
+            {shortOrderId(order.id).replace('#', '')}
+          </Text>
         </View>
-        <V2StatusBadge label={order.status} tone={hubStatusTone(order.status)} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ fontWeight: '700', color: colors.foreground }}>{order.customerName || shortOrderId(order.id)}</Text>
+          <Text style={{ fontSize: 12, color: colors.foregroundSecondary }}>{order.table} · {order.items.length} itens · {formatCurrency(order.total)}</Text>
+        </View>
+        <V2StatusBadge label={orderStatusLabel(order.status)} tone={orderStatusTone(order.status)} />
       </View>
     </View>
   );
@@ -1815,8 +1898,19 @@ function ProfileActive({ colors, roleName = 'Gerente' }: { colors: ReturnType<ty
 const styles = StyleSheet.create({
   scroll: { padding: 16, paddingBottom: 88 },
   headerCard: { borderRadius: 16, borderWidth: 1, padding: 12, marginBottom: 16 },
-  headerTop: { flexDirection: 'row', justifyContent: 'space-between' },
+  headerTop: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
   headerText: { flex: 1 },
+  signOutButton: {
+    minHeight: 36,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    alignSelf: 'flex-start',
+  },
+  signOutText: { fontSize: 12, fontWeight: '700' },
   eyebrow: { fontSize: 10, fontWeight: '700', letterSpacing: 2 },
   headerTitle: { fontSize: 15, fontWeight: '700', marginTop: 4 },
   headerHint: { fontSize: 11, marginTop: 4 },
@@ -1849,9 +1943,12 @@ const styles = StyleSheet.create({
   compactMetricCard: { flex: 1, minHeight: 70, borderRadius: 16, borderWidth: 1, padding: 12, backgroundColor: '#FFF', alignItems: 'center', justifyContent: 'center' },
   compactMetricValue: { fontSize: 18, fontWeight: '800' },
   quickAction: { width: '47%', minHeight: 82, borderRadius: 16, borderWidth: 1, padding: 12 },
+  inlineNotice: { borderWidth: 1, borderRadius: 14, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  inlineNoticeBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
   orderCard: { borderRadius: 16, borderWidth: 1, padding: 12, marginBottom: 8 },
   orderRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   avatar: { width: 44, height: 44, borderRadius: 22 },
+  orderInitials: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   actionBtn: { marginTop: 12, borderRadius: 16, paddingVertical: 12, alignItems: 'center' },
   delayAlert: {
     minHeight: 42,

@@ -286,10 +286,33 @@ export const isProduction = CURRENT_ENV === 'production';
  */
 export const isStaging = CURRENT_ENV === 'staging';
 
+function decodeJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const payload = token.split('.')[1];
+    if (!payload) return null;
+    const normalized = payload.replace(/-/g, '+').replace(/_/g, '/');
+    const decoded =
+      typeof atob === 'function'
+        ? atob(normalized)
+        : '';
+    if (!decoded) return null;
+    return JSON.parse(decoded);
+  } catch {
+    return null;
+  }
+}
+
+function isServiceRoleLikeKey(key: string) {
+  const claims = decodeJwtPayload(key);
+  return claims?.role === 'service_role' || key.toLowerCase().includes('service_role');
+}
+
 /**
  * Security validation for production builds
  */
 if (isProduction) {
+  const supabasePublicKey = ENV.SUPABASE_PUBLISHABLE_KEY || ENV.SUPABASE_ANON_KEY;
+
   // Ensure HTTPS is used in production
   if (!ENV.API_BASE_URL.startsWith('https://')) {
     throw new Error('SECURITY ERROR: Production API must use HTTPS');
@@ -298,6 +321,18 @@ if (isProduction) {
   // Ensure WebSocket Secure is used in production
   if (!ENV.WS_URL.startsWith('wss://')) {
     throw new Error('SECURITY ERROR: Production WebSocket must use WSS');
+  }
+
+  if (!ENV.SUPABASE_URL || !ENV.SUPABASE_URL.startsWith('https://')) {
+    throw new Error('SECURITY ERROR: Production Supabase URL must be configured with HTTPS');
+  }
+
+  if (!supabasePublicKey) {
+    throw new Error('SECURITY ERROR: Production Supabase public key is missing');
+  }
+
+  if (isServiceRoleLikeKey(supabasePublicKey) || requireEnv('EXPO_PUBLIC_SUPABASE_SERVICE_ROLE_KEY', '')) {
+    throw new Error('SECURITY ERROR: Supabase service role keys must never be bundled in mobile apps');
   }
   
   // Warn if Sentry is not configured

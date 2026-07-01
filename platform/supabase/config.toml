@@ -1,7 +1,10 @@
-project_id = "micstczoxsvnrkordftk"
+project_id = "eplivpvqemowmbivhfpx"
 
 [functions.send-demo-code]
 verify_jwt = false
 
 [functions.verify-demo-code]
+verify_jwt = false
+
+[functions.register-with-resend]
 verify_jwt = false

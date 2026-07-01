@@ -8,7 +8,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { Text, HelperText } from 'react-native-paper';
+import { Text, HelperText, IconButton } from 'react-native-paper';
 import { authService } from '@/shared/services/auth';
 import { useBiometricAuth } from '@/shared/hooks/useBiometricAuth';
 import { useScreenTracking, useAnalytics } from '@/shared/hooks/useAnalytics';
@@ -24,13 +24,15 @@ import { AuthTextField } from '../../components/auth/AuthTextField';
 import { SocialAuthChips } from '../../components/auth/SocialAuthChips';
 import { AUTH_BRAND } from '../../components/auth/authScreenTheme';
 import { AuthConsentCheckbox } from '../../components/auth/AuthConsentCheckbox';
-import { DEV_GUEST_USER, isAuthSkipped } from '@/shared/config/skip-auth';
+import { showSuccessToast } from '@/shared/utils/error-handler';
 
 interface RegisterScreenProps {
   navigation: any;
   onAppleLogin?: () => void;
   onGoogleLogin?: () => void;
   onBiometricLogin?: () => void;
+  googleLoginAvailable?: boolean;
+  appleLoginAvailable?: boolean;
   loading?: boolean;
   biometricLoading?: boolean;
 }
@@ -40,6 +42,8 @@ export default function RegisterScreen({
   onAppleLogin,
   onGoogleLogin,
   onBiometricLogin,
+  googleLoginAvailable = false,
+  appleLoginAvailable = false,
   loading: externalLoading = false,
   biometricLoading = false,
 }: RegisterScreenProps) {
@@ -58,6 +62,7 @@ export default function RegisterScreen({
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [showConsentError, setShowConsentError] = useState(false);
   const [showAgeError, setShowAgeError] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -69,6 +74,7 @@ export default function RegisterScreen({
     biometricType === 'FaceID' ? 'face-recognition' : 'fingerprint';
 
   const isBusy = loading || externalLoading || biometricLoading;
+  const hasSecondaryAuth = true;
 
   const clearFieldError = useCallback((field: string) => {
     if (fieldErrors[field]) {
@@ -97,21 +103,10 @@ export default function RegisterScreen({
   const handleRegister = async () => {
     setLoading(true);
     setError('');
+    setInfoMessage('');
     setShowConsentError(false);
 
     try {
-      if (isAuthSkipped()) {
-        await authService.enterDevGuestMode();
-        try {
-          await analytics.logSignUp('email');
-          await setUser(DEV_GUEST_USER.id, { account_type: 'customer' });
-        } catch {
-          // Analytics optional in dev bypass
-        }
-        Haptic.successNotification();
-        return;
-      }
-
       if (!validateFields()) return;
 
       if (!confirmedAge) {
@@ -127,6 +122,14 @@ export default function RegisterScreen({
       }
 
       const result = await authService.register(email, password, fullName);
+
+      if (result?.needsEmailConfirmation) {
+        const message = t('auth.confirmEmailSent') || 'Enviamos um e-mail de confirmação para ativar sua conta.';
+        setInfoMessage(message);
+        showSuccessToast(message);
+        Haptic.successNotification();
+        return;
+      }
 
       await analytics.logSignUp('email');
 
@@ -154,6 +157,16 @@ export default function RegisterScreen({
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        <View style={styles.topBar}>
+          <IconButton
+            icon="arrow-left"
+            onPress={() => navigation.goBack()}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
+            style={styles.backButton}
+          />
+        </View>
+
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -172,6 +185,7 @@ export default function RegisterScreen({
               setFullName(text);
               clearFieldError('fullName');
             }}
+            placeholder={t('auth.fullNamePlaceholder')}
             error={fieldErrors.fullName}
             accessibilityLabel="Full name"
             accessibilityHint="Enter your full name"
@@ -261,6 +275,7 @@ export default function RegisterScreen({
           />
 
           {error ? <HelperText type="error">{error}</HelperText> : null}
+          {infoMessage ? <HelperText type="info">{infoMessage}</HelperText> : null}
 
           <TouchableOpacity
             style={[styles.primaryButton, isBusy && styles.buttonDisabled]}
@@ -276,21 +291,27 @@ export default function RegisterScreen({
             )}
           </TouchableOpacity>
 
-          <View style={styles.dividerRow}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>{t('auth.or')}</Text>
-            <View style={styles.dividerLine} />
-          </View>
+          {hasSecondaryAuth ? (
+            <>
+              <View style={styles.dividerRow}>
+                <View style={styles.dividerLine} />
+                <Text style={styles.dividerText}>{t('auth.or')}</Text>
+                <View style={styles.dividerLine} />
+              </View>
 
-          <SocialAuthChips
-            onGoogleLogin={onGoogleLogin}
-            onAppleLogin={onAppleLogin}
-            onBiometricLogin={onBiometricLogin}
-            showBiometric
-            biometricLoading={biometricLoading}
-            biometricIcon={biometricIcon}
-            disabled={isBusy}
-          />
+              <SocialAuthChips
+                onGoogleLogin={onGoogleLogin}
+                onAppleLogin={onAppleLogin}
+                onBiometricLogin={onBiometricLogin}
+                googleAvailable={googleLoginAvailable}
+                appleAvailable={appleLoginAvailable}
+                showBiometric={false}
+                biometricLoading={biometricLoading}
+                biometricIcon={biometricIcon}
+                disabled={isBusy}
+              />
+            </>
+          ) : null}
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>{t('auth.hasAccountQuestion')} </Text>
@@ -314,10 +335,17 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       flex: 1,
       backgroundColor: colors.background,
     },
+    topBar: {
+      paddingHorizontal: 8,
+      paddingTop: 4,
+    },
+    backButton: {
+      margin: 0,
+    },
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: 24,
-      paddingTop: 40,
+      paddingTop: 8,
       paddingBottom: 32,
     },
     primaryButton: {

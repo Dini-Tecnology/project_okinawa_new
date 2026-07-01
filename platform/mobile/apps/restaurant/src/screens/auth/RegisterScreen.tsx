@@ -8,7 +8,7 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { Text, HelperText } from 'react-native-paper';
+import { Text, HelperText, IconButton } from 'react-native-paper';
 import { authService } from '@/shared/services/auth';
 import { useBiometricAuth } from '@/shared/hooks/useBiometricAuth';
 import { useI18n } from '@/shared/hooks/useI18n';
@@ -22,6 +22,7 @@ import { AuthTextField } from '../../components/auth/AuthTextField';
 import { SocialAuthChips } from '../../components/auth/SocialAuthChips';
 import { AUTH_BRAND } from '../../components/auth/authScreenTheme';
 import { AuthConsentCheckbox } from '../../components/auth/AuthConsentCheckbox';
+import { showErrorToast, showSuccessToast } from '@/shared/utils/error-handler';
 
 interface RegisterScreenProps {
   navigation: any;
@@ -99,6 +100,7 @@ export default function RegisterScreen({
     setError('');
     setInfoMessage('');
     setShowConsentError(false);
+    setShowAgeError(false);
 
     try {
       if (!validateFields()) return;
@@ -117,13 +119,25 @@ export default function RegisterScreen({
 
       const result = await authService.register(email, password, fullName);
       if (result?.needsEmailConfirmation) {
-        setInfoMessage(t('auth.confirmEmailSent') || 'Enviamos um e-mail de confirmação para ativar sua conta.');
+        const message = t('auth.confirmEmailSent') || 'Enviamos um e-mail de confirmação para ativar sua conta.';
+        setInfoMessage(message);
+        showSuccessToast(message);
         Haptic.successNotification();
         return;
       }
+
+      const message = t('auth.registerSuccess') || 'Conta criada com sucesso';
+      setInfoMessage(message);
+      showSuccessToast(message);
       Haptic.successNotification();
     } catch (err: any) {
-      setError(err.response?.data?.message || t('auth.registerFailed'));
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        t('auth.registerFailed') ||
+        'Falha no cadastro';
+      setError(message);
+      showErrorToast(err, message);
       Haptic.errorNotification();
     } finally {
       setLoading(false);
@@ -138,6 +152,16 @@ export default function RegisterScreen({
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        <View style={styles.topBar}>
+          <IconButton
+            icon="arrow-left"
+            onPress={() => navigation.goBack()}
+            accessibilityLabel={t('common.back')}
+            accessibilityRole="button"
+            style={styles.backButton}
+          />
+        </View>
+
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -156,6 +180,7 @@ export default function RegisterScreen({
               setFullName(text);
               clearFieldError('fullName');
             }}
+            placeholder={t('auth.fullNamePlaceholder')}
             error={fieldErrors.fullName}
             accessibilityLabel="Full name"
             accessibilityHint="Enter your full name"
@@ -305,10 +330,17 @@ const createStyles = (colors: ReturnType<typeof useColors>) =>
       flex: 1,
       backgroundColor: colors.background,
     },
+    topBar: {
+      paddingHorizontal: 8,
+      paddingTop: 4,
+    },
+    backButton: {
+      margin: 0,
+    },
     scrollContent: {
       flexGrow: 1,
       paddingHorizontal: 24,
-      paddingTop: 40,
+      paddingTop: 8,
       paddingBottom: 32,
     },
     primaryButton: {

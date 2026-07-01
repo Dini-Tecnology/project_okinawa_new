@@ -11,6 +11,7 @@ import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import * as Crypto from 'expo-crypto';
 import { secureStorage } from './secure-storage';
+import { isAppleAuthProviderConfigured, isGoogleAuthProviderConfigured } from '../config/auth-providers';
 import logger from '../utils/logger';
 
 // Complete auth session for web-based OAuth
@@ -83,6 +84,7 @@ class SocialAuthService {
    * Check if Apple Sign In is available on this device
    */
   async isAppleAuthAvailable(): Promise<boolean> {
+    if (!isAppleAuthProviderConfigured()) return false;
     if (Platform.OS !== 'ios') return false;
     return AppleAuthentication.isAvailableAsync();
   }
@@ -154,7 +156,7 @@ class SocialAuthService {
     promptAsync: () => Promise<Google.AuthSessionResult>
   ): Promise<SocialAuthResult> {
     try {
-      if (!request) {
+      if (!isGoogleAuthProviderConfigured() || !request) {
         return {
           success: false,
           provider: 'google',
